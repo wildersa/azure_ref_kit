@@ -1,0 +1,17 @@
+name: appinsights-observability
+type: observability
+category: operations
+status: scaffold
+purpose: Technical telemetry for Azure AI pipeline services.
+inputs:
+  - logs
+  - traces
+  - exceptions
+  - dependency_calls
+outputs:
+  - dashboards
+  - alerts
+  - correlated_diagnostics
+azure_resources:
+  - Application Insights
+  - Azure Monitor

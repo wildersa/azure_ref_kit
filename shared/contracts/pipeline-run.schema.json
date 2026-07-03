@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/shared/contracts/pipeline-run.schema.json",
+  "title": "PipelineRun",
+  "type": "object",
+  "required": ["id", "customer_id", "pipeline_type", "status", "created_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "customer_id": { "type": "string" },
+    "pipeline_type": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "waiting_input", "failed", "completed", "cancelled"]
+    },
+    "current_step": { "type": ["string", "null"] },
+    "progress_percent": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "business_summary": { "type": ["string", "null"] },
+    "friendly_error": { "type": ["string", "null"] },
+    "correlation_id": { "type": ["string", "null"] },
+    "estimated_cost": { "type": ["number", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "started_at": { "type": ["string", "null"], "format": "date-time" },
+    "finished_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

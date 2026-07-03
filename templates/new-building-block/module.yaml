@@ -1,0 +1,12 @@
+name: replace-me
+type: replace-me
+category: replace-me
+status: scaffold
+purpose: Replace with one concise sentence.
+inputs: []
+outputs: []
+azure_resources: []
+contracts:
+  reads: []
+  writes: []
+  emits: []

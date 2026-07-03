@@ -1,0 +1,21 @@
+name: document-ai-portal
+status: scaffold
+purpose: Customer-facing document AI pipeline monitoring solution.
+entrypoints:
+  manual_start: portal-api-functions
+  upload_start: blob-trigger-start-pipeline
+building_blocks:
+  - building-blocks/portals/static-status-portal
+  - building-blocks/functions/portal-api-functions
+  - building-blocks/functions/blob-trigger-start-pipeline
+  - building-blocks/functions/ocr-document-intelligence
+  - building-blocks/pipelines/durable-basic-pipeline
+  - building-blocks/agents/pipeline-assistant-foundry
+  - building-blocks/storage/blob-artifact-store
+  - building-blocks/observability/appinsights-observability
+  - building-blocks/security/entra-external-id-auth
+contracts:
+  - shared/contracts/pipeline-run.schema.json
+  - shared/contracts/pipeline-step.schema.json
+  - shared/contracts/artifact.schema.json
+  - shared/contracts/cost-ledger.schema.json

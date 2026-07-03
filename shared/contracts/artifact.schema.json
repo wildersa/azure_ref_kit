@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/shared/contracts/artifact.schema.json",
+  "title": "Artifact",
+  "type": "object",
+  "required": ["id", "run_id", "kind", "safe_name", "storage_ref"],
+  "properties": {
+    "id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "step_name": { "type": ["string", "null"] },
+    "kind": { "type": "string" },
+    "safe_name": { "type": "string" },
+    "storage_ref": { "type": "string" },
+    "content_type": { "type": ["string", "null"] },
+    "size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+    "is_customer_visible": { "type": "boolean", "default": false },
+    "created_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

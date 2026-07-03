@@ -1,0 +1,18 @@
+name: blob-trigger-start-pipeline
+type: azure-function-trigger
+category: pipeline-trigger
+status: scaffold
+purpose: Start a pipeline execution from a Blob Storage upload.
+inputs:
+  - blob_created_event
+  - customer_metadata
+outputs:
+  - pipeline_start_request
+azure_resources:
+  - Azure Functions
+  - Blob Storage
+  - Event Grid
+  - Application Insights
+contracts:
+  emits:
+    - shared/contracts/pipeline-run.schema.json

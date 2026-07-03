@@ -1,0 +1,15 @@
+name: blob-artifact-store
+type: storage
+category: artifacts
+status: scaffold
+purpose: Store input, intermediate, and output artifacts for pipeline executions.
+inputs:
+  - artifact_content
+  - artifact_metadata
+outputs:
+  - artifact_reference
+azure_resources:
+  - Blob Storage
+contracts:
+  emits:
+    - shared/contracts/artifact.schema.json
