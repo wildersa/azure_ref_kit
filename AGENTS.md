@@ -20,6 +20,35 @@ Do not treat this as a single application. Treat it as a catalog of independent 
 - If a Microsoft Docs MCP or equivalent documentation source is available in the execution environment, consult it before adding Azure-specific claims or patterns.
 - If no documentation MCP is available, use official Microsoft documentation as the source of truth.
 
+## Minimalism and complexity guardrails
+
+Use Ponytail-style minimalism as a design rule: solve the problem with the smallest safe change that preserves clarity, contracts, and future composition.
+
+Before adding code, modules, abstractions, dependencies, agents, or tools, verify:
+
+- existing repository code cannot be reused cleanly;
+- native Azure, browser, framework, or language behavior is not enough;
+- the new abstraction has at least one clear current use, not only a hypothetical future use;
+- the diff is smaller than the problem it solves;
+- added branches, modes, flags, and fallback paths are necessary;
+- a simpler module boundary would not solve the same need.
+
+When implementing code in this repository:
+
+- keep functions, components, and pipeline steps small;
+- split complex branching into named steps/helpers;
+- avoid generic frameworks inside a reference module unless the solution already proves the need;
+- do not add broad configuration surfaces before at least one concrete solution uses them;
+- if complexity increases, explain why in the module README, solution README, or PR body.
+
+Future code-bearing modules should add objective complexity checks where applicable:
+
+- Python: Ruff McCabe complexity (`C901`) with a tolerant initial limit;
+- TypeScript/React: ESLint complexity or cognitive-complexity rule;
+- pipelines/agents: step count, tool count, and branching should stay explicit and bounded.
+
+Do not block useful reference delivery only because old/example code is imperfect. Prefer a baseline/ratchet approach: report first, then block only new or worsened complexity.
+
 ## Repository boundaries
 
 - `building-blocks/` contains reusable modules.
