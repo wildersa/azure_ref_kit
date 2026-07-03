@@ -151,6 +151,8 @@ Before finishing a PR:
 
 ## Documentation standards
 
+- Follow the [README Standard](docs/readme-standard.md) for all building blocks and solutions.
+- Use the [Roadmap](docs/roadmap.md) to prioritize new contributions.
 - Keep documentation short and directly useful.
 - Prefer diagrams, commands, and concrete examples over long conceptual explanations.
 - State assumptions, prerequisites, limits, and trade-offs explicitly.

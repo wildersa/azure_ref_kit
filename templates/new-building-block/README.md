@@ -2,28 +2,44 @@
 
 ## Purpose
 
-Describe the reusable Azure module.
+Describe the reusable Azure module in 1-2 sentences.
 
-## Inputs
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+  Input[Input] --> Module[This module]
+  Module --> Output[Output]
+  Module --> Azure[Azure service dependency]
+```
+
+## Inputs/Outputs
+
+- **Inputs**: TBD
+- **Outputs**: TBD
+
+## Azure Resources
 
 - TBD
 
-## Outputs
+## Local Run
 
-- TBD
-
-## Azure resources
-
-- TBD
-
-## Local run
-
-TBD
+```bash
+# TBD: Provide exact commands
+```
 
 ## Deploy
 
-TBD
+```bash
+# TBD: Provide deployment commands (e.g., azd up, terraform apply)
+```
 
-## Tests/proof
+## Tests/Validation
 
-TBD
+```bash
+# TBD: Provide validation commands
+```
+
+## Known Limits
+
+- TBD

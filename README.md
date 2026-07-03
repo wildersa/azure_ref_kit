@@ -45,6 +45,8 @@ azure_ref_kit/
 │  └─ contracts/
 ├─ templates/
 ├─ docs/
+│  ├─ readme-standard.md
+│  └─ roadmap.md
 └─ infra/
 ```
 
@@ -109,6 +111,7 @@ It should combine:
 
 ## Design principles
 
+- Follow the [README Standard](docs/readme-standard.md) and [Roadmap](docs/roadmap.md).
 - Keep modules small and composable.
 - Prefer explicit contracts over hidden conventions.
 - Make each module readable by humans and LLM agents.
