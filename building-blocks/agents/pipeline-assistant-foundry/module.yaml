@@ -1,0 +1,27 @@
+name: pipeline-assistant-foundry
+type: azure-ai-foundry-agent
+category: agent
+status: scaffold
+purpose: Customer-safe assistant for explaining pipeline execution status and outcomes.
+inputs:
+  - customer_question
+  - run_id
+outputs:
+  - grounded_answer
+  - cited_status_sources
+allowed_tools:
+  - get_pipeline_status
+  - get_pipeline_steps
+  - get_artifacts
+  - explain_error
+  - estimate_cost
+  - request_human_review
+azure_resources:
+  - Azure AI Foundry
+  - Application Insights
+contracts:
+  reads:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+    - shared/contracts/cost-ledger.schema.json

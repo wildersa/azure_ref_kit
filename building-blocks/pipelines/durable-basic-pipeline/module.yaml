@@ -1,0 +1,21 @@
+name: durable-basic-pipeline
+type: durable-functions-pipeline
+category: orchestration
+status: scaffold
+purpose: Base Durable Functions pattern for AI pipeline execution tracking.
+inputs:
+  - pipeline_start_request
+outputs:
+  - pipeline_run
+  - pipeline_steps
+  - artifacts
+  - cost_ledger_entries
+azure_resources:
+  - Azure Durable Functions
+  - Storage Account
+  - Application Insights
+contracts:
+  writes:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/cost-ledger.schema.json

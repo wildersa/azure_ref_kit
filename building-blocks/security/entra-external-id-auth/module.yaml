@@ -1,0 +1,14 @@
+name: entra-external-id-auth
+type: security
+category: identity
+status: scaffold
+purpose: Customer identity and authorization pattern for external pipeline portals.
+inputs:
+  - user_identity
+  - customer_mapping
+outputs:
+  - authenticated_session
+  - authorized_customer_context
+azure_resources:
+  - Microsoft Entra External ID
+  - Optional API Management

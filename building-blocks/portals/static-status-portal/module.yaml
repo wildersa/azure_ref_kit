@@ -1,0 +1,24 @@
+name: static-status-portal
+type: portal
+category: customer-experience
+status: scaffold
+runtime:
+  framework: react-or-next-static
+  host: azure-static-web-apps
+purpose: Customer-facing UI for monitoring AI pipeline executions.
+inputs:
+  - pipeline_runs_api
+  - pipeline_run_detail_api
+  - artifacts_api
+  - optional_chat_api
+outputs:
+  - customer_status_view
+  - customer_action_requests
+azure_resources:
+  - Azure Static Web Apps
+  - Optional Entra External ID
+contracts:
+  reads:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json

@@ -1,0 +1,22 @@
+name: portal-api-functions
+type: azure-functions-api
+category: api
+status: scaffold
+purpose: Backend API for customer-facing pipeline status and actions.
+inputs:
+  - authenticated_customer_request
+outputs:
+  - pipeline_run_summary
+  - pipeline_run_detail
+  - artifact_links
+  - friendly_errors
+azure_resources:
+  - Azure Functions
+  - Application Insights
+  - Optional API Management
+contracts:
+  reads:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+    - shared/contracts/cost-ledger.schema.json

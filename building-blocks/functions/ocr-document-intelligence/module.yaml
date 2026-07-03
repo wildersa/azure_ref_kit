@@ -1,0 +1,24 @@
+name: ocr-document-intelligence
+type: azure-function-worker
+category: document-ai
+status: scaffold
+purpose: Extract text and structured fields from documents using Azure AI Document Intelligence.
+inputs:
+  - run_id
+  - artifact_id
+  - document_type
+outputs:
+  - extracted_text
+  - fields
+  - confidence
+  - artifacts
+azure_resources:
+  - Azure Functions
+  - Azure AI Document Intelligence
+  - Blob Storage
+  - Application Insights
+contracts:
+  reads:
+    - shared/contracts/artifact.schema.json
+  emits:
+    - shared/contracts/pipeline-step.schema.json
