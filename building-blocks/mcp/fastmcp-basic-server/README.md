@@ -45,7 +45,7 @@ For full protocol validation, use the `mcp inspector` or a compatible MCP client
 No environment variables are required for this basic reference.
 
 ## Known limits
-- **Local-first**: This block is designed for local execution and does not include Azure hosting (e.g., Azure Functions) in this version.
+- **Local-first**: This block is designed for local execution. For Azure hosting patterns, see [MCP on Azure Functions Reference Pattern](../azure-functions-mcp-endpoint/README.md).
 - **Single Tool**: Only one read-only tool is implemented to maintain minimalism.
 - **Transport**: Defaulted to `stdio`.
 
