@@ -3,17 +3,25 @@ type: portal
 category: customer-experience
 status: scaffold
 runtime:
-  framework: react-or-next-static
+  framework: react
   host: azure-static-web-apps
 purpose: Customer-facing UI for monitoring AI pipeline executions.
 inputs:
-  - pipeline_runs_api
-  - pipeline_run_detail_api
-  - artifacts_api
-  - optional_chat_api
+  - name: pipeline_runs_api
+    description: API endpoint for listing recent runs.
+    contract: shared/contracts/pipeline-run.schema.json
+  - name: pipeline_run_detail_api
+    description: API endpoint for a specific run and its steps.
+    contracts:
+      - shared/contracts/pipeline-run.schema.json
+      - shared/contracts/pipeline-step.schema.json
+  - name: artifacts_api
+    description: API endpoint for customer-visible artifacts.
+    contract: shared/contracts/artifact.schema.json
 outputs:
-  - customer_status_view
-  - customer_action_requests
+  - name: customer_status_view
+    description: A secure, curated view of pipeline progress and results.
+    type: portal-view
 azure_resources:
   - Azure Static Web Apps
   - Optional Entra External ID
@@ -22,3 +30,6 @@ contracts:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
     - shared/contracts/artifact.schema.json
+security:
+  boundary: building-blocks/security/customer-safe-status-boundary/README.md
+  enforcement: "Explicitly forbids raw logs, prompts, secrets, and internal resource IDs."
