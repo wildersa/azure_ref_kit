@@ -1,0 +1,15 @@
+name: fastmcp-basic-server
+type: building-block
+category: mcp
+status: reference
+purpose: Minimal local MCP server reference using FastMCP.
+inputs: []
+outputs: []
+azure_resources: []
+contracts:
+  reads: []
+  writes: []
+  emits:
+    - type: mcp-tool
+      name: get_system_status
+      description: Returns the current status of the basic MCP server.
