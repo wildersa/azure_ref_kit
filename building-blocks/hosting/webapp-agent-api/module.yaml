@@ -1,0 +1,14 @@
+name: webapp-agent-api
+type: building-block
+category: hosting
+status: reference
+purpose: Reference pattern for hosting an agent-facing API on Azure App Service/Web App using native Python runtime.
+inputs: []
+outputs: []
+azure_resources:
+  - azurerm_linux_web_app
+  - azurerm_service_plan
+contracts:
+  reads: []
+  writes: []
+  emits: []
