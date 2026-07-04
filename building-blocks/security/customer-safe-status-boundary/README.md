@@ -67,11 +67,14 @@ This object follows the `shared/contracts/pipeline-run.schema.json` and is safe 
 ```json
 {
   "id": "run-67890",
+  "customer_id": "cust-123",
+  "pipeline_type": "document-processing",
   "status": "failed",
   "business_summary": "Document processing failed during the data extraction phase.",
   "friendly_error": "The provided document is blurry or unreadable. Please upload a higher-quality scan.",
   "progress_percent": 45,
   "estimated_cost": 0.08,
+  "created_at": "2026-07-03T09:55:00Z",
   "started_at": "2026-07-03T10:00:00Z"
 }
 ```
