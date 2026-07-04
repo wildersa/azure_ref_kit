@@ -92,6 +92,8 @@ npm run build
 
 Use only commands that exist for the package/module. If no package exists yet, do not invent a repo-wide JavaScript toolchain.
 
+Existing issues that already require reading `AGENTS.md` inherit the default validation expectations there. When such an issue becomes active and can add code, add an issue comment or edit the issue to mention focused Ruff/pytest or package-local validation explicitly.
+
 ## Required issue template
 
 ```md
