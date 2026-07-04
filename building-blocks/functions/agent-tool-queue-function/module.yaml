@@ -1,0 +1,30 @@
+name: agent-tool-queue-function
+type: building-block
+category: functions
+status: stable
+purpose: Async queue-based Azure Function reference for longer-running agent tool execution.
+inputs: []
+outputs:
+  - name: queue_tool_result
+    type: queue-function-tool
+    description: Result of the asynchronous tool execution returned via an output queue.
+azure_resources:
+  - azurerm_linux_function_app
+  - azurerm_service_plan
+  - azurerm_storage_account
+  - azurerm_storage_queue
+contracts:
+  reads:
+    - type: storage-queue-message
+      description: Input message containing function arguments and CorrelationId.
+  writes:
+    - type: storage-queue-message
+      description: Output message containing the execution result and the matching CorrelationId.
+  emits:
+    - type: queue-function-tool
+      schema:
+        type: object
+        properties:
+          Value: {type: string}
+          Error: {type: string}
+          CorrelationId: {type: string}
