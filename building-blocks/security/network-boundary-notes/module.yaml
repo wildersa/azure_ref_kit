@@ -1,0 +1,12 @@
+name: network-boundary-notes
+type: documentation
+category: security
+status: active
+purpose: Practical network boundary notes for customer-facing APIs, agents, tools, and Azure services.
+inputs: []
+outputs: []
+azure_resources: []
+contracts:
+  reads: []
+  writes: []
+  emits: []
