@@ -1,21 +1,26 @@
 name: durable-basic-pipeline
-type: durable-functions-pipeline
-category: orchestration
-status: scaffold
-purpose: Base Durable Functions pattern for AI pipeline execution tracking.
+type: building-block
+category: pipelines
+status: stable
+purpose: Minimal Durable Functions orchestration pattern for customer-visible pipeline status tracking.
 inputs:
-  - pipeline_start_request
+  - name: pipeline_start_request
+    type: object
+    description: Initial request to start the pipeline.
 outputs:
-  - pipeline_run
-  - pipeline_steps
-  - artifacts
-  - cost_ledger_entries
+  - name: pipeline_run_status
+    type: object
+    description: Customer-safe status of the overall pipeline run.
+  - name: pipeline_step_status
+    type: object
+    description: Customer-safe status of individual pipeline steps.
 azure_resources:
-  - Azure Durable Functions
-  - Storage Account
+  - Azure Functions
+  - Azure Storage
   - Application Insights
 contracts:
+  reads: []
   writes:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
-    - shared/contracts/cost-ledger.schema.json
+  emits: []
