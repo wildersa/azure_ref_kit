@@ -1,0 +1,14 @@
+name: managed-identity-rbac
+type: security
+category: identity
+status: active
+purpose: Reference pattern for least-privilege identity and RBAC in Azure.
+inputs: []
+outputs: []
+azure_resources:
+  - Microsoft Entra Managed Identity
+  - Azure RBAC
+contracts:
+  reads: []
+  writes: []
+  emits: []
