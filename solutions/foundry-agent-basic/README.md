@@ -91,7 +91,7 @@ Choosing Prompt Agent minimizes operational overhead and focuses on the core Age
 ## Known Limits and Trade-offs
 
 - **Managed Only**: Prompt agents cannot execute arbitrary code outside of the Code Interpreter tool.
-- **Regional Availability**: Foundry Agent Service is currently available in specific regions (e.g., East US 2, Sweden Central).
+- **Regional Availability**: Foundry Agent Service is currently available in specific regions. See the [official regional support page](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/limits-quotas-regions) for the current list.
 - **No Custom Tools**: This reference does not include custom Functions or MCP servers.
 
 ## Follow-ups
@@ -105,4 +105,5 @@ Choosing Prompt Agent minimizes operational overhead and focuses on the core Age
 
 - [Microsoft Learn: Foundry Agent Service Overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
 - [Microsoft Learn: Foundry Agent Tool Catalog](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
+- [Microsoft Learn: Quotas, limits, and regional support](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/limits-quotas-regions)
 - [Azure Samples: Get Started with AI Agents](https://github.com/Azure-Samples/get-started-with-ai-agents)
