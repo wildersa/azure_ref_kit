@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This building block demonstrates a minimal Durable Functions orchestration pattern for tracking customer-visible pipeline status. It provides a structured way to manage long-running AI workflows, ensure reliability through checkpoints and retries, and expose business-level progress without leaking technical internals.
+This building block demonstrates a minimal Durable Functions orchestration pattern for tracking customer-visible pipeline status. It provides a structured way to manage long-running AI workflows, expose business-level progress, and keep technical internals out of customer-facing state.
 
 ## Pattern logic
 
@@ -48,10 +48,10 @@ To maintain security and clarity, the following rules apply to status updates:
 - **Storage**: Azure Storage Account (required for Durable Functions state).
 - **Observability**: Application Insights.
 
-## Retry and failure behavior
+## Failure behavior
 
-- **Retries**: Orchestrators use `call_activity_with_retry` for transient failures.
-- **Failures**: If a step fails after retries, the orchestrator updates the `PipelineRun` status to `failed` with a `friendly_error`.
+- **Failures**: If a step fails, the orchestrator updates the `PipelineRun` status to `failed` with a customer-safe `friendly_error`.
+- **Retry follow-up**: Add explicit Durable Functions retry options when the reference needs to demonstrate retry policy behavior instead of only orchestration shape.
 
 ## Known limits
 
