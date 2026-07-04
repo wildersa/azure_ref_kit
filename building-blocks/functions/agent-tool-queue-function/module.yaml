@@ -26,4 +26,5 @@ contracts:
         type: object
         properties:
           Value: {type: string}
+          Error: {type: string}
           CorrelationId: {type: string}

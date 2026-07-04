@@ -24,15 +24,16 @@ def queue_trigger(msg: func.QueueMessage, outputQueue: func.Out[str]):
         # Parse the incoming message from the agent
         # Expected schema: {"function_args": {...}, "CorrelationId": "..."}
         message_payload = json.loads(msg.get_body().decode("utf-8"))
-        logging.info("Received tool call: %s", json.dumps(message_payload))
-
-        # Extract arguments and CorrelationId
-        function_args = message_payload.get("function_args", {})
         correlation_id = message_payload.get("CorrelationId")
 
         if not correlation_id:
-            logging.error("Message missing CorrelationId.")
+            logging.error("Received tool call missing CorrelationId.")
             return
+
+        logging.info("Processing tool call with CorrelationId: %s", correlation_id)
+
+        # Extract arguments
+        function_args = message_payload.get("function_args", {})
 
         # --- Tool Logic Starts ---
         # Replace this with actual long-running business logic.
@@ -48,10 +49,21 @@ def queue_trigger(msg: func.QueueMessage, outputQueue: func.Out[str]):
             "CorrelationId": correlation_id,
         }
 
-        logging.info("Sending result: %s", json.dumps(response_message))
+        logging.info("Sending result for CorrelationId: %s", correlation_id)
         outputQueue.set(json.dumps(response_message))
 
     except Exception as e:
         # Avoid returning raw stack traces to the agent for security reasons.
         logging.error("Error processing tool call: %s", str(e))
-        # Optional: Return a safe error envelope if the agent expects it.
+
+        # Return a safe error envelope to the agent
+        try:
+            error_message = {
+                "Error": "An error occurred while processing the tool call.",
+                "CorrelationId": correlation_id
+                if "correlation_id" in locals()
+                else "unknown",
+            }
+            outputQueue.set(json.dumps(error_message))
+        except Exception:
+            logging.error("Failed to send error response.")

@@ -36,6 +36,7 @@ The message placed in the input queue must follow this structure:
 The function must return a message to the output queue with this structure:
 
 - `Value` (string/object): The result of the tool execution.
+- `Error` (string, optional): A safe error message if the tool execution fails.
 - `CorrelationId` (string): The matching identifier from the input message.
 
 ## Security and Boundaries
