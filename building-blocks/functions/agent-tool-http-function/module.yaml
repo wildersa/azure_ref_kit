@@ -1,0 +1,26 @@
+name: agent-tool-http-function
+type: building-block
+category: functions
+status: stable
+purpose: Minimal HTTP Azure Function reference for a safe, read-only agent tool boundary.
+inputs: []
+outputs:
+  - name: system_status
+    type: http-function-tool
+    description: Returns the current operational status of the system.
+azure_resources:
+  - azurerm_linux_function_app
+  - azurerm_service_plan
+contracts:
+  reads: []
+  writes: []
+  emits:
+    - type: http-function-tool
+      schema:
+        type: object
+        properties:
+          business_status: {type: string}
+          service_health: {type: string}
+          active_regions: {type: array, items: {type: string}}
+          last_updated: {type: string, format: date-time}
+          environment: {type: string}
