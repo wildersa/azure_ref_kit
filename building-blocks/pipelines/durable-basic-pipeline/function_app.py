@@ -3,10 +3,10 @@ import azure.durable_functions as df
 import logging
 from datetime import datetime, timezone
 
-myApp = df.Blueprint(http_auth_level=func.AuthLevel.FUNCTION)
+app = df.DFApp(http_auth_level=func.AuthLevel.FUNCTION)
 
-@myApp.route(route="orchestrators/{functionName}")
-@myApp.durable_client_input(client_name="client")
+@app.route(route="orchestrators/{functionName}")
+@app.durable_client_input(client_name="client")
 async def http_start(req: func.HttpRequest, client: df.DurableOrchestrationClient):
     function_name = req.route_params.get("functionName")
     instance_id = await client.start_new(function_name)
@@ -79,10 +79,10 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         })
         raise
 
-# Register the orchestrator with the Blueprint
-myApp.orchestration_trigger(context_name="context")(pipeline_orchestrator)
+# Register the orchestrator with the App
+app.orchestration_trigger(context_name="context")(pipeline_orchestrator)
 
-@myApp.activity_trigger(input_name="statusData")
+@app.activity_trigger(input_name="statusData")
 def update_pipeline_run_status(statusData: dict):
     """
     Activity to update the overall pipeline run status.
@@ -92,7 +92,7 @@ def update_pipeline_run_status(statusData: dict):
     # Contract validation would happen here
     return True
 
-@myApp.activity_trigger(input_name="stepData")
+@app.activity_trigger(input_name="stepData")
 def pipeline_step_activity(stepData: dict):
     """
     Demonstrates a pipeline step activity that updates its own status.

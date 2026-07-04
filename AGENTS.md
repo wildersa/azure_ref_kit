@@ -82,6 +82,7 @@ Implementation expectations:
 - Prefer official Microsoft Learn, Azure docs, SDK docs, and official Microsoft samples.
 - Read `docs/microsoft-reference-map.md` when the task touches Foundry, agents, tools, Functions, DevOps, CI/CD, observability, or deployment.
 - Record consulted Microsoft Learn URLs in the PR body when they materially influenced the implementation.
+- Verify that all libraries, frameworks, and patterns used follow current Microsoft best practices and architectural recommendations.
 - If official docs are missing, unclear, or contradictory, state the uncertainty in the PR body and choose the safest minimal implementation.
 - Do not introduce Azure-specific defaults, limits, regions, SKUs, permissions, networking behavior, identity behavior, preview assumptions, or security assumptions without checking current documentation.
 

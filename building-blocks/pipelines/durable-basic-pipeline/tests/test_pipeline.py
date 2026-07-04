@@ -1,6 +1,11 @@
 import pytest
+import sys
+import os
 from unittest.mock import MagicMock
 import azure.durable_functions as df
+
+# Add parent directory to sys.path so we can import function_app
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from function_app import pipeline_orchestrator, update_pipeline_run_status, pipeline_step_activity
 
 def test_pipeline_orchestrator():
