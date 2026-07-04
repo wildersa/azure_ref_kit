@@ -1,0 +1,11 @@
+name: customer-safe-status-boundary
+type: security
+category: policy
+status: scaffold
+purpose: Defines the boundary between internal technical telemetry and customer-safe business status for agents, pipelines, and portals.
+contracts:
+  applies_to:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+    - shared/contracts/cost-ledger.schema.json
