@@ -160,6 +160,8 @@ pytest <focused-test-path-or-module>
 
 If there are no tests yet for a new Python module, add the smallest meaningful test. If the module is intentionally example-only and cannot be tested without external Azure resources, provide at least one local import, schema, or dry-run validation command and document the limitation.
 
+Existing issues that already require reading `AGENTS.md` inherit these validation expectations, even if the issue body only says "focused test", "import", or "run" command.
+
 Before finishing a PR:
 
 - run the relevant formatter, linter, test, or build commands for the files changed;
