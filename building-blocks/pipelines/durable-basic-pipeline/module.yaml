@@ -15,14 +15,12 @@ outputs:
     type: object
     description: Customer-safe status of individual pipeline steps.
 azure_resources:
-  - azurerm_linux_function_app
-  - azurerm_service_plan
-  - azurerm_storage_account
+  - Azure Functions
+  - Azure Storage
+  - Application Insights
 contracts:
   reads: []
   writes:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
-  emits:
-    - type: mcp-tool
-      description: (Future) Potential to expose status via MCP tool.
+  emits: []
