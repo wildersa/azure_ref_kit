@@ -1,0 +1,14 @@
+name: container-agent-api
+type: building-block
+category: hosting
+status: reference
+purpose: Reference pattern for packaging and hosting an agent-facing API as a container.
+inputs: []
+outputs: []
+azure_resources:
+  - azurerm_container_app
+  - azurerm_linux_web_app
+contracts:
+  reads: []
+  writes: []
+  emits: []
