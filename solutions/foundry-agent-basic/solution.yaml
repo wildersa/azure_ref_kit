@@ -1,0 +1,7 @@
+name: foundry-agent-basic
+status: active
+purpose: Minimal reference solution for an Azure AI Foundry Prompt Agent.
+entrypoints:
+  sdk_invocation: AIProjectClient
+building_blocks: []
+contracts: []
