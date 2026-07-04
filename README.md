@@ -107,6 +107,20 @@ It should combine:
 - Application Insights observability;
 - estimated cost ledger.
 
+## CI/CD Pipeline & Runner Configuration
+
+The repository includes a GitHub Actions pipeline under `.github/workflows/ci.yml` that automatically runs test suites for only the modules that have changed (using path filtering).
+
+It is designed to run dynamically on either GitHub-hosted runners or on-premises self-hosted runners:
+
+1. **Automatic Fallback:**
+   * If an on-premises runner matching `["self-hosted","local-ci","docker","shared","azure_ref_kit"]` is online, the CI runs on it.
+   * If the local runner is offline, or if the repository variables/secrets are not yet configured, the CI **automatically falls back** to running on GitHub-hosted `ubuntu-latest`.
+
+2. **Required GitHub Setup (For On-Premises Runner):**
+   * **Secret:** `RUNNER_CHECK_TOKEN` — A GitHub Personal Access Token (PAT) with `actions:read` access, allowing the runner selection script to query the runner API. If not present, the pipeline falls back to GitHub-hosted runners.
+   * **Variable (Optional):** `vars.CI_ON_PREM_ONLY` — Set to `true` to force the workflow to run only on your self-hosted runner (disabling hosted fallback).
+
 ## Design principles
 
 - Keep modules small and composable.
