@@ -1,0 +1,16 @@
+name: azure-functions-mcp-endpoint
+type: reference-pattern
+category: mcp
+status: stable
+purpose: Reference pattern for hosting Model Context Protocol (MCP) servers on Azure Functions.
+inputs: []
+outputs: []
+azure_resources:
+  - Azure Functions (Flex Consumption)
+  - Azure AI Foundry Project
+contracts:
+  reads: []
+  writes: []
+  emits:
+    - type: mcp-tool
+      description: "Standardized tools exposed via the MCP protocol."
