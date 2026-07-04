@@ -6,7 +6,7 @@ purpose: Minimal HTTP Azure Function reference for a safe, read-only agent tool 
 inputs: []
 outputs:
   - name: system_status
-    type: mcp-tool
+    type: http-function-tool
     description: Returns the current operational status of the system.
 azure_resources:
   - azurerm_linux_function_app
@@ -15,7 +15,7 @@ contracts:
   reads: []
   writes: []
   emits:
-    - type: mcp-tool
+    - type: http-function-tool
       schema:
         type: object
         properties:

@@ -67,7 +67,7 @@ Prerequisites:
 Run tests to verify the tool logic and boundary:
 
 ```bash
-PYTHONPATH=src python3 -m pytest tests
+python3 -m pytest tests
 ```
 
 ## Azure Deployment
