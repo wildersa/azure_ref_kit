@@ -1,0 +1,9 @@
+name: foundry-agent-with-tools
+status: active
+purpose: Reference solution for a Foundry agent using a controlled HTTP tool boundary.
+entrypoints:
+  sdk_invocation: AIProjectClient
+building_blocks:
+  - building-blocks/functions/agent-tool-http-function
+contracts:
+  - solutions/foundry-agent-with-tools/contracts/system-status.schema.json
