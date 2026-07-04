@@ -19,6 +19,7 @@ Use this repository to collect and evolve reusable Azure building blocks for:
 
 ```text
 building-blocks = independent reusable Azure modules
+local-runtimes  = local engines/simulators (e.g. OCR, VLM) mimicking Azure APIs for offline runs
 solutions       = complete examples composed from multiple modules
 shared          = common contracts, schemas, libraries, and prompts
 templates       = scaffolds for new modules, agents, pipelines, and solutions
@@ -40,6 +41,9 @@ azure_ref_kit/
 │  ├─ portals/
 │  ├─ security/
 │  └─ storage/
+├─ local-runtimes/
+│  ├─ paddleocr/
+│  └─ vlm/
 ├─ solutions/
 ├─ shared/
 │  └─ contracts/

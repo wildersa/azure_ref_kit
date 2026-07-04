@@ -1,0 +1,45 @@
+# System and OS noise
+.DS_Store
+Thumbs.db
+
+# Git / IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+poetry.lock
+poetry.toml
+
+# Project Janitor and archive folders
+.archive/
+.janitor/
+
+# Local runtime data
+local-runtimes/paddleocr/__pycache__/
+local-runtimes/paddleocr/models/
+local-runtimes/paddleocr/modelos/
+local-runtimes/paddleocr/.models/
+local-runtimes/paddleocr/uploads/
+local-runtimes/paddleocr/*.db
+local-runtimes/paddleocr/*.sqlite
+local-runtimes/paddleocr/*.sqlite3
+
+# Local VLM models
+local-runtimes/vlm/models/
+*.gguf
+*.safetensors
+*.bin

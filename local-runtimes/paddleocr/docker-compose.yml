@@ -1,0 +1,24 @@
+services:
+  paddleocr:
+    build: .
+    container_name: paddleocr-server
+    ports:
+      # Expõe o serviço na porta 10001
+      - "10001:8000"
+    volumes:
+      # Monta a pasta cache do PaddleOCR da máquina local para evitar que
+      # ele baixe os modelos de OCR toda vez que o contêiner reiniciar.
+      - ~/.paddleocr:/root/.paddleocr
+      - ~/.paddlex:/root/.paddlex
+    environment:
+      - OCR_LANG=pt
+      - OCR_USE_GPU=false # Modifique para true para usar aceleração de GPU
+    restart: unless-stopped
+    # Descomente o bloco abaixo para permitir que o contêiner use a placa de vídeo
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

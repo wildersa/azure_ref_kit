@@ -1,0 +1,26 @@
+services:
+  llama-server:
+    # Troque pela tag da sua imagem que você já tem localmente se ela se chamar diferente
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    container_name: llama-server-incentivo
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      # O adapter (run_pipeline.py) espera o serviço na porta 10000
+      - "10000:8080"
+    volumes:
+      # Crie uma pasta ./models aqui junto do docker-compose e coloque os arquivos GGUF dentro dela
+      - E:\ollamamodels:/models
+    # Se o GLM precisar de projetor de imagem separado, adicione: --mmproj /models/nome-projetor.gguf
+    command: >
+      -m /models/GLM-OCR-Q8_0.gguf
+      --host 0.0.0.0
+      --port 8080
+      -c 8192
+      -ngl 99
+      --mmproj /models/mmproj-GLM-OCR-Q8_0.gguf

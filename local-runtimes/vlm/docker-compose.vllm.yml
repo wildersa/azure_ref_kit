@@ -1,0 +1,26 @@
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: vllm-server
+    # Usa a flag de compatibilidade moderna de GPUs no Docker Compose
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "10000:8000"
+    volumes:
+      # Mapeia o cache do HuggingFace para a máquina local para não baixar os modelos sempre que reiniciar o contêiner
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN:-}
+    command: >
+      --model zai-org/GLM-OCR
+      --trust-remote-code
+      --max-model-len 8192
+      --gpu-memory-utilization 0.9
+    # O ipc: host é altamente recomendado para o vLLM (PyTorch) para evitar travamentos de memória compartilhada (shm)
+    ipc: host
