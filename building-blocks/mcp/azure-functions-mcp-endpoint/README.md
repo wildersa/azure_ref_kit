@@ -5,8 +5,15 @@ This building block documents the supported architectural pattern for hosting Mo
 
 By hosting MCP tools on Azure Functions, agents can access enterprise systems and complex business logic with scale-to-zero pricing, managed identity security, and standardized tool discovery.
 
-## Supported Pattern: Remote MCP Server
-The primary supported pattern for cloud-hosted MCP is the **Remote MCP Server**. In this configuration, Azure Functions serves as the hosting runtime, exposing MCP tools via a streamable HTTP transport (typically SSE - Server-Sent Events).
+## Supported Patterns
+
+Azure Functions supports two primary ways to create and host remote MCP servers:
+
+### 1. MCP Binding Extension
+The **MCP binding extension** allows you to create and host custom MCP servers similarly to any other function app by using specialized triggers and bindings. This is the recommended approach for deep integration with the Azure Functions programming model.
+
+### 2. Self-hosted MCP Servers
+You can host MCP servers created by using official MCP SDKs. This approach uses **Streamable HTTP transport** (such as SSE - Server-Sent Events) to communicate with AI clients. This pattern is currently in **preview**.
 
 ### Architecture
 
@@ -14,7 +21,7 @@ The primary supported pattern for cloud-hosted MCP is the **Remote MCP Server**.
 flowchart LR
     User --> Agent
     Agent --> Foundry[Azure AI Foundry Agent Service]
-    Foundry -- MCP Protocol (HTTP/SSE) --> Functions[Azure Functions MCP Endpoint]
+    Foundry -- MCP Protocol (Streamable HTTP) --> Functions[Azure Functions MCP Endpoint]
     Functions --> ToolLogic[Tool Implementation]
     ToolLogic --> Enterprise[Enterprise Systems/Data]
 ```
@@ -28,7 +35,8 @@ flowchart LR
 ## Implementation Details
 
 ### 1. Transport Choice
-- **SSE (Standard)**: Use for synchronous, real-time tool interactions. This is the industry standard for Remote MCP servers.
+- **Streamable HTTP (SSE)**: Standard for real-time interactions with self-hosted MCP servers.
+- **MCP Triggers/Bindings**: Used when leveraging the Azure Functions MCP binding extension.
 - **Queue-based (Alternative)**: For long-running or asynchronous work, use the specialized `AzureFunctionsTool` with Storage Queues instead of a raw MCP endpoint.
 
 ### 2. Authentication and Security
@@ -38,12 +46,12 @@ flowchart LR
 
 ### 3. Local vs Azure
 - **Local**: Development typically uses `stdio` transport with the MCP Inspector for rapid testing.
-- **Azure**: Deployment requires switching to a network-based transport like `SSE` (HTTP) to allow the Foundry Agent Service to reach the endpoint.
+- **Azure**: Deployment requires switching to a network-based transport like **Streamable HTTP** (SSE) or the **MCP binding extension** to allow the Foundry Agent Service to reach the endpoint.
 
 ## Limitations and Trade-offs
-- **Documentation-Only**: This reference currently focuses on the architectural pattern. Implementation depends on the evolving `mcp` and `azure-functions` Python library support for SSE transport.
+- **Preview Status**: Remote MCP hosting patterns on Azure Functions are currently in preview and subject to change.
+- **Documentation-Only**: This reference currently focuses on the architectural pattern. Implementation depends on the evolving `mcp` and `azure-functions` Python library support.
 - **Cold Start**: While Flex Consumption minimizes cold starts, the first tool call after a period of inactivity may experience slight latency.
-- **Streaming**: Verify that the chosen hosting plan and networking configuration (e.g., Azure Front Door, Application Gateway) support long-lived HTTP connections required for SSE.
 
 ## When to use this pattern
 - When you need a centralized, reusable tool catalog shared across multiple agents.
@@ -54,3 +62,4 @@ flowchart LR
 - [Agent tools overview for Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
 - [Use Azure Functions with Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions)
 - [Use AI tools and models in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-ai-enabled-apps)
+- [Host MCP servers in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-ai-enabled-apps#remote-mcp-servers)

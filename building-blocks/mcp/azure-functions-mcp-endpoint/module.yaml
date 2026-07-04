@@ -1,7 +1,7 @@
 name: azure-functions-mcp-endpoint
 type: reference-pattern
 category: mcp
-status: stable
+status: preview
 purpose: Reference pattern for hosting Model Context Protocol (MCP) servers on Azure Functions.
 inputs: []
 outputs: []
