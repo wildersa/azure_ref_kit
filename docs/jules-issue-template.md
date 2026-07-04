@@ -27,6 +27,7 @@ Jules receives a ready execution demand: exact role, exact docs to consult, exac
 - Issues must be developer-ready: Jules should know what to build/change without deciding the roadmap.
 - For modules/solutions, require README and Mermaid service-level diagram when applicable.
 - Use the default Jules environment unless the issue proves a different runtime is required.
+- When code exists or is added, require focused validation commands in the issue.
 
 ## Agent role guidance
 
@@ -56,6 +57,40 @@ senior Azure network/security engineer
 senior GitHub Actions/Azure Pipelines platform engineer
 senior Terraform/OpenTofu and Azure Developer CLI engineer
 ```
+
+## Default validation guidance
+
+Use the smallest meaningful validation for the changed module.
+
+For documentation-only issues:
+
+```text
+- Markdown/manual validation of changed README/docs.
+- Mermaid fence validation by inspection or tool if available.
+- YAML/JSON syntax validation or manual syntax check when touching `module.yaml`, `solution.yaml`, or schemas.
+```
+
+For Python code-bearing issues, include these commands or a focused equivalent:
+
+```bash
+python --version
+ruff check <changed-python-paths>
+ruff format --check <changed-python-paths>
+pytest <focused-test-path-or-module>
+```
+
+If there are no tests yet for a new Python module, require the smallest meaningful test. If external Azure resources are required and unavailable, require at least one local import, schema, dry-run, or deterministic unit test and document the limitation in the PR body.
+
+For TypeScript/React code-bearing issues, include the available package-local commands, for example:
+
+```bash
+npm run lint -- --scope-or-path-if-supported
+npm run typecheck
+npm test -- --runInBand <focused-test-if-supported>
+npm run build
+```
+
+Use only commands that exist for the package/module. If no package exists yet, do not invent a repo-wide JavaScript toolchain.
 
 ## Required issue template
 
@@ -121,7 +156,13 @@ When this PR is merged, <observable repository state or behavior becomes true>.
 
 - Markdown/manual validation of README and Mermaid fence.
 - YAML/JSON validation or manual syntax check for `module.yaml`, `solution.yaml`, or schemas.
-- `<focused test/import/run/build command when code exists>`
+- If Python code exists or is added:
+  - `python --version`
+  - `ruff check <changed-python-paths>`
+  - `ruff format --check <changed-python-paths>`
+  - `pytest <focused-test-path-or-module>`
+- If TypeScript/React code exists or is added: package-local lint/typecheck/test/build commands that actually exist.
+- If no focused test can run because external Azure resources are required, provide a local import/schema/dry-run validation and explain the limitation.
 - PR body: summary, P0 mapping, docs consulted, exact commands/results, risks, and genuine follow-ups.
 
 ## Complexity / minimalism notes required in PR body
