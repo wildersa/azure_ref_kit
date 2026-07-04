@@ -21,7 +21,7 @@ inputs:
 outputs:
   - name: customer_status_view
     description: A secure, curated view of pipeline progress and results.
-    type: mcp-tool
+    type: portal-view
 azure_resources:
   - Azure Static Web Apps
   - Optional Entra External ID
