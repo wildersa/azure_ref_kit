@@ -1,0 +1,21 @@
+name: devops-mcp-tool-contract
+type: building-block
+category: mcp
+status: reference
+purpose: Safe read-only DevOps status tool contracts for AI agents.
+inputs: []
+outputs: []
+azure_resources: []
+contracts:
+  reads: []
+  writes: []
+  emits:
+    - type: mcp-tool
+      name: get_pipeline_run_status
+      description: Returns the status and summary of a specific Azure DevOps pipeline run.
+    - type: mcp-tool
+      name: get_latest_build_summary
+      description: Returns the summary of the most recent build for a specified pipeline or branch.
+    - type: mcp-tool
+      name: list_recent_pipeline_runs
+      description: Lists recent pipeline runs with their results and basic metadata.
