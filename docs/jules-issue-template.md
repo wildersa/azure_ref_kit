@@ -1,4 +1,4 @@
-# JULES_TEMPLATE v17.1 — Azure Reference Kit Spec-to-PR Issue
+# JULES_TEMPLATE v17.2 — Azure Reference Kit Spec-to-PR Issue
 
 Use this template to open implementation issues for Jules in `wildersa/azure_ref_kit`.
 
@@ -26,6 +26,10 @@ Jules receives a ready execution demand: exact role, exact docs to consult, exac
 - Agent role must be a senior technical execution persona, not only a domain label.
 - Issues must be developer-ready: Jules should know what to build/change without deciding the roadmap.
 - For modules/solutions, require README and Mermaid service-level diagram when applicable.
+- Every module or solution issue must include a Terraform/OpenTofu deployment decision.
+- If the module/solution creates or depends on Azure-deployable resources, require `infra/terraform/` under that module/solution.
+- If Terraform is intentionally not included, the PR body must explain why under `Deployment/IaC decision`.
+- Do not create empty Terraform scaffolds, fake resources, or production-grade infra unrelated to the current module.
 - Use the default Jules environment unless the issue proves a different runtime is required.
 - When code exists or is added, require focused validation commands in the issue.
 
@@ -92,7 +96,17 @@ npm run build
 
 Use only commands that exist for the package/module. If no package exists yet, do not invent a repo-wide JavaScript toolchain.
 
-Existing issues that already require reading `AGENTS.md` inherit the default validation expectations there. When such an issue becomes active and can add code, add an issue comment or edit the issue to mention focused Ruff/pytest or package-local validation explicitly.
+For Terraform/OpenTofu-bearing issues, include these commands or a focused equivalent:
+
+```bash
+terraform fmt -check -recursive <module-or-solution>/infra/terraform
+terraform init -backend=false <module-or-solution>/infra/terraform
+terraform validate <module-or-solution>/infra/terraform
+```
+
+If the environment lacks Terraform/OpenTofu, require manual HCL validation by inspection and document that limitation in the PR body.
+
+Existing issues that already require reading `AGENTS.md` inherit the default validation expectations there. When such an issue becomes active and can add code, add an issue comment or edit the issue to mention focused Ruff/pytest, package-local validation, or Terraform validation explicitly.
 
 ## Required issue template
 
@@ -111,16 +125,20 @@ Deliver one bounded <module/solution/docs/contract> item: <exact deliverable>. T
 - Implement only this roadmap item: <Track X, item Y — exact item name>.
 - Treat this as an implementation task, not a request for analysis, planning, or roadmap definition.
 - Use current Microsoft Learn docs, not model cutoff knowledge.
+- Include a `Deployment/IaC decision` in the PR body.
+- If this creates or depends on Azure-deployable resources, add or update `<module-or-solution>/infra/terraform/`.
+- If Terraform/OpenTofu is intentionally not included, explain why in the PR body and do not create fake or empty infra.
 - Use the default Jules environment unless a current dependency/runtime requirement proves otherwise.
 - Avoid unrelated refactors and formatting churn.
 - Continue until every P0 criterion passes; do not choose an arbitrary subset or silently defer in-scope work.
 - Add or update meaningful tests when behavior/code changes. Do not weaken, delete, skip, or broadly mock tests to obtain green results.
-- Stop only for a proven blocker requiring an unstated product, security, data, runtime, or destructive-migration decision. Report exact evidence and options.
+- Stop only for a proven blocker requiring an unstated product, security, data, runtime, deployment, or destructive-migration decision. Report exact evidence and options.
 
 ## Documentation and references to consult
 
 - <exact Microsoft Learn URL>
 - <exact Microsoft Learn URL>
+- Terraform on Azure overview: https://learn.microsoft.com/en-us/azure/developer/terraform/overview
 - <official SDK/docs URL if applicable>
 - <public Microsoft/Azure sample repo URL if applicable>
 - <other public reference repo URL if explicitly useful>
@@ -143,6 +161,7 @@ When this PR is merged, <observable repository state or behavior becomes true>.
 - <exact behavior/contract implemented or documented>
 - <README includes required sections and Mermaid diagram when applicable>
 - <schemas/tests/static validation updated when applicable>
+- <Terraform/OpenTofu deployment structure added under `infra/terraform/`, or a clear no-IaC decision recorded when not applicable>
 - <security/customer-safe/status/identity/runtime invariant preserved>
 - <Microsoft docs URLs consulted and recorded in PR body>
 
@@ -150,14 +169,19 @@ When this PR is merged, <observable repository state or behavior becomes true>.
 
 - Do not change <unrelated module/solution/runtime>.
 - Do not implement <future roadmap item>.
-- Do not create broad scaffolding, empty folder trees, or production-grade infra.
-- Do not commit secrets, tokens, connection strings, `.env`, local settings, or real customer/org identifiers.
+- Do not create broad scaffolding, empty folder trees, fake resources, or production-grade infra.
+- Do not commit secrets, tokens, connection strings, `.env`, local settings, Terraform state files, plans, or real customer/org identifiers.
 - Do not assume preview behavior is GA; document current status if relevant.
 
 ## Required proof
 
 - Markdown/manual validation of README and Mermaid fence.
 - YAML/JSON validation or manual syntax check for `module.yaml`, `solution.yaml`, or schemas.
+- If Terraform/OpenTofu files are added or changed:
+  - `terraform fmt -check -recursive <module-or-solution>/infra/terraform`
+  - `terraform init -backend=false <module-or-solution>/infra/terraform`
+  - `terraform validate <module-or-solution>/infra/terraform`
+  - If Terraform/OpenTofu is unavailable, manual HCL validation by inspection plus limitation recorded in PR body.
 - If Python code exists or is added:
   - `python --version`
   - `ruff check <changed-python-paths>`
@@ -165,7 +189,7 @@ When this PR is merged, <observable repository state or behavior becomes true>.
   - `pytest <focused-test-path-or-module>`
 - If TypeScript/React code exists or is added: package-local lint/typecheck/test/build commands that actually exist.
 - If no focused test can run because external Azure resources are required, provide a local import/schema/dry-run validation and explain the limitation.
-- PR body: summary, P0 mapping, docs consulted, exact commands/results, risks, and genuine follow-ups.
+- PR body: summary, P0 mapping, docs consulted, exact commands/results, `Deployment/IaC decision`, risks, and genuine follow-ups.
 
 ## Complexity / minimalism notes required in PR body
 
