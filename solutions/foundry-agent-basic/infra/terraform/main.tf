@@ -11,7 +11,8 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_storage_account" "storage" {
-  name                     = "st${var.prefix}${random_string.unique.result}"
+  # Storage account name must be between 3 and 24 characters and contain only lowercase letters and numbers.
+  name                     = "st${replace(var.prefix, "-", "")}${random_string.unique.result}"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -51,11 +52,20 @@ resource "azurerm_ai_hub" "hub" {
   tags = var.tags
 }
 
+# Connect the AI Services to the Hub
+resource "azurerm_ai_hub_connection" "ai_services_connection" {
+  name        = "connection-${var.prefix}-${random_string.unique.result}"
+  ai_hub_id   = azurerm_ai_hub.hub.id
+  target      = azurerm_ai_services.ai_services.id
+  provider_id = azurerm_ai_services.ai_services.id
+  category    = "AIServices"
+}
+
 # Azure AI Foundry Project
 resource "azurerm_ai_project" "project" {
-  name           = "proj-${var.prefix}-${random_string.unique.result}"
-  location       = azurerm_resource_group.rg.location
-  ai_hub_id      = azurerm_ai_hub.hub.id
+  name      = "proj-${var.prefix}-${random_string.unique.result}"
+  location  = azurerm_resource_group.rg.location
+  ai_hub_id = azurerm_ai_hub.hub.id
 
   identity {
     type = "SystemAssigned"
