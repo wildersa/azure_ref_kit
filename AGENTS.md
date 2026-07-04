@@ -141,6 +141,25 @@ See `docs/minimalism-and-complexity.md` for the project-level review rule.
 
 There is no single repository-wide test command yet. For each module, add or update the smallest meaningful validation path.
 
+Default validation expectations:
+
+- Documentation-only changes: manually validate Markdown structure, Mermaid fences, links, and YAML/JSON snippets touched.
+- YAML/JSON changes: validate syntax with an available parser or document manual validation if no parser is available.
+- Python code changes: run Ruff and the focused pytest/import/run command for the changed module.
+- TypeScript/React changes: run the focused package lint/typecheck/test/build command when a package exists.
+- Infrastructure changes: run the available format/validate command for the chosen tool, or document why it cannot run locally.
+
+Default Python validation commands when Python files exist:
+
+```bash
+python --version
+ruff check <changed-python-paths>
+ruff format --check <changed-python-paths>
+pytest <focused-test-path-or-module>
+```
+
+If there are no tests yet for a new Python module, add the smallest meaningful test. If the module is intentionally example-only and cannot be tested without external Azure resources, provide at least one local import, schema, or dry-run validation command and document the limitation.
+
 Before finishing a PR:
 
 - run the relevant formatter, linter, test, or build commands for the files changed;
