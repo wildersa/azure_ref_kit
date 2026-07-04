@@ -1,0 +1,247 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  # Dynamically selects between an on-premises runner (if online) and a GitHub-hosted runner.
+  choose-runner:
+    name: Choose CI Runner
+    runs-on: ${{ fromJSON(vars.CI_ON_PREM_ONLY == 'true' && '["self-hosted","local-ci","docker","shared","azure_ref_kit"]' || '"ubuntu-latest"') }}
+    outputs:
+      runner: ${{ steps.pick.outputs.runner }}
+      local: ${{ steps.pick.outputs.local }}
+    steps:
+      - name: Pick local or hosted runner
+        id: pick
+        env:
+          CI_ON_PREM_ONLY: ${{ vars.CI_ON_PREM_ONLY }}
+          GH_TOKEN: ${{ secrets.RUNNER_CHECK_TOKEN }}
+          REPO: ${{ github.repository }}
+          LOCAL_LABELS: '["self-hosted","local-ci","docker","shared","azure_ref_kit"]'
+          HOSTED_RUNNER: ubuntu-latest
+        run: |
+          set -euo pipefail
+
+          fallback() {
+            reason="$1"
+            echo "runner=\"${HOSTED_RUNNER}\"" >> "$GITHUB_OUTPUT"
+            echo "local=false" >> "$GITHUB_OUTPUT"
+            echo "Runner selection: ${reason}; using ${HOSTED_RUNNER}."
+          }
+
+          if [ "${CI_ON_PREM_ONLY:-false}" = "true" ]; then
+            echo "runner=${LOCAL_LABELS}" >> "$GITHUB_OUTPUT"
+            echo "local=true" >> "$GITHUB_OUTPUT"
+            echo "Runner selection: CI_ON_PREM_ONLY=true; using local runner labels ${LOCAL_LABELS}."
+            exit 0
+          fi
+
+          if [ -z "${GH_TOKEN:-}" ]; then
+            fallback "RUNNER_CHECK_TOKEN is not available"
+            exit 0
+          fi
+
+          OWNER="${REPO%/*}"
+          NAME="${REPO#*/}"
+
+          if ! RUNNERS="$(gh api "repos/${OWNER}/${NAME}/actions/runners?per_page=100" 2>/dev/null)"; then
+            fallback "could not list repository runners"
+            exit 0
+          fi
+
+          if ! ONLINE="$(jq -r --argjson required "$LOCAL_LABELS" '
+            [
+              .runners[]
+              | select(.status == "online")
+              | select(
+                  ([.labels[].name] as $labels
+                  | all($required[]; $labels | index(.)))
+                )
+            ] | length
+          ' <<< "$RUNNERS")"; then
+            fallback "could not evaluate repository runners"
+            exit 0
+          fi
+
+          if [ "$ONLINE" -gt 0 ]; then
+            echo "runner=${LOCAL_LABELS}" >> "$GITHUB_OUTPUT"
+            echo "local=true" >> "$GITHUB_OUTPUT"
+            echo "Runner selection: matched ${ONLINE} online local runner(s)."
+          else
+            fallback "no online runner matched ${LOCAL_LABELS}"
+          fi
+
+  # Analyzes changed paths to only execute relevant testing jobs.
+  changes:
+    name: Detect Changes
+    needs: choose-runner
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    outputs:
+      mcp_fastmcp: ${{ steps.filter.outputs.mcp_fastmcp }}
+      func_http: ${{ steps.filter.outputs.func_http }}
+      func_queue: ${{ steps.filter.outputs.func_queue }}
+      pipeline_durable: ${{ steps.filter.outputs.pipeline_durable }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Path Filter
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            mcp_fastmcp:
+              - 'building-blocks/mcp/fastmcp-basic-server/**'
+            func_http:
+              - 'building-blocks/functions/agent-tool-http-function/**'
+            func_queue:
+              - 'building-blocks/functions/agent-tool-queue-function/**'
+            pipeline_durable:
+              - 'building-blocks/pipelines/durable-basic-pipeline/**'
+            workflow:
+              - '.github/workflows/**'
+
+  # Job to test MCP FastMCP Server
+  test-mcp-fastmcp:
+    name: Test FastMCP Server
+    needs: [choose-runner, changes]
+    if: needs.changes.outputs.mcp_fastmcp == 'true' || needs.changes.outputs.workflow == 'true'
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    defaults:
+      run:
+        working-directory: building-blocks/mcp/fastmcp-basic-server
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest
+
+  # Job to test HTTP function tool
+  test-func-http:
+    name: Test HTTP Function Tool
+    needs: [choose-runner, changes]
+    if: needs.changes.outputs.func_http == 'true' || needs.changes.outputs.workflow == 'true'
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    defaults:
+      run:
+        working-directory: building-blocks/functions/agent-tool-http-function
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest
+
+  # Job to test Queue function tool
+  test-func-queue:
+    name: Test Queue Function Tool
+    needs: [choose-runner, changes]
+    if: needs.changes.outputs.func_queue == 'true' || needs.changes.outputs.workflow == 'true'
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    defaults:
+      run:
+        working-directory: building-blocks/functions/agent-tool-queue-function
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest
+
+  # Job to test Durable basic pipeline
+  test-pipeline-durable:
+    name: Test Durable Pipeline
+    needs: [choose-runner, changes]
+    if: needs.changes.outputs.pipeline_durable == 'true' || needs.changes.outputs.workflow == 'true'
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    defaults:
+      run:
+        working-directory: building-blocks/pipelines/durable-basic-pipeline
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: pytest
