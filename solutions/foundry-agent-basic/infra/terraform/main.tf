@@ -10,40 +10,17 @@ resource "azurerm_resource_group" "rg" {
   tags     = var.tags
 }
 
-resource "azurerm_storage_account" "storage" {
-  # Storage account name must be between 3 and 24 characters and contain only lowercase letters and numbers.
-  name                     = "st${replace(var.prefix, "-", "")}${random_string.unique.result}"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  tags                     = var.tags
-}
-
-resource "azurerm_key_vault" "kv" {
-  name                = "kv-${var.prefix}-${random_string.unique.result}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  tenant_id           = data.azurerm_client_config.current.tenant_id
-  sku_name            = "standard"
-  tags                = var.tags
-}
-
-resource "azurerm_ai_services" "ai_services" {
-  name                = "ais-${var.prefix}-${random_string.unique.result}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  sku_name            = "S0"
-  tags                = var.tags
-}
-
-# Azure AI Foundry Hub
-resource "azurerm_ai_hub" "hub" {
+# Azure AI Foundry Hub (Modern AzureRM pattern using Cognitive Account)
+resource "azurerm_cognitive_account" "hub" {
   name                = "hub-${var.prefix}-${random_string.unique.result}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  storage_account_id  = azurerm_storage_account.storage.id
-  key_vault_id        = azurerm_key_vault.kv.id
+  kind                = "AIServices"
+  sku_name            = "S0"
+
+  # Required for stateful development in Foundry including agent service
+  custom_subdomain_name      = "hub-${var.prefix}-${random_string.unique.result}"
+  project_management_enabled = true
 
   identity {
     type = "SystemAssigned"
@@ -52,20 +29,11 @@ resource "azurerm_ai_hub" "hub" {
   tags = var.tags
 }
 
-# Connect the AI Services to the Hub
-resource "azurerm_ai_hub_connection" "ai_services_connection" {
-  name        = "connection-${var.prefix}-${random_string.unique.result}"
-  ai_hub_id   = azurerm_ai_hub.hub.id
-  target      = azurerm_ai_services.ai_services.id
-  provider_id = azurerm_ai_services.ai_services.id
-  category    = "AIServices"
-}
-
 # Azure AI Foundry Project
-resource "azurerm_ai_project" "project" {
-  name      = "proj-${var.prefix}-${random_string.unique.result}"
-  location  = azurerm_resource_group.rg.location
-  ai_hub_id = azurerm_ai_hub.hub.id
+resource "azurerm_cognitive_account_project" "project" {
+  name                 = "proj-${var.prefix}-${random_string.unique.result}"
+  cognitive_account_id = azurerm_cognitive_account.hub.id
+  location             = azurerm_resource_group.rg.location
 
   identity {
     type = "SystemAssigned"
@@ -77,7 +45,7 @@ resource "azurerm_ai_project" "project" {
 # Model Deployment for the Agent
 resource "azurerm_cognitive_deployment" "gpt4o_mini" {
   name                 = "gpt-4o-mini"
-  cognitive_account_id = azurerm_ai_services.ai_services.id
+  cognitive_account_id = azurerm_cognitive_account.hub.id
 
   sku {
     name     = "GlobalStandard"
@@ -90,5 +58,3 @@ resource "azurerm_cognitive_deployment" "gpt4o_mini" {
     version = "2024-07-18"
   }
 }
-
-data "azurerm_client_config" "current" {}

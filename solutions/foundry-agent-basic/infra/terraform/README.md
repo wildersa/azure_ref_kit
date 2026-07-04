@@ -5,11 +5,8 @@ This directory contains the Terraform/OpenTofu configuration to deploy the infra
 ## Resources Provisioned
 
 - **Resource Group**: Container for all resources.
-- **Azure AI Foundry Hub**: The central management resource (using `azurerm_ai_hub`).
-- **Azure AI Foundry Project**: The workspace for the agent (using `azurerm_ai_project`).
-- **Azure AI Services**: The underlying AI capability (using `azurerm_ai_services`).
-- **Storage Account**: Required by the Hub.
-- **Key Vault**: Required by the Hub.
+- **Azure AI Foundry Hub**: The central management resource (using `azurerm_cognitive_account` with `AIServices` kind).
+- **Azure AI Foundry Project**: The workspace for the agent (using `azurerm_cognitive_account_project`).
 - **Model Deployment**: GPT-4o-mini deployment for the agent's reasoning.
 
 ## Deployment / IaC Decision
@@ -21,7 +18,7 @@ We use Terraform to manage the stable infrastructure "platform" (Hub, Project, M
 This decision is based on:
 1. **Developer Experience**: Prompt agents are often iterated on quickly by developers or authors; managing every version in Terraform can be cumbersome.
 2. **Foundry Native Flow**: Azure AI Foundry emphasizes a "code-first" deployment for agent versions via the `project.agents.create_version` API.
-3. **Maturity**: Native Terraform resources for the specific Agent Service entities are still maturing compared to the robust Hub/Project/Account resources.
+3. **Microsoft Guidance**: Follows the AzureRM resource pattern documented in [Microsoft Learn](https://learn.microsoft.com/en-us/azure/foundry/how-to/create-resource-terraform?tabs=azurerm).
 
 ## Prerequisites
 
