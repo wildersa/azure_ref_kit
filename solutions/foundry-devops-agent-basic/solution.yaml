@@ -1,0 +1,11 @@
+name: foundry-devops-agent-basic
+status: active
+purpose: Minimal reference solution for an Azure AI Foundry agent answering safe pipeline/build status questions through a controlled tool boundary.
+entrypoints:
+  sdk_invocation: AIProjectClient
+building_blocks:
+  - building-blocks/agents/pipeline-assistant-foundry/
+  - building-blocks/mcp/devops-mcp-tool-contract/
+contracts:
+  - shared/contracts/pipeline-run.schema.json
+  - shared/contracts/pipeline-step.schema.json
