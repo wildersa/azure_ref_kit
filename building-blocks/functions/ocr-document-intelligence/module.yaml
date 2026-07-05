@@ -4,14 +4,28 @@ category: document-ai
 status: scaffold
 purpose: Extract text and structured fields from documents using Azure AI Document Intelligence.
 inputs:
-  - run_id
-  - artifact_id
-  - document_type
+  - name: run_id
+    description: "The unique identifier for the pipeline run."
+    type: string
+  - name: artifact_id
+    description: "The ID of the document artifact to process."
+    type: string
+  - name: document_type
+    description: "Optional hint or model ID for Document Intelligence (e.g., 'prebuilt-invoice', 'prebuilt-layout')."
+    type: string
 outputs:
-  - extracted_text
-  - fields
-  - confidence
-  - artifacts
+  - name: extracted_text
+    description: "The raw text content extracted from the document."
+    type: string
+  - name: fields
+    description: "Structured key-value pairs (e.g., from prebuilt models)."
+    type: object
+  - name: confidence
+    description: "Average confidence score for the extraction (0.0 to 1.0)."
+    type: number
+  - name: artifacts
+    description: "List of new artifact IDs generated (e.g., OCR JSON, searchable PDF)."
+    type: array
 azure_resources:
   - Azure Functions
   - Azure AI Document Intelligence
@@ -22,3 +36,21 @@ contracts:
     - shared/contracts/artifact.schema.json
   emits:
     - shared/contracts/pipeline-step.schema.json
+security_boundary:
+  policy: "Managed Identity access to Document Intelligence and Blob Storage."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Cognitive Services User"
+      description: "Allows the function to call Document Intelligence APIs."
+    - role: "Storage Blob Data Reader"
+      description: "Allows reading the source document from Blob Storage."
+    - role: "Storage Blob Data Contributor"
+      description: "Allows saving extracted artifacts to Blob Storage."
+customer_safe_boundary:
+  forbid:
+    - "Raw Document Intelligence JSON responses"
+    - "Azure SDK internal metadata"
+    - "Storage SAS URLs"
+    - "Internal resource IDs and Subscription IDs"
+    - "Technical stack traces and raw error messages"
