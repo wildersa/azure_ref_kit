@@ -1,0 +1,50 @@
+name: final-result-publisher
+type: azure-function-worker
+category: document-ai
+status: scaffold
+purpose: Finalizes the document processing pipeline by marking artifacts as customer-visible and updating the final run status.
+inputs:
+  - name: run_id
+    description: "The unique identifier for the pipeline run."
+    type: string
+  - name: correlation_id
+    description: "Optional opaque identifier for customer-side tracking."
+    type: string
+  - name: validation_status
+    description: "The outcome of the previous validation step (e.g., 'valid', 'warning')."
+    type: string
+  - name: artifact_ids
+    description: "List of artifact IDs to be published to the customer portal."
+    type: array
+outputs:
+  - name: publication_status
+    description: "The outcome of the publication process (e.g., 'published', 'failed')."
+    type: string
+azure_resources:
+  - Azure Functions
+  - Blob Storage
+  - Application Insights
+contracts:
+  reads:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+  emits:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+security_boundary:
+  policy: "Managed Identity access to Blob Storage and Status Store to finalize processing results."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Storage Blob Data Contributor"
+      description: "Allows updating artifact metadata to set is_customer_visible flag."
+customer_safe_boundary:
+  forbid:
+    - "Raw OCR provider payloads"
+    - "Internal pipeline orchestration logs"
+    - "Storage SAS URLs or connection strings"
+    - "Internal Azure Resource IDs and Subscription IDs"
+    - "Technical stack traces and unhandled exception details"
+    - "LLM prompts or system instructions used in earlier steps"
