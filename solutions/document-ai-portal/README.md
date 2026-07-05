@@ -1,31 +1,109 @@
-# Document AI Portal
+# Document AI Portal Solution
 
-First target solution: customer-facing portal for tracking a document AI pipeline.
+This solution demonstrates a customer-facing portal for monitoring and interacting with an AI-driven document processing pipeline.
 
-## Scenario
+## Customer Scenario
 
-A customer uploads a document or starts a process. The system runs OCR/extraction, validates data, generates artifacts, estimates cost, and exposes friendly status through a portal and optional agent.
+A customer needs to upload documents (e.g., invoices, receipts, forms) and track the status of their processing in real-time. Once processed, they want to view the extracted structured data and use an AI assistant to ask questions about the document or the process (e.g., "Why did this fail?", "What is the total amount?").
 
-## Composed blocks
+## Process Flow
 
-- `building-blocks/portals/static-status-portal`
-- `building-blocks/functions/portal-api-functions`
-- `building-blocks/functions/blob-trigger-start-pipeline`
-- `building-blocks/functions/ocr-document-intelligence`
-- `building-blocks/pipelines/durable-basic-pipeline`
-- `building-blocks/agents/pipeline-assistant-foundry`
-- `building-blocks/storage/blob-artifact-store`
-- `building-blocks/observability/appinsights-observability`
-- `building-blocks/security/entra-external-id-auth`
+1. **Upload**: Customer uploads a document to a Blob Storage container.
+2. **Trigger**: A Blob-triggered Azure Function detects the upload and initiates the pipeline.
+3. **Orchestration**: A Durable Functions orchestrator manages the pipeline steps, updating the customer-safe status at each stage.
+4. **OCR/Extraction**: Azure AI Document Intelligence extracts text and fields from the document.
+5. **Storage**: Extracted artifacts and metadata are stored in a secure artifact store.
+6. **Monitoring**: The customer monitors progress through a Static Web Apps portal.
+7. **Assistance**: A Pipeline Assistant (Azure AI Foundry Agent) provides grounded answers to customer queries using the status and artifact data.
 
-## Customer-facing outcome
+## Composed Building Blocks
 
-The customer can see:
+- [Static Status Portal](../../building-blocks/portals/static-status-portal/): The React-based frontend.
+- [Portal API Functions](../../building-blocks/functions/portal-api-functions/): Backend API for the portal.
+- [Blob Trigger](../../building-blocks/functions/blob-trigger-start-pipeline/): Entrypoint for new documents.
+- [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results.
+- [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration.
+- [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker.
+- [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction.
+- [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing.
 
-- whether the process started;
-- which step is running;
-- whether action is required;
-- friendly failure reason;
-- generated artifacts;
-- estimated cost;
-- assistant answers about the execution.
+## Service-Level Diagram
+
+```mermaid
+graph TD
+    User([Customer]) --> Portal[Static Status Portal]
+    User -->|Uploads Document| BlobIn[(Input Container)]
+
+    BlobIn -->|Trigger| TriggerFunc[Blob Trigger Function]
+    TriggerFunc -->|Starts| Orchestrator[Durable Orchestrator]
+
+    Orchestrator -->|Step: OCR| OCRFunc[OCR Worker]
+    OCRFunc -->|Analyze| DocIntel[Azure AI Document Intelligence]
+
+    Orchestrator -->|Updates| StatusStore[(Status Store)]
+    Orchestrator -->|Saves| ArtifactStore[(Artifact Store)]
+
+    Portal -->|Calls| PortalAPI[Portal API]
+    PortalAPI -->|Reads| StatusStore
+    PortalAPI -->|Reads| ArtifactStore
+
+    Portal -->|Query| Agent[Pipeline Assistant Agent]
+    Agent -->|Tools| StatusStore
+    Agent -->|Tools| ArtifactStore
+
+    subgraph Observability
+        AllComponents --> AppInsights[Application Insights]
+    end
+```
+
+## Entrypoints & Trigger Model
+
+- **Primary Entrypoint**: Blob Storage Upload (async).
+- **Interactive Entrypoint**: Static Web App (HTTPS).
+- **Trigger**: Event Grid / Blob Trigger on the input container.
+
+## Customer-Facing Outcome
+
+- Real-time visibility into document processing status.
+- Access to extracted structured data without technical jargon.
+- AI-powered assistance for clarifying results or errors.
+- Secure, scoped access to only their own artifacts and status.
+
+## Customer-Safe Status & Artifact Boundary
+
+This solution strictly enforces the [Customer-Safe Status Boundary](../../building-blocks/security/customer-safe-status-boundary/) to prevent exposure of technical internals.
+
+### Allowed Customer-Facing Data
+- **Business Status**: `pending`, `running`, `completed`, `failed`.
+- **Friendly Step Names**: "Analyzing Document", "Validating Data", "Finalizing Results".
+- **Safe Summaries**: "Processing successful", "Document unreadable".
+- **Extracted Fields**: Specific business data mapped to `pipeline-step.schema.json`.
+- **Friendly Errors**: Non-technical explanations for failures.
+
+### Forbidden Data (Internal-Only)
+- **Raw Logs**: No Function logs, stack traces, or internal resource IDs.
+- **Prompts**: No system instructions or grounded prompt text.
+- **Secrets**: No SAS tokens, API keys, or connection strings.
+- **Technical IDs**: No Azure Subscription IDs or raw resource URIs.
+
+Enforcement is performed at the [Portal API Functions](../../building-blocks/functions/portal-api-functions/) layer, which filters all outgoing data against the shared contracts.
+
+## Deployment Assumptions
+
+- Azure subscription with AI Services (Document Intelligence) and AI Foundry enabled.
+- Storage accounts for input, artifacts, and Durable Functions state.
+- Azure Static Web App for hosting the frontend.
+- Azure Functions (Flex Consumption) for APIs and workers.
+
+## Local / Demo Flow
+
+1. Use [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) to run the Functions project.
+2. Use Azurite for local storage emulation.
+3. Use the Static Web Apps CLI (`swa start`) to run the portal locally against the Functions API.
+4. Upload a sample file to the local `input` container to trigger the pipeline.
+
+## Known Limits
+
+- The current scaffold does not include real OCR ingestion or Agent runtime code.
+- Authentication/Authorization patterns are deferred to the [Security Track](../../docs/roadmap.md#track-5-security).
+- Large document processing may require adjustment of Durable Functions timeouts.
