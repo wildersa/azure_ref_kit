@@ -6,6 +6,9 @@ purpose: Practical network boundary notes for customer-facing APIs, agents, tool
 inputs: []
 outputs: []
 azure_resources: []
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
 contracts:
   reads: []
   writes: []
