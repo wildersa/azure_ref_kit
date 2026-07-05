@@ -1,6 +1,7 @@
 import yaml
 import pathlib
 
+
 def test_module_yaml_structure():
     """Verify that module.yaml has the required fields and security invariants."""
     module_path = pathlib.Path(__file__).parent.parent / "module.yaml"
@@ -24,7 +25,10 @@ def test_module_yaml_structure():
         role_name = role_entry.get("role", "")
         assert "*" not in role_name, f"Role '{role_name}' should not contain wildcards"
         assert "Owner" not in role_name, f"Role '{role_name}' should not be 'Owner'"
-        assert "Contributor" not in role_name or "Data" in role_name, f"Role '{role_name}' should be a Data Plane role if using Contributor"
+        assert "Contributor" not in role_name or "Data" in role_name, (
+            f"Role '{role_name}' should be a Data Plane role if using Contributor"
+        )
+
 
 def test_readme_sections():
     """Verify that README.md contains mandatory sections."""
@@ -43,11 +47,12 @@ def test_readme_sections():
         "## Azure Deployment Assumptions",
         "## Known Limits",
         "## Validation Notes",
-        "```mermaid"
+        "```mermaid",
     ]
 
     for section in mandatory_sections:
         assert section in content, f"README should contain '{section}'"
+
 
 def test_no_secrets_in_docs():
     """Verify no common secret patterns exist in the building block folder."""
@@ -62,8 +67,17 @@ def test_no_secrets_in_docs():
                 if "client_secret" in content:
                     # Allow mention of AZURE_CLIENT_SECRET in the context of local dev fallback
                     assert "azure_client_secret" in content
-                    assert content.count("client_secret") <= content.count("azure_client_secret")
+                    assert content.count("client_secret") <= content.count(
+                        "azure_client_secret"
+                    )
 
                 if "connectionstring" in content:
                     # Allow descriptive mentions
-                    assert any(allowed in content for allowed in ["reference", "azurefilesconnectionstring", "connection string requirement"])
+                    assert any(
+                        allowed in content
+                        for allowed in [
+                            "reference",
+                            "azurefilesconnectionstring",
+                            "connection string requirement",
+                        ]
+                    )
