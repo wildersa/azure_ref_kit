@@ -102,6 +102,14 @@ Enforcement is performed at the [Portal API Functions](../../building-blocks/fun
 3. Use the Static Web Apps CLI (`swa start`) to run the portal locally against the Functions API.
 4. Upload a sample file to the local `input` container to trigger the pipeline.
 
+## Validation
+
+To validate the solution contract, referenced building blocks, and customer-safe boundary:
+
+```bash
+python3 -m pytest solutions/document-ai-portal/tests/test_solution_contract.py
+```
+
 ## Known Limits
 
 - The current scaffold does not include real OCR ingestion or Agent runtime code.
