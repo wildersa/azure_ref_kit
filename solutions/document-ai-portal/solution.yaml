@@ -18,6 +18,7 @@ building_blocks:
   - building-blocks/pipelines/durable-basic-pipeline/
   - building-blocks/functions/ocr-document-intelligence/
   - building-blocks/functions/field-validation-worker/
+  - building-blocks/functions/final-result-publisher/
   - building-blocks/agents/pipeline-assistant-foundry/
   - building-blocks/observability/appinsights-observability/
 

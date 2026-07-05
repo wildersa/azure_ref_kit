@@ -25,6 +25,7 @@ A customer needs to upload documents (e.g., invoices, receipts, forms) and track
 - [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration.
 - [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker.
 - [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker.
+- [Final Result Publisher](../../building-blocks/functions/final-result-publisher/): Finalizes and publishes safe results.
 - [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction.
 - [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing.
 
@@ -42,9 +43,13 @@ graph TD
     OCRFunc -->|Analyze| DocIntel[Azure AI Document Intelligence]
 
     Orchestrator -->|Step 2: Validate| ValFunc[Field Validation Worker]
+    Orchestrator -->|Step 3: Publish| PubFunc[Final Result Publisher]
 
     Orchestrator -->|Updates| StatusStore[(Status Store)]
     Orchestrator -->|Saves| ArtifactStore[(Artifact Store)]
+
+    PubFunc -->|Updates| StatusStore
+    PubFunc -->|Saves| ArtifactStore
 
     Portal -->|Calls| PortalAPI[Portal API]
     PortalAPI -->|Reads| StatusStore
