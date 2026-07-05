@@ -69,6 +69,25 @@ graph TD
 - AI-powered assistance for clarifying results or errors.
 - Secure, scoped access to only their own artifacts and status.
 
+## Customer-Safe Status & Artifact Boundary
+
+This solution strictly enforces the [Customer-Safe Status Boundary](../../building-blocks/security/customer-safe-status-boundary/) to prevent exposure of technical internals.
+
+### Allowed Customer-Facing Data
+- **Business Status**: `pending`, `running`, `completed`, `failed`.
+- **Friendly Step Names**: "Analyzing Document", "Validating Data", "Finalizing Results".
+- **Safe Summaries**: "Processing successful", "Document unreadable".
+- **Extracted Fields**: Specific business data mapped to `pipeline-step.schema.json`.
+- **Friendly Errors**: Non-technical explanations for failures.
+
+### Forbidden Data (Internal-Only)
+- **Raw Logs**: No Function logs, stack traces, or internal resource IDs.
+- **Prompts**: No system instructions or grounded prompt text.
+- **Secrets**: No SAS tokens, API keys, or connection strings.
+- **Technical IDs**: No Azure Subscription IDs or raw resource URIs.
+
+Enforcement is performed at the [Portal API Functions](../../building-blocks/functions/portal-api-functions/) layer, which filters all outgoing data against the shared contracts.
+
 ## Deployment Assumptions
 
 - Azure subscription with AI Services (Document Intelligence) and AI Foundry enabled.
