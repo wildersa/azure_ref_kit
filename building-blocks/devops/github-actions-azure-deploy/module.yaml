@@ -1,0 +1,21 @@
+name: github-actions-azure-deploy
+type: devops
+category: devops
+status: reference
+purpose: Secure GitHub Actions deployment reference pattern using OIDC and federated identity.
+inputs:
+  - name: AZURE_CLIENT_ID
+    description: Client ID of the Microsoft Entra application or User-Assigned Managed Identity.
+    type: secret
+  - name: AZURE_TENANT_ID
+    description: Tenant ID of the Azure subscription.
+    type: secret
+  - name: AZURE_SUBSCRIPTION_ID
+    description: Subscription ID of the target Azure subscription.
+    type: secret
+outputs: []
+azure_resources: []
+contracts:
+  reads: []
+  writes: []
+  emits: []
