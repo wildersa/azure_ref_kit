@@ -3,11 +3,41 @@ type: security
 category: identity
 status: active
 purpose: Reference pattern for least-privilege identity and RBAC in Azure.
+description: >
+  This building block defines the standard for secure service-to-service authentication using
+  Managed Identities and Azure RBAC. It enforces a strict "no-secrets" policy by leveraging
+  Microsoft Entra ID. Wildcard permissions (*) and broad roles like 'Owner' or 'Contributor'
+  are strictly forbidden in favor of specific Data Plane roles.
 inputs: []
 outputs: []
+dependencies:
+  - name: azure-identity
+    type: sdk
+    version: "^1.12.0"
 azure_resources:
   - Microsoft Entra Managed Identity
   - Azure RBAC
+security_boundary:
+  policy: "Least-privilege Managed Identity access only"
+  forbid_wildcards: true
+  forbid_secrets: true
+  recommended_roles:
+    - role: "Storage Blob Data Reader"
+      description: "Read-only access to blobs."
+    - role: "Storage Blob Data Contributor"
+      description: "Read/Write/Delete access to blobs."
+    - role: "Storage Queue Data Message Processor"
+      description: "Read and process queue messages."
+    - role: "Cognitive Services User"
+      description: "Access to Azure AI services (OpenAI, Document Intelligence, etc.)"
+    - role: "Foundry User"
+      description: "Standard project-level access for AI Foundry agents."
+customer_safe_boundary:
+  forbid:
+    - "Internal Managed Identity Object IDs"
+    - "Tenant IDs"
+    - "Subscription IDs"
+    - "Raw Access Tokens"
 contracts:
   reads: []
   writes: []
