@@ -1,0 +1,21 @@
+name: agent-evaluation-observability
+type: guidance
+category: observability
+status: stable
+purpose: Tracing, evaluation, and monitoring expectations for agent flows.
+inputs: []
+outputs: []
+azure_resources:
+  - Azure AI Foundry
+  - Application Insights
+  - Azure Monitor
+contracts:
+  reads:
+    - OpenTelemetry spans
+    - Agent traces
+  writes:
+    - Redacted technical logs
+    - Evaluation results
+  emits:
+    - Quality metrics
+    - Safety metrics
