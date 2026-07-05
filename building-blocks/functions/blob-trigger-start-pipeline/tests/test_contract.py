@@ -1,6 +1,5 @@
 import yaml
 from pathlib import Path
-import json
 
 REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent
 MODULE_DIR = REPO_ROOT / "building-blocks" / "functions" / "blob-trigger-start-pipeline"
