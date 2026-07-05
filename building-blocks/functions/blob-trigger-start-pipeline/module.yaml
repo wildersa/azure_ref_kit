@@ -2,17 +2,46 @@ name: blob-trigger-start-pipeline
 type: azure-function-trigger
 category: pipeline-trigger
 status: scaffold
-purpose: Start a pipeline execution from a Blob Storage upload.
+purpose: Start a Document AI pipeline execution from a Blob Storage upload.
+
 inputs:
-  - blob_created_event
-  - customer_metadata
+  - name: blob_created_event
+    description: "Azure Storage blob created event (Event Grid or polling)."
+    type: object
+  - name: customer_metadata
+    description: "Extracted customer_id and document_type from blob metadata or path."
+    type: object
+
 outputs:
-  - pipeline_start_request
+  - name: pipeline_start_request
+    description: "Normalized request to start a Durable Functions orchestration."
+    type: object
+
+dependencies:
+  - shared/contracts/pipeline-run.schema.json
+  - building-blocks/pipelines/durable-basic-pipeline/
+
 azure_resources:
-  - Azure Functions
+  - Azure Functions (Flex Consumption)
   - Blob Storage
   - Event Grid
   - Application Insights
+
 contracts:
   emits:
     - shared/contracts/pipeline-run.schema.json
+
+customer_safe_boundary:
+  forbids:
+    - raw_storage_connection_strings
+    - sas_tokens
+    - raw_blob_urls
+    - stack_traces
+    - internal_resource_ids
+    - prompts
+    - provider_payloads
+  allows:
+    - run_id
+    - customer_id
+    - business_status
+    - friendly_step_names
