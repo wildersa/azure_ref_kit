@@ -46,6 +46,7 @@ No environment variables are required for this basic reference.
 
 ## Known limits
 - **Local-first**: This block is designed for local execution. For Azure hosting patterns, see [MCP on Azure Functions Reference Pattern](../azure-functions-mcp-endpoint/README.md).
+- **Foundry Agent Integration**: To see how to use this server with an Azure AI Foundry agent, see the [Foundry Agent with MCP](../../../solutions/foundry-agent-with-mcp/README.md) solution.
 - **Single Tool**: Only one read-only tool is implemented to maintain minimalism.
 - **Transport**: Defaulted to `stdio`.
 
