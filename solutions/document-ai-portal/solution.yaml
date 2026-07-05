@@ -17,6 +17,7 @@ building_blocks:
   - building-blocks/storage/blob-artifact-store/
   - building-blocks/pipelines/durable-basic-pipeline/
   - building-blocks/functions/ocr-document-intelligence/
+  - building-blocks/functions/field-validation-worker/
   - building-blocks/agents/pipeline-assistant-foundry/
   - building-blocks/observability/appinsights-observability/
 

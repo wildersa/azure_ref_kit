@@ -1,0 +1,53 @@
+name: field-validation-worker
+type: azure-function-worker
+category: document-ai
+status: scaffold
+purpose: Validate extracted fields against business rules and confidence thresholds after OCR.
+inputs:
+  - name: run_id
+    description: "The unique identifier for the pipeline run."
+    type: string
+  - name: artifact_id
+    description: "The ID of the OCR result artifact to validate."
+    type: string
+  - name: ruleset_id
+    description: "Optional identifier for the business ruleset to apply."
+    type: string
+outputs:
+  - name: validation_status
+    description: "The outcome of the validation (e.g., 'valid', 'invalid', 'warning')."
+    type: string
+  - name: missing_fields
+    description: "List of required fields that were not found."
+    type: array
+  - name: invalid_fields
+    description: "List of fields that failed business rule validation."
+    type: array
+  - name: artifacts
+    description: "List of new artifact IDs generated (e.g., validation report)."
+    type: array
+azure_resources:
+  - Azure Functions
+  - Blob Storage
+  - Application Insights
+contracts:
+  reads:
+    - shared/contracts/artifact.schema.json
+  emits:
+    - shared/contracts/pipeline-step.schema.json
+security_boundary:
+  policy: "Managed Identity access to Blob Storage for reading OCR artifacts and writing reports."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Storage Blob Data Reader"
+      description: "Allows reading the OCR result artifact from Blob Storage."
+    - role: "Storage Blob Data Contributor"
+      description: "Allows saving validation artifacts (reports) to Blob Storage."
+customer_safe_boundary:
+  forbid:
+    - "Raw validation engine execution logs"
+    - "Internal business ruleset technical definitions"
+    - "Storage SAS URLs"
+    - "Internal resource IDs and Subscription IDs"
+    - "Technical stack traces and raw error messages"

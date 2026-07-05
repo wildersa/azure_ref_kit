@@ -24,6 +24,7 @@ A customer needs to upload documents (e.g., invoices, receipts, forms) and track
 - [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results.
 - [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration.
 - [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker.
+- [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker.
 - [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction.
 - [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing.
 
@@ -37,8 +38,10 @@ graph TD
     BlobIn -->|Trigger| TriggerFunc[Blob Trigger Function]
     TriggerFunc -->|Starts| Orchestrator[Durable Orchestrator]
 
-    Orchestrator -->|Step: OCR| OCRFunc[OCR Worker]
+    Orchestrator -->|Step 1: OCR| OCRFunc[OCR Worker]
     OCRFunc -->|Analyze| DocIntel[Azure AI Document Intelligence]
+
+    Orchestrator -->|Step 2: Validate| ValFunc[Field Validation Worker]
 
     Orchestrator -->|Updates| StatusStore[(Status Store)]
     Orchestrator -->|Saves| ArtifactStore[(Artifact Store)]
