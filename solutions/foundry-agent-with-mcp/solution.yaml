@@ -1,0 +1,8 @@
+name: foundry-agent-with-mcp
+status: active
+purpose: Reference solution for a Foundry agent consuming an MCP server through a minimal MCP tool boundary.
+entrypoints:
+  sdk_invocation: AIProjectClient
+building_blocks:
+  - building-blocks/mcp/fastmcp-basic-server
+contracts: []
