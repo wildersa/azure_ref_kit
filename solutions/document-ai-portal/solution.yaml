@@ -1,21 +1,46 @@
 name: document-ai-portal
 status: scaffold
-purpose: Customer-facing document AI pipeline monitoring solution.
+purpose: "A customer-facing portal for monitoring and interacting with a Document AI pipeline, featuring OCR extraction and an AI assistant."
+
 entrypoints:
-  manual_start: portal-api-functions
-  upload_start: blob-trigger-start-pipeline
+  blob_upload:
+    description: "Pipeline starts when a document is uploaded to the input container."
+    target: building-blocks/functions/blob-trigger-start-pipeline/
+  portal_ui:
+    description: "Customer accesses the portal to view status and ask questions."
+    target: building-blocks/portals/static-status-portal/
+
 building_blocks:
-  - building-blocks/portals/static-status-portal
-  - building-blocks/functions/portal-api-functions
-  - building-blocks/functions/blob-trigger-start-pipeline
-  - building-blocks/functions/ocr-document-intelligence
-  - building-blocks/pipelines/durable-basic-pipeline
-  - building-blocks/agents/pipeline-assistant-foundry
-  - building-blocks/storage/blob-artifact-store
-  - building-blocks/observability/appinsights-observability
-  - building-blocks/security/entra-external-id-auth
+  - building-blocks/portals/static-status-portal/
+  - building-blocks/functions/portal-api-functions/
+  - building-blocks/functions/blob-trigger-start-pipeline/
+  - building-blocks/storage/blob-artifact-store/
+  - building-blocks/pipelines/durable-basic-pipeline/
+  - building-blocks/functions/ocr-document-intelligence/
+  - building-blocks/agents/pipeline-assistant-foundry/
+  - building-blocks/observability/appinsights-observability/
+
 contracts:
   - shared/contracts/pipeline-run.schema.json
   - shared/contracts/pipeline-step.schema.json
   - shared/contracts/artifact.schema.json
   - shared/contracts/cost-ledger.schema.json
+
+inputs:
+  - name: document_blob
+    description: "The source document uploaded by the customer."
+    type: blob
+  - name: customer_id
+    description: "Identifier for the customer owning the document."
+    type: string
+
+outputs:
+  - name: customer_portal_url
+    description: "The URL of the deployed Static Web App portal."
+    type: string
+  - name: extracted_data
+    description: "The structured data extracted from the document."
+    type: object
+  - name: agent_answer
+    description: "Response from the pipeline assistant agent."
+    type: string
