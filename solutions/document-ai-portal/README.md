@@ -28,6 +28,7 @@ A customer needs to upload documents (e.g., invoices, receipts, forms) and track
 - [Final Result Publisher](../../building-blocks/functions/final-result-publisher/): Finalizes and publishes safe results.
 - [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction.
 - [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing.
+- [Cost Ledger Capture](../../building-blocks/observability/cost-ledger-capture/): Internal cost estimate capture.
 
 ## Service-Level Diagram
 
@@ -44,6 +45,10 @@ graph TD
 
     Orchestrator -->|Step 2: Validate| ValFunc[Field Validation Worker]
     Orchestrator -->|Step 3: Publish| PubFunc[Final Result Publisher]
+
+    OCRFunc -->|Record Cost| CostLedger[Cost Ledger Capture]
+    ValFunc -->|Record Cost| CostLedger
+    PubFunc -->|Record Cost| CostLedger
 
     Orchestrator -->|Updates| StatusStore[(Status Store)]
     Orchestrator -->|Saves| ArtifactStore[(Artifact Store)]
