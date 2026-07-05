@@ -7,6 +7,9 @@ inputs:
   - name: run_id
     description: "The unique identifier for the pipeline run."
     type: string
+  - name: correlation_id
+    description: "Optional opaque identifier for customer-side tracking."
+    type: string
   - name: validation_status
     description: "The outcome of the previous validation step (e.g., 'valid', 'warning')."
     type: string

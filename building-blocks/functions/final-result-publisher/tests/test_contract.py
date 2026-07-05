@@ -63,6 +63,8 @@ def test_readme_compliance():
     assert "### Forbidden Data (Internal-Only)" in content
     assert "- **Prompts**:" in content
     assert "- **Internal Azure IDs**:" in content
+    assert "- **Correlation Preservation**:" in content
+    assert "- **Internal ID Redaction**:" in content
     assert "## Failure Model" in content
     assert "## Deployment Assumptions" in content
     assert "## Known Limits" in content

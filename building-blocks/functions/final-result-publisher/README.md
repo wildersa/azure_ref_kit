@@ -23,6 +23,7 @@ graph TD
 - **Trigger**: Invoked as a Durable Functions activity after the `Field Validation Worker` has completed.
 - **Inputs**:
   - `run_id`: The unique identifier for the pipeline run.
+  - `correlation_id`: (Optional) Opaque identifier provided by the customer or portal for end-to-end tracking.
   - `validation_status`: The outcome from the validation step (e.g., `valid`, `warning`).
   - `artifact_ids`: A list of artifact IDs (e.g., extracted JSON, validation report) that should be made visible to the customer.
 
@@ -30,6 +31,8 @@ graph TD
 
 - **Artifact Finalization**: Updates the `is_customer_visible` flag to `true` for all specified `artifact_ids` in the artifact store.
 - **Status Finalization**: Updates the `pipeline-run` status to `completed` (or `failed` if validation was critical).
+- **Correlation Preservation**: Ensures the `correlation_id` is preserved in the final status store record to facilitate customer-side tracking across the portal boundary.
+- **Internal ID Redaction**: Explicitly strips technical orchestration IDs, activity IDs, and internal task references before finalizing the customer-safe record.
 - **Business Summary**: Generates a final, customer-friendly `business_summary` of the entire processing run.
 - **Idempotency**: Ensures that multiple calls with the same `run_id` do not create duplicate final states or redundant notifications.
 
