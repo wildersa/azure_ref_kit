@@ -59,6 +59,7 @@ graph TD
     Portal -->|Calls| PortalAPI[Portal API]
     PortalAPI -->|Reads| StatusStore
     PortalAPI -->|Reads| ArtifactStore
+    PortalAPI -->|Reads| CostLedger
 
     Portal -->|Query| Agent[Pipeline Assistant Agent]
     Agent -->|Tools| StatusStore
@@ -92,12 +93,14 @@ This solution strictly enforces the [Customer-Safe Status Boundary](../../buildi
 - **Safe Summaries**: "Processing successful", "Document unreadable".
 - **Extracted Fields**: Specific business data mapped to `pipeline-step.schema.json`.
 - **Friendly Errors**: Non-technical explanations for failures.
+- **Aggregated Cost**: Total estimated amount for the run.
 
 ### Forbidden Data (Internal-Only)
 - **Raw Logs**: No Function logs, stack traces, or internal resource IDs.
 - **Prompts**: No system instructions or grounded prompt text.
 - **Secrets**: No SAS tokens, API keys, or connection strings.
 - **Technical IDs**: No Azure Subscription IDs or raw resource URIs.
+- **Provider Payloads**: No raw JSON from Document Intelligence or OpenAI.
 
 Enforcement is performed at the [Portal API Functions](../../building-blocks/functions/portal-api-functions/) layer, which filters all outgoing data against the shared contracts.
 

@@ -2,21 +2,60 @@ name: portal-api-functions
 type: azure-functions-api
 category: api
 status: scaffold
-purpose: Backend API for customer-facing pipeline status and actions.
+purpose: Backend API layer providing customer-safe access to Document AI pipeline status, artifacts, and costs.
 inputs:
-  - authenticated_customer_request
+  - name: authenticated_customer_request
+    description: "Incoming HTTPS request from the portal, typically authenticated via SWA or EasyAuth."
+    type: request
+  - name: customer_id
+    description: "The unique identifier of the customer extracted from the authenticated context."
+    type: string
 outputs:
-  - pipeline_run_summary
-  - pipeline_run_detail
-  - artifact_links
-  - friendly_errors
+  - name: pipeline_run_summary
+    description: "A list of summarized pipeline runs for the customer."
+    type: array
+  - name: pipeline_run_detail
+    description: "Full details and step timeline for a specific pipeline run."
+    type: object
+  - name: artifact_metadata
+    description: "Metadata for customer-visible artifacts."
+    type: array
+  - name: cost_summary
+    description: "Aggregated estimated cost for a specific run."
+    type: number
+  - name: friendly_errors
+    description: "Non-technical error messages and correlation IDs."
+    type: object
 azure_resources:
   - Azure Functions
   - Application Insights
-  - Optional API Management
+  - Azure Static Web Apps (Backend)
+  - Storage Tables (Status Store)
+  - Blob Storage (Artifact Metadata)
 contracts:
   reads:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
     - shared/contracts/artifact.schema.json
     - shared/contracts/cost-ledger.schema.json
+  emits:
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+    - shared/contracts/artifact.schema.json
+security_boundary:
+  policy: "Enforces strict data isolation by customer_id and filters responses against safe schemas."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Storage Table Data Reader"
+      description: "Allows reading pipeline status from the status store."
+    - role: "Storage Blob Data Reader"
+      description: "Allows reading artifact metadata from the artifact store."
+customer_safe_boundary:
+  forbid:
+    - "Raw Azure Function logs or internal execution traces"
+    - "Internal technical exception payloads and stack traces"
+    - "Storage account keys, SAS tokens, or connection strings"
+    - "System prompts or LLM grounding instructions"
+    - "Internal Azure Resource IDs, Tenant IDs, or Subscription IDs"
+    - "Raw provider payloads from Document Intelligence or OpenAI"
