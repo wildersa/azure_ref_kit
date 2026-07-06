@@ -1,129 +1,115 @@
-# Container-Hosted Agent API
+# Container-hosted Agent API
+
+Reference building block defining when and how to package an agent-facing API as a container instead of using serverless functions or static web apps.
 
 ## Purpose
 
-This building block provides a reference pattern for packaging and hosting an AI agent or agent-facing API as a container. It documents when to choose container-based hosting over serverless functions and how to structure the container for Azure deployment.
+Provide a standard hosting contract for agentic workloads that require custom runtimes, long-running processes, or specific system dependencies that exceed the limits of serverless environments like Azure Functions.
 
-## Justification: Why Container Hosting?
+## When to Use Containers
 
-Choosing the right hosting platform depends on the architectural requirements:
+- **Custom Dependencies:** Your agent requires OS-level libraries (e.g., PDF processing, specialized OCR engines, or ML runtimes) not available in standard serverless environments.
+- **Long-Running Requests:** The agent task exceeds the timeout limits of Azure Functions (typically 10 minutes).
+- **Consistent Execution Environment:** You need bit-for-bit parity between local development, CI/CD, and production.
+- **Streaming Responses:** You require long-lived HTTP connections for token-by-token streaming that may be throttled or interrupted in some serverless tiers.
+- **Resource Intensity:** The workload requires specific CPU/Memory ratios or GPU access not easily met by standard serverless plans.
 
-| Feature | Azure Functions | Azure App Service | Azure Container Apps |
-| :--- | :--- | :--- | :--- |
-| **Primary Use** | Event-driven, short-lived tasks | Web apps, monolithic APIs | Microservices, serverless containers |
-| **Execution Time** | Limited (default 5-10 mins) | Unbounded | Unbounded |
-| **Scaling** | Scale to zero (Consumption) | Manual/Autoscale (App Service Plan) | Scale to zero, event-driven (KEDA) |
-| **Dependencies** | Limited by runtime | Full control (via Docker) | Full control (via Docker) |
-| **Dapr Support** | No | No | Yes (Native) |
+## When NOT to Use Containers
 
-**Use Container Hosting when:**
-- Your agent requires custom OS-level dependencies or a specific Linux distribution.
-- You need long-running execution beyond Function limits (e.g., complex multi-step reasoning).
-- You want to utilize the [Dapr](https://dapr.io/) runtime for service discovery and state management.
-- You have an existing containerized API that you are extending with agent capabilities.
+- **Simple Request/Response:** If the API just orchestrates a few calls to Azure AI services, Azure Functions is usually more cost-effective and easier to manage.
+- **Low Traffic:** Serverless functions scale to zero and cost nothing when idle. Containers (unless using specialized serverless tiers like Container Apps with scale-to-zero) often incur a base cost.
+- **Frontend Only:** Static content and simple React/Vue/Svelte frontends should use Azure Static Web Apps.
 
-## Architecture
+## Comparison with Other Hosting Options
 
-The following diagram illustrates the flow from a client through the container boundary to the agent logic and observability.
+| Feature | Azure Functions | Container Apps | App Service (Web App) |
+|---------|-----------------|----------------|-----------------------|
+| **Best For** | Event-driven, small tasks | Microservices, custom runtimes | Monolithic APIs, legacy apps |
+| **Scaling** | Fast, scale-to-zero | Fast, scale-to-zero (KEDA) | Slower, plan-based |
+| **Runtime** | Managed stacks | Any (Container) | Managed or Container |
+| **Complexity** | Low | Medium | Low to Medium |
+| **Cost Model** | Pay-per-execution / Flex | Pay-per-use (CPU/Mem) | Plan-based (Reserved) |
+
+## API Boundary
+
+The container-hosted API acts as a secure gateway between the agent client and the internal tools/services. It must enforce the `customer-safe-status-boundary`.
 
 ```mermaid
-flowchart LR
-    Client[Client / Portal] --> API[Container API Entrypoint]
-    subgraph Container[Container Boundary]
-        API --> AgentLogic[Agent / Tool Logic]
-        AgentLogic --> Registry[Internal Tool Registry]
+flowchart TD
+    subgraph "Public Internet"
+        Client[Agent Client / UI]
     end
-    AgentLogic --> Foundry[Azure AI Foundry / Models]
-    AgentLogic --> ExternalTools[External APIs / MCP Servers]
-    Container -.-> Obs[Azure Monitor / App Insights]
+
+    subgraph "Azure Container Boundary"
+        API[FastAPI / Flask / Node Container]
+        subgraph "Internal Logic"
+            Orch[Agent Orchestrator]
+        end
+    end
+
+    subgraph "Internal / Protected Services"
+        Tools[Azure Functions Tools]
+        LLM[Azure OpenAI / Foundry]
+        Data[Blob Storage / Cosmos DB]
+    end
+
+    Client -->|REST API / WebSocket| API
+    API --> Orch
+    Orch -->|Tool Call| Tools
+    Orch -->|Inference| LLM
+    Orch -->|State| Data
+
+    API -.->|Safe Status| Client
 ```
 
-## Minimal File Layout
-
-A reference container-hosted agent API should follow this minimal structure:
-
-```text
-building-blocks/hosting/container-agent-api/
-├── Dockerfile          # Multi-stage build for Python/FastAPI
-├── main.py             # Entrypoint (e.g., FastAPI/Uvicorn)
-├── requirements.txt    # Python dependencies
-└── module.yaml         # Module contract
-```
-
-### Dockerfile Recommendation
-
-```dockerfile
-# Use a slim Python base image
-FROM python:3.11-slim as builder
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Final stage
-FROM python:3.11-slim
-WORKDIR /app
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY . .
-
-EXPOSE 8080
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-```
-
-## Local Run
+## Local / Demo Flow
 
 To run the agent API locally using Docker:
 
-1. Build the image:
+1. **Build the image:**
    ```bash
-   docker build -t container-agent-api .
-   ```
-2. Run the container:
-   ```bash
-   docker run -p 8080:8080 --env-file .env container-agent-api
+   docker build -t agent-api .
    ```
 
-Verify the service by visiting `http://localhost:8080/health`.
+2. **Run the container:**
+   ```bash
+   docker run -p 8080:8080 \
+     -e AZURE_OPENAI_ENDPOINT="https://..." \
+     -e AZURE_OPENAI_KEY="your-key" \
+     agent-api
+   ```
 
-## Configuration
+3. **Test the endpoint:**
+   ```bash
+   curl http://localhost:8080/health
+   ```
 
-### Environment Variables
-- `PORT`: Port the container listens on (default: 8080).
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: For observability.
-- `AZURE_CLIENT_ID`: Required for User-Assigned Managed Identity.
-
-### Secrets Handling
-- **Azure Container Apps:** Use [Secret references](https://learn.microsoft.com/en-us/azure/container-apps/manage-secrets) mapped to environment variables.
-- **Azure App Service:** Use [Key Vault references](https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references) in Application Settings.
-
-### Health Checks
-Implement a `/health` or `/ready` endpoint to allow the hosting platform to monitor container status.
-- **Container Apps:** Configure `liveness`, `readiness`, and `startup` probes.
-- **App Service:** Enable "Health check" in the "Monitoring" section.
-
-## Known Limits and Trade-offs
-
-- **Cold Starts:** Serverless containers (ACA) may experience cold starts when scaling from zero.
-- **State:** Containers are ephemeral. Use Azure Blob Storage, Cosmos DB, or Managed Redis for session persistence.
-- **Networking:** Private networking (VNet integration) is recommended for production but increases complexity.
-
-## Deployment Notes
+## Azure Hosting Notes
 
 ### Azure Container Apps (Recommended)
-Container Apps is the preferred serverless platform for modern containerized agents.
-```bash
-az containerapp up --name my-agent-api --source .
-```
+- **Scale to Zero:** Ideal for agent workloads that aren't constant.
+- **Dapr Integration:** Useful for state management and service-to-service communication.
+- **KEDA Scalers:** Can scale based on queue depth or custom metrics.
 
-### Azure App Service
-Use App Service if you require a more traditional Web App environment or specific Windows container support.
-```bash
-az webapp create --name my-agent-api --plan my-plan --deployment-container-image-name myregistry.azurecr.io/my-agent:latest
-```
+### Azure App Service for Containers
+- **Stability:** Better suited for long-lived, high-throughput monolithic APIs.
+- **WebSockets:** Excellent support for persistent connections.
+- **Easy Transition:** Good for teams already familiar with App Service.
 
-## References
+## Security Notes
 
-- [Azure Container Apps overview](https://learn.microsoft.com/en-us/azure/container-apps/overview)
-- [Azure App Service custom containers](https://learn.microsoft.com/en-us/azure/app-service/quickstart-custom-container)
-- [Microsoft Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
+- **Managed Identity:** Use User-Assigned Managed Identity to access Azure OpenAI, Storage, and Key Vault. Avoid API keys in environment variables.
+- **Private Networking:** Deploy the container within a VNet and use Private Endpoints for downstream services.
+- **Customer-Safe Boundary:** Ensure the API filters raw model outputs and technical logs. Never expose internal stack traces or prompts to the client.
+
+## Cost & Ops Trade-offs
+
+- **Operational Overhead:** Managing Dockerfiles and container registries adds complexity compared to pure serverless.
+- **Cold Starts:** Containers may have longer "cold starts" than Functions if scaling from zero.
+- **Cost Predictability:** App Service Plans provide fixed costs, while Container Apps can be more variable but efficient for bursty workloads.
+
+## Known Limits
+
+- **Port Limits:** Azure App Service generally expects only one exposed port (defaults to 80 or 8080).
+- **Ephemeral Storage:** Local disk changes are lost when the container restarts. Use Azure Files or Blob Storage for persistence.
+- **Registry Dependency:** Requires an Azure Container Registry (ACR) or similar for deployment.
