@@ -23,6 +23,9 @@ building_blocks:
   - building-blocks/observability/appinsights-observability/
   - building-blocks/observability/cost-ledger-capture/
 
+infra:
+  - solutions/document-ai-portal/infra/terraform/
+
 contracts:
   - shared/contracts/pipeline-run.schema.json
   - shared/contracts/pipeline-step.schema.json

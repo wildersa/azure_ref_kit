@@ -111,6 +111,8 @@ Enforcement is performed at the [Portal API Functions](../../building-blocks/fun
 - Azure Static Web App for hosting the frontend.
 - Azure Functions (Flex Consumption) for APIs and workers.
 
+The solution provides a [Terraform foundation](./infra/terraform/) for provisioning these resources.
+
 ## Local / Demo Flow
 
 1. Use [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) to run the Functions project.
