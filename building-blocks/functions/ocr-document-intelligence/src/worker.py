@@ -86,8 +86,12 @@ def process_ocr_task(
             "finished_at": datetime.now(timezone.utc).isoformat(),
         }
 
-    except Exception as e:
-        logging.error(f"OCR failed for run_id={run_id}: {str(e)}")
+    except Exception:
+        # We explicitly do not log str(e) to avoid leaking secrets, SAS tokens, or internal URLs
+        # that are often present in Azure SDK exception messages.
+        logging.error(
+            f"OCR failed for run_id={run_id}. See Application Insights for technical details."
+        )
         # Map to safe failure response
         return {
             "run_id": run_id,

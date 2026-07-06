@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from src.worker import process_ocr_task
 
 
@@ -108,6 +108,30 @@ class TestOCRWorker(unittest.TestCase):
         self.assertNotIn("internal_metadata", result)
         self.assertNotIn("subscription_id", result)
         self.assertNotIn("SECRET_STUFF", str(result))
+
+    @patch("src.worker.logging")
+    def test_process_ocr_task_safe_logging(self, mock_logging):
+        # Mock failure with sensitive information
+        sensitive_error = "Error: https://secret.blob.core.windows.net/container/doc.pdf?sig=SECRET_SAS_TOKEN"
+        self.storage_adapter.download_blob.side_effect = Exception(sensitive_error)
+
+        # Call worker
+        process_ocr_task(
+            self.run_id,
+            self.artifact_id,
+            self.document_type,
+            self.storage_ref,
+            self.doc_intel_adapter,
+            self.storage_adapter,
+        )
+
+        # Verify that the sensitive information was NOT logged
+        # Ensure logging.error was called
+        mock_logging.error.assert_called()
+        # Get the call arguments
+        call_args = mock_logging.error.call_args[0][0]
+        self.assertNotIn("https://secret.blob.core.windows.net", call_args)
+        self.assertNotIn("SECRET_SAS_TOKEN", call_args)
 
 
 if __name__ == "__main__":
