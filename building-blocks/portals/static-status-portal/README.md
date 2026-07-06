@@ -1,78 +1,118 @@
-# Static Status Portal
+# Static Status Portal Shell Contract
 
-Customer-facing portal reference for tracking AI pipeline executions.
+Customer-facing portal reference for tracking AI pipeline executions using Azure Static Web Apps.
 
 ## Purpose
 
-Expose business-friendly status for AI pipelines without requiring the customer to access Azure Portal, Functions logs, Foundry, or technical dashboards. This module defines the contract and scaffold for a React application hosted on Azure Static Web Apps.
+Expose business-friendly status for AI pipelines without requiring the customer to access Azure Portal, Functions logs, Foundry, or technical dashboards. This module defines the contract and UI shell for a React application hosted on Azure Static Web Apps.
 
-## Scenario
+## Portal Responsibilities
 
-A customer initiates a long-running AI task (e.g., "Analyze Legal Document"). Instead of waiting for an email or checking technical logs, they are directed to this portal to:
-1. Track real-time progress of the analysis steps.
-2. View a business-level summary of the findings.
-3. Download generated artifacts (e.g., a summary PDF).
-4. See an estimate of the execution cost.
-5. Understand any failures through friendly, non-technical error messages.
+- **Authentication Handling**: Leverage Azure Static Web Apps built-in authentication (EasyAuth) to identify the customer.
+- **Data Presentation**: Map technical JSON responses from the Portal API to human-readable UI components.
+- **Security Enforcement**: Ensure no technical internals are displayed by strictly adhering to the customer-safe boundary.
+- **State Management**: Provide real-time or polling-based updates for active pipeline runs.
 
-## Architecture
+## Architecture Boundary
 
-The portal follows a serverless architecture, separating the presentation layer from the status storage through a controlled API boundary.
+The following Mermaid diagram represents the flow from the customer to the underlying status responses, mediated by the Portal API.
 
 ```mermaid
-flowchart LR
-    Customer[Customer] -->|HTTPS| SWA[Static Web Apps Portal]
-    SWA -->|REST| API[Functions API / Status Endpoint]
-    API -->|Reads| Store[(Status Store)]
-    Store -.->|Artifact Metadata| Artifacts[Safe Artifact Storage]
-    API -->|Validates| Boundary{Status Boundary}
-    Boundary -->|Safe JSON| SWA
+graph TD
+    Customer([Customer]) -->|HTTPS| Portal[Static Web Apps Portal]
+    Portal -->|REST| API[Portal API Functions]
+
+    subgraph "Customer-Safe API Responses"
+        API -->|JSON| RunList[Run List Response]
+        API -->|JSON| RunDetail[Run Detail/Timeline Response]
+        API -->|JSON| Artifacts[Artifact Metadata Response]
+        API -->|JSON| Cost[Cost Summary Response]
+    end
+
+    subgraph "Internal Enforcement"
+        API -.->|Filters| Boundary{Customer-Safe Boundary}
+    end
 ```
 
-## Expected UI Sections
+## UI Surface Contract
 
-- **Run List:** A dashboard view showing recent pipeline executions with their status (`running`, `completed`, `failed`), start time, and pipeline type.
-- **Run Detail:** A focused view for a specific run showing the `business_summary`, total `progress_percent`, and `estimated_cost`.
-- **Step Timeline:** A vertical or horizontal timeline representing `PipelineStep` objects. Each step shows its `name` (as a business-friendly step name), status, and `output_summary`.
-- **Artifact List:** A section within the detail view listing available `Artifact` objects (using `safe_name`) marked as `is_customer_visible: true`.
-- **Friendly Error Panel:** A prominent alert shown when a run or step fails, using the `friendly_error` field instead of technical stack traces.
+The portal defines the following primary UI surfaces. Implementation must use the fields provided by the `shared/contracts/` schemas.
 
-## API Contract
+### 1. Run List (Dashboard)
+- **Source**: `GET /runs`
+- **Fields**: `id`, `pipeline_type`, `status`, `created_at`.
+- **Behavior**: Displays a table or list of recent executions. Status should be color-coded (e.g., green for `completed`, red for `failed`).
 
-The portal expects a backend API (typically Azure Functions) to expose the following endpoints, returning data that strictly adheres to the `shared/contracts/` schemas.
+### 2. Run Detail & Timeline
+- **Source**: `GET /runs/{id}`
+- **Fields**: `business_summary`, `progress_percent`, `friendly_error`, `started_at`, `finished_at`.
+- **Timeline Components**: Displays a list of `PipelineStep` objects showing `name` (Friendly Name), `status`, and `output_summary`.
+
+### 3. Artifacts List
+- **Source**: `GET /runs/{id}/artifacts`
+- **Fields**: `id`, `safe_name`, `kind`, `size_bytes`, `created_at`.
+- **Behavior**: Lists files available for download.
+- **Download Action**: Must use an opaque, customer-safe proxied route (e.g., `GET /api/artifacts/{id}/download`).
+- **Constraint**: The `storage_ref` field is **internal-only metadata** and must never be exposed or used by the frontend to construct direct storage URLs or SAS links.
+
+### 4. Cost Summary
+- **Source**: `GET /runs/{id}/cost`
+- **Fields**: `estimated_amount`, `currency`.
+- **Behavior**: Displays the aggregated estimate for the specific run.
+
+### 5. Friendly Error Panel
+- **Trigger**: Displayed when `PipelineRun.status` is `failed` or a step fails.
+- **Field**: `PipelineRun.friendly_error`.
+- **Constraint**: Must NEVER display `internal_log` or `stack_trace`.
+
+### 6. Start Run Placeholder
+- **Source**: `POST /runs/start`
+- **Behavior**: A "New Processing Run" button that initiates a pipeline and redirects to the new Run Detail page.
+
+## API Contract Usage
+
+The portal consumes the [Portal API Functions](../../functions/portal-api-functions/) contract.
 
 | Endpoint | Method | Response Schema | Description |
 |----------|--------|-----------------|-------------|
-| `/api/runs` | GET | `PipelineRun[]` | List recent runs for the authenticated customer. |
-| `/api/runs/{id}` | GET | `PipelineRun` | Detailed status of a specific run. |
-| `/api/runs/{id}/steps` | GET | `PipelineStep[]` | List of steps for a specific run. |
-| `/api/runs/{id}/artifacts` | GET | `Artifact[]` | List of customer-visible artifacts. |
+| `/api/runs` | GET | `PipelineRun[]` | List recent runs. |
+| `/api/runs/{id}` | GET | `PipelineRun` | Detailed status and steps. |
+| `/api/runs/{id}/artifacts` | GET | `Artifact[]` | List customer-visible artifacts. |
+| `/api/artifacts/{id}/download` | GET | `Stream` | Opaque download route (proxied by API). |
+| `/api/runs/{id}/cost` | GET | `number` (Aggregate) | Get total estimated cost. |
+| `/api/runs/start` | POST | `PipelineRun` | Manually trigger a new run. |
 
-## Security and Status Boundary
+## Customer-Safe Status Boundary
 
-This portal strictly enforces the **SEC-001 Customer-Safe Status Boundary**.
+This portal strictly enforces the [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/).
 
-### Explicitly Forbidden Fields
-The portal and its supporting API **must not** expose:
-- **Raw Logs:** No technical stdout/stderr or function execution logs.
-- **Prompts:** No LLM system prompts or few-shot examples.
-- **Secrets:** No API keys, SAS tokens (unless short-lived for download), or connection strings.
-- **Stack Traces:** No code-level error details or file paths.
-- **Internal Payloads:** No raw JSON responses from Azure AI Foundry or DevOps APIs.
-- **Resource IDs:** No raw Azure Subscription or Resource Group IDs.
+### Forbidden Data (Internal-Only)
+The following items **must never** be exposed in the UI or stored in the portal's local state:
+- **Raw Logs**: No technical stdout/stderr or function execution logs.
+- **Prompts**: No LLM system prompts, instructions, or grounding text.
+- **Provider Payloads**: No raw JSON from Document Intelligence or OpenAI.
+- **Azure Resource IDs**: No Azure Subscription IDs, Tenant IDs, or Resource Group names.
+- **Tenant IDs**: No technical tenant identifiers.
+- **Subscription IDs**: No technical subscription identifiers.
+- **Secrets**: No storage keys, SAS tokens, or connection strings.
+- **Storage Internals**: No `storage_ref` or raw container/blob names.
+- **Internal Exceptions**: No stack traces, file paths, or line numbers.
+- **Stack Traces**: No internal code execution details.
 
-## Local and Demo Assumptions
+## Local / Demo Flow
 
-- **Mock API:** For local development without a backend, the portal can consume static JSON files matching the schemas in `shared/contracts/`.
-- **Auth:** Authentication is assumed to be handled by Azure Static Web Apps (EasyAuth) or Entra External ID, providing a `customer_id` header to the backend API.
+1. **Mock Data**: Use the schemas in `shared/contracts/` to generate mock JSON files.
+2. **Local Development**: Run a React dev server (e.g., Vite) and proxy `/api` requests to a local instance of `portal-api-functions` or a mock server.
+3. **SWA CLI**: Use `swa start http://localhost:5173 --api-location http://localhost:7071` to test the integrated experience.
 
-## Deployment Notes
+## Deployment Assumptions
 
-- **Host:** Azure Static Web Apps (Standard or Free tier).
-- **API:** Integrated Azure Functions (Managed or Linked).
-- **CI/CD:** Deployed via GitHub Actions or Azure Pipelines using the standard SWA deployment task.
+- **Host**: Azure Static Web Apps (SWA).
+- **API Integration**: Linked Azure Functions (Flex Consumption) providing the Portal API.
+- **Authentication**: SWA Built-in authentication (EasyAuth).
 
 ## Known Limits
 
-- **Read-Only:** This scaffold focus is on status visibility. It does not include pipeline triggering or mutation tools by default.
-- **Latency:** Status updates depend on the underlying pipeline (e.g., Durable Functions) updating the status store.
+- **Read-Only Focus**: The primary purpose is status monitoring; complex data mutation is out of scope.
+- **Latency**: UI updates are subject to the polling interval or the latency of the underlying status store.
+- **Authentication Scope**: Assumes `customer_id` is derived from the SWA authentication header and handled by the API.
