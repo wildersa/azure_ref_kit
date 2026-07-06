@@ -21,6 +21,7 @@ building_blocks:
   - building-blocks/functions/final-result-publisher/
   - building-blocks/agents/pipeline-assistant-foundry/
   - building-blocks/observability/appinsights-observability/
+  - building-blocks/observability/cost-ledger-capture/
 
 contracts:
   - shared/contracts/pipeline-run.schema.json

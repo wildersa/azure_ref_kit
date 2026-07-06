@@ -1,0 +1,32 @@
+name: cost-ledger-capture
+type: observability
+category: operations
+status: scaffold
+purpose: Capture estimated internal cost entries for pipeline steps without exposing technical billing internals.
+inputs:
+  - name: run_id
+    description: "Unique identifier for the pipeline run."
+    type: string
+  - name: category
+    description: "Cost category (e.g., ai_tokens, storage, function_execution)."
+    type: string
+  - name: estimated_amount
+    description: "The estimated cost amount."
+    type: number
+outputs:
+  - name: ledger_entry
+    description: "The recorded cost ledger entry conforming to cost-ledger.schema.json."
+    type: object
+contracts:
+  emits:
+    - shared/contracts/cost-ledger.schema.json
+customer_safe_boundary:
+  forbid:
+    - "Raw billing records"
+    - "Azure Subscription IDs"
+    - "Azure Tenant IDs"
+    - "Resource Group names"
+    - "Provider payloads (e.g., raw Cost Management responses)"
+    - "Technical logs and execution traces"
+    - "Secrets, tokens, and connection strings"
+    - "Customer identifiers (except when mapped to run_id)"
