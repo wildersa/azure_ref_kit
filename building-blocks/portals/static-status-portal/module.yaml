@@ -8,28 +8,39 @@ runtime:
 purpose: Customer-facing UI for monitoring AI pipeline executions.
 inputs:
   - name: pipeline_runs_api
-    description: API endpoint for listing recent runs.
+    description: "API endpoint for listing recent runs."
     contract: shared/contracts/pipeline-run.schema.json
   - name: pipeline_run_detail_api
-    description: API endpoint for a specific run and its steps.
+    description: "API endpoint for a specific run and its steps."
     contracts:
       - shared/contracts/pipeline-run.schema.json
       - shared/contracts/pipeline-step.schema.json
   - name: artifacts_api
-    description: API endpoint for customer-visible artifacts.
+    description: "API endpoint for customer-visible artifacts."
     contract: shared/contracts/artifact.schema.json
+  - name: cost_api
+    description: "API endpoint for aggregated run costs."
+    contract: shared/contracts/cost-ledger.schema.json
 outputs:
   - name: customer_status_view
-    description: A secure, curated view of pipeline progress and results.
+    description: "A secure, curated view of pipeline progress and results."
     type: portal-view
 azure_resources:
   - Azure Static Web Apps
-  - Optional Entra External ID
 contracts:
   reads:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
     - shared/contracts/artifact.schema.json
-security:
-  boundary: building-blocks/security/customer-safe-status-boundary/README.md
-  enforcement: "Explicitly forbids raw logs, prompts, secrets, and internal resource IDs."
+    - shared/contracts/cost-ledger.schema.json
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+customer_safe_boundary:
+  forbid:
+    - "Raw Azure Function logs or internal execution traces"
+    - "Internal technical exception payloads and stack traces"
+    - "Storage account keys, SAS tokens, or connection strings"
+    - "System prompts or LLM grounding instructions"
+    - "Internal Azure Resource IDs, Tenant IDs, or Subscription IDs"
+    - "Raw provider payloads from Document Intelligence or OpenAI"
