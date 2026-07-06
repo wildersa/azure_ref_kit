@@ -1,14 +1,18 @@
 name: pipeline-assistant-foundry
 type: azure-ai-foundry-agent
 category: agent
-status: scaffold
+status: implemented
 purpose: Customer-safe assistant for explaining pipeline execution status and outcomes.
 inputs:
-  - customer_question
-  - run_id
+  - name: customer_question
+    type: string
+  - name: run_id
+    type: string
 outputs:
-  - grounded_answer
-  - cited_status_sources
+  - name: grounded_answer
+    type: string
+  - name: cited_status_sources
+    type: array
 allowed_tools:
   - get_pipeline_status
   - get_pipeline_steps
@@ -25,3 +29,8 @@ contracts:
     - shared/contracts/pipeline-step.schema.json
     - shared/contracts/artifact.schema.json
     - shared/contracts/cost-ledger.schema.json
+  defines:
+    - building-blocks/agents/pipeline-assistant-foundry/contracts/tool-definitions.json
+customer_safe_boundary:
+  policy: "Strictly forbids exposure of technical logs, internal IDs, secrets, and raw provider payloads."
+  enforcement: "System instructions (src/agent_definition.py) and Portal API filtering."
