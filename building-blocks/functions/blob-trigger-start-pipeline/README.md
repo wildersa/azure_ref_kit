@@ -54,6 +54,8 @@ The trigger normalizes the input into a `PipelineRun` object as defined in `shar
 | `status` | Constant | Initialized to `pending`. |
 | `correlation_id` | Metadata/Trigger | Used for end-to-end tracing. |
 
+The trigger also includes the `source_blob` reference (the blob name) in the orchestration input to ensure the pipeline knows which file to process.
+
 ## Durable Functions Hand-off
 
 The function uses the `DurableClient` binding to start the orchestration:

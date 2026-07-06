@@ -1,7 +1,7 @@
 name: blob-trigger-start-pipeline
 type: azure-function-trigger
 category: pipeline-trigger
-status: scaffold
+status: implemented
 purpose: Start a Document AI pipeline execution from a Blob Storage upload.
 
 inputs:
