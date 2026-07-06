@@ -46,20 +46,20 @@ output "solution_identity_client_id" {
 
 output "function_app_api_name" {
   description = "The name of the Portal API Function App."
-  value       = azurerm_linux_function_app.api.name
+  value       = azurerm_function_app_flex_consumption.api.name
 }
 
 output "function_app_api_hostname" {
   description = "The default hostname of the Portal API Function App."
-  value       = azurerm_linux_function_app.api.default_hostname
+  value       = azurerm_function_app_flex_consumption.api.default_hostname
 }
 
 output "function_app_pipeline_name" {
   description = "The name of the Pipeline Function App."
-  value       = azurerm_linux_function_app.pipeline.name
+  value       = azurerm_function_app_flex_consumption.pipeline.name
 }
 
 output "function_app_pipeline_hostname" {
   description = "The default hostname of the Pipeline Function App."
-  value       = azurerm_linux_function_app.pipeline.default_hostname
+  value       = azurerm_function_app_flex_consumption.pipeline.default_hostname
 }

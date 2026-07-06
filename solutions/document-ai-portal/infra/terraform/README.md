@@ -37,19 +37,19 @@ This directory contains the Terraform configuration for the core infrastructure 
 ### 1. Initialize
 
 ```bash
-terraform init -backend=false solutions/document-ai-portal/infra/terraform
+terraform init -backend=false
 ```
 
 ### 2. Validate
 
 ```bash
-terraform validate solutions/document-ai-portal/infra/terraform
+terraform validate
 ```
 
 ### 3. Format Check
 
 ```bash
-terraform fmt -check -recursive solutions/document-ai-portal/infra/terraform
+terraform fmt -check -recursive
 ```
 
 ### 4. Plan

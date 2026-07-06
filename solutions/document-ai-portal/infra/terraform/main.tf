@@ -125,32 +125,29 @@ resource "azurerm_role_assignment" "storage_queue_contributor" {
 }
 
 # Portal API Function App (Flex Consumption)
-resource "azurerm_linux_function_app" "api" {
+resource "azurerm_function_app_flex_consumption" "api" {
   name                = "func-api-${var.prefix}-${random_string.unique.result}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  service_plan_id     = azurerm_service_plan.plan.id
 
-  service_plan_id            = azurerm_service_plan.plan.id
-  storage_uses_managed_identity = true
+  runtime_name    = "python"
+  runtime_version = "3.11"
+
+  instance_memory_in_mb = 2048
+
+  # Flex Consumption specific deployment configuration
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+  storage_authentication_type = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
 
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.solution_identity.id]
   }
 
-  key_vault_reference_identity_id = azurerm_user_assigned_identity.solution_identity.id
-
-  storage {
-    type           = "blobContainer"
-    container_id   = azurerm_storage_container.deployment.id
-    account_id     = azurerm_storage_account.st.id
-  }
-
-  site_config {
-    application_stack {
-      python_version = "3.11"
-    }
-  }
+  site_config {}
 
   app_settings = {
     "STATUS_STORE_TABLE_ENDPOINT"     = azurerm_storage_account.st.primary_table_endpoint
@@ -167,32 +164,29 @@ resource "azurerm_linux_function_app" "api" {
 }
 
 # Pipeline Function App (Flex Consumption)
-resource "azurerm_linux_function_app" "pipeline" {
+resource "azurerm_function_app_flex_consumption" "pipeline" {
   name                = "func-pipe-${var.prefix}-${random_string.unique.result}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  service_plan_id     = azurerm_service_plan.plan.id
 
-  service_plan_id            = azurerm_service_plan.plan.id
-  storage_uses_managed_identity = true
+  runtime_name    = "python"
+  runtime_version = "3.11"
+
+  instance_memory_in_mb = 2048
+
+  # Flex Consumption specific deployment configuration
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+  storage_authentication_type = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
 
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.solution_identity.id]
   }
 
-  key_vault_reference_identity_id = azurerm_user_assigned_identity.solution_identity.id
-
-  storage {
-    type           = "blobContainer"
-    container_id   = azurerm_storage_container.deployment.id
-    account_id     = azurerm_storage_account.st.id
-  }
-
-  site_config {
-    application_stack {
-      python_version = "3.11"
-    }
-  }
+  site_config {}
 
   app_settings = {
     "ARTIFACT_STORE_BLOB_ENDPOINT"    = azurerm_storage_account.st.primary_blob_endpoint
