@@ -131,16 +131,20 @@ resource "azurerm_function_app_flex_consumption" "api" {
   location            = azurerm_resource_group.rg.location
   service_plan_id     = azurerm_service_plan.plan.id
 
-  runtime_name    = "python"
-  runtime_version = "3.11"
+  runtime {
+    name    = "python"
+    version = "3.11"
+  }
 
   instance_memory_in_mb = 2048
 
   # Flex Consumption specific deployment configuration
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
-  storage_authentication_type = "UserAssignedIdentity"
-  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
+  storage {
+    type                        = "blobContainer"
+    container_endpoint          = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+    authentication_type         = "UserAssignedIdentity"
+    user_assigned_identity_id   = azurerm_user_assigned_identity.solution_identity.id
+  }
 
   identity {
     type         = "UserAssigned"
@@ -158,6 +162,8 @@ resource "azurerm_function_app_flex_consumption" "api" {
     "ARTIFACT_CONTAINER_NAME"         = azurerm_storage_container.artifacts.name
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.ai.connection_string
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.st.name
+    "AzureWebJobsStorage__credential"  = "managedidentity"
+    "AzureWebJobsStorage__clientId"    = azurerm_user_assigned_identity.solution_identity.client_id
   }
 
   tags = var.tags
@@ -170,16 +176,20 @@ resource "azurerm_function_app_flex_consumption" "pipeline" {
   location            = azurerm_resource_group.rg.location
   service_plan_id     = azurerm_service_plan.plan.id
 
-  runtime_name    = "python"
-  runtime_version = "3.11"
+  runtime {
+    name    = "python"
+    version = "3.11"
+  }
 
   instance_memory_in_mb = 2048
 
   # Flex Consumption specific deployment configuration
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
-  storage_authentication_type = "UserAssignedIdentity"
-  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
+  storage {
+    type                        = "blobContainer"
+    container_endpoint          = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+    authentication_type         = "UserAssignedIdentity"
+    user_assigned_identity_id   = azurerm_user_assigned_identity.solution_identity.id
+  }
 
   identity {
     type         = "UserAssigned"
@@ -199,6 +209,8 @@ resource "azurerm_function_app_flex_consumption" "pipeline" {
     "ORCHESTRATOR_FUNCTION_NAME"      = "durable-basic-pipeline"
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.ai.connection_string
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.st.name
+    "AzureWebJobsStorage__credential"  = "managedidentity"
+    "AzureWebJobsStorage__clientId"    = azurerm_user_assigned_identity.solution_identity.client_id
   }
 
   tags = var.tags
