@@ -5,6 +5,7 @@ from fastmcp import FastMCP
 # using the FastMCP framework.
 mcp = FastMCP("fastmcp-basic-server")
 
+
 @mcp.tool()
 def get_system_status() -> str:
     """
@@ -12,6 +13,7 @@ def get_system_status() -> str:
     This is a safe, read-only tool for reference and validation.
     """
     return "Status: Operational. Source: FastMCP Basic Server Reference."
+
 
 if __name__ == "__main__":
     # Running the server will start the MCP transport (default is stdio)

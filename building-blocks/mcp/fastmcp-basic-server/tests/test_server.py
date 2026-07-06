@@ -3,9 +3,10 @@ import sys
 import os
 
 # Add src to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 from server import mcp
+
 
 @pytest.mark.asyncio
 async def test_tool_registration():
@@ -13,6 +14,7 @@ async def test_tool_registration():
     tools = await mcp.list_tools()
     tool_names = [tool.name for tool in tools]
     assert "get_system_status" in tool_names
+
 
 @pytest.mark.asyncio
 async def test_get_system_status_content():
