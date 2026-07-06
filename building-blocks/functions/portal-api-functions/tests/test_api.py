@@ -25,6 +25,7 @@ def test_api_unauthorized(mock_req):
 
 
 @patch("function_app.PortalWorker")
+@patch.dict("os.environ", {"AZURE_FUNCTIONS_ENVIRONMENT": "Development"})
 def test_get_runs_success(mock_worker_class, mock_req):
     # Setup
     mock_req.headers["x-dev-customer-id"] = "cust-1"
@@ -41,6 +42,7 @@ def test_get_runs_success(mock_worker_class, mock_req):
 
 
 @patch("function_app.PortalWorker")
+@patch.dict("os.environ", {"AZURE_FUNCTIONS_ENVIRONMENT": "Development"})
 def test_get_run_detail_not_found(mock_worker_class, mock_req):
     # Setup
     mock_req.headers["x-dev-customer-id"] = "cust-1"
@@ -76,6 +78,7 @@ def test_get_customer_id_from_swa_header(mock_req):
 
 
 @patch("function_app.PortalWorker")
+@patch.dict("os.environ", {"AZURE_FUNCTIONS_ENVIRONMENT": "Development"})
 def test_get_artifacts_success(mock_worker_class, mock_req):
     # Setup
     mock_req.headers["x-dev-customer-id"] = "cust-1"
@@ -92,6 +95,7 @@ def test_get_artifacts_success(mock_worker_class, mock_req):
 
 
 @patch("function_app.PortalWorker")
+@patch.dict("os.environ", {"AZURE_FUNCTIONS_ENVIRONMENT": "Development"})
 def test_get_cost_success(mock_worker_class, mock_req):
     # Setup
     mock_req.headers["x-dev-customer-id"] = "cust-1"

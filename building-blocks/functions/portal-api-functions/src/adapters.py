@@ -23,37 +23,36 @@ class StorageAdapter:
         )
 
     def _get_table_client(self, table_name: str) -> TableClient:
-        if self.table_service_endpoint:
-            return TableClient(
-                endpoint=self.table_service_endpoint,
-                table_name=table_name,
-                credential=self.credential,
+        if not self.table_service_endpoint:
+            raise ValueError(
+                "STATUS_STORE_TABLE_ENDPOINT environment variable is missing."
             )
-        else:
-            # Fallback for local development if endpoint is not provided (using connection string or similar)
-            conn_str = os.environ.get("AzureWebJobsStorage")
-            return TableClient.from_connection_string(conn_str, table_name=table_name)
+
+        return TableClient(
+            endpoint=self.table_service_endpoint,
+            table_name=table_name,
+            credential=self.credential,
+        )
 
     def _get_container_client(self) -> ContainerClient:
-        if self.blob_service_endpoint:
-            return ContainerClient(
-                account_url=self.blob_service_endpoint,
-                container_name=self.artifact_container_name,
-                credential=self.credential,
+        if not self.blob_service_endpoint:
+            raise ValueError(
+                "ARTIFACT_STORE_BLOB_ENDPOINT environment variable is missing."
             )
-        else:
-            conn_str = os.environ.get("AzureWebJobsStorage")
-            return ContainerClient.from_connection_string(
-                conn_str, container_name=self.artifact_container_name
-            )
+
+        return ContainerClient(
+            account_url=self.blob_service_endpoint,
+            container_name=self.artifact_container_name,
+            credential=self.credential,
+        )
 
     def get_runs(self, customer_id: str) -> List[Dict[str, Any]]:
         try:
             client = self._get_table_client(self.status_table_name)
             query = f"PartitionKey eq '{customer_id}'"
             return list(client.query_entities(query))
-        except Exception as e:
-            logging.error(f"Error fetching runs for customer {customer_id}: {str(e)}")
+        except Exception:
+            logging.error("Error fetching runs for customer")
             return []
 
     def get_run(self, customer_id: str, run_id: str) -> Optional[Dict[str, Any]]:
@@ -68,8 +67,8 @@ class StorageAdapter:
             client = self._get_table_client(self.steps_table_name)
             query = f"PartitionKey eq '{run_id}'"
             return list(client.query_entities(query))
-        except Exception as e:
-            logging.error(f"Error fetching steps for run {run_id}: {str(e)}")
+        except Exception:
+            logging.error("Error fetching steps for run")
             return []
 
     def get_artifacts(self, run_id: str) -> List[Dict[str, Any]]:
@@ -102,8 +101,8 @@ class StorageAdapter:
                             }
                         )
             return artifacts
-        except Exception as e:
-            logging.error(f"Error fetching artifacts for run {run_id}: {str(e)}")
+        except Exception:
+            logging.error("Error fetching artifacts for run")
             return []
 
     def get_costs(self, run_id: str) -> List[Dict[str, Any]]:
@@ -111,6 +110,6 @@ class StorageAdapter:
             client = self._get_table_client(self.cost_table_name)
             query = f"PartitionKey eq '{run_id}'"
             return list(client.query_entities(query))
-        except Exception as e:
-            logging.error(f"Error fetching costs for run {run_id}: {str(e)}")
+        except Exception:
+            logging.error("Error fetching costs for run")
             return []

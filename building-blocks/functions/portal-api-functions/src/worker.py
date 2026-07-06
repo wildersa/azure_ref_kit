@@ -103,7 +103,26 @@ class PortalWorker:
             return None
 
         artifacts = self.adapter.get_artifacts(run_id)
-        return artifacts  # Already sanitized in adapter
+
+        # Map to customer-safe artifact identifier/download route shape
+        safe_artifacts = []
+        for art in artifacts:
+            art_id = art.get("id")
+            safe_artifacts.append(
+                {
+                    "id": art_id,
+                    "run_id": run_id,
+                    "kind": art.get("kind"),
+                    "safe_name": art.get("safe_name"),
+                    "download_url": f"/api/artifacts/{art_id}/download",
+                    "content_type": art.get("content_type"),
+                    "size_bytes": art.get("size_bytes"),
+                    "is_customer_visible": True,
+                    "created_at": art.get("created_at"),
+                }
+            )
+
+        return safe_artifacts
 
     def get_cost_summary(
         self, customer_id: str, run_id: str

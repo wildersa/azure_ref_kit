@@ -2,6 +2,7 @@ import azure.functions as func
 import logging
 import json
 import base64
+import os
 
 try:
     from .src.worker import PortalWorker
@@ -26,14 +27,14 @@ def get_customer_id(req: func.HttpRequest) -> str:
             # SWA typically provides 'userId' or we can use 'userDetails' (email/id)
             # In our system, we map the identity provider's ID to our customer_id
             return decoded_principal.get("userId")
-        except Exception as e:
-            logging.error(f"Failed to decode x-ms-client-principal: {str(e)}")
+        except Exception:
+            logging.error("Failed to decode x-ms-client-principal")
 
-    # 2. Fallback for development (DO NOT USE IN PRODUCTION without proper guards)
-    # In a real scenario, this would be guarded by environment checks
-    dev_customer_id = req.headers.get("x-dev-customer-id")
-    if dev_customer_id:
-        return dev_customer_id
+    # 2. Fallback for local development ONLY (guarded by environment)
+    if os.environ.get("AZURE_FUNCTIONS_ENVIRONMENT") == "Development":
+        dev_customer_id = req.headers.get("x-dev-customer-id")
+        if dev_customer_id:
+            return dev_customer_id
 
     return None
 

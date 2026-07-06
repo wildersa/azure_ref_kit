@@ -88,13 +88,15 @@ def test_get_run_detail_not_found(worker, mock_adapter):
     assert run is None
 
 
-def test_get_artifacts_scoping(worker, mock_adapter):
+def test_get_artifacts_scoping_and_safety(worker, mock_adapter):
     # Setup
     customer_id = "cust-1"
     run_id = "run-1"
     # Mock get_run to verify ownership
     mock_adapter.get_run.return_value = {"PartitionKey": "cust-1", "RowKey": "run-1"}
-    mock_adapter.get_artifacts.return_value = [{"id": "art-1", "safe_name": "doc.pdf"}]
+    mock_adapter.get_artifacts.return_value = [
+        {"id": "art-1", "safe_name": "doc.pdf", "storage_ref": "internal/blob/path"}
+    ]
 
     # Execute
     artifacts = worker.get_artifacts(customer_id, run_id)
@@ -102,6 +104,8 @@ def test_get_artifacts_scoping(worker, mock_adapter):
     # Assert
     assert len(artifacts) == 1
     assert artifacts[0]["id"] == "art-1"
+    assert "storage_ref" not in artifacts[0]
+    assert artifacts[0]["download_url"] == "/api/artifacts/art-1/download"
     mock_adapter.get_run.assert_called_with(customer_id, run_id)
 
 
