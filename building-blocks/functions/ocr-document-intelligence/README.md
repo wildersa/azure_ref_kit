@@ -84,6 +84,20 @@ Strict adherence to the [Customer-Safe Status Boundary](../../security/customer-
 1. Run [Azurite](https://github.com/Azure/Azurite) for local blob storage.
 2. Use `DefaultAzureCredential` to authenticate locally via Azure CLI.
 3. Use the [Document Intelligence Studio](https://documentintelligence.ai.azure.com/studio) to verify model IDs before integration.
+4. Set required environment variables:
+   - `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT`: Your Document Intelligence endpoint.
+   - `AZURE_STORAGE_ACCOUNT_URL`: Your Storage Account URL (or Azurite URL).
+
+## Validation
+
+Run the following commands to verify the module:
+
+```bash
+python --version
+ruff check building-blocks/functions/ocr-document-intelligence/
+ruff format --check building-blocks/functions/ocr-document-intelligence/
+pytest building-blocks/functions/ocr-document-intelligence/tests/
+```
 
 ## Known Limits
 

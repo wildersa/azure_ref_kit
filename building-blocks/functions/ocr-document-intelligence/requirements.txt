@@ -1,0 +1,7 @@
+azure-functions
+azure-functions-durable
+azure-ai-documentintelligence
+azure-storage-blob
+azure-identity
+jsonschema
+pyyaml

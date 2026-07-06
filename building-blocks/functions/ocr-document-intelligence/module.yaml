@@ -1,7 +1,7 @@
 name: ocr-document-intelligence
 type: azure-function-worker
 category: document-ai
-status: scaffold
+status: active
 purpose: Extract text and structured fields from documents using Azure AI Document Intelligence.
 inputs:
   - name: run_id
