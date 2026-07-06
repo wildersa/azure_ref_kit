@@ -131,20 +131,15 @@ resource "azurerm_function_app_flex_consumption" "api" {
   location            = azurerm_resource_group.rg.location
   service_plan_id     = azurerm_service_plan.plan.id
 
-  runtime {
-    name    = "python"
-    version = "3.11"
-  }
-
+  runtime_name          = "python"
+  runtime_version       = "3.11"
   instance_memory_in_mb = 2048
 
   # Flex Consumption specific deployment configuration
-  storage {
-    type                        = "blobContainer"
-    container_endpoint          = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
-    authentication_type         = "UserAssignedIdentity"
-    user_assigned_identity_id   = azurerm_user_assigned_identity.solution_identity.id
-  }
+  storage_container_type           = "blobContainer"
+  storage_container_endpoint       = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+  storage_authentication_type      = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
 
   identity {
     type         = "UserAssigned"
@@ -176,20 +171,15 @@ resource "azurerm_function_app_flex_consumption" "pipeline" {
   location            = azurerm_resource_group.rg.location
   service_plan_id     = azurerm_service_plan.plan.id
 
-  runtime {
-    name    = "python"
-    version = "3.11"
-  }
-
+  runtime_name          = "python"
+  runtime_version       = "3.11"
   instance_memory_in_mb = 2048
 
   # Flex Consumption specific deployment configuration
-  storage {
-    type                        = "blobContainer"
-    container_endpoint          = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
-    authentication_type         = "UserAssignedIdentity"
-    user_assigned_identity_id   = azurerm_user_assigned_identity.solution_identity.id
-  }
+  storage_container_type           = "blobContainer"
+  storage_container_endpoint       = "${azurerm_storage_account.st.primary_blob_endpoint}${azurerm_storage_container.deployment.name}"
+  storage_authentication_type      = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.solution_identity.id
 
   identity {
     type         = "UserAssigned"
