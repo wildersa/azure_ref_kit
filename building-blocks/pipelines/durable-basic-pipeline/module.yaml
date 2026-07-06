@@ -1,7 +1,7 @@
 name: durable-basic-pipeline
 type: building-block
 category: pipelines
-status: stable
+status: implemented
 purpose: Minimal Durable Functions orchestration pattern for customer-visible pipeline status tracking.
 inputs:
   - name: pipeline_start_request

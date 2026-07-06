@@ -7,13 +7,19 @@ This building block demonstrates a minimal Durable Functions orchestration patte
 ## Pattern logic
 
 ```mermaid
-flowchart LR
-    Trigger[HTTP/Blob Trigger] --> Orchestrator[Pipeline Orchestrator]
-    Orchestrator --> Activity1[Step 1: Activity]
-    Orchestrator --> Activity2[Step 2: Activity]
-    Activity1 --> StatusUpdate[Status/Artifact Update]
-    Activity2 --> StatusUpdate
-    StatusUpdate --> CustomerStatus[Customer-Safe Status Store]
+flowchart TD
+    Trigger[Blob Trigger] --> Orchestrator[Pipeline Orchestrator]
+    Orchestrator --> Init[Activity: Update Status 'running']
+    Init --> OCR[Activity: OCR Document Intelligence]
+    OCR --> Val[Activity: Field Validation Worker]
+    Val --> Pub[Activity: Final Result Publisher]
+    Pub --> Final[Activity: Update Status 'completed']
+
+    subgraph Error Handling
+        OCR -.->|Failure| Fail[Activity: Update Status 'failed']
+        Val -.->|Failure| Fail
+        Pub -.->|Failure| Fail
+    end
 ```
 
 ## Contracts
