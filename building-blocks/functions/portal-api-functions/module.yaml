@@ -1,7 +1,7 @@
 name: portal-api-functions
 type: azure-functions-api
 category: api
-status: scaffold
+status: implemented
 purpose: Backend API layer providing customer-safe access to Document AI pipeline status, artifacts, and costs.
 inputs:
   - name: authenticated_customer_request
