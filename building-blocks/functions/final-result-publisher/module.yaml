@@ -1,7 +1,7 @@
 name: final-result-publisher
 type: azure-function-worker
 category: document-ai
-status: scaffold
+status: implemented
 purpose: Finalizes the document processing pipeline by marking artifacts as customer-visible and updating the final run status.
 inputs:
   - name: run_id
