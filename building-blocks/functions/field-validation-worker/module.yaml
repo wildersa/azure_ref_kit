@@ -1,7 +1,7 @@
 name: field-validation-worker
 type: azure-function-worker
 category: document-ai
-status: scaffold
+status: active
 purpose: Validate extracted fields against business rules and confidence thresholds after OCR.
 inputs:
   - name: run_id
