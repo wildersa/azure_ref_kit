@@ -106,3 +106,38 @@ def test_customer_safe_output_no_internals():
     assert "secret-123" not in report_str
     assert "raw_ocr_payload" not in report_str
     assert "very" not in report_str
+
+
+def test_safety_boundary_on_failure(caplog):
+    from function_app import field_validation_worker
+    import unittest.mock as mock
+    import asyncio
+
+    # Mock storage to throw an exception with sensitive info
+    mock_storage = mock.MagicMock()
+    mock_storage.read_artifact.side_effect = Exception(
+        "Secret SAS token: https://storage.account.com?sig=secret"
+    )
+
+    with mock.patch("function_app.StorageAdapter", return_value=mock_storage):
+        with mock.patch("os.environ", {"BlobStorageConnectionString": "dummy"}):
+            input_data = {"run_id": "test-run", "artifact_id": "test-art"}
+
+            # Run the activity
+            result = asyncio.run(field_validation_worker(input_data))
+
+            assert result["status"] == "failed"
+            assert (
+                result["friendly_error"]
+                == "Could not find or read the extracted data artifact."
+            )
+
+            # Ensure the sensitive exception message is not in the result
+            result_str = str(result)
+            assert "Secret SAS token" not in result_str
+            assert "secret" not in result_str
+
+            # Ensure the sensitive exception message is NOT in the logs
+            log_text = caplog.text
+            assert "Secret SAS token" not in log_text
+            assert "sig=secret" not in log_text

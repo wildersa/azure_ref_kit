@@ -1,5 +1,4 @@
 azure-functions
-azure-durable-functions
+azure-functions-durable
 azure-storage-blob
 azure-identity
-jsonschema

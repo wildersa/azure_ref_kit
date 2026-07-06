@@ -1,8 +1,13 @@
 import azure.durable_functions as df
 import logging
 import os
-from .src.worker import validate_fields
-from .src.adapters import StorageAdapter
+
+try:
+    from .src.worker import validate_fields
+    from .src.adapters import StorageAdapter
+except ImportError:
+    from src.worker import validate_fields
+    from src.adapters import StorageAdapter
 
 app = df.DFApp()
 
@@ -46,8 +51,8 @@ async def field_validation_worker(input: dict):
 
         try:
             extracted_data = storage.read_artifact(container_name, blob_name)
-        except Exception as e:
-            logging.error(f"Failed to read artifact {blob_name}: {str(e)}")
+        except Exception:
+            logging.error("Failed to read artifact: Access denied or file not found.")
             return {
                 "run_id": run_id,
                 "name": "field-validation-worker",
@@ -79,8 +84,8 @@ async def field_validation_worker(input: dict):
         )
         return result
 
-    except Exception as e:
-        logging.exception(f"Unexpected error in field-validation-worker: {str(e)}")
+    except Exception:
+        logging.error("Unexpected error in field-validation-worker.")
         return {
             "run_id": run_id,
             "name": "field-validation-worker",
