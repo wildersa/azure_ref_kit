@@ -1,7 +1,12 @@
 import pytest
+import sys
+import os
 from unittest.mock import MagicMock
 import azure.durable_functions as df
 from datetime import datetime, timezone
+
+# Add parent directory to sys.path to allow importing from src
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the orchestrator and activities
 from src.orchestrator import pipeline_orchestrator
