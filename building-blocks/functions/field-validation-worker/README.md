@@ -73,10 +73,20 @@ Strictly follows the repository-wide security and privacy guidelines.
 
 ## Local / Demo Notes
 
-1. Use Azure Functions Core Tools to run the worker locally.
+1. Use Azure Functions Core Tools to run the worker locally:
+   ```bash
+   func start
+   ```
 2. Use Azurite for local blob storage emulation.
-3. Mock the OCR result artifact in the local `artifacts` container.
-4. Use a local `run_id` and `artifact_id` to test the validation logic via the Function's HTTP or Queue trigger.
+3. Mock the OCR result artifact in the local `artifacts` container at `{run_id}/{artifact_id}.json`.
+4. Use a local `run_id` and `artifact_id` to test the validation logic via the Function's activity trigger.
+
+## Testing
+
+Run unit tests and contract validation:
+```bash
+PYTHONPATH=. pytest tests/
+```
 
 ## Known Limits
 
