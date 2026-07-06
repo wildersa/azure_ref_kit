@@ -2,20 +2,32 @@ name: github-actions-azure-deploy
 type: devops
 category: devops
 status: reference
-purpose: Secure GitHub Actions deployment reference pattern using OIDC and federated identity.
+purpose: Secure GitHub Actions deployment reference pattern for Azure Static Web Apps using OIDC and federated identity.
 inputs:
   - name: AZURE_CLIENT_ID
-    description: Client ID of the Microsoft Entra application or User-Assigned Managed Identity.
+    description: "Client ID of the Microsoft Entra application or User-Assigned Managed Identity for OIDC authentication."
     type: secret
   - name: AZURE_TENANT_ID
-    description: Tenant ID of the Azure subscription.
+    description: "Tenant ID of the Azure tenant."
     type: secret
   - name: AZURE_SUBSCRIPTION_ID
-    description: Subscription ID of the target Azure subscription.
+    description: "Subscription ID of the target Azure subscription."
     type: secret
-outputs: []
-azure_resources: []
-contracts:
-  reads: []
-  writes: []
-  emits: []
+  - name: AZURE_STATIC_WEB_APPS_API_TOKEN
+    description: "Deployment token for Azure Static Web Apps. Used when OIDC is not exclusively used for the SWA upload action."
+    type: secret
+    required: false
+outputs:
+  - name: static_web_app_url
+    description: "The URL of the deployed Static Web App."
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+customer_safe_boundary:
+  forbid:
+    - "Azure Service Principal secrets, passwords, or certificates"
+    - "Short-lived OIDC tokens or JWTs"
+    - "Static Web Apps deployment tokens/publish profiles"
+    - "Internal Azure resource identifiers (Subscription/Tenant IDs) in logs"
+    - "Detailed technical logs from the build and deployment process"
+    - "Environment variables containing technical internals"

@@ -1,112 +1,127 @@
 # GitHub Actions Azure Deployment Reference
 
-This building block defines the secure reference pattern for deploying Azure resources and applications using GitHub Actions. It prioritizes identity-based authentication over long-lived secrets.
+Secure GitHub Actions deployment pattern for publishing the [Static Status Portal](../../portals/static-status-portal/) to Azure Static Web Apps.
 
 ## Purpose
 
-The purpose of this reference is to provide a standardized, secure, and repeatable pattern for CI/CD workflows targeting Azure. By following this pattern, development teams can ensure that their deployment pipelines are:
+This building block defines the reference pattern for deploying Azure Static Web Apps (SWA) using GitHub Actions. It prioritizes identity-based authentication (OIDC) to minimize the use of long-lived secrets.
 
-- **Secure:** Using OpenID Connect (OIDC) to eliminate the need for long-lived Azure Service Principal secrets in GitHub.
-- **Auditable:** Leveraging Microsoft Entra ID (formerly Azure AD) for identity management and access control.
-- **Consistent:** Providing a common structure for workflows across different modules and solutions.
+## When to Use This Pattern
 
-## OIDC and Federated Identity
+- **Use when**: Deploying the `static-status-portal` or similar frontend applications to Azure Static Web Apps from a GitHub repository.
+- **Use when**: You want to eliminate long-lived Service Principal secrets in GitHub using OpenID Connect (OIDC).
+- **Do not use when**: Deploying to non-Azure targets or using legacy credential-based authentication as the primary method.
+- **Do not use when**: Deploying infrastructure-only changes (use Terraform/OpenTofu patterns instead).
 
-Traditional CI/CD patterns often rely on storing a Service Principal's `client-secret` as a GitHub Secret. This creates a security risk if the secret is leaked and requires manual rotation.
+## Deployment Architecture
 
-This reference recommends **OpenID Connect (OIDC)**. With OIDC, GitHub Actions requests a short-lived access token from Azure by presenting a GitHub-issued JWT (JSON Web Token). Azure verifies this token against a **Federated Identity Credential** configured on the Microsoft Entra application or User-Assigned Managed Identity.
-
-### Why OIDC is preferred:
-- **No long-lived secrets:** No Azure password or secret is stored in GitHub.
-- **Automatic token expiration:** Access tokens are short-lived and valid only for the specific workflow run.
-- **Granular trust:** Federated credentials can be restricted to specific GitHub repositories, branches, environments, or even specific workflow triggers.
-
-## Authentication Flow
-
-The following diagram illustrates the secure authentication boundary using OIDC:
+The following diagram illustrates the secure deployment boundary:
 
 ```mermaid
 graph TD
-    subgraph GitHub ["GitHub Actions"]
-        WF[Workflow Run]
-        OIDC[Request OIDC Token]
+    Developer[Developer] -->|Push Code| GitHub[GitHub Repository]
+    GitHub -->|Trigger| GHA[GitHub Actions Workflow]
+
+    subgraph "Azure Auth & Deploy Boundary"
+        GHA -->|OIDC Auth| Entra[Microsoft Entra ID]
+        Entra -->|Short-lived Token| SWADeploy[Azure Static Web Apps Deploy Action]
     end
 
-    subgraph AzureAuth ["Azure Auth Boundary (Microsoft Entra ID)"]
-        FIC[Federated Identity Credential]
-        Ver[Verify JWT & Issue Access Token]
+    subgraph "Hosting & Outcome"
+        SWADeploy -->|Upload Artifacts| SWAHost[Azure Static Web Apps Hosting]
+        SWAHost -->|Serves| Portal[Customer-Safe Portal]
     end
-
-    subgraph AzureTarget ["Target Azure Module"]
-        Deploy[Resource Provisioning / App Deploy]
-        Validation[Post-Deployment Validation]
-    end
-
-    WF --> OIDC
-    OIDC -- "JWT (OIDC Token)" --> FIC
-    FIC --> Ver
-    Ver -- "Short-lived Access Token" --> Deploy
-    Deploy --> Validation
 ```
 
-## Required Secrets and Variables
+## Configuration and Secrets
 
-To implement this pattern, the following GitHub Secrets (or Environment Variables) must be configured:
+To implement this pattern securely, configure the following GitHub Repository Secrets. **Never commit these values to the repository.**
 
 | Name | Type | Description |
 |------|------|-------------|
-| `AZURE_CLIENT_ID` | Secret | The Application (client) ID of the Entra ID app or Managed Identity. |
+| `AZURE_CLIENT_ID` | Secret | The Application (client) ID of the Entra ID app or Managed Identity configured for OIDC. |
 | `AZURE_TENANT_ID` | Secret | The Directory (tenant) ID of your Azure tenant. |
-| `AZURE_SUBSCRIPTION_ID` | Secret | The ID of the Azure Subscription for deployment. |
+| `AZURE_SUBSCRIPTION_ID` | Secret | The ID of the Azure Subscription. |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Secret | (Optional) The SWA deployment token. Required if not using the full OIDC integration for the upload action. |
 
-## Implementation Guidance
+### OIDC Configuration Prerequisites
+1. Create a Microsoft Entra application or User-Assigned Managed Identity.
+2. Configure **Federated Identity Credentials** in Azure to trust your GitHub repository, branch, or environment.
+3. Assign the `Contributor` role (or a custom role with SWA deployment permissions) to the identity at the target resource or resource group scope.
 
-Concrete GitHub Actions workflows (`.github/workflows/*.yml`) should be added to the repository only when they are tied to a specific **deployable module** or **reference solution**.
+## Reference Workflow: Deploy Static Status Portal
 
-### Example Workflow Snippet (OIDC)
-
-When creating a workflow, ensure the `id-token: write` permission is granted to allow the OIDC exchange:
+The following YAML demonstrates a secure deployment for the `static-status-portal`.
 
 ```yaml
+name: Deploy Static Status Portal
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/portals/static-status-portal/**'
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [ main ]
+    paths:
+      - 'building-blocks/portals/static-status-portal/**'
+
 jobs:
-  deploy:
+  build_and_deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Required for OIDC
-      contents: read  # Required for checkout
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      id-token: write # Mandatory for OIDC
+      contents: read  # Mandatory for checkout
 
-      - name: Azure Login
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: 'Az CLI Login'
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Run Azure CLI
-        run: az account show
+      - name: 'Get ID Token for SWA'
+        uses: actions/github-script@v7
+        id: idtoken
+        with:
+          script: |
+            const id_token = await core.getIDToken();
+            core.setOutput('token', id_token);
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          # Use github_id_token for OIDC-native deployment to SWA
+          github_id_token: ${{ steps.idtoken.outputs.token }}
+          action: "upload"
+          app_location: "building-blocks/portals/static-status-portal/src"
+          api_location: "" # Linked API is handled separately or via portal-api-functions
+          output_location: "dist" # Folder where the build output is generated
 ```
 
-## Local run
+## Security & Customer-Safe Boundary
 
-Deployment workflows are designed to run in GitHub Actions. For local simulation or testing of deployment scripts:
-1. Log in locally using `az login`.
-2. Ensure your local identity has the same RBAC permissions as the Service Principal/Managed Identity used in CI.
-3. Run deployment scripts (e.g., Terraform, Azure CLI) manually.
+This pattern enforces strict boundaries to prevent leakage of technical internals:
 
-## Deploy
+- **Forbidden in Repository**: Never commit `.env`, `.publishsettings`, `.json` credentials, or hardcoded IDs.
+- **Identity First**: Prefer OIDC over long-lived secrets.
+- **Least Privilege**: The deployment identity should only have permissions to deploy to the specific SWA resource.
+- **Log Masking**: GitHub Actions automatically masks secrets, but avoid printing technical identifiers (Tenant ID, Subscription ID) in non-secret variables if they might appear in customer-facing logs.
 
-This is a documentation-first reference. Concrete deployment instructions depend on the target module.
+## Deployment/IaC Decision
 
-## Tests/proof
-
-Validation of this pattern involves:
-1. **Static Analysis:** Verifying that workflows use `azure/login@v2` with OIDC parameters and have `id-token: write` permissions.
-2. **End-to-End Test:** Successfully running a deployment workflow in a GitHub environment with configured Federated Identity.
+- **Pattern-Only**: This building block defines the *workflow* contract. It does not include Terraform/OpenTofu files because it focuses on the GitHub Actions orchestration.
+- **Prerequisites**: It assumes the Azure Static Web App resource has been provisioned (e.g., via a separate infra module or manually for initial setup).
 
 ## References
-- [Use Azure Login action with OpenID Connect](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
-- [GitHub Actions for Azure](https://learn.microsoft.com/en-us/azure/developer/github/github-actions)
-- [Configuring OpenID Connect in Azure](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure)
+- [GitHub Actions for Azure Overview](https://learn.microsoft.com/en-us/azure/developer/github/github-actions)
+- [Deploy to Azure Static Web Apps with GitHub Actions](https://learn.microsoft.com/en-us/azure/static-web-apps/build-configuration)
+- [Azure Login action / OpenID Connect guidance](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
