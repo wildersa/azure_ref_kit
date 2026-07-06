@@ -1,14 +1,34 @@
 name: container-agent-api
 type: building-block
 category: hosting
-status: reference
-purpose: Reference pattern for packaging and hosting an agent-facing API as a container.
-inputs: []
-outputs: []
+status: stable
+purpose: Reference for packaging an agent-facing API as a container for Azure Container Apps or App Service.
+runtime: Docker / Container
 azure_resources:
   - azurerm_container_app
+  - azurerm_container_app_environment
   - azurerm_linux_web_app
-contracts:
-  reads: []
-  writes: []
-  emits: []
+  - azurerm_service_plan
+  - azurerm_container_registry
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+customer_safe_boundary:
+  forbid_raw_logs: true
+  forbid_prompts: true
+  forbid_provider_payloads: true
+  forbid_internal_resource_ids: true
+  forbid_storage_keys: true
+  forbid_stack_traces: true
+  forbid_sas_tokens: true
+inputs:
+  - name: container_image
+    type: string
+    description: The container image URI to deploy.
+  - name: listen_port
+    type: integer
+    description: The port the container listens on (default 80 or 8080).
+outputs:
+  - name: api_endpoint
+    type: string
+    description: The public or internal URL of the hosted API.
