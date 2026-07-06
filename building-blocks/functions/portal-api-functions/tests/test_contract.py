@@ -1,5 +1,4 @@
 import yaml
-import pytest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.parent.parent.parent
@@ -50,7 +49,9 @@ def test_customer_safe_boundary_no_leaks():
         "Provider Payloads",
     ]
     for term in forbidden_terms:
-        assert term in content, f"README missing explicit mention of forbidden term: {term}"
+        assert term in content, (
+            f"README missing explicit mention of forbidden term: {term}"
+        )
 
 
 def test_contract_references_exist():
@@ -60,7 +61,7 @@ def test_contract_references_exist():
         config = yaml.safe_load(f)
 
     contracts = config.get("contracts", {})
-    all_refs = (contracts.get("reads", []) + contracts.get("emits", []))
+    all_refs = contracts.get("reads", []) + contracts.get("emits", [])
 
     for ref in all_refs:
         contract_path = REPO_ROOT / ref
