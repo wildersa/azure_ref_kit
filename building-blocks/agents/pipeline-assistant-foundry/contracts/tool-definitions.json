@@ -12,6 +12,18 @@
           }
         },
         "required": ["run_id"]
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "enum": ["pending", "running", "waiting_input", "failed", "completed", "cancelled"] },
+          "progress_percent": { "type": "integer" },
+          "business_summary": { "type": "string" },
+          "estimated_cost": { "type": "number" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "started_at": { "type": "string", "format": "date-time" },
+          "finished_at": { "type": "string", "format": "date-time" }
+        }
       }
     },
     {
@@ -26,6 +38,20 @@
           }
         },
         "required": ["run_id"]
+      },
+      "response": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "status": { "type": "string" },
+            "input_summary": { "type": "string" },
+            "output_summary": { "type": "string" },
+            "started_at": { "type": "string", "format": "date-time" },
+            "finished_at": { "type": "string", "format": "date-time" }
+          }
+        }
       }
     },
     {
@@ -40,6 +66,18 @@
           }
         },
         "required": ["run_id"]
+      },
+      "response": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "safe_name": { "type": "string" },
+            "kind": { "type": "string" },
+            "size_bytes": { "type": "integer" },
+            "created_at": { "type": "string", "format": "date-time" }
+          }
+        }
       }
     },
     {
@@ -54,6 +92,12 @@
           }
         },
         "required": ["run_id"]
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "friendly_error": { "type": "string" }
+        }
       }
     },
     {
@@ -68,6 +112,13 @@
           }
         },
         "required": ["run_id"]
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "estimated_amount": { "type": "number" },
+          "currency": { "type": "string" }
+        }
       }
     },
     {
@@ -86,6 +137,13 @@
           }
         },
         "required": ["run_id", "reason"]
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "review_id": { "type": "string" },
+          "status": { "type": "string" }
+        }
       }
     }
   ]

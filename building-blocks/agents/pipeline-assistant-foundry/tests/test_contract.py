@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from src.agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 
 
@@ -56,15 +57,53 @@ def test_tool_contract_json_exists_and_valid():
 
     assert set(contract_names) == set(code_names)
 
+    # Verify each tool in contract has a response schema
+    for tool in contract_tools:
+        assert "response" in tool, f"Tool {tool['name']} is missing a response schema"
+
 
 def test_forbidden_terms_not_in_instructions():
     """Verify system instructions do not contain examples of real secrets or IDs."""
-    # We check if specific hardcoded values like '1234-5678' or real-looking IDs are present.
-    # The instructions explicitly mention NOT to expose IDs, which is good.
-    # This test ensures we didn't put a REAL id in as an example.
-    import re
-
     uuid_pattern = re.compile(
         r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     )
     assert not uuid_pattern.search(SYSTEM_INSTRUCTIONS)
+
+
+def test_no_technical_fields_in_response_schemas():
+    """Verify forbidden fields are not in the contract response schemas."""
+    contract_path = os.path.join(
+        os.path.dirname(__file__), "../contracts/tool-definitions.json"
+    )
+    with open(contract_path, "r") as f:
+        contract_data = json.load(f)
+
+    forbidden_fields = [
+        "storage_ref",
+        "storage_account",
+        "sas_token",
+        "key",
+        "subscription_id",
+        "tenant_id",
+        "resource_id",
+        "traceback",
+        "stack_trace",
+    ]
+
+    def check_schema(schema):
+        if not isinstance(schema, dict):
+            return
+
+        properties = schema.get("properties", {})
+        for field in forbidden_fields:
+            assert field not in properties, f"Forbidden field '{field}' found in schema"
+
+        # Recursive check for objects or arrays
+        if schema.get("type") == "object":
+            for val in properties.values():
+                check_schema(val)
+        elif schema.get("type") == "array":
+            check_schema(schema.get("items"))
+
+    for tool in contract_data.get("tools", []):
+        check_schema(tool.get("response"))

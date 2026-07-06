@@ -58,7 +58,7 @@ sequenceDiagram
     Agent->>Tool: call explain_error(run_id)
     Tool->>Data: Fetch friendly_error
     Data-->>Tool: "Document unreadable"
-    Tool-->>Agent: { "explanation": "Document unreadable" }
+    Tool-->>Agent: { "friendly_error": "Document unreadable" }
     Agent-->>Portal: "The analysis failed because the document was unreadable."
     Portal->>User: "The analysis failed because the document was unreadable."
 ```
