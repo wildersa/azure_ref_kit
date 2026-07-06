@@ -16,6 +16,9 @@ This directory contains the Terraform configuration for the core infrastructure 
   - **Application Insights**: For application performance monitoring and distributed tracing.
 - **Hosting Foundation**:
   - **App Service Plan**: Configured for **Flex Consumption** (FC1) to support serverless functions.
+  - **Function Apps**:
+    - `api`: Hosts the `portal-api-functions` module.
+    - `pipeline`: Hosts the worker and orchestration modules (`ocr-document-intelligence`, `field-validation-worker`, `final-result-publisher`, `durable-basic-pipeline`).
 - **Portal Hosting**:
   - **Static Web App**: Host for the React-based customer portal.
 - **Identity & Security**:
@@ -34,19 +37,19 @@ This directory contains the Terraform configuration for the core infrastructure 
 ### 1. Initialize
 
 ```bash
-terraform init
+terraform init -backend=false solutions/document-ai-portal/infra/terraform
 ```
 
 ### 2. Validate
 
 ```bash
-terraform validate
+terraform validate solutions/document-ai-portal/infra/terraform
 ```
 
 ### 3. Format Check
 
 ```bash
-terraform fmt -check
+terraform fmt -check -recursive solutions/document-ai-portal/infra/terraform
 ```
 
 ### 4. Plan
@@ -63,6 +66,5 @@ terraform apply tfplan
 
 ## Intentionally Not Deployed Yet
 
-- **Function Apps**: The individual worker functions (OCR, Validation, etc.) are currently defined as runtime modules and will be added to this foundation as they are finalized.
 - **Networking**: Production-grade networking (Private Endpoints, VNets) is excluded from this foundation to keep the initial reference simple.
 - **Authentication**: External authentication providers for the Static Web App are not configured in this basic foundation.

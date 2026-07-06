@@ -18,3 +18,9 @@ variable "tags" {
     env      = "dev"
   }
 }
+
+variable "document_intelligence_endpoint" {
+  description = "The endpoint for the Azure AI Document Intelligence resource."
+  type        = string
+  default     = ""
+}

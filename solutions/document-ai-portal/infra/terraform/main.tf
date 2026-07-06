@@ -48,6 +48,11 @@ resource "azurerm_storage_table" "pipeline_status" {
   storage_account_name = azurerm_storage_account.st.name
 }
 
+resource "azurerm_storage_table" "pipeline_steps" {
+  name                 = "pipelinesteps"
+  storage_account_name = azurerm_storage_account.st.name
+}
+
 resource "azurerm_storage_table" "cost_ledger" {
   name                 = "costledger"
   storage_account_name = azurerm_storage_account.st.name
@@ -111,4 +116,96 @@ resource "azurerm_role_assignment" "storage_table_contributor" {
   scope                = azurerm_storage_account.st.id
   role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_user_assigned_identity.solution_identity.principal_id
+}
+
+resource "azurerm_role_assignment" "storage_queue_contributor" {
+  scope                = azurerm_storage_account.st.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_user_assigned_identity.solution_identity.principal_id
+}
+
+# Portal API Function App (Flex Consumption)
+resource "azurerm_linux_function_app" "api" {
+  name                = "func-api-${var.prefix}-${random_string.unique.result}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  service_plan_id            = azurerm_service_plan.plan.id
+  storage_uses_managed_identity = true
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.solution_identity.id]
+  }
+
+  key_vault_reference_identity_id = azurerm_user_assigned_identity.solution_identity.id
+
+  storage {
+    type           = "blobContainer"
+    container_id   = azurerm_storage_container.deployment.id
+    account_id     = azurerm_storage_account.st.id
+  }
+
+  site_config {
+    application_stack {
+      python_version = "3.11"
+    }
+  }
+
+  app_settings = {
+    "STATUS_STORE_TABLE_ENDPOINT"     = azurerm_storage_account.st.primary_table_endpoint
+    "STATUS_TABLE_NAME"               = azurerm_storage_table.pipeline_status.name
+    "STEPS_TABLE_NAME"                = azurerm_storage_table.pipeline_steps.name
+    "COST_TABLE_NAME"                 = azurerm_storage_table.cost_ledger.name
+    "ARTIFACT_STORE_BLOB_ENDPOINT"    = azurerm_storage_account.st.primary_blob_endpoint
+    "ARTIFACT_CONTAINER_NAME"         = azurerm_storage_container.artifacts.name
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.ai.connection_string
+    "AzureWebJobsStorage__accountName" = azurerm_storage_account.st.name
+  }
+
+  tags = var.tags
+}
+
+# Pipeline Function App (Flex Consumption)
+resource "azurerm_linux_function_app" "pipeline" {
+  name                = "func-pipe-${var.prefix}-${random_string.unique.result}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  service_plan_id            = azurerm_service_plan.plan.id
+  storage_uses_managed_identity = true
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.solution_identity.id]
+  }
+
+  key_vault_reference_identity_id = azurerm_user_assigned_identity.solution_identity.id
+
+  storage {
+    type           = "blobContainer"
+    container_id   = azurerm_storage_container.deployment.id
+    account_id     = azurerm_storage_account.st.id
+  }
+
+  site_config {
+    application_stack {
+      python_version = "3.11"
+    }
+  }
+
+  app_settings = {
+    "ARTIFACT_STORE_BLOB_ENDPOINT"    = azurerm_storage_account.st.primary_blob_endpoint
+    "STATUS_STORE_TABLE_ENDPOINT"     = azurerm_storage_account.st.primary_table_endpoint
+    "STATUS_TABLE_NAME"               = azurerm_storage_table.pipeline_status.name
+    "STEPS_TABLE_NAME"                = azurerm_storage_table.pipeline_steps.name
+    "COST_TABLE_NAME"                 = azurerm_storage_table.cost_ledger.name
+    "ARTIFACT_CONTAINER_NAME"         = azurerm_storage_container.artifacts.name
+    "DOC_INTEL_ENDPOINT"              = var.document_intelligence_endpoint
+    "ORCHESTRATOR_FUNCTION_NAME"      = "durable-basic-pipeline"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.ai.connection_string
+    "AzureWebJobsStorage__accountName" = azurerm_storage_account.st.name
+  }
+
+  tags = var.tags
 }

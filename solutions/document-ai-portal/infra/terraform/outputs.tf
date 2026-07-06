@@ -43,3 +43,23 @@ output "solution_identity_client_id" {
   description = "The client ID of the user-assigned identity."
   value       = azurerm_user_assigned_identity.solution_identity.client_id
 }
+
+output "function_app_api_name" {
+  description = "The name of the Portal API Function App."
+  value       = azurerm_linux_function_app.api.name
+}
+
+output "function_app_api_hostname" {
+  description = "The default hostname of the Portal API Function App."
+  value       = azurerm_linux_function_app.api.default_hostname
+}
+
+output "function_app_pipeline_name" {
+  description = "The name of the Pipeline Function App."
+  value       = azurerm_linux_function_app.pipeline.name
+}
+
+output "function_app_pipeline_hostname" {
+  description = "The default hostname of the Pipeline Function App."
+  value       = azurerm_linux_function_app.pipeline.default_hostname
+}
