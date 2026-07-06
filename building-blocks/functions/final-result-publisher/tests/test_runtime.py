@@ -134,3 +134,37 @@ def test_idempotency_behavior(mock_artifact_adapter, mock_status_adapter):
     assert res2["publication_status"] == "published"
     assert mock_artifact_adapter.set_visible.call_count == 2
     assert mock_status_adapter.update_run_status.call_count == 2
+
+
+def test_log_safety_boundary_on_exception(
+    mock_artifact_adapter, mock_status_adapter, caplog
+):
+    # Arrange
+    run_id = "test-run-123"
+    artifact_ids = ["artifact-xyz-789"]  # Raw artifact ID
+    # Mock an exception that contains technical details like a storage URL and SAS token
+    mock_artifact_adapter.set_visible.side_effect = Exception(
+        "Access denied to https://account.blob.core.windows.net/container/blob?sv=2019-12-12&ss=b&srt=o&sp=rwdlacix&se=2021-01-01T00:00:00Z&st=2021-01-01T00:00:00Z&spr=https&sig=secret"
+    )
+
+    # Act
+    publish_final_result(
+        run_id=run_id,
+        validation_status="valid",
+        artifact_ids=artifact_ids,
+        artifact_adapter=mock_artifact_adapter,
+        status_adapter=mock_status_adapter,
+    )
+
+    # Assert
+    log_text = caplog.text
+    # Verify that the technical details are NOT in the logs
+    assert "https://account.blob.core.windows.net" not in log_text
+    assert "sv=2019-12-12" not in log_text
+    assert "sig=secret" not in log_text
+    # Verify that raw artifact IDs are NOT in the logs
+    assert "artifact-xyz-789" not in log_text
+    # Verify that the run_id IS in the logs for correlation
+    assert run_id in log_text
+    # Verify that a safe message is logged instead
+    assert "Failed to set visibility for one or more artifacts" in log_text

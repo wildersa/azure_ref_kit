@@ -24,9 +24,10 @@ def publish_final_result(
             try:
                 artifact_adapter.set_visible(run_id, aid)
             except Exception:
-                # We log that it failed but continue or fail based on business logic.
-                # Here we choose to fail the publication if artifacts can't be set visible.
-                logging.error(f"Failed to set visibility for artifact {aid}")
+                # Safe boundary: avoid logging raw artifact IDs or technical exception strings.
+                logging.error(
+                    f"Failed to set visibility for one or more artifacts for RunID: {run_id}"
+                )
                 raise
 
         # 2. Determine final status and summary
@@ -62,7 +63,8 @@ def publish_final_result(
 
     except Exception:
         # Technical details are logged internally by the orchestrator/SDK.
-        logging.error(f"Final publication failed for run_id: {run_id}")
+        # Safe boundary: avoid logging raw exception strings or technical details.
+        logging.error(f"Final publication failed for RunID: {run_id}")
         return {
             "publication_status": "failed",
             "run_id": run_id,

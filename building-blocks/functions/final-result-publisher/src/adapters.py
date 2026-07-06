@@ -8,14 +8,8 @@ from azure.storage.blob import BlobServiceClient
 class StorageAdapter:
     """Generic adapter for Azure Blob Storage operations."""
 
-    def __init__(
-        self, account_url: Optional[str] = None, connection_string: Optional[str] = None
-    ):
-        if connection_string:
-            self.blob_service_client = BlobServiceClient.from_connection_string(
-                connection_string
-            )
-        elif account_url:
+    def __init__(self, account_url: Optional[str] = None):
+        if account_url:
             self.blob_service_client = BlobServiceClient(
                 account_url, credential=DefaultAzureCredential()
             )
@@ -27,16 +21,10 @@ class StorageAdapter:
                     account_url, credential=DefaultAzureCredential()
                 )
             else:
-                conn_str = os.environ.get("BlobStorageConnectionString")
-                if conn_str:
-                    self.blob_service_client = BlobServiceClient.from_connection_string(
-                        conn_str
-                    )
-                else:
-                    raise ValueError(
-                        "Storage configuration missing. Provide account_url, connection_string, "
-                        "or set STORAGE_ACCOUNT_URL/BlobStorageConnectionString environment variables."
-                    )
+                raise ValueError(
+                    "Storage configuration missing. Provide account_url "
+                    "or set the STORAGE_ACCOUNT_URL environment variable."
+                )
 
     def read_json(self, container_name: str, blob_name: str) -> Dict[str, Any]:
         """Reads and parses a JSON blob."""
