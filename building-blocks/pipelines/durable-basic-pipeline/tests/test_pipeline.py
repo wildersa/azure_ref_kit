@@ -140,10 +140,25 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
     assert exc.value.value == "failed"
 
 
-def test_orchestrator_safety_boundary(mock_context, valid_input):
+def test_orchestrator_invalid_contract(mock_context):
+    invalid_input = {
+        "pipeline_run": {
+            "id": "missing-fields"
+            # Missing customer_id, pipeline_type, created_at, status
+        }
+    }
+    mock_context.get_input.return_value = invalid_input
+
+    gen = pipeline_orchestrator(mock_context)
+    with pytest.raises(StopIteration) as exc:
+        next(gen)
+    assert exc.value.value == "invalid_contract"
+
+
+def test_orchestrator_safety_boundary(mock_context, valid_input, caplog):
     """
     Ensure that even if an activity returns sensitive data in an error,
-    the orchestrator redacts it for the customer status.
+    the orchestrator redacts it for both the customer status AND internal logs.
     """
     mock_context.get_input.return_value = valid_input
 
@@ -159,12 +174,17 @@ def test_orchestrator_safety_boundary(mock_context, valid_input):
     # Send unsafe failure
     gen.send(ocr_unsafe_failure)
 
-    # Check last call to update_pipeline_run_status
+    # 1. Check customer-facing status (must be redacted)
     last_call_args = mock_context.call_activity.call_args_list[-1][0][1]
     assert last_call_args["status"] == "failed"
     assert "secret-endpoint" not in last_call_args["friendly_error"]
     assert "12345" not in last_call_args["friendly_error"]
     assert "An error occurred" in last_call_args["friendly_error"]
+
+    # 2. Check internal logs (must NOT contain the sensitive error text)
+    assert "secret-endpoint" not in caplog.text
+    assert "12345" not in caplog.text
+    assert "failed during execution" in caplog.text
 
 
 def test_activities_basic():

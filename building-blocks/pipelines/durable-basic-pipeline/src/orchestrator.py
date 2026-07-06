@@ -1,6 +1,20 @@
 import azure.durable_functions as df
 import logging
+import json
+import jsonschema
 from datetime import timezone
+from pathlib import Path
+
+# Load schemas once
+BASE_DIR = Path(__file__).parent.parent.parent.parent.parent
+PIPELINE_RUN_SCHEMA_PATH = (
+    BASE_DIR / "shared" / "contracts" / "pipeline-run.schema.json"
+)
+
+
+def _load_schema(path):
+    with open(path, "r") as f:
+        return json.load(f)
 
 
 def pipeline_orchestrator(context: df.DurableOrchestrationContext):
@@ -15,6 +29,15 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         return "invalid_input"
 
     pipeline_run = input_data["pipeline_run"]
+
+    # Contract Validation
+    try:
+        schema = _load_schema(PIPELINE_RUN_SCHEMA_PATH)
+        jsonschema.validate(instance=pipeline_run, schema=schema)
+    except Exception:
+        logging.error("PipelineRun payload failed contract validation.")
+        return "invalid_contract"
+
     run_id = pipeline_run["id"]
     customer_id = pipeline_run["customer_id"]
     pipeline_type = pipeline_run["pipeline_type"]
@@ -105,13 +128,10 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
 
         return "completed"
 
-    except Exception as e:
-        # Safely capture failure without leaking internals
-        error_msg = str(e)
-        # Check if error_msg looks like a technical traceback or contains secrets
-        # (Though in this implementation we control the exceptions raised above)
-
-        logging.error(f"Pipeline {run_id} failed: {error_msg}")
+    except Exception:
+        # Safely capture failure without leaking internals in technical logs.
+        # Avoid logging the exception object directly as it may contain SAS tokens or other secrets.
+        logging.error(f"Pipeline {run_id} failed during execution.")
         error_time = context.current_utc_datetime.replace(
             tzinfo=timezone.utc
         ).isoformat()
