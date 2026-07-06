@@ -50,8 +50,10 @@ The portal defines the following primary UI surfaces. Implementation must use th
 
 ### 3. Artifacts List
 - **Source**: `GET /runs/{id}/artifacts`
-- **Fields**: `safe_name`, `kind`, `size_bytes`, `created_at`.
-- **Behavior**: Lists files available for download. Link to `storage_ref` (expected to be a safe, short-lived SAS URL or proxied download).
+- **Fields**: `id`, `safe_name`, `kind`, `size_bytes`, `created_at`.
+- **Behavior**: Lists files available for download.
+- **Download Action**: Must use an opaque, customer-safe proxied route (e.g., `GET /api/artifacts/{id}/download`).
+- **Constraint**: The `storage_ref` field is **internal-only metadata** and must never be exposed or used by the frontend to construct direct storage URLs or SAS links.
 
 ### 4. Cost Summary
 - **Source**: `GET /runs/{id}/cost`
@@ -76,6 +78,7 @@ The portal consumes the [Portal API Functions](../../functions/portal-api-functi
 | `/api/runs` | GET | `PipelineRun[]` | List recent runs. |
 | `/api/runs/{id}` | GET | `PipelineRun` | Detailed status and steps. |
 | `/api/runs/{id}/artifacts` | GET | `Artifact[]` | List customer-visible artifacts. |
+| `/api/artifacts/{id}/download` | GET | `Stream` | Opaque download route (proxied by API). |
 | `/api/runs/{id}/cost` | GET | `number` (Aggregate) | Get total estimated cost. |
 | `/api/runs/start` | POST | `PipelineRun` | Manually trigger a new run. |
 
@@ -92,6 +95,7 @@ The following items **must never** be exposed in the UI or stored in the portal'
 - **Tenant IDs**: No technical tenant identifiers.
 - **Subscription IDs**: No technical subscription identifiers.
 - **Secrets**: No storage keys, SAS tokens, or connection strings.
+- **Storage Internals**: No `storage_ref` or raw container/blob names.
 - **Internal Exceptions**: No stack traces, file paths, or line numbers.
 - **Stack Traces**: No internal code execution details.
 

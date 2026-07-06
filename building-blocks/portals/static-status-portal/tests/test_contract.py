@@ -61,7 +61,7 @@ def test_mermaid_flow():
     assert "Customer" in content
     assert "Static Web Apps Portal" in content
     assert "Portal API Functions" in content
-    assert "status/artifact/cost responses" or "Run List Response" in content
+    assert "status/artifact/cost responses" in content or "Run List Response" in content
 
 
 def test_customer_safe_boundary_no_leaks():
@@ -83,12 +83,52 @@ def test_customer_safe_boundary_no_leaks():
         "storage keys",
         "connection strings",
         "stack traces",
+        "storage_ref",
     ]
     for term in forbidden_terms:
         # Use case-insensitive search for some terms to be flexible but firm
         assert re.search(re.escape(term), content, re.IGNORECASE), (
             f"README missing explicit mention of forbidden term: {term}"
         )
+
+
+def test_no_sensitive_terms_in_ui_contract():
+    """Ensure that sensitive terms are NOT present in the UI Surface Contract sections as allowed fields or behavior."""
+    readme_path = MODULE_DIR / "README.md"
+    with open(readme_path, "r") as f:
+        content = f.read()
+
+    # Extract the UI Surface Contract section
+    ui_section_match = re.search(
+        r"## UI Surface Contract(.*?)(?=## API Contract Usage)", content, re.DOTALL
+    )
+    assert ui_section_match, "Could not find UI Surface Contract section in README"
+    ui_section = ui_section_match.group(1)
+
+    # These terms should NOT be used in the UI Surface Contract as something to display or use
+    # We allow them only if they are explicitly prefixed with "must never", "forbidden", "internal-only", etc.
+    # But for simplicity, we check if they are mentioned as "Fields" or "Behavior"
+    sensitive_terms = ["storage_ref", "SAS", "connection string", "account key"]
+
+    for term in sensitive_terms:
+        # Check if term appears as a field or in behavior without a negative constraint
+        # This is a bit complex for a regex, so we'll do a basic check and look for "Constraint" or "must never"
+        if term in ui_section:
+            # If it's there, it MUST be part of a "Constraint" or "must never" or "internal-only" sentence
+            lines = ui_section.split("\n")
+            for line in lines:
+                if term in line:
+                    assert any(
+                        keyword in line.lower()
+                        for keyword in [
+                            "constraint",
+                            "must never",
+                            "internal-only",
+                            "forbidden",
+                        ]
+                    ), (
+                        f"Sensitive term '{term}' found in UI Surface Contract without clear restriction: {line}"
+                    )
 
 
 def test_contract_references_exist():
