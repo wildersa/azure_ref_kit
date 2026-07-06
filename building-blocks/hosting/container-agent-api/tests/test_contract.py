@@ -61,6 +61,8 @@ def test_no_unsafe_output_wording():
         r"return secrets",
         r"disable security",
         r"publicly accessible storage",
+        r"azure_openai_key",
+        r"your-key",
     ]
 
     for file_path in files_to_check:

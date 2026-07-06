@@ -73,9 +73,9 @@ To run the agent API locally using Docker:
 
 2. **Run the container:**
    ```bash
+   # Use DefaultAzureCredential (Managed Identity / Azure CLI login) for local auth
    docker run -p 8080:8080 \
      -e AZURE_OPENAI_ENDPOINT="https://..." \
-     -e AZURE_OPENAI_KEY="your-key" \
      agent-api
    ```
 
