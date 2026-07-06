@@ -21,6 +21,7 @@ This directory contains the Terraform configuration for the core infrastructure 
 - **Identity & Security**:
   - **User-Assigned Managed Identity**: Used by the solution components for secure service-to-service access.
   - **RBAC Assignments**: Least-privilege access for the identity (Storage Blob Data Contributor, Storage Table Data Contributor).
+  - **Identity-First Storage**: Shared Key access is explicitly disabled (`shared_access_key_enabled = false`), enforcing Microsoft Entra authorization for all data operations.
 
 ## Prerequisites
 
