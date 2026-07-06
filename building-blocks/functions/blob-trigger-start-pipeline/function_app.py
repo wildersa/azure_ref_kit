@@ -8,7 +8,7 @@ import jsonschema
 from datetime import datetime, timezone
 from pathlib import Path
 
-app = df.DFApp(http_auth_level=func.AuthLevel.FUNCTION)
+app = df.DFApp()
 
 # Load schema once
 SCHEMA_PATH = (
@@ -25,7 +25,8 @@ async def main_logic(myblob: func.InputStream, client: df.DurableOrchestrationCl
     """
     Core logic extracted from the trigger to facilitate unit testing.
     """
-    logging.info(f"Processing blob: {myblob.name} ({myblob.length} bytes)")
+    run_id = str(uuid.uuid4())
+    logging.info(f"Processing new pipeline request. RunID: {run_id}")
 
     # 1. Extract Metadata
     blob_name_parts = myblob.name.split("/")
@@ -39,14 +40,11 @@ async def main_logic(myblob: func.InputStream, client: df.DurableOrchestrationCl
     # 2. Validation
     if not customer_id or not document_type:
         logging.error(
-            f"Missing mandatory metadata for blob {myblob.name}. "
-            f"customer_id: {customer_id}, document_type: {document_type}. "
-            "Pipeline start aborted."
+            f"Missing mandatory metadata for run {run_id}. Pipeline start aborted."
         )
         return
 
     # 3. Normalize PipelineRun Payload
-    run_id = str(uuid.uuid4())
     pipeline_run = {
         "id": run_id,
         "customer_id": customer_id,
@@ -54,35 +52,22 @@ async def main_logic(myblob: func.InputStream, client: df.DurableOrchestrationCl
         "status": "pending",
         "correlation_id": correlation_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "business_summary": f"Triggered by upload of {myblob.name}",
+        "business_summary": "Pipeline triggered by document upload.",
     }
-
-    # Add source blob reference (safe path only)
-    # The schema might need to be extended or we use business_summary/metadata for it if strict.
-    # However, for the orchestrator to work, it needs this reference.
-    # We'll pass it as part of a safe metadata extension if allowed or just include it.
-    # pipeline-run.schema.json has additionalProperties: false, so we must be careful.
-
-    # Let's check the schema again.
-    # id, customer_id, pipeline_type, status, current_step, progress_percent, business_summary,
-    # friendly_error, correlation_id, estimated_cost, created_at, started_at, finished_at.
-    # No source_blob field. I should probably use business_summary or just pass it in start_new
-    # alongside the run, or better: the orchestrator should get it from a specific field.
-    # If I can't change the schema, I'll put it in business_summary or a separate input.
-
-    # Actually, the orchestrator call 'client.start_new' takes 'client_input'.
-    # If the orchestrator expects more than just the PipelineRun object, I can wrap it.
 
     orchestration_input = {
         "pipeline_run": pipeline_run,
-        "source_blob": myblob.name,  # Safe path reference
+        "source_blob": myblob.name,  # Safe internal path reference
     }
 
     # 4. Contract Validation
     try:
         jsonschema.validate(instance=pipeline_run, schema=PIPELINE_RUN_SCHEMA)
-    except jsonschema.ValidationError as e:
-        logging.error(f"PipelineRun payload failed contract validation: {e.message}")
+    except jsonschema.ValidationError:
+        logging.error(
+            f"PipelineRun payload failed contract validation for run {run_id}. "
+            "Please check the data format against the shared schema."
+        )
         return
 
     # 5. Durable Orchestration Hand-off
@@ -95,7 +80,7 @@ async def main_logic(myblob: func.InputStream, client: df.DurableOrchestrationCl
             orchestrator_name, instance_id=run_id, client_input=orchestration_input
         )
         logging.info(
-            f"Successfully started orchestration '{orchestrator_name}' with ID '{instance_id}'."
+            f"Successfully started orchestration for run {run_id} with instance ID {instance_id}."
         )
     except Exception:
         logging.error(

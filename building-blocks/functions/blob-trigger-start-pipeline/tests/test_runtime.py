@@ -1,6 +1,7 @@
 import pytest
 import azure.functions as func
 import azure.durable_functions as df
+import logging
 from unittest.mock import AsyncMock, MagicMock, patch
 from function_app import main_logic
 
@@ -36,13 +37,14 @@ async def test_blob_trigger_success():
     assert payload["correlation_id"] == "corr-456"
     assert payload["status"] == "pending"
     assert payload["id"] == instance_id
+    assert payload["business_summary"] == "Pipeline triggered by document upload."
     # Ensure no secrets or raw URLs in payload
     assert "url" not in payload
     assert "connection" not in payload
 
 
 @pytest.mark.asyncio
-async def test_blob_trigger_missing_metadata():
+async def test_blob_trigger_missing_metadata(caplog):
     # Arrange
     mock_blob = MagicMock(spec=func.InputStream)
     mock_blob.name = "uploads/invalid/file.pdf"
@@ -52,10 +54,15 @@ async def test_blob_trigger_missing_metadata():
     mock_client.start_new = AsyncMock()
 
     # Act
-    await main_logic(mock_blob, mock_client)
+    with caplog.at_level(logging.ERROR):
+        await main_logic(mock_blob, mock_client)
 
     # Assert
     mock_client.start_new.assert_not_called()
+    # Ensure no raw blob name or customer path in logs
+    assert "uploads/invalid/file.pdf" not in caplog.text
+    assert "invalid" not in caplog.text
+    assert "Missing mandatory metadata" in caplog.text
 
 
 @pytest.mark.asyncio
@@ -82,7 +89,7 @@ async def test_blob_trigger_prefer_metadata_over_path():
 
 
 @pytest.mark.asyncio
-async def test_blob_trigger_validation_failure():
+async def test_blob_trigger_validation_failure(caplog):
     # Arrange
     mock_blob = MagicMock(spec=func.InputStream)
     mock_blob.name = "uploads/customer123/invoice.pdf"
@@ -99,7 +106,12 @@ async def test_blob_trigger_validation_failure():
         mock_validate.side_effect = jsonschema.ValidationError("Invalid payload")
 
         # Act
-        await main_logic(mock_blob, mock_client)
+        with caplog.at_level(logging.ERROR):
+            await main_logic(mock_blob, mock_client)
 
         # Assert
         mock_client.start_new.assert_not_called()
+        # Ensure no raw blob name or customer path in logs
+        assert "uploads/customer123/invoice.pdf" not in caplog.text
+        assert "customer123" not in caplog.text
+        assert "PipelineRun payload failed contract validation" in caplog.text
