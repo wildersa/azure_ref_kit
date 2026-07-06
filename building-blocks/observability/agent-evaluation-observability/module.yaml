@@ -2,13 +2,21 @@ name: agent-evaluation-observability
 type: guidance
 category: observability
 status: stable
-purpose: Tracing, evaluation, and monitoring expectations for agent flows.
-inputs: []
-outputs: []
+purpose: Tracing, evaluation, and monitoring expectations for customer-safe agent flows.
+inputs:
+  - name: telemetry_redaction_rules
+    type: object
+    description: Explicit rules for what may and must not be traced.
+outputs:
+  - name: evaluation_checklist
+    type: object
+    description: Core quality and safety pillars for agent verification.
 azure_resources:
   - Azure AI Foundry
   - Application Insights
   - Azure Monitor
+dependencies:
+  - building-blocks/agents/pipeline-assistant-foundry
 contracts:
   reads:
     - OpenTelemetry spans
