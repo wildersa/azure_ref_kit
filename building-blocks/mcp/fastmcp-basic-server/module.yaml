@@ -4,7 +4,11 @@ category: mcp
 status: implemented
 purpose: Minimal local MCP server reference using FastMCP to demonstrate the protocol boundary.
 inputs: []
-outputs: []
+outputs:
+  - name: get_system_status_response
+    type: string
+    description: "Response from the system status tool. Example: 'Status: Operational. ...'"
+    contract: "read-only"
 dependencies:
   - python >= 3.10
   - fastmcp >= 3.4.3
@@ -14,9 +18,6 @@ contracts:
     - type: mcp-tool
       name: get_system_status
       description: Returns the general operational status of the MCP server.
-    - type: mcp-tool
-      name: get_service_health
-      description: Returns the health status of a specific internal service.
 customer_safe_boundary:
   policy: "Read-only access to mock system metadata. No access to real PII, secrets, or mutation operations."
-  enforcement: "FastMCP decorator-based tool registration and bounded input validation in server.py."
+  enforcement: "FastMCP decorator-based tool registration and no-op implementation in server.py."

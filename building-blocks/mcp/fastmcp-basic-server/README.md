@@ -15,13 +15,11 @@ flowchart LR
         Transport[Transport Layer: stdio]
         Server[FastMCP Server]
         Tool1[get_system_status]
-        Tool2[get_service_health]
     end
 
     Agent <-->|JSON-RPC over stdio| Transport
     Transport <--> Server
     Server --> Tool1
-    Server --> Tool2
 ```
 
 ## MCP vs. Other Tooling Patterns
@@ -65,7 +63,7 @@ python3 src/server.py --help
 
 ## Security & Customer Safety
 - **Read-Only**: This reference contains only read-only tools.
-- **Bounded Inputs**: Inputs are validated and matched against safe allow-lists.
+- **Bounded Inputs**: No external inputs are accepted in this minimal reference to maximize safety.
 - **No Secrets**: No API keys or connection strings are stored or logged in this reference.
 
 ## Deployment / IaC Decision
