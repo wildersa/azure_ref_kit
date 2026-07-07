@@ -1,17 +1,18 @@
 from fastmcp import FastMCP
 
 # Initialize FastMCP server
-# This server demonstrates a minimal implementation of the Model Context Protocol (MCP)
-# using the FastMCP framework.
+# This server provides a minimal reference implementation of the Model Context Protocol (MCP)
+# for local tool integration. It demonstrates safe, read-only tool exposure.
 mcp = FastMCP("fastmcp-basic-server")
+
 
 @mcp.tool()
 def get_system_status() -> str:
     """
-    Returns the current status of the basic MCP server.
-    This is a safe, read-only tool for reference and validation.
+    Returns the general operational status of the MCP server.
     """
-    return "Status: Operational. Source: FastMCP Basic Server Reference."
+    return "Status: Operational. FastMCP Basic Server is ready to handle tool requests via stdio."
+
 
 if __name__ == "__main__":
     # Running the server will start the MCP transport (default is stdio)

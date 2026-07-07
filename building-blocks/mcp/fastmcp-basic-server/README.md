@@ -1,55 +1,72 @@
 # FastMCP Basic Server Reference
 
 ## Purpose
-This building block provides a minimal reference implementation of a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server using the [FastMCP](https://github.com/jlowin/fastmcp) framework.
-
-MCP allows AI agents to interact with external tools and data through a standardized protocol. This reference is designed to be small, independent, and locally runnable.
+This building block provides a minimal reference implementation of a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server using the [FastMCP](https://github.com/jlowin/fastmcp) framework. It demonstrates how to expose local tools to AI agents through a standardized, secure boundary.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    User --> Agent
-    Agent -- MCP Protocol (stdio) --> MCP_Server[FastMCP Basic Server]
-    MCP_Server --> Tool[get_system_status]
-    Tool --> SystemStatus[Static Status Response]
+    subgraph "Agent Runtime (Client)"
+        Agent[Foundry Agent / Client]
+    end
+
+    subgraph "MCP Boundary (Server)"
+        Transport[Transport Layer: stdio]
+        Server[FastMCP Server]
+        Tool1[get_system_status]
+    end
+
+    Agent <-->|JSON-RPC over stdio| Transport
+    Transport <--> Server
+    Server --> Tool1
 ```
 
-## When to use MCP
-- When you want to provide a standardized interface for AI agents to call your tools.
-- When you need to separate tool execution from the agent's core reasoning logic.
-- When you want to reuse tools across different agent frameworks (e.g., Azure Foundry, Claude, etc.).
+## MCP vs. Other Tooling Patterns
 
-## When NOT to use MCP
-- For simple internal function calls where a protocol overhead is not justified.
-- When the tool requires complex streaming or proprietary transport not yet supported by MCP.
-- If the agent framework you are using does not support MCP yet.
+| Feature | Direct Function Calling | OpenAPI / REST | MCP |
+| :--- | :--- | :--- | :--- |
+| **Discovery** | Manual schema definition | OpenAPI Spec (JSON/YAML) | Protocol-level introspection |
+| **Portability** | Low (code-dependent) | High (platform-agnostic) | High (AI-native standard) |
+| **Complexity** | Low | Medium/High | Medium (managed by FastMCP) |
+| **Statefulness** | Stateless | Typically Stateless | Supports stateful resources |
+| **Best For** | Internal application logic | External web services | Composable agent ecosystems |
 
-## Local run
-The server uses `stdio` as the default transport. You can run it locally using Python:
+### Why choose MCP?
+MCP is preferable when you want to build a **reusable tool catalog** that can be consumed by different agents or platforms (e.g., Azure AI Foundry, Claude Desktop) without writing custom integration code for every tool. It decouples the tool execution environment from the agent's reasoning environment.
+
+### Why choose OpenAPI?
+OpenAPI is better for legacy integrations or when you already have a robust HTTP/REST infrastructure with established OAuth2/Security patterns.
+
+### Why choose Direct Function Calling?
+Direct calling is best for high-performance, local-only operations that don't need to be exposed outside a single codebase.
+
+## Local Execution
+
+### Prerequisites
+- Python 3.10+
+- `fastmcp` library
+
+### Run the server
+The server uses `stdio` (standard input/output) as its transport mechanism.
 
 ```bash
 python3 src/server.py
 ```
 
-## Validation
-To verify the server starts and exposes the tool, you can check the help command:
+### Validation
+You can verify the tool definitions by running the server with the help flag:
 
 ```bash
 python3 src/server.py --help
 ```
 
-For full protocol validation, use the `mcp inspector` or a compatible MCP client.
+## Security & Customer Safety
+- **Read-Only**: This reference contains only read-only tools.
+- **Bounded Inputs**: No external inputs are accepted in this minimal reference to maximize safety.
+- **No Secrets**: No API keys or connection strings are stored or logged in this reference.
 
-## Environment variables
-No environment variables are required for this basic reference.
+## Deployment / IaC Decision
+**Status: No-IaC (Local Reference Only)**
 
-## Known limits
-- **Local-first**: This block is designed for local execution. For Azure hosting patterns, see [MCP on Azure Functions Reference Pattern](../azure-functions-mcp-endpoint/README.md).
-- **Foundry Agent Integration**: To see how to use this server with an Azure AI Foundry agent, see the [Foundry Agent with MCP](../../../solutions/foundry-agent-with-mcp/README.md) solution.
-- **Single Tool**: Only one read-only tool is implemented to maintain minimalism.
-- **Transport**: Defaulted to `stdio`.
-
-## Contracts
-Declared in `module.yaml`.
-- **Tools**: `get_system_status` (read-only).
+This module is a local-first pattern. Deployment to Azure (e.g., via Azure Functions) requires different transport negotiation (SSE). Reference patterns for Azure-hosted MCP can be found in `building-blocks/mcp/azure-functions-mcp-endpoint/`.
