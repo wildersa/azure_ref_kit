@@ -1,8 +1,13 @@
 name: foundry-agent-with-mcp
 status: active
-purpose: Reference solution for a Foundry agent consuming an MCP server through a minimal MCP tool boundary.
+purpose: Reference solution for a Foundry agent using a Model Context Protocol (MCP) tool boundary.
 entrypoints:
   sdk_invocation: AIProjectClient
 building_blocks:
   - building-blocks/mcp/fastmcp-basic-server
 contracts: []
+azure_resources:
+  - Azure AI Foundry
+  - Azure Functions (Flex Consumption) # For MCP hosting
+  - Azure Storage Account
+  - Application Insights
