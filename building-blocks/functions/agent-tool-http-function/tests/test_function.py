@@ -1,5 +1,10 @@
 import json
+import sys
+import os
 import azure.functions as func
+
+# Add the parent directory to sys.path so we can import function_app
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from function_app import get_system_status
 
 

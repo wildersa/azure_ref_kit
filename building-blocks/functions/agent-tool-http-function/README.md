@@ -41,6 +41,11 @@ Returns a high-level summary of the system status.
 - **Authentication:** In Azure, this function should be protected via Function Keys or Microsoft Entra ID.
 - **No Passthrough:** This is not a generic proxy to other Azure APIs; it returns a specific, pre-defined contract.
 
+## Known Limits
+
+- This reference uses a synchronous HTTP trigger. For long-running tasks (>230 seconds), use the [Queue Function Tool](../agent-tool-queue-function/README.md) pattern.
+- This is a reference implementation; real-world status checks should be backed by actual resource monitoring or a status database.
+
 ## Local Run
 
 Prerequisites:
@@ -84,8 +89,3 @@ This module can be deployed to an Azure Function App.
 
 **Environment Variables:**
 - `AzureWebJobsStorage`: Connection string for the storage account (required by Functions).
-
-## Known Limits
-
-- This reference uses a synchronous HTTP trigger. For long-running tasks (>230 seconds), use the [Queue Function Tool](../agent-tool-queue-function/README.md) pattern.
-- This is a reference implementation; real-world status checks should be backed by actual resource monitoring or a status database.
