@@ -61,9 +61,9 @@ stages:
         inlineScript: |
           set -e
           cd $(TF_WORKING_DIR)
-          # Note: Real deployments require a configured backend (e.g. Azure Storage)
-          # This reference uses -backend=false for static/non-destructive validation.
-          terraform init -backend=false
+          # NOTE: Infrastructure planning requires a configured remote backend.
+          # Ensure a backend block (e.g. backend "azurerm" {}) is defined in your terraform configuration.
+          terraform init
           terraform plan -input=false
 
 - stage: Deploy
@@ -89,7 +89,6 @@ stages:
               inlineScript: |
                 set -e
                 cd $(TF_WORKING_DIR)
-                terraform init -backend=false
-                # Warning: terraform apply without a remote backend will not persist state.
-                # This is a minimal reference for command structure.
+                # NOTE: Infrastructure deployment requires a configured remote backend for state persistence.
+                terraform init
                 terraform apply -auto-approve -input=false

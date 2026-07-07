@@ -84,10 +84,26 @@ The [Durable Basic Pipeline](../../pipelines/durable-basic-pipeline/infra/terraf
 #### Pipeline Stages
 
 1.  **Static Validation**: Performs `terraform fmt` and `terraform validate` (using `-backend=false` for non-destructive check).
-2.  **Infrastructure Plan**: Generates a Terraform plan.
-3.  **Infrastructure Deploy**: Gated by an environment check; executes `terraform apply`.
+2.  **Infrastructure Plan**: Generates a Terraform plan. This stage requires a configured remote backend.
+3.  **Infrastructure Deploy**: Gated by an environment check; executes `terraform apply`. This stage requires a configured remote backend for state persistence.
 
-> **Note on State Management**: This minimal example uses `-backend=false` for demonstration. In a production scenario, a remote backend (e.g., Azure Storage) must be configured in the Terraform `backend` block to persist state.
+#### State Management & Remote Backend
+
+To use the Plan and Deploy stages, you must configure a remote backend in your Terraform configuration (e.g., `backend.tf`). Without a remote backend, Terraform state will not be persisted across pipeline runs.
+
+**Example Backend Configuration:**
+
+```hcl
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "rg-terraform-state"
+    storage_account_name = "stterraformstate"
+    container_name       = "tfstate"
+    key                  = "durable-pipeline.tfstate"
+    use_oidc             = true
+  }
+}
+```
 
 ## Local run
 
