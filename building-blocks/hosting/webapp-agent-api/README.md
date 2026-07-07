@@ -1,112 +1,107 @@
 # Web App Hosted Agent API
 
+Reference building block defining when and how to host an agent-facing API on Azure App Service (Web Apps) using the native Python runtime.
+
 ## Purpose
 
-This building block provides a reference pattern for hosting an AI agent or agent-facing API on Azure App Service (Web App) using the native Python runtime. It documents when to choose App Service over serverless functions or containers and how to structure the application for Azure.
+This building block provides a standard hosting contract for agentic workloads that benefit from a managed, native Python environment. It defines the boundary between the agent client and the internal tool logic, ensuring a secure and observable interface.
 
-## Justification: Why Web App?
+## When to Use Web Apps
 
-| Feature | Azure Functions | Azure App Service (Web App) | Azure Container Apps |
+- **Managed Runtime:** You want Azure to handle OS and Python runtime patching (Native Runtime) without managing Dockerfiles.
+- **Web Frameworks:** Your agent API is built using standard Python web frameworks like FastAPI, Django, or Flask.
+- **Long-Running Requests:** The agent task may exceed the default timeout limits of Azure Functions (typically 10 minutes).
+- **Persistent Connections:** You need support for WebSockets or long-lived streaming responses.
+- **Feature Rich Hosting:** You want to leverage App Service features like Staging Slots, easy integrated authentication (EasyAuth), and simple "Always On" capability to avoid cold starts.
+
+## When NOT to Use Web Apps
+
+- **Complex System Dependencies:** Your agent requires OS-level libraries or non-Python binaries not included in the standard App Service Python image. Use [Container-hosted Agent API](../container-agent-api/README.md) instead.
+- **Event-Driven / Sparse Traffic:** If the API is rarely called and can tolerate cold starts, [Azure Functions](../../functions/agent-tool-http-function/README.md) may be more cost-effective due to scale-to-zero.
+- **Microservices Orchestration:** If you are deploying a large collection of interdependent microservices, Azure Container Apps might be a better fit.
+
+## Comparison with Other Hosting Options
+
+| Feature | Azure Functions | Web App (Native) | Web App for Containers |
 | :--- | :--- | :--- | :--- |
-| **Primary Use** | Event-driven, short-lived tasks | Web apps, monolithic APIs | Microservices, serverless containers |
-| **Execution Time** | Limited (default 5-10 mins) | Unbounded | Unbounded |
-| **Scaling** | Scale to zero (Consumption) | Manual/Autoscale (App Service Plan) | Scale to zero, event-driven (KEDA) |
-| **Runtime Control** | Managed by platform | Managed (Native) or Custom (Docker) | Full control (via Docker) |
-| **Cold Starts** | Possible on Consumption | Minimal (if Always On enabled) | Possible (if scaled to zero) |
+| **Primary Use** | Event-driven, small tasks | Monolithic APIs, Web Apps | Custom runtimes, legacy apps |
+| **Scaling** | Scale to zero (Consumption) | Plan-based (Auto/Manual) | Plan-based (Auto/Manual) |
+| **Runtime** | Managed by platform | Managed (Native Python) | Full control (Docker) |
+| **Cold Starts** | Possible on Consumption | Minimal (with Always On) | Minimal (with Always On) |
+| **Execution Time** | Limited (5-10 mins) | Unbounded | Unbounded |
 
-**Use Azure App Service (Web App) when:**
-- Your agent API is a standard web application (e.g., FastAPI, Django, Flask).
-- You want the platform to manage the OS and Python runtime patching (Native Runtime).
-- You need long-running execution or persistent connections (WebSockets) beyond Function limits.
-- You prefer a familiar web hosting environment with features like Staging Slots and integrated authentication.
+## API Boundary
 
-## Architecture
-
-The following diagram illustrates the flow from a client through the Web App boundary to the agent logic and observability.
+The Web App hosted API acts as a secure gateway, enforcing the `customer-safe-status-boundary` before returning data to the caller.
 
 ```mermaid
 flowchart LR
-    Client[Client / Portal] --> API[Web App API Entrypoint]
+    Client[Agent Client / Portal] --> API[Web App API Entrypoint]
     subgraph WebApp[Azure App Service Boundary]
         API --> AgentLogic[Agent / Tool Logic]
-        AgentLogic --> Registry[Internal Tool Registry]
+        AgentLogic --> Security[Customer-Safe Boundary]
     end
-    AgentLogic --> Foundry[Azure AI Foundry / Models]
-    AgentLogic --> ExternalTools[External APIs / MCP Servers]
+    Security -->|Safe JSON Response| Client
+    AgentLogic --> AI[Azure AI Foundry / Models]
+    AgentLogic --> Tools[Internal Tools / MCP Servers]
     WebApp -.-> Obs[Azure Monitor / App Insights]
 ```
 
-## Minimal File Layout
+## Local / Demo Flow
 
-A reference App Service hosted agent API should follow this minimal structure:
+To run a sample FastAPI agent API locally:
 
-```text
-building-blocks/hosting/webapp-agent-api/
-├── main.py             # Entrypoint (e.g., FastAPI/Uvicorn)
-├── requirements.txt    # Python dependencies
-└── module.yaml         # Module contract
-```
-
-## Local Run
-
-To run the agent API locally:
-
-1. Create and activate a virtual environment:
+1. **Setup environment:**
    ```bash
    python -m venv .venv
    source .venv/bin/activate
+   pip install fastapi uvicorn
    ```
-2. Install dependencies:
+
+2. **Run the app:**
    ```bash
-   pip install -r requirements.txt
+   # In building-blocks/hosting/webapp-agent-api/src/ (if code existed)
+   uvicorn main:app --host 0.0.0.0 --port 8000
    ```
-3. Run the app using Uvicorn:
+
+3. **Verify:**
    ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   curl http://localhost:8000/health
    ```
 
-Verify the service by visiting `http://localhost:8000/health`.
+## Azure Hosting Notes
 
-## Configuration
+### Deployment Methods
+- **Azure CLI:** Use `az webapp up` for quick creation and deployment.
+- **Zip Deploy:** Recommended for CI/CD. Ensure `SCM_DO_BUILD_DURING_DEPLOYMENT=true` is set to enable server-side `pip install`.
+- **GitHub Actions:** Use the official `azure/webapps-deploy` action.
 
-### Environment Variables
-- `PORT`: Port the app listens on (default: 8000).
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: For observability.
-- `AZURE_CLIENT_ID`: Required when using User-Assigned Managed Identity.
+### Configuration
+- **Startup Command:** For FastAPI, set the startup command to:
+  `gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app`
+- **Always On:** Enable for Production/Basic+ tiers to eliminate cold starts.
 
-### Secrets Handling
-- Use [Key Vault references](https://learn.microsoft.com/en-us/azure/app-service/app-service-key-vault-references) in Application Settings to securely inject secrets as environment variables.
-- Example: `@Microsoft.KeyVault(SecretUri=https://myvault.vault.azure.net/secrets/mysecret/)`
+## Security Notes
 
-### Identity
-- Enable **Managed Identity** (System-assigned or User-assigned) to allow the Web App to authenticate to Azure AI Foundry and other Azure services without managing credentials.
+- **Managed Identity:** Always use System-Assigned or User-Assigned Managed Identity for accessing downstream Azure services (AI Foundry, Key Vault, Storage).
+- **Redaction:** Implement strict response filtering to ensure no raw prompts, internal Azure resource IDs, or technical stack traces are exposed to the client.
+- **Integrated Auth:** Use App Service Authentication (EasyAuth) to restrict access to the API without writing custom auth code.
 
-## Deployment Notes
+## Cost & Ops Trade-offs
 
-### Azure CLI (Quickstart)
-The `az webapp up` command simplifies creation and deployment:
-```bash
-az webapp up --runtime PYTHON:3.12 --sku B1 --name <your-app-name>
-```
+- **Predictable Cost:** App Service Plans (B, S, P tiers) have a fixed monthly cost regardless of traffic.
+- **Ops Simplicity:** No need to manage container registries or Dockerfiles; just push code.
+- **Scaling:** Vertical scaling (Up) and horizontal scaling (Out) are mature and well-integrated into the portal and CLI.
 
-### Zip Deployment
-For CI/CD or manual zip-based deployment, ensure `SCM_DO_BUILD_DURING_DEPLOYMENT=true` is set in App Settings to enable build automation (pip install) on the server.
+## Known Limits
 
-### Startup Command
-For FastAPI, you may need to configure a custom startup command in the Azure Portal or via CLI:
-```bash
-gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app
-```
-
-## Known Limits and Trade-offs
-
-- **Native Dependencies:** Limited to what is available in the App Service Python image. If you need complex system-level libraries, consider [Container Hosting](../container-agent-api/README.md).
-- **File System:** The file system is ephemeral unless using persistent storage mounts. Use Azure Blob Storage for persistent artifacts.
-- **Port 80/443:** App Service routes traffic from 80/443 to the port your app listens on (usually configured via `PORT` env var).
+- **Image Customization:** You cannot modify the underlying OS or install arbitrary system packages.
+- **Ephemeral Disk:** Files written to the local disk (outside of `/home`) are lost on restart. Use Azure Blob Storage for persistence.
+- **Port Mapping:** App Service expects the app to listen on the port provided by the `PORT` environment variable (usually 80 or 8080 is mapped by the platform).
 
 ## References
 
 - [Azure App Service overview](https://learn.microsoft.com/en-us/azure/app-service/overview)
-- [Quickstart: Deploy a Python web app to Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/quickstart-python)
-- [Microsoft Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
 - [Configure a Linux Python app for Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-language-python)
+- [Managed identities for App Service](https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity)
+- [Microsoft Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
