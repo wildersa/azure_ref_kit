@@ -42,6 +42,10 @@ To implement this pattern securely, configure the following GitHub Repository Se
 | `AZURE_TENANT_ID` | Secret | The Directory (tenant) ID of your Azure tenant. |
 | `AZURE_SUBSCRIPTION_ID` | Secret | The ID of the Azure Subscription. |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Secret | (Optional) The SWA deployment token. Required if not using the full OIDC integration for the upload action. |
+| `BACKEND_RESOURCE_GROUP_NAME` | Secret | The resource group name for the Terraform remote backend. |
+| `BACKEND_STORAGE_ACCOUNT_NAME` | Secret | The storage account name for the Terraform remote backend. |
+| `BACKEND_CONTAINER_NAME` | Secret | The container name for the Terraform remote backend. |
+| `BACKEND_KEY` | Secret | The state file key for the Terraform remote backend. |
 
 ### Configuration Variables
 
@@ -175,7 +179,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Plan
         run: |
-          terraform init
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
           terraform plan -input=false
         working-directory: ${{ env.TF_WORKING_DIR }}
 
@@ -197,7 +205,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
       - name: Terraform Apply
         run: |
-          terraform init
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
           terraform apply -auto-approve -input=false
         working-directory: ${{ env.TF_WORKING_DIR }}
 ```
