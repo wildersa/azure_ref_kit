@@ -1,44 +1,46 @@
 import json
-import azure.functions as func
 import sys
 import os
+import azure.functions as func
 
 # Add the parent directory to sys.path so we can import function_app
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from function_app import get_system_status
 
+
 def test_get_system_status_returns_200_and_json():
     # Construct a mock HTTP request
-    req = func.HttpRequest(
-        method='GET',
-        body=None,
-        url='/api/system_status'
-    )
+    req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
 
     # Call the function
     resp = get_system_status(req)
 
     # Validate the response
     assert resp.status_code == 200
-    assert resp.mimetype == 'application/json'
+    assert resp.mimetype == "application/json"
 
     body = json.loads(resp.get_body())
-    assert body['business_status'] == 'operational'
-    assert 'service_health' in body
-    assert 'active_regions' in body
-    assert 'last_updated' in body
+    assert body["business_status"] == "operational"
+    assert body["service_health"] == "healthy"
+    assert isinstance(body["active_regions"], list)
+    assert "last_updated" in body
+    assert body["environment"] == "production-reference"
+
 
 def test_get_system_status_safe_boundary():
     # Verify it doesn't leak sensitive fields (negative test for the boundary)
-    req = func.HttpRequest(
-        method='GET',
-        body=None,
-        url='/api/system_status'
-    )
+    req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
 
     resp = get_system_status(req)
     body = json.loads(resp.get_body())
 
-    forbidden_fields = ['secret', 'token', 'connection_string', 'raw_logs', 'stack_trace']
+    forbidden_fields = [
+        "secret",
+        "token",
+        "connection_string",
+        "raw_logs",
+        "stack_trace",
+        "subscription_id",
+    ]
     for field in forbidden_fields:
         assert field not in body, f"Leaked forbidden field: {field}"

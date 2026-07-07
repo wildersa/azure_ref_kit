@@ -10,8 +10,8 @@ It provides a concrete reference for exposing enterprise data to agents without 
 
 ```mermaid
 flowchart LR
-    Agent[AI Agent] -->|GET /api/system_status| Tool[Azure Function Tool]
-    Tool -->|Filtered Status| Agent
+    Agent[AI Agent] -->|GET /api/system_status| Tool[HTTP Function Agent Tool]
+    Tool -->|Controlled Tool Response| Agent
     subgraph "Safe Boundary"
         Tool
     end
@@ -24,13 +24,13 @@ flowchart LR
 
 Returns a high-level summary of the system status.
 
-**Request Schema:**
-- No parameters required for this reference.
+**Inputs:**
+- None (GET request with no parameters).
 
-**Response Schema:**
+**Outputs:**
 - `business_status` (string): Friendly operational status (e.g., "operational").
-- `service_health` (string): technical health indicator.
-- `active_regions` (array): List of regions currently serving traffic.
+- `service_health` (string): Technical health indicator.
+- `active_regions` (array of strings): List of regions currently serving traffic.
 - `last_updated` (string): ISO8601 timestamp of the last status update.
 - `environment` (string): Name of the environment.
 
@@ -41,11 +41,16 @@ Returns a high-level summary of the system status.
 - **Authentication:** In Azure, this function should be protected via Function Keys or Microsoft Entra ID.
 - **No Passthrough:** This is not a generic proxy to other Azure APIs; it returns a specific, pre-defined contract.
 
+## Known Limits
+
+- This reference uses a synchronous HTTP trigger. For long-running tasks (>230 seconds), use the [Queue Function Tool](../agent-tool-queue-function/README.md) pattern.
+- This is a reference implementation; real-world status checks should be backed by actual resource monitoring or a status database.
+
 ## Local Run
 
 Prerequisites:
 - [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- Python 3.10+
+- Python 3.11+
 
 1. Install dependencies:
    ```bash
@@ -67,8 +72,14 @@ Prerequisites:
 Run tests to verify the tool logic and boundary:
 
 ```bash
-python3 -m pytest tests
+# From the module root
+PYTHONPATH=. pytest tests/test_function.py
 ```
+
+## Dependencies
+
+- `azure-functions`: Python SDK for Azure Functions.
+- `pytest`: For running unit tests.
 
 ## Azure Deployment
 
@@ -76,10 +87,7 @@ This module can be deployed to an Azure Function App.
 
 **Recommended SKU:** Flex Consumption (for scale-to-zero and managed identity support).
 
-**Environment Variables:**
-- `AzureWebJobsStorage`: Connection string for the storage account (required by Functions).
-
-## Known Limits
-
-- This reference uses a synchronous HTTP trigger. For long-running tasks (>230 seconds), use the [Queue Function Tool](../agent-tool-queue-function/README.md) pattern.
-- This is a reference implementation; real-world status checks should be backed by actual resource monitoring or a status database.
+**Identity-First Configuration:**
+This reference uses Managed Identity for all storage operations. The following App Settings are required:
+- `AzureWebJobsStorage__accountName`: The name of the storage account.
+- `AzureWebJobsStorage__credential`: Set to `managedidentity` to use the Function's identity.
