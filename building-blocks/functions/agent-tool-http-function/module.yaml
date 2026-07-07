@@ -9,8 +9,9 @@ outputs:
     type: http-function-tool
     description: Returns the current operational status of the system.
 azure_resources:
-  - azurerm_linux_function_app
+  - azurerm_function_app_flex_consumption
   - azurerm_service_plan
+  - azurerm_storage_account
 contracts:
   reads: []
   writes: []

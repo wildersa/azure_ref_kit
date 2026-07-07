@@ -87,5 +87,7 @@ This module can be deployed to an Azure Function App.
 
 **Recommended SKU:** Flex Consumption (for scale-to-zero and managed identity support).
 
-**Environment Variables:**
-- `AzureWebJobsStorage`: Connection string for the storage account (required by Functions).
+**Identity-First Configuration:**
+This reference uses Managed Identity for all storage operations. The following App Settings are required:
+- `AzureWebJobsStorage__accountName`: The name of the storage account.
+- `AzureWebJobsStorage__credential`: Set to `managedidentity` to use the Function's identity.
