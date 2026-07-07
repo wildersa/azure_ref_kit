@@ -54,7 +54,9 @@ def get_tool_definitions() -> List[FunctionTool]:
                     },
                 },
                 "required": ["pipeline_id", "run_id"],
+                "additionalProperties": False,
             },
+            strict=True,
         ),
         FunctionTool(
             name="get_latest_build_summary",
@@ -72,7 +74,9 @@ def get_tool_definitions() -> List[FunctionTool]:
                     },
                 },
                 "required": ["pipeline_id"],
+                "additionalProperties": False,
             },
+            strict=True,
         ),
         FunctionTool(
             name="list_recent_pipeline_runs",
@@ -90,6 +94,8 @@ def get_tool_definitions() -> List[FunctionTool]:
                     },
                 },
                 "required": ["pipeline_id"],
+                "additionalProperties": False,
             },
+            strict=True,
         ),
     ]

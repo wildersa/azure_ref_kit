@@ -6,6 +6,7 @@ Verifies safety instructions and tool definitions.
 from src.agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 from azure.ai.projects.models import FunctionTool
 
+
 def test_system_instructions_safety_keywords():
     """
     Verifies that the system instructions contain essential safety and privacy keywords.
@@ -22,7 +23,10 @@ def test_system_instructions_safety_keywords():
     ]
 
     for keyword in required_keywords:
-        assert keyword.lower() in SYSTEM_INSTRUCTIONS.lower(), f"Missing safety keyword: {keyword}"
+        assert keyword.lower() in SYSTEM_INSTRUCTIONS.lower(), (
+            f"Missing safety keyword: {keyword}"
+        )
+
 
 def test_system_instructions_prohibits_mutations():
     """
@@ -30,8 +34,11 @@ def test_system_instructions_prohibits_mutations():
     """
     prohibited_actions = ["trigger", "cancel", "approve"]
     for action in prohibited_actions:
-        assert action in SYSTEM_INSTRUCTIONS.lower(), f"Instruction should mention prohibiting '{action}'"
+        assert action in SYSTEM_INSTRUCTIONS.lower(), (
+            f"Instruction should mention prohibiting '{action}'"
+        )
     assert "NEVER perform any mutation actions" in SYSTEM_INSTRUCTIONS
+
 
 def test_tool_definitions_structure():
     """
@@ -50,6 +57,12 @@ def test_tool_definitions_structure():
         assert tool.description is not None
         assert tool.parameters is not None
         assert tool.parameters["type"] == "object"
+        # Verify safety hardening (strict schemas)
+        assert tool.strict is True, f"Tool {tool.name} must have strict=True"
+        assert tool.parameters.get("additionalProperties") is False, (
+            f"Tool {tool.name} must set additionalProperties to False"
+        )
+
 
 def test_get_pipeline_run_status_parameters():
     """

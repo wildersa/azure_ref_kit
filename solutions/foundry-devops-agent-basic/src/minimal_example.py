@@ -9,6 +9,7 @@ from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import PromptAgentDefinition
 from .agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 
+
 def main():
     # Load configuration from environment variables
     # Expected: https://<resource-name>.ai.azure.com/api/projects/<project-name>
@@ -46,6 +47,7 @@ def main():
     #     if item.type == "function_call":
     #         # Resolve tool call via your DevOps Status integration
     #         pass
+
 
 if __name__ == "__main__":
     main()
