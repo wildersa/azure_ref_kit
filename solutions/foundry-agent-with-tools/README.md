@@ -83,7 +83,7 @@ The agent is trained to call the `get_system_status` tool when asked about the h
        credential=DefaultAzureCredential(),
    )
 
-   # Create the agent with function tool definitions
+   # Create the agent with function tool definitions (returns List[Tool])
    agent = project.agents.create_version(
        agent_name="status-assistant",
        definition=PromptAgentDefinition(

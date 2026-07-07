@@ -7,7 +7,10 @@ from src.agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 def test_tool_definitions_present():
     """Verify get_system_status tool is present."""
     tools = get_tool_definitions()
-    tool_names = [t["function"]["name"] for t in tools]
+    # Handle both dict-based and SDK object-based tools for test flexibility
+    tool_names = [
+        t.name if hasattr(t, "name") else t["function"]["name"] for t in tools
+    ]
 
     assert "get_system_status" in tool_names
 
@@ -43,7 +46,9 @@ def test_tool_contract_json_exists_and_valid():
     contract_names = [t["name"] for t in contract_tools]
 
     tools = get_tool_definitions()
-    code_names = [t["function"]["name"] for t in tools]
+    code_names = [
+        t.name if hasattr(t, "name") else t["function"]["name"] for t in tools
+    ]
 
     assert set(contract_names) == set(code_names)
 

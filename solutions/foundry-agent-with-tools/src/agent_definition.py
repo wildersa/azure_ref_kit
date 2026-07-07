@@ -3,7 +3,8 @@ Foundry Agent with Tools - Agent Definition.
 This module defines the customer-safe boundary and tool definitions for the agent.
 """
 
-from typing import List, Dict, Any
+from typing import List
+from azure.ai.projects.models import FunctionTool, Tool
 
 # System instructions that enforce the customer-safe boundary.
 SYSTEM_INSTRUCTIONS = """
@@ -26,23 +27,19 @@ Your goal is to help users understand the health and operational status of the s
 """
 
 
-def get_tool_definitions() -> List[Dict[str, Any]]:
+def get_tool_definitions() -> List[Tool]:
     """
     Returns the list of tool definitions for use with the Azure AI Projects SDK.
-    These are represented as function tools with defined parameters.
+    Uses the SDK FunctionTool class to ensure consistency with current documentation.
     The application logic (User/App) is responsible for executing the tool call.
     """
     return [
-        {
-            "type": "function",
-            "function": {
-                "name": "get_system_status",
-                "description": "Get the current business status and health of the system. Returns business_status, service_health, active_regions, last_updated, and environment.",
-                "parameters": {
-                    "type": "object",
-                    "properties": {},
-                    "required": [],
-                },
+        FunctionTool(
+            name="get_system_status",
+            description="Get the current business status and health of the system. Returns business_status, service_health, active_regions, last_updated, and environment.",
+            parameters={
+                "type": "object",
+                "properties": {},
             },
-        }
+        )
     ]
