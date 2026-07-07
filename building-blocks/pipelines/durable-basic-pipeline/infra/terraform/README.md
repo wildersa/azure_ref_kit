@@ -32,7 +32,7 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 
 - **Shared Access Key access is disabled** on the storage account (`shared_access_key_enabled = false`) to enforce Microsoft Entra authorization.
 - The Function App is granted the following roles on the storage account:
-  - `Storage Blob Data Contributor` (for deployment and Durable Functions state)
+  - `Storage Blob Data Owner` (required for AzureWebJobsStorage when keys are disabled)
   - `Storage Queue Data Contributor` (for Durable Functions orchestration queues)
   - `Storage Table Data Contributor` (for Durable Functions orchestration history/tracking)
 
