@@ -11,6 +11,9 @@ outputs:
   - name: evaluation_checklist
     type: object
     description: Core quality and safety pillars for agent verification.
+  - name: trace_checklist
+    type: object
+    description: Required technical telemetry fields for diagnostics.
 azure_resources:
   - Azure AI Foundry
   - Application Insights
@@ -27,3 +30,4 @@ contracts:
   emits:
     - Quality metrics
     - Safety metrics
+    - Diagnostic traces
