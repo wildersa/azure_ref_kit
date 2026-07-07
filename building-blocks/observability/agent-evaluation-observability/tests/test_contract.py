@@ -11,12 +11,13 @@ def test_readme_contains_p0_sections():
     required_sections = [
         "## Purpose",
         "## Trace Boundary",
+        "## Trace and Evaluation Checklist",
         "## Customer-Safe Logging Rules",
         "### What MAY be traced",
         "### What MUST NOT be traced/logged",
         "## Minimal Evaluation Checklist",
-        "## Monitoring Signals",
-        "## Known Limits",
+        "## Security and Privacy Notes",
+        "## Deployment / IaC Decision",
         "```mermaid",
     ]
 
@@ -32,24 +33,48 @@ def test_readme_contains_specific_safety_rules():
     with open(readme_path, "r") as f:
         content = f.read()
 
-    # Checklist items
-    checklist_items = ["groundedness", "tool-use", "safety", "no-leak"]
+    # Evaluation Checklist items
+    checklist_items = [
+        "quality",
+        "safety",
+        "tool-boundary",
+        "answer format",
+        "failure quality",
+    ]
     for item in checklist_items:
         assert item in content.lower(), (
             f"README Evaluation Checklist is missing: {item}"
         )
 
+    # Trace Checklist items
+    trace_items = [
+        "request id",
+        "agent id/name",
+        "tool name",
+        "tool outcome",
+        "latency",
+        "status/result",
+        "safety outcome",
+        "sanitized summary",
+    ]
+    for item in trace_items:
+        assert item in content.lower(), f"README Trace Checklist is missing: {item}"
+
     # Forbidden fields
     forbidden_fields = [
-        "prompts",
-        "stack traces",
-        "secrets",
+        "prompts with secrets",
+        "raw tool/provider payloads",
+        "raw azure devops logs",
         "tokens",
-        "provider payloads",
-        "storage paths",
-        "subscription ids",
-        "tenant ids",
-        "resource ids",
+        "secrets",
+        "connection strings",
+        "tenant",
+        "subscription",
+        "customer",
+        "org",
+        "secret variables",
+        "stack traces",
+        "unrestricted user content",
     ]
     for field in forbidden_fields:
         assert field in content.lower(), (

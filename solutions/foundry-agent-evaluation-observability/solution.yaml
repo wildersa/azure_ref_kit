@@ -1,0 +1,10 @@
+name: foundry-agent-evaluation-observability
+type: solution
+status: stable
+purpose: Reference solution for applying evaluation and observability standards to a Foundry agent.
+composed_of:
+  - solutions/foundry-agent-with-tools
+  - building-blocks/observability/agent-evaluation-observability
+  - building-blocks/observability/appinsights-observability
+azure_resources: []
+deployment_iac: "No-IaC: Prompt agent configuration via SDK/CLI."
