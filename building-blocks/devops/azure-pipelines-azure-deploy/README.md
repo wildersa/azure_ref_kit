@@ -68,22 +68,26 @@ The following variable is typically used in the YAML pipeline to reference the s
 
 Concrete Azure Pipelines YAML files (`azure-pipelines.yml` or templates) should be added to the repository only when they are tied to a specific **deployable module** or **reference solution**.
 
-### Example Pipeline Snippet (YAML)
+### Deployment Pattern: Durable Basic Pipeline
 
-When creating a pipeline, use the `AzureCLI@2` or `AzureResourceManagerTemplateDeployment@3` tasks, referencing the service connection:
+The [Durable Basic Pipeline](../../pipelines/durable-basic-pipeline/infra/terraform/) includes a concrete Azure Pipelines reference: `durable-basic-pipeline-deploy.yml`.
 
-```yaml
-jobs:
-- job: Deploy
-  steps:
-  - task: AzureCLI@2
-    inputs:
-      azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        az account show
-```
+#### Requirements & Assumptions
+
+- **Azure Resource Manager Service Connection**: An ARM service connection named `AZURE_RM_SVC_CONN` (configured via `AZURE_SERVICE_CONNECTION_NAME` variable) must exist in the Azure DevOps project. **Workload Identity Federation** is the recommended authentication method.
+- **Environment & Review Gate**: The pipeline uses an environment named `durable-pipeline-deploy`. For security, this environment should be created in Azure DevOps with an **Approvals and Checks** gate to prevent unauthorized deployments to target subscriptions.
+- **Variables**:
+    - `AZURE_SERVICE_CONNECTION_NAME`: Name of the service connection.
+    - `TF_WORKING_DIR`: Relative path to the Terraform module.
+    - `ENVIRONMENT_NAME`: Name of the Azure DevOps environment for gating.
+
+#### Pipeline Stages
+
+1.  **Static Validation**: Performs `terraform fmt` and `terraform validate` (using `-backend=false` for non-destructive check).
+2.  **Infrastructure Plan**: Generates a Terraform plan.
+3.  **Infrastructure Deploy**: Gated by an environment check; executes `terraform apply`.
+
+> **Note on State Management**: This minimal example uses `-backend=false` for demonstration. In a production scenario, a remote backend (e.g., Azure Storage) must be configured in the Terraform `backend` block to persist state.
 
 ## Local run
 
