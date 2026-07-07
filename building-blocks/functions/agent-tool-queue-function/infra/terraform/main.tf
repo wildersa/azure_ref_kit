@@ -54,6 +54,8 @@ resource "azurerm_function_app_flex_consumption" "function" {
   runtime_name    = "python"
   runtime_version = "3.11"
 
+  instance_memory_mb = 2048
+
   # Flex Consumption specific deployment configuration
   storage_container_type      = "blobContainer"
   storage_container_endpoint  = "${azurerm_storage_account.storage.primary_blob_endpoint}deploymentpackage"
@@ -66,18 +68,32 @@ resource "azurerm_function_app_flex_consumption" "function" {
   site_config {}
 
   app_settings = {
-    # Workaround for AzureWebJobsStorage in Flex Consumption
-    "AzureWebJobsStorage"              = ""
+    # Identity-first AzureWebJobsStorage
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.storage.name
-    # Connection string for the queue trigger/output
-    "STORAGE_CONNECTION" = azurerm_storage_account.storage.primary_connection_string
+    "AzureWebJobsStorage__credential"  = "managedidentity"
+
+    # Identity-first queue connection
+    "STORAGE_CONNECTION__accountName" = azurerm_storage_account.storage.name
+    "STORAGE_CONNECTION__credential"  = "managedidentity"
   }
 
   tags = var.tags
 }
 
-resource "azurerm_role_assignment" "storage_owner" {
+resource "azurerm_role_assignment" "storage_blob_data_contributor" {
   scope                = azurerm_storage_account.storage.id
-  role_definition_name = "Storage Blob Data Owner"
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "storage_queue_data_contributor" {
+  scope                = azurerm_storage_account.storage.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "storage_table_data_contributor" {
+  scope                = azurerm_storage_account.storage.id
+  role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
 }

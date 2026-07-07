@@ -86,9 +86,11 @@ This module should be deployed to an Azure Function App.
 
 A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Storage Queues, and the Flex Consumption Function App.
 
-**Required Configuration:**
-- `AzureWebJobsStorage`: Connection string for the storage account.
-- `STORAGE_CONNECTION`: Connection string (or service URI if using managed identity) for the queues.
+**Required Configuration (Identity-First):**
+- `AzureWebJobsStorage__accountName`: The name of the storage account.
+- `AzureWebJobsStorage__credential`: Set to `managedidentity`.
+- `STORAGE_CONNECTION__accountName`: The name of the storage account for queues.
+- `STORAGE_CONNECTION__credential`: Set to `managedidentity`.
 
 ## Known Limits
 

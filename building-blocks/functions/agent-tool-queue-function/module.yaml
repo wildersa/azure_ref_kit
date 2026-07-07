@@ -9,7 +9,7 @@ outputs:
     type: queue-function-tool
     description: Result of the asynchronous tool execution returned via an output queue.
 azure_resources:
-  - azurerm_linux_function_app
+  - azurerm_function_app_flex_consumption
   - azurerm_service_plan
   - azurerm_storage_account
   - azurerm_storage_queue
@@ -28,3 +28,20 @@ contracts:
           Value: {type: string}
           Error: {type: string}
           CorrelationId: {type: string}
+security_boundary:
+  policy: "Enforces async boundary through controlled storage queues and filtered response schemas."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Storage Queue Data Contributor"
+      description: "Allows reading from input queue and writing to output queue."
+    - role: "Storage Table Data Contributor"
+      description: "Required for internal Function host operations in identity-first configurations."
+customer_safe_boundary:
+  forbid:
+    - "Raw Azure Function logs or internal execution traces"
+    - "Internal technical exception payloads and stack traces"
+    - "Storage account keys, SAS tokens, or connection strings"
+    - "System prompts or LLM grounding instructions"
+    - "Internal Azure Resource IDs, Tenant IDs, or Subscription IDs"
+    - "Raw provider payloads from Document Intelligence or OpenAI"
