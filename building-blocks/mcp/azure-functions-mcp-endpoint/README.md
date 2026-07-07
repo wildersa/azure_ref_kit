@@ -21,12 +21,14 @@ flowchart LR
         Endpoint["/runtime/webhooks/mcp (SSE/HTTP)"]
         Extension[MCP Binding Extension]
         Tool1[get_service_info]
+        Tool2[get_resource_health]
     end
 
     Agent <--> Foundry
     Foundry <-->|Streamable HTTP| Endpoint
     Endpoint <--> Extension
     Extension --> Tool1
+    Extension --> Tool2
 ```
 
 ## MCP on Azure Functions vs. Standard FastMCP
@@ -44,13 +46,22 @@ flowchart LR
 ### Tool: `get_service_info`
 Returns a safe, read-only summary of the service hosting the MCP tools.
 
-**Inputs:**
-- None.
-
 **Outputs:**
 - `service_name` (string): Name of the service.
 - `status` (string): Current operational status.
 - `version` (string): Version of the MCP server.
+
+### Tool: `get_resource_health`
+Returns a mock health status for a given resource identifier.
+
+**Inputs:**
+- `resource_id` (string, optional): Identifier for the resource to check health for.
+
+**Outputs:**
+- `resource` (string): The resource identifier checked.
+- `health` (string): Health status (e.g., "Healthy").
+- `last_check` (string): Timestamp of the last health check.
+- `message` (string): Human-readable status message.
 
 ## Local Development & Validation
 
@@ -83,9 +94,9 @@ PYTHONPATH=src pytest tests/test_endpoint.py
 - **Identity-First**: The recommended pattern uses Managed Identity for all backend resource access.
 
 ## Deployment / IaC Decision
-**Status: Deferred-IaC (Reference Pattern)**
+**Status: IaC Included (infra/terraform/)**
 
-This module provides the code and configuration for the MCP server. Infrastructure deployment (Function App, Storage) follows the standard pattern in `infra/terraform/` but is deferred in this building block to maintain minimalism.
+This module includes a Terraform reference for deploying the MCP server to Azure Functions Flex Consumption with identity-first security boundaries.
 
 ## Microsoft Learn References
 - [Azure Functions MCP extension overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-mcp)
