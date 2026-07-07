@@ -30,6 +30,7 @@ def test_mcp_tool_configuration():
     assert mcp_tool.server_label == "system-status-server"
     assert mcp_tool.require_approval == "always"
     assert mcp_tool.server_url is not None
+    assert mcp_tool.allowed_tools == ["get_system_status"]
 
 
 def test_no_secrets_in_instructions():

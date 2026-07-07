@@ -77,9 +77,10 @@ MCP is chosen here because it provides a standardized way for the agent to disco
 
    # Define the MCP Tool
    mcp_tool = MCPTool(
-       server_label="system-status",
+       server_label="system-status-server",
        server_url="https://your-mcp-server.com/mcp",
-       require_approval="always"
+       require_approval="always",
+       allowed_tools=["get_system_status"]
    )
 
    # Create the agent

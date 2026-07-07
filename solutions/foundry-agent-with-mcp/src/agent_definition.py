@@ -49,5 +49,8 @@ def get_tool_definitions() -> List[Tool]:
             server_label="system-status-server",
             server_url=mcp_server_url,
             require_approval="always",  # Security best practice: always require approval for MCP tools
+            allowed_tools=[
+                "get_system_status"
+            ],  # Constraint the agent to specific safe tools
         )
     ]

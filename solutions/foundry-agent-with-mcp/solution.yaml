@@ -6,8 +6,4 @@ entrypoints:
 building_blocks:
   - building-blocks/mcp/fastmcp-basic-server
 contracts: []
-azure_resources:
-  - Azure AI Foundry
-  - Azure Functions (Flex Consumption) # For MCP hosting
-  - Azure Storage Account
-  - Application Insights
+azure_resources: []
