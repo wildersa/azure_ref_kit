@@ -1,16 +1,27 @@
 name: azure-functions-mcp-endpoint
-type: reference-pattern
+type: building-block
 category: mcp
-status: preview
-purpose: Reference pattern for hosting Model Context Protocol (MCP) servers on Azure Functions.
+status: implemented
+purpose: Reference implementation for hosting Model Context Protocol (MCP) servers on Azure Functions using the MCP binding extension.
 inputs: []
-outputs: []
+outputs:
+  - name: get_service_info_response
+    type: object
+    description: "Response from the get_service_info tool."
+    contract: "read-only"
+dependencies:
+  - python >= 3.10
+  - azure-functions >= 1.24.0
 azure_resources:
-  - Azure Functions (Flex Consumption)
-  - Azure AI Foundry Project
+  - azurerm_function_app_flex_consumption
+  - azurerm_storage_account
 contracts:
   reads: []
   writes: []
   emits:
     - type: mcp-tool
-      description: "Standardized tools exposed via the MCP protocol."
+      name: get_service_info
+      description: Returns a safe, filtered summary of the MCP service status.
+customer_safe_boundary:
+  policy: "Read-only access to mock service metadata. No access to real PII, secrets, or technical internals."
+  enforcement: "Azure Functions MCP decorator-based tool registration and explicit field filtering."

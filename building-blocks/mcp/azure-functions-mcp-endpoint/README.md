@@ -1,65 +1,93 @@
-# MCP on Azure Functions Reference Pattern
+# Azure Functions MCP Endpoint Reference
 
 ## Purpose
-This building block documents the supported architectural pattern for hosting Model Context Protocol (MCP) servers behind an Azure Functions boundary.
+This building block provides a reference implementation for hosting a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server using the official **Azure Functions MCP binding extension**.
 
-By hosting MCP tools on Azure Functions, agents can access enterprise systems and complex business logic with scale-to-zero pricing, managed identity security, and standardized tool discovery.
+By hosting MCP tools on Azure Functions, agents can access enterprise systems and complex business logic with scale-to-zero pricing, managed identity security, and standardized tool discovery via the Streamable HTTP transport.
 
-## Supported Patterns
-
-Azure Functions supports two primary ways to create and host remote MCP servers:
-
-### 1. MCP Binding Extension
-The **MCP binding extension** allows you to create and host custom MCP servers similarly to any other function app by using specialized triggers and bindings. This is the recommended approach for deep integration with the Azure Functions programming model.
-
-### 2. Self-hosted MCP Servers
-You can host MCP servers created by using official MCP SDKs. This approach uses **Streamable HTTP transport** (such as SSE - Server-Sent Events) to communicate with AI clients. This pattern is currently in **preview**.
-
-### Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    User --> Agent
-    Agent --> Foundry[Azure AI Foundry Agent Service]
-    Foundry -- MCP Protocol (Streamable HTTP) --> Functions[Azure Functions MCP Endpoint]
-    Functions --> ToolLogic[Tool Implementation]
-    ToolLogic --> Enterprise[Enterprise Systems/Data]
+    subgraph "Agent Client"
+        Agent[Foundry Agent / Client]
+    end
+
+    subgraph "Azure AI Foundry"
+        Foundry[Agent Service / Connection]
+    end
+
+    subgraph "Azure Functions (MCP Server)"
+        Endpoint["/runtime/webhooks/mcp (SSE/HTTP)"]
+        Extension[MCP Binding Extension]
+        Tool1[get_service_info]
+    end
+
+    Agent <--> Foundry
+    Foundry <-->|Streamable HTTP| Endpoint
+    Endpoint <--> Extension
+    Extension --> Tool1
 ```
 
-## Prerequisites
-- **Azure AI Foundry Project**: To register and consume the MCP tool.
-- **Azure Functions (Flex Consumption)**: Recommended for optimal serverless scaling and identity-based access.
-- **Python 3.10+**: Standard runtime for FastMCP and Azure AI SDKs.
-- **Managed Identity**: Enabled on the Function App for secure access to Azure resources without secrets.
+## MCP on Azure Functions vs. Standard FastMCP
 
-## Implementation Details
+| Feature | FastMCP (Local/Container) | Azure Functions MCP Extension |
+| :--- | :--- | :--- |
+| **Transport** | stdio / SSE (manual) | Streamable HTTP (Native) |
+| **Triggers** | CLI / Manual | `@app.mcp_tool_trigger` |
+| **Auth** | Manual / Middleware | App Service Auth / System Keys |
+| **Scaling** | Manual / K8s | Serverless (Flex Consumption) |
+| **Identity** | Manual SDK setup | Managed Identity (Native) |
 
-### 1. Transport Choice
-- **Streamable HTTP (SSE)**: Standard for real-time interactions with self-hosted MCP servers.
-- **MCP Triggers/Bindings**: Used when leveraging the Azure Functions MCP binding extension.
-- **Queue-based (Alternative)**: For long-running or asynchronous work, use the specialized `AzureFunctionsTool` with Storage Queues instead of a raw MCP endpoint.
+## Tool Contract
 
-### 2. Authentication and Security
-- **Entra ID / Managed Identity**: The Function App should use Managed Identity to authenticate with other Azure services.
-- **Foundry Connection**: Store any required third-party API keys in Azure AI Foundry Project Connections rather than in the Function App code.
-- **Network Boundary**: Use Private Endpoints to restrict access to the MCP endpoint within a Virtual Network.
+### Tool: `get_service_info`
+Returns a safe, read-only summary of the service hosting the MCP tools.
 
-### 3. Local vs Azure
-- **Local**: Development typically uses `stdio` transport with the MCP Inspector for rapid testing.
-- **Azure**: Deployment requires switching to a network-based transport like **Streamable HTTP** (SSE) or the **MCP binding extension** to allow the Foundry Agent Service to reach the endpoint.
+**Inputs:**
+- None.
 
-## Limitations and Trade-offs
-- **Preview Status**: Remote MCP hosting patterns on Azure Functions are currently in preview and subject to change.
-- **Documentation-Only**: This reference currently focuses on the architectural pattern. Implementation depends on the evolving `mcp` and `azure-functions` Python library support.
-- **Cold Start**: While Flex Consumption minimizes cold starts, the first tool call after a period of inactivity may experience slight latency.
+**Outputs:**
+- `service_name` (string): Name of the service.
+- `status` (string): Current operational status.
+- `version` (string): Version of the MCP server.
 
-## When to use this pattern
-- When you need a centralized, reusable tool catalog shared across multiple agents.
-- When tool logic requires specific Python dependencies or environment configurations not available in-process.
-- When you want to leverage Azure Functions' built-in triggers, bindings, and scaling.
+## Local Development & Validation
+
+### Prerequisites
+- [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) (v4.0.7030+)
+- Python 3.10+
+- `azure-functions>=1.24.0`
+
+### Local Run
+1. Install dependencies:
+   ```bash
+   pip install -r src/requirements.txt
+   ```
+2. Start the function app:
+   ```bash
+   func start
+   ```
+3. The MCP endpoint will be available at: `http://localhost:7071/runtime/webhooks/mcp`
+
+### Local Validation
+You can perform static validation of the function app structure:
+```bash
+PYTHONPATH=src pytest tests/test_endpoint.py
+```
+
+## Security and Customer Safety
+- **Read-Only**: This reference contains only read-only tool triggers.
+- **Data Redaction**: The implementation avoids logging raw tool arguments or internal stack traces.
+- **System Keys**: When deployed to Azure, the endpoint is protected by the `mcp_extension` system key.
+- **Identity-First**: The recommended pattern uses Managed Identity for all backend resource access.
+
+## Deployment / IaC Decision
+**Status: Deferred-IaC (Reference Pattern)**
+
+This module provides the code and configuration for the MCP server. Infrastructure deployment (Function App, Storage) follows the standard pattern in `infra/terraform/` but is deferred in this building block to maintain minimalism.
 
 ## Microsoft Learn References
-- [Agent tools overview for Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
-- [Use Azure Functions with Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions)
+- [Azure Functions MCP extension overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-mcp)
+- [Create a tool endpoint in your remote MCP server](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-mcp-tool-trigger)
 - [Use AI tools and models in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-ai-enabled-apps)
-- [Host MCP servers in Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-ai-enabled-apps#remote-mcp-servers)
