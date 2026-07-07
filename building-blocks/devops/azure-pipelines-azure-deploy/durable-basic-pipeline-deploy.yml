@@ -1,0 +1,94 @@
+# building-blocks/devops/azure-pipelines-azure-deploy/durable-basic-pipeline-deploy.yml
+# Minimal Azure Pipelines reference for Durable Basic Pipeline infrastructure deployment.
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - building-blocks/pipelines/durable-basic-pipeline/infra/terraform/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # REQUIRED: Name of the Azure Resource Manager service connection (Workload Identity Federation recommended)
+  - name: AZURE_SERVICE_CONNECTION_NAME
+    value: 'AZURE_RM_SVC_CONN'
+  # Path to the Terraform module
+  - name: TF_WORKING_DIR
+    value: 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform'
+  # Environment for deployment approval/gating (must be created in Azure DevOps)
+  - name: ENVIRONMENT_NAME
+    value: 'durable-pipeline-deploy'
+
+stages:
+- stage: Static_Validation
+  displayName: 'Static Validation'
+  jobs:
+  - job: Validate
+    steps:
+    - script: |
+        cd $(TF_WORKING_DIR)
+        terraform fmt -check
+      displayName: 'Terraform Format Check'
+    - task: AzureCLI@2
+      displayName: 'Terraform Init & Validate'
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          set -e
+          cd $(TF_WORKING_DIR)
+          terraform init -backend=false
+          terraform validate
+
+- stage: Plan
+  displayName: 'Infrastructure Plan'
+  dependsOn: Static_Validation
+  jobs:
+  - job: Plan
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Terraform Plan'
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        inlineScript: |
+          set -e
+          cd $(TF_WORKING_DIR)
+          # NOTE: Infrastructure planning requires a configured remote backend.
+          # Ensure a backend block (e.g. backend "azurerm" {}) is defined in your terraform configuration.
+          terraform init
+          terraform plan -input=false
+
+- stage: Deploy
+  displayName: 'Infrastructure Deploy'
+  dependsOn: Plan
+  # Only deploy from main branch by default in this example
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Apply
+    environment: '$(ENVIRONMENT_NAME)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
+              inlineScript: |
+                set -e
+                cd $(TF_WORKING_DIR)
+                # NOTE: Infrastructure deployment requires a configured remote backend for state persistence.
+                terraform init
+                terraform apply -auto-approve -input=false
