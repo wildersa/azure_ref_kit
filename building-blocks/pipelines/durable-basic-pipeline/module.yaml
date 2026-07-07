@@ -15,9 +15,10 @@ outputs:
     type: object
     description: Customer-safe status of individual pipeline steps.
 azure_resources:
-  - Azure Functions
-  - Azure Storage
+  - Azure Functions (Flex Consumption)
+  - Azure Storage Account
   - Application Insights
+  - Log Analytics Workspace
 contracts:
   reads: []
   writes:
