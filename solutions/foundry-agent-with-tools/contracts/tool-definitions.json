@@ -1,0 +1,49 @@
+{
+  "tools": [
+    {
+      "name": "get_system_status",
+      "description": "Get the current business status and health of the system. Call this whenever the user asks about system status, health, or environment details.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "response": {
+        "type": "object",
+        "required": [
+          "business_status",
+          "service_health",
+          "active_regions",
+          "last_updated",
+          "environment"
+        ],
+        "properties": {
+          "business_status": {
+            "type": "string",
+            "description": "Friendly operational status (e.g., 'operational')."
+          },
+          "service_health": {
+            "type": "string",
+            "description": "Technical health indicator."
+          },
+          "active_regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of regions currently serving traffic."
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO8601 timestamp of the last status update."
+          },
+          "environment": {
+            "type": "string",
+            "description": "Name of the environment (e.g., 'prod', 'staging')."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ]
+}

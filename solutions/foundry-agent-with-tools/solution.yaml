@@ -6,4 +6,10 @@ entrypoints:
 building_blocks:
   - building-blocks/functions/agent-tool-http-function
 contracts:
+  - solutions/foundry-agent-with-tools/contracts/tool-definitions.json
   - solutions/foundry-agent-with-tools/contracts/system-status.schema.json
+azure_resources:
+  - Azure AI Foundry
+  - Azure Functions (Flex Consumption)
+  - Azure Storage Account
+  - Application Insights

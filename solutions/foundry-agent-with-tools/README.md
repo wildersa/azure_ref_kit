@@ -6,17 +6,26 @@ This reference solution demonstrates how to connect an Azure AI Foundry agent to
 
 A business needs an AI assistant that can answer questions about system status without having direct access to technical logs, secrets, or raw infrastructure APIs. The agent uses a "Status Tool" that acts as a sanitized gateway to the underlying environment.
 
+This example composes a Foundry Prompt Agent with the `agent-tool-http-function` building block.
+
 ## Architecture
 
 ```mermaid
-flowchart LR
-    User[User/App] --> Agent[Foundry Agent]
-    Agent --> Tool[Controlled Tool\nAzure Function]
-    Tool --> Data[Internal Systems]
-    Data -.->|Filter/Sanitize| Tool
-    Tool --> Agent
-    Agent --> User
-    Agent -.->|Traces| Obs[Observability]
+sequenceDiagram
+    participant User as User/App
+    participant Agent as Foundry Agent
+    participant Tool as Status Tool (Azure Function)
+    participant Systems as Internal Systems
+
+    User->>Agent: "How is the system doing?"
+    Agent->>User: call get_system_status()
+    User->>Tool: GET /api/system_status
+    Tool->>Systems: Check health/status
+    Systems-->>Tool: Raw technical data
+    Note over Tool: Sanitize & Filter
+    Tool-->>User: { "business_status": "operational", ... }
+    User->>Agent: return tool result
+    Agent-->>User: "The system is currently operational."
 ```
 
 ## Design Decisions
@@ -27,17 +36,18 @@ Instead of giving the agent broad permissions (RBAC) to read Azure resource logs
 - **Sanitization**: Raw error messages, stack traces, and internal IDs are stripped before reaching the agent.
 - **Read-Only**: The tool is designed to be side-effect free, preventing the agent from accidentally changing system state.
 
-### HTTP vs. Queue-based Tools
-For this reference, we use an **HTTP-triggered Azure Function**.
-- **Synchronous**: Best for quick status checks or data retrieval.
-- **Protocol**: Integrated via an OpenAPI specification or as a custom function call in the agent runtime.
+### Function Calling Pattern
+For this reference, we use the **Function Tool** pattern (client-side execution).
+- **Control**: The application hosting the agent has full control over how the tool is invoked and how the result is returned to the agent.
+- **Consistency**: Matches the pattern used in `pipeline-assistant-foundry`.
+- **Minimalism**: Does not require an OpenAPI specification or a complex MCP setup for a single simple tool.
 
-## Tool Contract: `system_status`
+## Tool Contract: `get_system_status`
 
 The agent is trained to call the `get_system_status` tool when asked about the health or state of the environment.
 
 **Request Schema:**
-- `None` (Simple GET request)
+- `None` (Simple call with no parameters)
 
 **Response Schema (`system-status.schema.json`):**
 ```json
@@ -53,22 +63,19 @@ The agent is trained to call the `get_system_status` tool when asked about the h
 ## Local Validation
 
 1. **Prerequisites**:
+   - Python 3.10+
    - `pip install azure-ai-projects azure-identity jsonschema pytest`
    - Access to an Azure AI Foundry project.
 
-2. **Python Snippet (OpenAPI Pattern)**:
-   This snippet demonstrates how to define an agent with an OpenAPI tool pointing to the sanitized function.
+2. **Python Snippet (Function Tool Pattern)**:
+   This snippet demonstrates how to define an agent with a function tool and handle the call.
 
    ```python
    import os
    from azure.identity import DefaultAzureCredential
    from azure.ai.projects import AIProjectClient
-   from azure.ai.projects.models import (
-       PromptAgentDefinition,
-       OpenApiTool,
-       OpenApiFunctionDefinition,
-       OpenApiAnonymousAuthDetails
-   )
+   from azure.ai.projects.models import PromptAgentDefinition
+   from src.agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 
    # Initialize project client
    project = AIProjectClient(
@@ -76,45 +83,48 @@ The agent is trained to call the `get_system_status` tool when asked about the h
        credential=DefaultAzureCredential(),
    )
 
-   # Define the tool using an OpenAPI spec (URL or local string)
-   # The spec describes the /api/system_status endpoint
-   status_tool = OpenApiTool(
-       openapi=OpenApiFunctionDefinition(
-           name="get_system_status",
-           spec="https://<your-func-app>.azurewebsites.net/api/swagger.json",
-           description="Get the current business status and health of the system.",
-           auth=OpenApiAnonymousAuthDetails(),
-       )
-   )
-
-   # Create the agent with the tool
+   # Create the agent with function tool definitions (returns List[Tool])
    agent = project.agents.create_version(
        agent_name="status-assistant",
        definition=PromptAgentDefinition(
            model="gpt-4o-mini",
-           instructions="You are a status assistant. Use the get_system_status tool to answer health questions.",
-           tools=[status_tool],
+           instructions=SYSTEM_INSTRUCTIONS,
+           tools=get_tool_definitions(),
        ),
    )
 
-   # Invoke
+   # Invoke (simplified flow)
    openai = project.get_openai_client()
    response = openai.responses.create(
        input="How is the system doing today?",
        extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}}
    )
 
-   print(f"Agent: {response.output_text}")
+   # Note: In a real app, you would handle tool_calls here if the agent requests them.
+   print(f"Agent Response: {response.output_text}")
    ```
 
 ## Security and Boundaries
 
-- **Minimal Scope**: The agent's identity only needs permission to invoke the Function App, not the underlying resources.
-- **No Secrets**: Authentication to the function should use Function Keys (stored in Foundry connections) or Microsoft Entra ID.
+- **Minimal Scope**: The agent's instructions (System Prompt) explicitly forbid revealing internal technical details.
+- **Data Redaction**: The `agent-tool-http-function` performs the primary redaction.
 - **Observability**: Every tool call is traced in Azure AI Foundry, allowing for auditing of the data exchanged between the agent and the tool.
+
+## Complexity / Minimalism Notes
+
+- **Reused existing pattern**: Yes (`FunctionTool` pattern from `pipeline-assistant-foundry`).
+- **New abstraction added**: No.
+- **Complexity risk**: Low.
+- **Follow-up needed**: No.
+
+## Deployment / IaC Decision
+
+No new Terraform is added in this solution. It composes existing building blocks:
+- `building-blocks/functions/agent-tool-http-function` (contains its own Terraform).
+- The Foundry Agent itself is typically managed via SDK/CLI as part of an application deployment or project configuration.
 
 ## References
 
+- [Microsoft Learn: Foundry Agent Service Overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
 - [Microsoft Learn: Foundry Agent Tool Catalog](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
-- [Microsoft Learn: Connect agents to OpenAPI tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/openapi)
-- [Microsoft Learn: Azure Functions as Foundry tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions)
+- [Microsoft Learn: Use function calling with Foundry agents](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/function-calling)

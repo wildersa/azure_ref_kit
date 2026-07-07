@@ -3,9 +3,12 @@ import jsonschema
 import pytest
 from pathlib import Path
 
+
 def test_system_status_contract():
     # Path to the schema
-    schema_path = Path(__file__).parent.parent / "contracts" / "system-status.schema.json"
+    schema_path = (
+        Path(__file__).parent.parent / "contracts" / "system-status.schema.json"
+    )
     with open(schema_path, "r") as f:
         schema = json.load(f)
 
@@ -15,7 +18,7 @@ def test_system_status_contract():
         "service_health": "Healthy",
         "active_regions": ["eastus", "westus2"],
         "last_updated": "2026-07-03T10:00:00Z",
-        "environment": "production"
+        "environment": "production",
     }
 
     # Validate valid response
@@ -24,7 +27,7 @@ def test_system_status_contract():
     # Invalid response (missing required field)
     invalid_response_missing = {
         "business_status": "operational",
-        "service_health": "Healthy"
+        "service_health": "Healthy",
     }
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=invalid_response_missing, schema=schema)
@@ -33,9 +36,9 @@ def test_system_status_contract():
     invalid_response_wrong_type = {
         "business_status": "operational",
         "service_health": "Healthy",
-        "active_regions": "eastus", # Should be array
+        "active_regions": "eastus",  # Should be array
         "last_updated": "2026-07-03T10:00:00Z",
-        "environment": "production"
+        "environment": "production",
     }
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=invalid_response_wrong_type, schema=schema)
