@@ -87,6 +87,9 @@ This module should be deployed to an Azure Function App.
 A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Storage Queues, and the Flex Consumption Function App.
 
 **Required Configuration (Identity-First):**
+
+This module enforces an **identity-first security boundary**. Shared access keys are disabled on the storage account (`shared_access_key_enabled = false`), and all communication is authorized via Microsoft Entra ID (Managed Identity).
+
 - `AzureWebJobsStorage__accountName`: The name of the storage account.
 - `AzureWebJobsStorage__credential`: Set to `managedidentity`.
 - `STORAGE_CONNECTION__accountName`: The name of the storage account for queues.
