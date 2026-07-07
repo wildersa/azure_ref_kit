@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/shared/contracts/devops-status.schema.json",
+  "title": "DevOpsStatus",
+  "type": "object",
+  "required": [
+    "pipeline_name",
+    "run_id",
+    "status",
+    "result",
+    "branch",
+    "start_time",
+    "portal_url"
+  ],
+  "properties": {
+    "pipeline_name": {
+      "type": "string",
+      "description": "The name of the Azure DevOps pipeline."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "The unique identifier for the specific run or build."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "inProgress",
+        "completed",
+        "queued",
+        "cancelling",
+        "postponed",
+        "notStarted"
+      ],
+      "description": "The current state of the run."
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "succeeded",
+        "failed",
+        "canceled",
+        "partiallySucceeded",
+        "none"
+      ],
+      "description": "The outcome of a completed run."
+    },
+    "branch": {
+      "type": "string",
+      "description": "The source branch for the run."
+    },
+    "commit_sha": {
+      "type": "string",
+      "description": "The short commit SHA associated with the run."
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the run started."
+    },
+    "end_time": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When the run finished."
+    },
+    "duration_seconds": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The total duration of the run in seconds."
+    },
+    "summary": {
+      "type": "string",
+      "description": "A friendly business-level summary of the run status or failure."
+    },
+    "portal_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "A sanitized link to the run in the Azure DevOps portal."
+    }
+  },
+  "additionalProperties": false
+}

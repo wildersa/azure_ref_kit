@@ -7,5 +7,6 @@ building_blocks:
   - building-blocks/agents/pipeline-assistant-foundry/
   - building-blocks/mcp/devops-mcp-tool-contract/
 contracts:
-  - shared/contracts/pipeline-run.schema.json
-  - shared/contracts/pipeline-step.schema.json
+  - shared/contracts/devops-status.schema.json
+azure_resources: []
+deployment_iac: "No-IaC: Prompt agent configuration via SDK/CLI."
