@@ -17,6 +17,26 @@ inputs:
     description: "Deployment token for Azure Static Web Apps. Used when OIDC is not exclusively used for the SWA upload action."
     type: secret
     required: false
+  - name: ENVIRONMENT_NAME
+    description: "The name of the GitHub Environment for deployment gating and approvals."
+    type: string
+    required: false
+  - name: BACKEND_RESOURCE_GROUP_NAME
+    description: "The resource group name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_STORAGE_ACCOUNT_NAME
+    description: "The storage account name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_CONTAINER_NAME
+    description: "The container name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_KEY
+    description: "The state file key for the Terraform remote backend."
+    type: secret
+    required: false
 outputs:
   - name: static_web_app_url
     description: "The URL of the deployed Static Web App."

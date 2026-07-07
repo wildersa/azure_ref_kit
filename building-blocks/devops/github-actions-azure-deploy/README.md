@@ -4,14 +4,13 @@ Secure GitHub Actions deployment pattern for publishing the [Static Status Porta
 
 ## Purpose
 
-This building block defines the reference pattern for deploying Azure Static Web Apps (SWA) using GitHub Actions. It prioritizes identity-based authentication (OIDC) to minimize the use of long-lived secrets.
+This building block defines secure reference patterns for deploying to Azure using GitHub Actions. It prioritizes identity-based authentication (OIDC) to minimize the use of long-lived secrets.
 
-## When to Use This Pattern
+## When to Use These Patterns
 
-- **Use when**: Deploying the `static-status-portal` or similar frontend applications to Azure Static Web Apps from a GitHub repository.
+- **Use when**: Deploying frontend applications to Azure Static Web Apps or infrastructure via Terraform/OpenTofu from a GitHub repository.
 - **Use when**: You want to eliminate long-lived Service Principal secrets in GitHub using OpenID Connect (OIDC).
 - **Do not use when**: Deploying to non-Azure targets or using legacy credential-based authentication as the primary method.
-- **Do not use when**: Deploying infrastructure-only changes (use Terraform/OpenTofu patterns instead).
 
 ## Deployment Architecture
 
@@ -43,6 +42,16 @@ To implement this pattern securely, configure the following GitHub Repository Se
 | `AZURE_TENANT_ID` | Secret | The Directory (tenant) ID of your Azure tenant. |
 | `AZURE_SUBSCRIPTION_ID` | Secret | The ID of the Azure Subscription. |
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Secret | (Optional) The SWA deployment token. Required if not using the full OIDC integration for the upload action. |
+| `BACKEND_RESOURCE_GROUP_NAME` | Secret | The resource group name for the Terraform remote backend. |
+| `BACKEND_STORAGE_ACCOUNT_NAME` | Secret | The storage account name for the Terraform remote backend. |
+| `BACKEND_CONTAINER_NAME` | Secret | The container name for the Terraform remote backend. |
+| `BACKEND_KEY` | Secret | The state file key for the Terraform remote backend. |
+
+### Configuration Variables
+
+| Name | Type | Description |
+|------|------|-------------|
+| `ENVIRONMENT_NAME` | Variable | The name of the GitHub Environment used for deployment gating (e.g., `durable-pipeline-deploy`). |
 
 ### OIDC Configuration Prerequisites
 1. Create a Microsoft Entra application or User-Assigned Managed Identity.
@@ -105,6 +114,104 @@ jobs:
           app_location: "building-blocks/portals/static-status-portal/src"
           api_location: "" # Linked API is handled separately or via portal-api-functions
           output_location: "dist" # Folder where the build output is generated
+```
+
+## Reference Workflow: Deploy Durable Basic Pipeline Infrastructure
+
+The following YAML demonstrates a secure Terraform deployment for the [Durable Basic Pipeline](../../pipelines/durable-basic-pipeline/infra/terraform/). It includes static validation, planning, and deployment stages with environment-based gating.
+
+```yaml
+name: Deploy Durable Basic Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_WORKING_DIR: 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform'
+  # Terraform OIDC environment variables
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: true
+
+jobs:
+  static_validation:
+    name: 'Static Validation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Terraform Init & Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  plan:
+    name: 'Infrastructure Plan'
+    needs: static_validation
+    runs-on: ubuntu-latest
+    environment: durable-pipeline-deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Plan
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
+          terraform plan -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  deploy:
+    name: 'Infrastructure Deploy'
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: durable-pipeline-deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Apply
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
+          terraform apply -auto-approve -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
 ```
 
 ## Security & Customer-Safe Boundary
