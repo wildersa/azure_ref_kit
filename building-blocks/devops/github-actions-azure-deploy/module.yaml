@@ -17,6 +17,10 @@ inputs:
     description: "Deployment token for Azure Static Web Apps. Used when OIDC is not exclusively used for the SWA upload action."
     type: secret
     required: false
+  - name: ENVIRONMENT_NAME
+    description: "The name of the GitHub Environment for deployment gating and approvals."
+    type: string
+    required: false
 outputs:
   - name: static_web_app_url
     description: "The URL of the deployed Static Web App."

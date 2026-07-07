@@ -1,0 +1,98 @@
+name: Deploy Durable Basic Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_WORKING_DIR: 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform'
+  # Terraform OIDC environment variables
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: true
+
+jobs:
+  static_validation:
+    name: 'Static Validation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Init & Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  plan:
+    name: 'Infrastructure Plan'
+    needs: static_validation
+    runs-on: ubuntu-latest
+    # Recommended: use a protected environment for plan to ensure secrets are gated if necessary
+    # and to track deployments in GitHub.
+    environment: durable-pipeline-deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Plan
+        run: |
+          # NOTE: Infrastructure planning requires a configured remote backend.
+          # Ensure a backend block (e.g. backend "azurerm" {}) is defined in your terraform configuration.
+          terraform init
+          terraform plan -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  deploy:
+    name: 'Infrastructure Deploy'
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: durable-pipeline-deploy # Use protected environment with approval gate
+    # Only deploy from main branch on push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Apply
+        run: |
+          # NOTE: Infrastructure deployment requires a configured remote backend for state persistence.
+          terraform init
+          terraform apply -auto-approve -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
