@@ -84,6 +84,46 @@ To run the agent API locally using Docker:
    curl http://localhost:8080/health
    ```
 
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | The port the API listens on. | `8080` |
+| `AZURE_OPENAI_ENDPOINT` | (Example) Endpoint for AI services. | - |
+
+## Validation Commands
+
+### Local Python Validation
+```bash
+# Install dependencies
+pip install fastapi uvicorn pydantic httpx pytest
+
+# Run tests
+PYTHONPATH=. pytest tests/test_api.py
+
+# Linting
+ruff check src/
+ruff format --check src/
+```
+
+### Docker Validation
+```bash
+docker build -t agent-api .
+# Run in background and check health
+docker run -d -p 8080:8080 --name agent-test agent-api
+sleep 5
+curl http://localhost:8080/health
+docker stop agent-test
+docker rm agent-test
+```
+
+### Terraform Validation
+```bash
+cd infra/terraform
+terraform init -backend=false
+terraform validate
+```
+
 ## Azure Hosting Notes
 
 ### Azure Container Apps (Recommended)

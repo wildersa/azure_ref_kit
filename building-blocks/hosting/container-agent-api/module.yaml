@@ -32,3 +32,9 @@ outputs:
   - name: api_endpoint
     type: string
     description: The public or internal URL of the hosted API.
+contracts:
+  reads: []
+  writes: []
+  emits:
+    - name: agent-status
+      description: Customer-safe agent status response.
