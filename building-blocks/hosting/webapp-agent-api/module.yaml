@@ -22,6 +22,18 @@ inputs:
   - name: container_image
     type: string
     description: The container image URI to deploy.
+  - name: docker_registry_url
+    type: string
+    description: The URL of the Docker registry.
+  - name: docker_registry_username
+    type: string
+    description: The username for the Docker registry (if not using Managed Identity).
+  - name: docker_registry_password
+    type: string
+    description: The password for the Docker registry (if not using Managed Identity).
+  - name: sku_name
+    type: string
+    description: The SKU name for the App Service Plan (e.g., B1, S1, P1v3).
   - name: startup_command
     type: string
     description: Custom startup command for the web app.

@@ -76,7 +76,6 @@ This building block reuses the FastAPI application from `container-agent-api`. T
 | `DOCKER_REGISTRY_SERVER_URL` | URL for the container registry. | - |
 | `DOCKER_REGISTRY_SERVER_USERNAME` | Username for the registry (if using keys). | - |
 | `DOCKER_REGISTRY_SERVER_PASSWORD` | Password for the registry (if using keys). | - |
-| `SCM_DO_BUILD_DURING_DEPLOYMENT` | Enable server-side build for zip deploys. | `true` |
 
 ## Validation Commands
 
@@ -100,14 +99,12 @@ ruff check building-blocks/hosting/webapp-agent-api
 ## Azure Hosting Notes
 
 ### Deployment Methods
-- **Azure CLI:** Use `az webapp up` for quick creation and deployment.
-- **Zip Deploy:** Recommended for CI/CD. Ensure `SCM_DO_BUILD_DURING_DEPLOYMENT=true` is set to enable server-side `pip install`.
-- **GitHub Actions:** Use the official `azure/webapps-deploy` action.
+- **Azure CLI:** Use `az webapp config container set` to update the image and registry settings.
+- **GitHub Actions:** Use the `azure/webapps-deploy` action with the `images` parameter.
 
 ### Configuration
-- **Startup Command:** For FastAPI, set the startup command to:
-  `gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 main:app`
-- **Always On:** Enable for Production/Basic+ tiers to eliminate cold starts.
+- **Startup Command:** If the container doesn't have an `ENTRYPOINT` or `CMD`, provide the startup command in the App Service configuration.
+- **Always On:** Enable for Production/Basic+ tiers to eliminate cold starts and keep the agent API responsive.
 
 ## Security Notes
 
@@ -118,7 +115,7 @@ ruff check building-blocks/hosting/webapp-agent-api
 ## Cost & Ops Trade-offs
 
 - **Predictable Cost:** App Service Plans (B, S, P tiers) have a fixed monthly cost regardless of traffic.
-- **Ops Simplicity:** No need to manage container registries or Dockerfiles; just push code.
+- **Ops Overhead:** Requires managing a container registry (like Azure Container Registry) and ensuring the App Service has permission to pull images (Managed Identity is recommended).
 - **Scaling:** Vertical scaling (Up) and horizontal scaling (Out) are mature and well-integrated into the portal and CLI.
 
 ## Known Limits
