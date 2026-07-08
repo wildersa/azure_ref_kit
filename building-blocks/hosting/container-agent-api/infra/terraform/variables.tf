@@ -12,14 +12,13 @@ variable "location" {
 
 variable "container_image" {
   type        = string
-  description = "The container image to deploy"
-  default     = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+  description = "The container image to deploy (e.g., <registry>.azurecr.io/agent-api:v1)"
 }
 
 variable "tags" {
   type        = map(string)
   description = "Tags for resources"
-  default     = {
+  default = {
     environment = "reference"
     component   = "container-agent-api"
   }

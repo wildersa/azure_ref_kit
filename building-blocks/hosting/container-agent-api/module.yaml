@@ -7,9 +7,7 @@ runtime: Docker / Container
 azure_resources:
   - azurerm_container_app
   - azurerm_container_app_environment
-  - azurerm_linux_web_app
-  - azurerm_service_plan
-  - azurerm_container_registry
+  - azurerm_log_analytics_workspace
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
