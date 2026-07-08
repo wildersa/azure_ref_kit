@@ -3,7 +3,19 @@ type: building-block
 category: mcp
 status: implemented
 purpose: Reference implementation for hosting Model Context Protocol (MCP) servers on Azure Functions using the MCP binding extension.
-inputs: []
+deployment_iac: "infra/terraform/"
+inputs:
+  - name: prefix
+    type: string
+    description: "Prefix for naming resources."
+    default: "mcp-af"
+  - name: location
+    type: string
+    description: "Azure region for deployment."
+    default: "East US"
+  - name: resource_group_name
+    type: string
+    description: "Optional: Existing resource group name."
 outputs:
   - name: get_service_info_response
     type: object

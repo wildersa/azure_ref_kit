@@ -93,10 +93,20 @@ PYTHONPATH=src pytest tests/test_endpoint.py
 - **System Keys**: When deployed to Azure, the endpoint is protected by the `mcp_extension` system key.
 - **Identity-First**: The recommended pattern uses Managed Identity for all backend resource access.
 
-## Deployment / IaC Decision
-**Status: IaC Included (infra/terraform/)**
+## Deployment / IaC Reference
+**Path**: `infra/terraform/`
 
-This module includes a Terraform reference for deploying the MCP server to Azure Functions Flex Consumption with identity-first security boundaries.
+This module includes a Terraform/OpenTofu reference for deploying the MCP server to Azure Functions Flex Consumption with identity-first security boundaries.
+
+### Required Variables
+- `prefix`: Prefix for naming resources.
+- `location`: Azure region for deployment.
+
+### Key Outputs
+- `mcp_endpoint_url`: The full URL for the MCP Streamable HTTP endpoint.
+- `function_app_name`: Name of the deployed Function App.
+
+For detailed instructions, see [infra/terraform/README.md](infra/terraform/README.md).
 
 ## Microsoft Learn References
 - [Azure Functions MCP extension overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-mcp)

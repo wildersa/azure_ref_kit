@@ -6,8 +6,13 @@ terraform {
       version = "~> 4.0"
     }
   }
+  backend "azurerm" {}
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
