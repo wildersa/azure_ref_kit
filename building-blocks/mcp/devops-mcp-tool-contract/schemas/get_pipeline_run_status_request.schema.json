@@ -10,11 +10,17 @@
   "properties": {
     "pipeline_id": {
       "type": "string",
-      "description": "The ID or name of the pipeline."
+      "description": "The ID or name of the pipeline.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
     "run_id": {
       "type": "string",
-      "description": "The specific run ID to query."
+      "description": "The specific run ID to query.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     }
   },
   "additionalProperties": false

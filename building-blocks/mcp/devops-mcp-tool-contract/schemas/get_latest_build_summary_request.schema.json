@@ -9,11 +9,17 @@
   "properties": {
     "pipeline_id": {
       "type": "string",
-      "description": "The ID or name of the pipeline."
+      "description": "The ID or name of the pipeline.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
     "branch": {
       "type": "string",
-      "description": "Filter by branch name (defaults to default branch)."
+      "description": "Filter by branch name (defaults to default branch).",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     }
   },
   "additionalProperties": false
