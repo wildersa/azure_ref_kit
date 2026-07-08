@@ -1,57 +1,81 @@
-resource "azurerm_resource_group" "example" {
+data "azurerm_resource_group" "existing" {
+  count = var.resource_group_name != "" ? 1 : 0
+  name  = var.resource_group_name
+}
+
+resource "azurerm_resource_group" "new" {
+  count    = var.resource_group_name == "" ? 1 : 0
   name     = "${var.prefix}-rg"
   location = var.location
 }
 
+locals {
+  resource_group_name = var.resource_group_name != "" ? data.azurerm_resource_group.existing[0].name : azurerm_resource_group.new[0].name
+  location            = var.resource_group_name != "" ? data.azurerm_resource_group.existing[0].location : azurerm_resource_group.new[0].location
+}
+
 resource "azurerm_storage_account" "example" {
-  name                            = "${replace(var.prefix, "-", "")}sa"
-  resource_group_name             = azurerm_resource_group.example.name
-  location                        = azurerm_resource_group.example.location
+  name                            = "${replace(lower(var.prefix), "-", "")}sa"
+  resource_group_name             = local.resource_group_name
+  location                        = local.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   shared_access_key_enabled       = false
   default_to_oauth_authentication = true
 }
 
+resource "azurerm_storage_container" "deploy" {
+  name                  = "deploymentpackage"
+  storage_account_name  = azurerm_storage_account.example.name
+  container_access_type = "private"
+}
+
 resource "azurerm_log_analytics_workspace" "example" {
   name                = "${var.prefix}-law"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = local.location
+  resource_group_name = local.resource_group_name
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
 
 resource "azurerm_application_insights" "example" {
   name                = "${var.prefix}-ai"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = local.location
+  resource_group_name = local.resource_group_name
   workspace_id        = azurerm_log_analytics_workspace.example.id
   application_type    = "web"
 }
 
 resource "azurerm_service_plan" "example" {
   name                = "${var.prefix}-asp"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = local.location
+  resource_group_name = local.resource_group_name
   os_type             = "Linux"
   sku_name            = "FC1"
 }
 
 resource "azurerm_user_assigned_identity" "example" {
   name                = "${var.prefix}-id"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = local.location
+  resource_group_name = local.resource_group_name
 }
 
 resource "azurerm_function_app_flex_consumption" "example" {
   name                = "${var.prefix}-func"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = azurerm_resource_group.example.location
-
-  storage_account_type = "AzureWebJobsStorage"
-  storage_account_id   = azurerm_storage_account.example.id
+  resource_group_name = local.resource_group_name
+  location            = local.location
 
   service_plan_id = azurerm_service_plan.example.id
+
+  runtime_name    = "python"
+  runtime_version = "3.10"
+
+  instance_memory_in_mb = 2048
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.example.primary_blob_endpoint}deploymentpackage"
+  storage_authentication_type = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.example.id
 
   identity {
     type         = "UserAssigned"
@@ -69,12 +93,8 @@ resource "azurerm_function_app_flex_consumption" "example" {
   }
 
   app_settings = {
-    "AzureWebJobsStorage__accountName" = azurerm_storage_account.example.name
-    "AzureWebJobsStorage__credential"  = "managedidentity"
-    "AzureWebJobsStorage__clientId"    = azurerm_user_assigned_identity.example.client_id
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.example.connection_string
   }
-
-  instance_memory_mb = 2048
 }
 
 resource "azurerm_role_assignment" "storage_blob_owner" {
