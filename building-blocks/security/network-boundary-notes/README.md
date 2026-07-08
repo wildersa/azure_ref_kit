@@ -57,9 +57,11 @@ The customer-facing portal (e.g., Static Web App) must be strictly separated fro
 - For more details on data-level separation, see [Customer-Safe Status Boundary](../customer-safe-status-boundary/).
 
 ## Restricted Ingress Guidance
-Public-facing services (like Azure Functions or App Service) must be protected against direct unauthorized access:
-- **Access Restrictions**: Use IP filtering or Azure Service Tags to allow traffic only from trusted sources (e.g., Azure Front Door, Application Gateway, or the specific Static Web App).
-- **Service Tags**: Prefer `AppService.Subnet` or `AzureStaticWebApps` tags where appropriate to simplify rule management.
+Public-facing services (like Azure Functions or App Service) must be protected against direct unauthorized access. Supported restriction methods include:
+- **Service Endpoints**: Restrict inbound traffic to specific subnets within your Azure Virtual Network.
+- **Explicit IP Rules**: Allow only a well-defined set of public IP addresses (e.g., your corporate egress or a specific external partner).
+- **Azure Front Door Restriction**: Use the `AzureFrontDoor.Backend` service tag combined with an `X-Azure-FDID` header check to ensure traffic only originates from your specific Front Door instance.
+- **Private Link (for Private Origins)**: For high-security requirements, use Azure Front Door Premium with Private Link to reach your backend origin without exposing it to the public internet.
 - **WAF**: Deploy a Web Application Firewall (WAF) to provide Layer 7 protection.
 
 ## Private Endpoint Notes
@@ -87,7 +89,7 @@ To maintain a secure customer-facing surface, the following technical details mu
 
 ### 2. Functions API to Private Backend Service Boundary
 - **Compute**: Azure Functions (Flex Consumption) with VNet integration.
-- **Integration Subnet**: Dedicated subnet delegated to `Microsoft.App/environments` (required for Flex Consumption VNet integration).
+- **Integration Subnet**: Dedicated subnet delegated to `Microsoft.Web/serverFarms` (required for Flex Consumption VNet integration).
 - **Private Endpoint**: Storage account with `public_network_access_enabled = false` and a Private Endpoint in the VNet.
 
 ## When to Use It
