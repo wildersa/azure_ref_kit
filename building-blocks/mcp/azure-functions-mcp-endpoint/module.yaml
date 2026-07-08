@@ -7,7 +7,11 @@ inputs: []
 outputs:
   - name: get_service_info_response
     type: object
-    description: "Response from the get_service_info tool."
+    description: "Response from the get_service_info tool. Example: {'service_name': 'Azure Functions MCP Reference', 'status': 'operational', 'version': '1.0.0'}"
+    contract: "read-only"
+  - name: get_resource_health_response
+    type: object
+    description: "Response from the get_resource_health tool. Example: {'resource': 'system', 'health': 'Healthy', 'message': 'All systems operational.'}"
     contract: "read-only"
 dependencies:
   - python >= 3.10
@@ -15,6 +19,11 @@ dependencies:
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_storage_account
+  - azurerm_service_plan
+  - azurerm_user_assigned_identity
+  - azurerm_log_analytics_workspace
+  - azurerm_application_insights
+  - azurerm_role_assignment
 contracts:
   reads: []
   writes: []
@@ -22,6 +31,10 @@ contracts:
     - type: mcp-tool
       name: get_service_info
       description: Returns a safe, filtered summary of the MCP service status.
+    - type: mcp-tool
+      name: get_resource_health
+      description: Returns a mock health status for a given resource or the overall system.
 customer_safe_boundary:
-  policy: "Read-only access to mock service metadata. No access to real PII, secrets, or technical internals."
+  policy: "Read-only access to mock service metadata and health status. No access to real PII, secrets, or technical internals."
   enforcement: "Azure Functions MCP decorator-based tool registration and explicit field filtering."
+security_boundary: "Managed Identity for storage; disabled shared access keys; MCP system key protection."

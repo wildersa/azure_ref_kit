@@ -8,7 +8,15 @@
     "mcp": {
       "serverName": "ReferenceMcpServer",
       "serverVersion": "1.0.0",
-      "instructions": "This server provides reference MCP tools for Azure Functions."
+      "instructions": "This server provides reference MCP tools for Azure Functions. It includes tools for service information and resource health."
+    }
+  },
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      }
     }
   }
 }
