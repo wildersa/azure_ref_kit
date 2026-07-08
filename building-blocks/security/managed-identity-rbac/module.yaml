@@ -32,6 +32,8 @@ security_boundary:
       description: "Access to Azure AI services (OpenAI, Document Intelligence, etc.)"
     - role: "Foundry User"
       description: "Standard project-level access for AI Foundry agents."
+    - role: "Search Index Data Reader"
+      description: "Read-only access to AI Search index content."
 customer_safe_boundary:
   forbid:
     - "Internal Managed Identity Object IDs"
