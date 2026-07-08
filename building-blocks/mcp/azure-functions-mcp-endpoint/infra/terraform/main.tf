@@ -24,6 +24,12 @@ resource "azurerm_storage_account" "example" {
   default_to_oauth_authentication = true
 }
 
+resource "azurerm_storage_container" "deploy" {
+  name                  = "deploymentpackage"
+  storage_account_name  = azurerm_storage_account.example.name
+  container_access_type = "private"
+}
+
 resource "azurerm_log_analytics_workspace" "example" {
   name                = "${var.prefix}-law"
   location            = local.location
@@ -61,12 +67,15 @@ resource "azurerm_function_app_flex_consumption" "example" {
 
   service_plan_id = azurerm_service_plan.example.id
 
-  storage {
-    type            = "AzureWebJobsStorage"
-    account_id      = azurerm_storage_account.example.id
-    authentication_type = "UserAssignedIdentity"
-    identity_id     = azurerm_user_assigned_identity.example.id
-  }
+  runtime_name    = "python"
+  runtime_version = "3.10"
+
+  instance_memory_in_mb = 2048
+
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.example.primary_blob_endpoint}deploymentpackage"
+  storage_authentication_type = "UserAssignedIdentity"
+  storage_user_assigned_identity_id = azurerm_user_assigned_identity.example.id
 
   identity {
     type         = "UserAssigned"
@@ -84,13 +93,8 @@ resource "azurerm_function_app_flex_consumption" "example" {
   }
 
   app_settings = {
-    "AzureWebJobsStorage__accountName"       = azurerm_storage_account.example.name
-    "AzureWebJobsStorage__credential"        = "managedidentity"
-    "AzureWebJobsStorage__clientId"          = azurerm_user_assigned_identity.example.client_id
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.example.connection_string
   }
-
-  instance_memory_mb = 2048
 }
 
 resource "azurerm_role_assignment" "storage_blob_owner" {

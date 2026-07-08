@@ -5,8 +5,9 @@ This directory contains Terraform/OpenTofu code to deploy the Azure resources re
 ## Architecture
 
 The deployment follows the **Azure Functions Flex Consumption** pattern with **Identity-First** security:
-- **Azure Function App (Flex Consumption)**: Hosts the MCP tools.
+- **Azure Function App (Flex Consumption)**: Hosts the MCP tools, configured with identity-based storage access for the deployment package.
 - **Azure Storage Account**: Used by the Function App for internal state and the MCP extension.
+- **Azure Storage Container**: `deploymentpackage` container for hosting the Function App code.
 - **User-Assigned Managed Identity**: Provides the Function App with secure, keyless access to storage.
 - **Application Insights & Log Analytics**: Provides observability and telemetry.
 
@@ -57,5 +58,5 @@ The deployment follows the **Azure Functions Flex Consumption** pattern with **I
 ## Security and Identity
 This module enforces an **identity-first** posture:
 - `shared_access_key_enabled = false` on the storage account.
-- The Function App uses a **User-Assigned Managed Identity**.
+- The Function App uses a **User-Assigned Managed Identity** for both host storage (`AzureWebJobsStorage`) and deployment package access.
 - Role-based access control (RBAC) is granted for Blob, Queue, and Table data.
