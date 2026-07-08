@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/mcp/devops-mcp-tool-contract/schemas/get_pipeline_run_status_request.schema.json",
+  "title": "GetPipelineRunStatusRequest",
+  "type": "object",
+  "required": [
+    "pipeline_id",
+    "run_id"
+  ],
+  "properties": {
+    "pipeline_id": {
+      "type": "string",
+      "description": "The ID or name of the pipeline.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "The specific run ID to query.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
+    }
+  },
+  "additionalProperties": false
+}

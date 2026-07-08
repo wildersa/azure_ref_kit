@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/mcp/devops-mcp-tool-contract/schemas/get_latest_build_summary_request.schema.json",
+  "title": "GetLatestBuildSummaryRequest",
+  "type": "object",
+  "required": [
+    "pipeline_id"
+  ],
+  "properties": {
+    "pipeline_id": {
+      "type": "string",
+      "description": "The ID or name of the pipeline.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
+    },
+    "branch": {
+      "type": "string",
+      "description": "Filter by branch name (defaults to default branch).",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
+    }
+  },
+  "additionalProperties": false
+}

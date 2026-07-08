@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/mcp/devops-mcp-tool-contract/schemas/get_pipeline_run_status_response.schema.json",
+  "title": "GetPipelineRunStatusResponse",
+  "$ref": "../../../../shared/contracts/devops-status.schema.json"
+}

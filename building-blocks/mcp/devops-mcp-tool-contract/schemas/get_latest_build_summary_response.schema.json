@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/mcp/devops-mcp-tool-contract/schemas/get_latest_build_summary_response.schema.json",
+  "title": "GetLatestBuildSummaryResponse",
+  "type": "object",
+  "required": [
+    "pipeline_name",
+    "build_number",
+    "status",
+    "result",
+    "branch",
+    "finish_time",
+    "portal_url"
+  ],
+  "properties": {
+    "pipeline_name": {
+      "type": "string",
+      "description": "The name of the pipeline."
+    },
+    "build_number": {
+      "type": "string",
+      "description": "The build number (e.g., 20240102.1)."
+    },
+    "status": {
+      "type": "string",
+      "description": "The current state of the build."
+    },
+    "result": {
+      "type": "string",
+      "description": "The outcome of a completed build."
+    },
+    "branch": {
+      "type": "string",
+      "description": "The source branch for the build."
+    },
+    "finish_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the build finished."
+    },
+    "summary": {
+      "type": "string",
+      "description": "A friendly business-level summary of the build status."
+    },
+    "portal_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "A sanitized link to the build in the Azure DevOps portal."
+    }
+  },
+  "additionalProperties": false
+}
