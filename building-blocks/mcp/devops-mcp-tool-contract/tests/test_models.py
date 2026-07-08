@@ -16,10 +16,16 @@ def test_get_pipeline_run_status_request_valid():
     assert req.run_id == "20240101.1"
 
 
-def test_get_pipeline_run_status_request_invalid():
-    """Verify invalid request model (missing field)."""
+def test_get_pipeline_run_status_request_invalid_identifier():
+    """Verify identifier constraints (no path characters)."""
     with pytest.raises(ValidationError):
-        GetPipelineRunStatusRequest(pipeline_id="Main-CI")
+        GetPipelineRunStatusRequest(pipeline_id="../../secret", run_id="123")
+
+
+def test_get_pipeline_run_status_request_extra_forbid():
+    """Verify extra fields are forbidden."""
+    with pytest.raises(ValidationError):
+        GetPipelineRunStatusRequest(pipeline_id="123", run_id="456", token="secret")
 
 
 def test_get_pipeline_run_status_response_valid():

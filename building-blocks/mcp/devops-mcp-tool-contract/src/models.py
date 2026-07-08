@@ -1,7 +1,15 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, ConfigDict, StringConstraints
+from typing_extensions import Annotated
+
+# Regex for safe identifiers: alphanumeric, hyphens, underscores, dots, and spaces.
+# No leading/trailing spaces. No path separators or control characters.
+SAFE_ID_PATTERN = r"^[a-zA-Z0-9_\-\. ]+$"
+SafeId = Annotated[
+    str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=128)
+]
 
 
 class PipelineStatus(str, Enum):
@@ -24,12 +32,16 @@ class PipelineResult(str, Enum):
 class GetPipelineRunStatusRequest(BaseModel):
     """Request to get the status of a specific pipeline run."""
 
-    pipeline_id: str = Field(..., description="The ID or name of the pipeline.")
-    run_id: str = Field(..., description="The specific run ID to query.")
+    model_config = ConfigDict(extra="forbid")
+
+    pipeline_id: SafeId = Field(..., description="The ID or name of the pipeline.")
+    run_id: SafeId = Field(..., description="The specific run ID to query.")
 
 
 class GetPipelineRunStatusResponse(BaseModel):
     """Response containing the status and summary of a pipeline run."""
+
+    model_config = ConfigDict(extra="forbid")
 
     pipeline_name: str = Field(
         ..., description="The name of the Azure DevOps pipeline."
@@ -59,8 +71,10 @@ class GetPipelineRunStatusResponse(BaseModel):
 class GetLatestBuildSummaryRequest(BaseModel):
     """Request to get the summary of the latest build."""
 
-    pipeline_id: str = Field(..., description="The ID or name of the pipeline.")
-    branch: Optional[str] = Field(
+    model_config = ConfigDict(extra="forbid")
+
+    pipeline_id: SafeId = Field(..., description="The ID or name of the pipeline.")
+    branch: Optional[SafeId] = Field(
         None, description="Filter by branch name (defaults to default branch)."
     )
 
@@ -68,10 +82,12 @@ class GetLatestBuildSummaryRequest(BaseModel):
 class GetLatestBuildSummaryResponse(BaseModel):
     """Response containing the summary of the most recent build."""
 
+    model_config = ConfigDict(extra="forbid")
+
     pipeline_name: str = Field(..., description="The name of the pipeline.")
     build_number: str = Field(..., description="The build number (e.g., 20240102.1).")
-    status: str = Field(..., description="The current state of the build.")
-    result: str = Field(..., description="The outcome of a completed build.")
+    status: PipelineStatus = Field(..., description="The current state of the build.")
+    result: PipelineResult = Field(..., description="The outcome of a completed build.")
     branch: str = Field(..., description="The source branch for the build.")
     finish_time: datetime = Field(
         ..., description="When the build finished (ISO 8601)."
