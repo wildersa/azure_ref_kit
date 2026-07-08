@@ -28,36 +28,91 @@ Always assign roles at the **lowest possible scope** to minimize the "blast radi
 2. **Resource Group Scope (Good):** Assign at the RG level if the identity needs access to all resources of that type within the group.
 3. **Subscription Scope (Avoid):** Only use if the identity must manage resources across the entire subscription (rare for runtime identities).
 
+## Forbidden Practices
+
+To maintain a secure environment, the following practices are strictly forbidden:
+
+- **Wildcard Permissions:** Never use `*` or `Owner` roles for runtime identities.
+- **Committed Secrets:** Do not commit API keys, connection strings, or service principal secrets to source control.
+- **Hardcoded Identifiers:** Do not hardcode Tenant IDs, Subscription IDs, or Managed Identity Object IDs in application code.
+- **Raw Token Exposure:** Do not log, store, or return raw Entra ID access tokens to client-facing interfaces.
+- **Connection Strings:** Prefer identity-based connections over Shared Access Keys (SAK) or connection strings for supported services.
+
 ## Local Development Fallback
 
-For a seamless transition between local development and Azure hosting, utilize the `DefaultAzureCredential` class from the `azure-identity` SDK.
+It is critical to separate the credentials used during local development from the identity used in the Azure runtime.
 
-- **Local:** Uses Azure CLI, VS Code, or environment variables (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`).
-- **Azure:** Automatically utilizes the assigned Managed Identity.
+- **Local Development:** Developers use their own Entra ID identity (via Azure CLI, VS Code, or Azure PowerShell) or a dedicated local Service Principal. This identity typically has broader "Contributor" or "Developer" access to the development environment.
+- **Azure Runtime:** The deployed service uses a **Managed Identity** with strictly limited **Data Plane** RBAC roles (e.g., `Storage Blob Data Reader`). The service should never use the developer's personal credentials or a broad-privilege service principal in production.
 
-### Python Example
+For a seamless transition, use the `DefaultAzureCredential` class from the `azure-identity` SDK, which handles the fallback logic automatically.
+
+### Python Implementation
 ```python
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
-# Standard pattern for all Azure Reference Kit modules
+# Use DefaultAzureCredential to automatically pick up the right identity
+# (Azure CLI locally, Managed Identity in Azure)
 credential = DefaultAzureCredential()
-blob_service_client = BlobServiceClient(account_url, credential=credential)
+
+# Initialize client using identity, not a connection string
+blob_service_client = BlobServiceClient(
+    account_url="https://<account_name>.blob.core.windows.net",
+    credential=credential
+)
 ```
 
-## Least-Privilege Role Examples
+## Concrete Implementation Examples
 
-| Service | Target Resource | Recommended Built-in Role |
-| :--- | :--- | :--- |
-| **Functions / Web Apps** | Blob Storage | `Storage Blob Data Reader` (Read-only) or `Storage Blob Data Contributor` (Read/Write) |
-| **Functions / Web Apps** | Storage Queues | `Storage Queue Data Message Processor` or `Storage Queue Data Message Sender` |
-| **Functions / Web Apps** | Key Vault | `Key Vault Secrets User` |
-| **Functions / Web Apps** | AI Services | `Cognitive Services User` |
-| **AI Foundry Agent** | AI Foundry Project | `Foundry User` |
+### Example 1: Azure Function Accessing Blob Storage (Identity-Based)
+
+In this pattern, the Function App is granted `Storage Blob Data Contributor` access to a specific storage account. No connection string is stored in App Settings.
+
+**Infrastructure (Conceptual):**
+1. User-Assigned Managed Identity: `id-storage-processor`
+2. Role Assignment: `Storage Blob Data Contributor` assigned to `id-storage-processor` at the scope of `st-process-artifacts`.
+3. Function App Setting: `STORAGE_CONNECTION__accountName = "stprocessartifacts"`
+
+**Code:**
+```python
+import os
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import BlobServiceClient
+
+# Azure Functions can use identity-based triggers and bindings
+# For manual client initialization:
+account_name = os.environ["STORAGE_CONNECTION__accountName"]
+account_url = f"https://{account_name}.blob.core.windows.net"
+client = BlobServiceClient(account_url, credential=DefaultAzureCredential())
+```
+
+### Example 2: AI Foundry Agent Tool Boundary
+
+When an AI Foundry Agent calls a tool (e.g., an Azure Function), the Function should use its own Managed Identity to access backend data, ensuring the agent itself never touches raw data or secrets.
+
+**Infrastructure (Conceptual):**
+1. Agent Identity: `id-foundry-agent`
+2. Tool Identity: `id-search-tool`
+3. Role Assignment: `id-search-tool` is granted `Search Index Data Reader` on the AI Search index.
+4. The Agent calls the Tool via an authenticated endpoint; the Tool then uses `id-search-tool` to perform the search.
+
+**Code (Tool Side):**
+```python
+from azure.identity import DefaultAzureCredential
+from azure.search.documents import SearchClient
+
+# The tool uses its own identity to perform the action
+credential = DefaultAzureCredential()
+search_client = SearchClient(endpoint, index_name, credential=credential)
+
+def perform_search(query):
+    # Returns only safe, business-level results to the Agent
+    results = search_client.search(query)
+    return sanitize_results(results)
+```
 
 ## Architecture Flow
-
-The following diagram shows the separation between local development credentials and the Azure Managed Identity flow.
 
 ```mermaid
 flowchart TD
@@ -94,18 +149,18 @@ flowchart TD
 - **System-Assigned Limits:** A resource can only have one system-assigned identity.
 - **User-Assigned Limits:** There are limits on the number of user-assigned identities per resource (typically 20-50).
 - **Scope Limits:** Subscription-level role assignments are capped (typically 2000-4000 per subscription).
-- **Service Support:** Some legacy Azure services or specific features (like some Azure Files SMB flows) may still require connection strings or secrets.
 
 ## Validation Notes
 
 To verify this pattern in a new module:
 1. Ensure `module.yaml` defines the required RBAC roles in the `security_boundary`.
 2. Check that `DefaultAzureCredential` is used in the source code.
-3. Verify that no secrets or connection strings are present in `appsettings.json` or environment variables (excluding `AzureWebJobsStorage` if not using Flex Consumption identity-based connections).
+3. Verify that no secrets or connection strings are present in App Settings or environment variables.
 
 ## References
 
 - [Managed identities for Azure resources overview](https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview)
 - [Azure role-based access control (Azure RBAC) overview](https://learn.microsoft.com/en-us/azure/role-based-access-control/overview)
+- [Azure RBAC best practices](https://learn.microsoft.com/en-us/azure/role-based-access-control/best-practices)
 - [Azure built-in roles](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles)
-- [Azure Functions identity connections](https://learn.microsoft.com/en-us/azure/azure-functions/functions-identity-based-connections-tutorial)
+- [Azure Functions identity-based connections](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=blob&pivots=programming-language-python#configure-an-identity-based-connection)
