@@ -10,10 +10,28 @@ variable "location" {
   default     = "eastus"
 }
 
-variable "python_version" {
+variable "container_image" {
   type        = string
-  description = "The Python version to use (e.g., 3.12, 3.14)."
-  default     = "3.12"
+  description = "The container image to deploy (e.g., mcr.microsoft.com/azuredocs/containerapps-helloworld:latest or <registry>.azurecr.io/agent-api:v1)"
+}
+
+variable "docker_registry_url" {
+  type        = string
+  description = "The URL of the Docker registry."
+  default     = "https://mcr.microsoft.com"
+}
+
+variable "docker_registry_username" {
+  type        = string
+  description = "The username for the Docker registry (if not using Managed Identity)."
+  default     = null
+}
+
+variable "docker_registry_password" {
+  type        = string
+  description = "The password for the Docker registry (if not using Managed Identity)."
+  default     = null
+  sensitive   = true
 }
 
 variable "sku_name" {

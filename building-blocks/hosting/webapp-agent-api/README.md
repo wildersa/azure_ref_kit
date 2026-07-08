@@ -1,15 +1,16 @@
-# Web App Hosted Agent API
+# Web App Hosted Agent API (Web App for Containers)
 
-Reference building block defining when and how to host an agent-facing API on Azure App Service (Web Apps) using the native Python runtime.
+Reference building block defining when and how to host an agent-facing API on Azure App Service using custom containers.
 
 ## Purpose
 
-This building block provides a standard hosting contract for agentic workloads that benefit from a managed, native Python environment. It defines the boundary between the agent client and the internal tool logic, ensuring a secure and observable interface.
+This building block provides a standard hosting contract for agentic workloads that benefit from the stability and features of Azure App Service. It specifically demonstrates the **Web App for Containers** pattern, allowing for a secure and observable interface while reusing the API implementation from the [container-hosted reference](../container-agent-api/README.md) without duplicating code.
 
-## When to Use Web Apps
+## When to Use Web Apps (Containers)
 
-- **Managed Runtime:** You want Azure to handle OS and Python runtime patching (Native Runtime) without managing Dockerfiles.
-- **Web Frameworks:** Your agent API is built using standard Python web frameworks like FastAPI, Django, or Flask.
+- **Managed Container Platform:** You want the simplicity of App Service but need the control of a custom container.
+- **Reuse Existing Containers:** You already have a containerized agent API (like the one in `container-agent-api`) and want to host it on a mature PaaS.
+- **Web Frameworks:** Your agent API is built using standard Python web frameworks like FastAPI, Django, or Flask and packaged as a container.
 - **Long-Running Requests:** The agent task may exceed the default timeout limits of Azure Functions (typically 10 minutes).
 - **Persistent Connections:** You need support for WebSockets or long-lived streaming responses.
 - **Feature Rich Hosting:** You want to leverage App Service features like Staging Slots, easy integrated authentication (EasyAuth), and simple "Always On" capability to avoid cold starts.
@@ -24,7 +25,7 @@ This building block provides a standard hosting contract for agentic workloads t
 
 | Feature | Azure Functions | Web App (Native) | Web App for Containers |
 | :--- | :--- | :--- | :--- |
-| **Primary Use** | Event-driven, small tasks | Monolithic APIs, Web Apps | Custom runtimes, legacy apps |
+| **Primary Use** | Event-driven, small tasks | Monolithic APIs | This Reference / Custom runtimes |
 | **Scaling** | Scale to zero (Consumption) | Plan-based (Auto/Manual) | Plan-based (Auto/Manual) |
 | **Runtime** | Managed by platform | Managed (Native Python) | Full control (Docker) |
 | **Cold Starts** | Possible on Consumption | Minimal (with Always On) | Minimal (with Always On) |
@@ -32,7 +33,7 @@ This building block provides a standard hosting contract for agentic workloads t
 
 ## API Boundary
 
-The Web App hosted API acts as a secure gateway, enforcing the `customer-safe-status-boundary` before returning data to the caller.
+The Web App hosted API acts as a secure gateway, enforcing the `customer-safe-status-boundary` before returning data to the caller. This reference reuses the API implementation from [Container-hosted Agent API](../container-agent-api/README.md).
 
 ```mermaid
 flowchart LR
@@ -49,25 +50,52 @@ flowchart LR
 
 ## Local / Demo Flow
 
-To run a sample FastAPI agent API locally:
+This building block reuses the FastAPI application from `container-agent-api`. To run it locally:
 
-1. **Setup environment:**
+1. **Navigate to the container API source:**
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install fastapi uvicorn
+   cd building-blocks/hosting/container-agent-api/
    ```
 
-2. **Run the app:**
+2. **Follow the local run instructions in its README:**
    ```bash
-   # In building-blocks/hosting/webapp-agent-api/src/ (if code existed)
-   uvicorn main:app --host 0.0.0.0 --port 8000
+   docker build -t agent-api .
+   docker run -p 8080:8080 agent-api
    ```
 
 3. **Verify:**
    ```bash
-   curl http://localhost:8000/health
+   curl http://localhost:8080/health
    ```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | The port the API listens on (mapped by App Service). | `8080` |
+| `DOCKER_REGISTRY_SERVER_URL` | URL for the container registry. | - |
+| `DOCKER_REGISTRY_SERVER_USERNAME` | Username for the registry (if using keys). | - |
+| `DOCKER_REGISTRY_SERVER_PASSWORD` | Password for the registry (if using keys). | - |
+| `SCM_DO_BUILD_DURING_DEPLOYMENT` | Enable server-side build for zip deploys. | `true` |
+
+## Validation Commands
+
+### Contract Validation
+```bash
+pytest building-blocks/hosting/webapp-agent-api/tests/test_contract.py
+```
+
+### Infrastructure Validation
+```bash
+cd building-blocks/hosting/webapp-agent-api/infra/terraform
+terraform init -backend=false
+terraform validate
+```
+
+### Linting
+```bash
+ruff check building-blocks/hosting/webapp-agent-api
+```
 
 ## Azure Hosting Notes
 
@@ -95,7 +123,7 @@ To run a sample FastAPI agent API locally:
 
 ## Known Limits
 
-- **Image Customization:** You cannot modify the underlying OS or install arbitrary system packages.
+- **Startup Latency:** App Service may have slightly higher startup latency than Azure Functions if not using "Always On".
 - **Ephemeral Disk:** Files written to the local disk (outside of `/home`) are lost on restart. Use Azure Blob Storage for persistence.
 - **Port Mapping:** App Service expects the app to listen on the port provided by the `PORT` environment variable (usually 80 or 8080 is mapped by the platform).
 
