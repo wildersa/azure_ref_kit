@@ -67,8 +67,12 @@ Public-facing services (like Azure Functions or App Service) must be protected a
 ## Private Endpoint Notes
 Use Private Endpoints to bring PaaS services into your private network:
 - **Private Link**: Ensures traffic between your compute and services (Storage, Key Vault, AI) never traverses the public internet.
-- **DNS Resolution**: Ensure that internal DNS (Azure Private DNS Zones) is configured to resolve service FQDNs to their private endpoint IPs.
 - **Sub-resources**: Remember to create private endpoints for each required sub-resource (e.g., `blob`, `queue`, `table` for a single storage account).
+
+> [!IMPORTANT]
+> **Private Endpoint Warnings**
+> - **Public access is not automatically disabled**: Creating a private endpoint **does not** disable the public endpoint. You must explicitly disable public network access on the resource (e.g., `public_network_access_enabled = false` in Terraform) to enforce the boundary.
+> - **DNS planning is required**: When a private endpoint is used, your network must resolve the service FQDN (e.g., `mystorage.blob.core.windows.net`) to the private IP address. If DNS is not configured (typically via Azure Private DNS Zones), traffic will continue to route via the public internet.
 
 ## Forbidden Exposures
 To maintain a secure customer-facing surface, the following technical details must **NEVER** be exposed:
@@ -89,8 +93,36 @@ To maintain a secure customer-facing surface, the following technical details mu
 
 ### 2. Functions API to Private Backend Service Boundary
 - **Compute**: Azure Functions (Flex Consumption) with VNet integration.
-- **Integration Subnet**: Dedicated subnet delegated to `Microsoft.Web/serverFarms` (required for Flex Consumption VNet integration).
+- **Integration Subnet**: Dedicated subnet delegated to `Microsoft.App/environments` (required for Flex Consumption VNet integration).
 - **Private Endpoint**: Storage account with `public_network_access_enabled = false` and a Private Endpoint in the VNet.
+
+### 3. Key Vault and Application Insights Boundaries
+- **Key Vault**: Secure secrets using a Private Endpoint. For serverless compute (Functions), ensure `vnet_route_all_enabled = true` is set to force Key Vault reference lookups through the VNet integration.
+- **Application Insights**: Use **Azure Monitor Private Link Scope (AMPLS)** to ensure telemetry stays within the private network boundary. If AMPLS is not used, ensure that the ingestion endpoints are only reachable via the Microsoft backbone.
+
+## Customer-Safe Network/Status Checklist
+Use this checklist when reviewing a module or solution for network and data boundary compliance:
+- [ ] No Private IPs are exposed in API responses or portal UI.
+- [ ] No internal resource IDs (Subscription, Tenant, Managed Identity) are visible to the customer.
+- [ ] `public_network_access_enabled` is set to `false` for all backend storage and AI services.
+- [ ] API ingress is restricted to only allowed origins (SWA, Front Door, or specific IPs).
+- [ ] VNet integration is configured for all compute accessing private resources.
+- [ ] DNS resolution for private endpoints is verified (no public routing for private services).
+
+## Recommended Boundary Notes Snippets
+Copy and adapt these snippets into your module or solution documentation.
+
+### For API Modules (README.md)
+```markdown
+### Security Boundary
+This API implements a restricted ingress boundary. It is designed to be deployed behind a WAF or restricted to a specific frontend origin. It redacts all internal technical details (private IPs, stack traces, and raw provider payloads) before returning a response to the customer.
+```
+
+### For Storage/Backend Modules (README.md)
+```markdown
+### Network Boundary
+All storage and backend services in this module are intended to be private. Access is restricted to internal VNet compute via Private Endpoints. Public network access must be disabled in production environments.
+```
 
 ## When to Use It
 
@@ -99,6 +131,11 @@ To maintain a secure customer-facing surface, the following technical details mu
 | **Restricted Ingress** | Protecting public APIs | Always use for any service with a public IP. |
 | **Private Endpoints** | Securing PaaS services | Use for Storage, Key Vault, AI Services in production. |
 | **VNet Integration** | Compute-to-VNet access | Required for serverless compute reaching Private Endpoints. |
+
+## When Not to Use It
+- **Enterprise Network Platforms**: Do not use this as a reference for Hub-Spoke, Centralized Firewalls, or global DNS management.
+- **Firewall Product Deployment**: This is a guidance block, not a module for deploying Network Virtual Appliances or Azure Firewall.
+- **Public Prototypes**: If the solution is an unauthenticated, non-sensitive public prototype, the complexity of VNets and Private Endpoints may be avoided.
 
 ## Validation Notes
 - **Design Review**: Verify network diagrams show the API boundary and private zones.
