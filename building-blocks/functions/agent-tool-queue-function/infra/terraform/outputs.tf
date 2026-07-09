@@ -6,6 +6,10 @@ output "function_app_default_hostname" {
   value = azurerm_function_app_flex_consumption.function.default_hostname
 }
 
+output "api_endpoint" {
+  value = "https://${azurerm_function_app_flex_consumption.function.default_hostname}"
+}
+
 output "input_queue_name" {
   value = azurerm_storage_queue.input_queue.name
 }

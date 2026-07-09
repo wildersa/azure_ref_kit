@@ -62,6 +62,12 @@ resource "azurerm_function_app_flex_consumption" "function" {
   storage_container_endpoint  = "${azurerm_storage_account.storage.primary_blob_endpoint}deploymentpackage"
   storage_authentication_type = "SystemAssignedIdentity"
 
+  storage {
+    name                = "AzureWebJobsStorage"
+    storage_account_id  = azurerm_storage_account.storage.id
+    authentication_type = "SystemAssignedIdentity"
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -81,15 +87,21 @@ resource "azurerm_function_app_flex_consumption" "function" {
   tags = var.tags
 }
 
-resource "azurerm_role_assignment" "storage_blob_data_contributor" {
+resource "azurerm_role_assignment" "storage_blob_data_owner" {
   scope                = azurerm_storage_account.storage.id
-  role_definition_name = "Storage Blob Data Contributor"
+  role_definition_name = "Storage Blob Data Owner"
   principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "storage_queue_data_contributor" {
   scope                = azurerm_storage_account.storage.id
   role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "storage_queue_data_message_processor" {
+  scope                = azurerm_storage_account.storage.id
+  role_definition_name = "Storage Queue Data Message Processor"
   principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
 }
 
