@@ -6,6 +6,10 @@ This solution demonstrates a customer-facing portal for monitoring and interacti
 
 A customer needs to upload documents (e.g., invoices, receipts, forms) and track the status of their processing in real-time. Once processed, they want to view the extracted structured data and use an AI assistant to ask questions about the document or the process (e.g., "Why did this fail?", "What is the total amount?").
 
+## Solution Status
+
+This solution is a composition of several building blocks. See the [Composition Status Map](./docs/composition-status-map.md) for a detailed view of which components are implemented, in progress, or scaffolded.
+
 ## Process Flow
 
 1. **Upload**: Customer uploads a document to a Blob Storage container.
