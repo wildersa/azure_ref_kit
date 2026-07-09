@@ -1,0 +1,104 @@
+name: Deploy Web App Container API (Example)
+
+# This pipeline is a manual trigger example and does not run automatically on commit.
+trigger: none
+
+variables:
+  # Reference a Variable Group for secrets and environment-specific values
+  # - group: webapp-agent-api-vars
+
+  # Placeholder service connection names
+  azureServiceConnection: 'MyAzureServiceConnection'
+  dockerRegistryServiceConnection: 'MyDockerRegistryConnection'
+
+  # Placeholder registry and image details
+  containerRegistry: 'myacr.azurecr.io'
+  imageRepository: 'agent-api'
+  tag: '$(Build.BuildId)'
+
+  # Infrastructure paths
+  terraformWorkingDirectory: 'building-blocks/hosting/webapp-agent-api/infra/terraform'
+
+stages:
+- stage: Build
+  displayName: 'Build and Push'
+  jobs:
+  - job: BuildPush
+    displayName: 'Build and Push Image'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+
+    - task: Docker@2
+      displayName: 'Build and Push Image to ACR'
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: 'building-blocks/hosting/container-agent-api/Dockerfile'
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          latest
+
+- stage: DeployInfra
+  displayName: 'Infrastructure'
+  dependsOn: Build
+  jobs:
+  - job: Terraform
+    displayName: 'Terraform Plan & Apply'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+
+    - task: AzureCLI@2
+      displayName: 'Terraform Init, Plan, and Apply'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          set -e
+          cd $(terraformWorkingDirectory)
+
+          # Initialize Terraform with a remote backend
+          # Replace these placeholders with your actual backend configuration
+          terraform init \
+            -backend-config="resource_group_name=rg-terraform-state" \
+            -backend-config="storage_account_name=stterraformstate" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=webapp-agent-api.tfstate"
+
+          # Terraform Plan
+          terraform plan \
+            -var="container_image=$(containerRegistry)/$(imageRepository):$(tag)" \
+            -var="docker_registry_url=https://$(containerRegistry)" \
+            -out=tfplan
+
+          # Terraform Apply
+          terraform apply -auto-approve tfplan
+
+          # Export Web App Name as an output variable for the next stage
+          WEBAPP_NAME=$(terraform output -raw webapp_name)
+          echo "##vso[task.setvariable variable=webappName;isOutput=true]$WEBAPP_NAME"
+      name: terraformStep
+
+- stage: DeployApp
+  displayName: 'Deploy App'
+  dependsOn: DeployInfra
+  jobs:
+  - job: Deploy
+    displayName: 'Update Web App'
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      # Capture the output variable from the previous stage
+      webappName: $[ stageDependencies.DeployInfra.Terraform.outputs['terraformStep.webappName'] ]
+    steps:
+    - task: AzureWebAppContainer@1
+      displayName: 'Azure Web App on Container Deploy'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        appName: $(webappName)
+        containers: '$(containerRegistry)/$(imageRepository):$(tag)'
