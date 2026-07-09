@@ -21,6 +21,7 @@ sequenceDiagram
     GH->>GH: Build Docker Image
     GH->>ACR: Push Image
     GH->>ARM: terraform apply (infra)
+    ARM-->>GH: terraform output (webapp_name)
     GH->>ARM: az webapp deploy (app)
 ```
 
@@ -46,7 +47,8 @@ The following secrets must be configured in your GitHub repository or environmen
 | `ACR_NAME` | The name of your Azure Container Registry (without `.azurecr.io`). |
 | `BACKEND_RG` | Resource group for the Terraform remote backend. |
 | `BACKEND_STORAGE` | Storage account for the Terraform remote backend. |
-| `WEBAPP_NAME` | The name of the target Web App. |
+
+> **Note:** The `WEBAPP_NAME` is automatically derived from Terraform outputs and does not need to be provided as a secret.
 
 ## Deployment Flow
 
@@ -58,8 +60,9 @@ The following secrets must be configured in your GitHub repository or environmen
 4. **Terraform Deployment:**
    - Initializes Terraform with a remote backend in Azure Storage.
    - Runs `terraform apply` to ensure the App Service is configured.
+   - Captures the `webapp_name` from Terraform outputs.
 5. **App Service Deploy:**
-   - Updates the Web App to use the newly pushed image tag.
+   - Updates the Web App to use the newly pushed image tag using the derived name.
 
 ## Rollback and Cleanup
 

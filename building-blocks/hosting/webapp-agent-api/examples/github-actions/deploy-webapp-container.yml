@@ -48,6 +48,8 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
+    outputs:
+      webapp_name: ${{ steps.tf-output.outputs.webapp_name }}
 
     steps:
       - name: Checkout
@@ -84,6 +86,13 @@ jobs:
         working-directory: building-blocks/hosting/webapp-agent-api/infra/terraform
         run: terraform apply -auto-approve tfplan
 
+      - name: Terraform Output
+        id: tf-output
+        working-directory: building-blocks/hosting/webapp-agent-api/infra/terraform
+        run: |
+          WEBAPP_NAME=$(terraform output -raw webapp_name)
+          echo "webapp_name=$WEBAPP_NAME" >> $GITHUB_OUTPUT
+
   deploy-app:
     needs: [build-and-push, deploy-infra]
     runs-on: ubuntu-latest
@@ -100,5 +109,5 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.WEBAPP_NAME }}
+          app-name: ${{ needs.deploy-infra.outputs.webapp_name }}
           images: '${{ secrets.ACR_NAME }}.azurecr.io/agent-api:${{ needs.build-and-push.outputs.image_tag }}'
