@@ -94,6 +94,7 @@ jobs:
       func_http: ${{ steps.filter.outputs.func_http }}
       func_queue: ${{ steps.filter.outputs.func_queue }}
       pipeline_durable: ${{ steps.filter.outputs.pipeline_durable }}
+      webapp_agent_api: ${{ steps.filter.outputs.webapp_agent_api }}
       workflow: ${{ steps.filter.outputs.workflow }}
     steps:
       - name: Checkout
@@ -111,6 +112,8 @@ jobs:
               - 'building-blocks/functions/agent-tool-queue-function/**'
             pipeline_durable:
               - 'building-blocks/pipelines/durable-basic-pipeline/**'
+            webapp_agent_api:
+              - 'building-blocks/hosting/webapp-agent-api/**'
             workflow:
               - '.github/workflows/**'
 
@@ -146,6 +149,40 @@ jobs:
 
       - name: Run pytest
         run: pytest
+
+  # Job to test Web App agent API module
+  test-webapp-agent-api:
+    name: Test Web App Agent API
+    needs: [choose-runner, changes]
+    if: needs.changes.outputs.webapp_agent_api == 'true' || needs.changes.outputs.workflow == 'true'
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    defaults:
+      run:
+        working-directory: building-blocks/hosting/webapp-agent-api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # webapp-agent-api doesn't have a requirements.txt yet, using direct install for contract tests
+          pip install pytest pyyaml
+
+      - name: Run pytest
+        run: pytest tests/test_contract.py
 
   # Job to test HTTP function tool
   test-func-http:

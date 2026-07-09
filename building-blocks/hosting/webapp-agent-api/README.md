@@ -101,6 +101,7 @@ ruff check building-blocks/hosting/webapp-agent-api
 ### Deployment Methods
 - **Azure CLI:** Use `az webapp config container set` to update the image and registry settings.
 - **GitHub Actions:** See the [GitHub Actions Example](./examples/github-actions/README.md) for a full deployment workflow.
+- **Azure Pipelines:** See the [Azure Pipelines Example](./examples/azure-pipelines/README.md) for a YAML-based deployment workflow.
 
 ### Configuration
 - **Startup Command:** If the container doesn't have an `ENTRYPOINT` or `CMD`, provide the startup command in the App Service configuration.
