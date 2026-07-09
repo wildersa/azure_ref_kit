@@ -34,6 +34,7 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 - The Function App is granted the following roles on the storage account:
   - `Storage Blob Data Owner` (required for AzureWebJobsStorage when keys are disabled)
   - `Storage Queue Data Contributor` (for Durable Functions orchestration queues)
+  - `Storage Queue Data Message Processor` (required for identity-first Durable Functions)
   - `Storage Table Data Contributor` (for Durable Functions orchestration history/tracking)
 
 ## Durable Functions Limits

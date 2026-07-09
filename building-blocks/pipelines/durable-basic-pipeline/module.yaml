@@ -14,14 +14,39 @@ outputs:
   - name: pipeline_step_status
     type: object
     description: Customer-safe status of individual pipeline steps.
+  - name: api_endpoint
+    type: string
+    description: The endpoint of the deployed Function App.
 azure_resources:
-  - Azure Functions (Flex Consumption)
-  - Azure Storage Account
-  - Application Insights
-  - Log Analytics Workspace
+  - azurerm_function_app_flex_consumption
+  - azurerm_service_plan
+  - azurerm_storage_account
+  - azurerm_application_insights
+  - azurerm_log_analytics_workspace
 contracts:
   reads: []
   writes:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
   emits: []
+security_boundary:
+  policy: "Enforces Durable Functions orchestration boundary through identity-first storage and filtered status schemas."
+  forbid_wildcards: true
+  forbid_secrets: true
+  required_roles:
+    - role: "Storage Blob Data Owner"
+      description: "Required for AzureWebJobsStorage when shared access keys are disabled."
+    - role: "Storage Queue Data Contributor"
+      description: "Allows orchestrator to manage task queues."
+    - role: "Storage Queue Data Message Processor"
+      description: "Allows the function host to process queue messages."
+    - role: "Storage Table Data Contributor"
+      description: "Allows orchestrator to manage history and tracking tables."
+customer_safe_boundary:
+  forbid:
+    - "Raw Azure Function logs or Durable Functions orchestration history"
+    - "Internal technical exception payloads and stack traces"
+    - "Storage account keys, SAS tokens, or connection strings"
+    - "System prompts or LLM grounding instructions"
+    - "Internal Azure Resource IDs, Tenant IDs, or Subscription IDs"
+    - "Raw provider payloads from Document Intelligence or OpenAI"
