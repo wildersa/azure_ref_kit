@@ -95,6 +95,12 @@ This module enforces an **identity-first security boundary**. Shared access keys
 - `STORAGE_CONNECTION__accountName`: The name of the storage account for queues.
 - `STORAGE_CONNECTION__credential`: Set to `managedidentity`.
 
+**Required RBAC Roles:**
+- `Storage Blob Data Owner` on the storage account.
+- `Storage Queue Data Contributor` on the storage account.
+- `Storage Queue Data Message Processor` on the storage account.
+- `Storage Table Data Contributor` on the storage account.
+
 ## Known Limits
 
 - Queue-based tools are asynchronous; the agent will wait for the message to appear in the output queue.

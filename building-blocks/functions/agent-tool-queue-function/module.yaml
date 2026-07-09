@@ -8,6 +8,9 @@ outputs:
   - name: queue_tool_result
     type: queue-function-tool
     description: Result of the asynchronous tool execution returned via an output queue.
+  - name: api_endpoint
+    type: string
+    description: The base URL of the Function App API.
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_service_plan
@@ -33,10 +36,14 @@ security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
   required_roles:
+    - role: "Storage Blob Data Owner"
+      description: "Allows the Function App to manage deployment packages and internal host coordination."
     - role: "Storage Queue Data Contributor"
       description: "Allows reading from input queue and writing to output queue."
+    - role: "Storage Queue Data Message Processor"
+      description: "Allows the Function App to process messages from queue triggers."
     - role: "Storage Table Data Contributor"
-      description: "Required for internal Function host operations in identity-first configurations."
+      description: "Required for internal Function host operations and diagnostic events in identity-first configurations."
 customer_safe_boundary:
   forbid:
     - "Raw Azure Function logs or internal execution traces"
