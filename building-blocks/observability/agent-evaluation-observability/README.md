@@ -11,23 +11,26 @@ This building block defines the standards for capturing technical diagnostics an
 Technical telemetry should be strictly separated from business status. Tracing focuses on the "how" (diagnostics), while the Portal API and Status Store focus on the "what" (outcomes).
 
 ```mermaid
-sequenceDiagram
-    participant U as User/App
-    participant A as Foundry Agent
-    participant T as Tools (e.g. Portal API)
-    participant O as Observability (App Insights)
-    participant S as Status Store
+flowchart TD
+    subgraph "Agent Execution (Private)"
+        A[Foundry Agent] -->|Tool Call| T[Agent Tools]
+        A -->|Step Outcome| R[Internal Results]
+    end
 
-    U->>A: Request (run_id)
-    A-->>O: Trace: Agent ID, Request ID, Latency
-    A->>T: Call Tool
-    T-->>O: Trace: Tool Name, Request ID
-    T->>S: Fetch Data
-    S-->>T: Technical Data
-    T-->>A: Safe Data (Redacted)
-    T-->>O: Trace: Tool Outcome, Latency, Error Category
-    A-->>U: Sanitized Summary Response
-    A-->>O: Trace: Status/Result, Safety Outcome
+    subgraph "Trace/Evaluation Boundary"
+        A -.->|OpenTelemetry| O[Azure Monitor / App Insights]
+        A -.->|Evaluation Signal| F[Foundry Observability]
+    end
+
+    subgraph "Observability Views (Internal)"
+        O -->|End-to-end Traces| D1[App Insights Dashboard]
+        F -->|Quality/Safety Scores| D2[Foundry Monitoring]
+    end
+
+    subgraph "Customer Boundary (Safe)"
+        A -->|Safe Status| S[Status Store]
+        S -->|Business Status| P[Customer Portal]
+    end
 ```
 
 ## Trace and Evaluation Checklist
@@ -36,64 +39,69 @@ Technical telemetry should include these fields for debugging and performance tu
 
 | Field | Description |
 |-------|-------------|
-| **Request ID** | Correlation ID for the unique user request. |
+| **Request ID** | Request correlation ID for the user request used to correlate spans across services. |
 | **Agent ID/Name** | Identifier for the specific agent version being called. |
-| **Tool Name** | The name of the tool called (e.g., `get_pipeline_status`). |
-| **Tool Outcome** | Success, Failure, or Partial Success of the tool execution. |
+| **Agent Step Names** | Names of internal reasoning steps or state transitions. |
+| **Tool Call Names** | The specific name of the tool called (e.g., `get_pipeline_status`). |
+| **Tool Name** | Redundant field for tool identification in various log formats. |
+| **Tool Outcome** | Technical success or failure of the tool call. |
 | **Latency** | Duration of agent turns and individual tool executions. |
-| **Status/Result** | Final high-level outcome of the agent interaction. |
-| **Safety Outcome** | Result of built-in or custom safety filters (e.g., `Pass`, `Flagged`). |
-| **Sanitized Summary** | A non-sensitive technical summary of the execution path. |
+| **Status/Result** | Technical status or result of the individual span or operation. |
+| **Safety Outcome** | High-level safety result from content filters. |
+| **Sanitized Summary** | High-level evaluation outcome summary or diagnostic summary. |
 
 ## Customer-Safe Logging Rules
 
 ### What MAY be traced
-- **Run ID Alias**: A non-internal correlation ID for the pipeline run.
-- **Business Status**: High-level status (e.g., `completed`, `failed`).
+- **Request ID**: Request correlation ID linking the agent flow.
+- **Business Status**: High-level states (e.g., `completed`, `failed`).
 - **Safe Artifact Metadata**: Non-sensitive info like file extensions or redacted names.
 - **Timing/Latency**: Duration of agent turns and tool execution.
 - **Cost Estimate**: Aggregated cost figures (no raw usage details).
-- **Friendly Error Category**: Categorized failures (e.g., `ValidationFailed`, `ServiceUnavailable`).
+- **Friendly Error Category**: Categorized failures that don't reveal internals.
 
 ### What MUST NOT be traced/logged
-These fields must **never** enter technical telemetry or logs:
-- **Prompts with Secrets**: Raw system, user, or tool-caller prompts containing credentials or PII.
-- **Raw Tool/Provider Payloads**: Unfiltered JSON from OpenAI, Document Intelligence, or internal APIs.
-- **Raw Azure DevOps Logs**: Direct output from build/release pipelines that may contain secrets.
-- **Tokens/Secrets**: API keys, SAS tokens, Bearer tokens, or connection strings.
-- **Secret Variables**: Environment variables or pipeline variables marked as secret.
-- **Internal Identifiers**: Tenant IDs, Subscription IDs, or unrestricted Customer/Org identifiers.
-- **Stack Traces**: Technical error details that reveal code paths or internal state.
+These fields must **never** enter technical telemetry or logs to protect the security and privacy boundary:
+- **Secrets & Tokens**: API keys, SAS tokens, Bearer tokens, or credentials.
+- **Connection Strings**: Full URIs containing authentication parameters.
+- **Prompts with Secrets**: System instructions, user inputs, or model grounding text (raw prompts) containing sensitive data or credentials.
+- **Raw Customer Documents**: Full text or binary content from processed files.
+- **Raw Tool/Provider Payloads**: Full unfiltered JSON request/response bodies sent to tools or AI providers.
+- **Stack Traces**: Technical error details revealing code paths, file names, or environment state.
+- **Raw Azure DevOps Logs**: Direct output from build/release pipelines.
+- **Raw Azure/DevOps Payloads**: Technical details from platform APIs (Tenant IDs, Subscription IDs, Customer/Org/Tenant identifiers) or internal secret variables.
 - **Unrestricted User Content**: Large blocks of raw user input without PII/PHI scrubbing.
 
 ## Minimal Evaluation Checklist
 
 Every agent iteration must be evaluated against these pillars:
 
-| Pillar | Check | Evaluator |
-|--------|-------|-----------|
-| **Quality** | Are answers accurate, coherent, and fluent? | `Groundedness`, `Coherence`, `Fluency` |
-| **Safety** | Does the agent correctly refuse to answer out-of-scope or sensitive queries? | `Safety` (Built-in) + Refusal Rate |
-| **Tool-Boundary** | Does the agent call the correct tool and stay within its data boundary? | Custom Tool Accuracy |
-| **Answer Format** | Is the answer in the required customer-safe format? | Regex / Keyword Scanner |
-| **Failure Quality** | Is the failure explanation friendly and non-technical? | Manual Review / Custom LLM Evaluator |
+| Pillar | Check | Description |
+|--------|-------|-------------|
+| **Quality** | Task Completion & Coherence | Did the agent complete the goal accurately and coherently? |
+| **Tool-Boundary** | Tool-Call Correctness | Did the agent call the right tool with valid arguments and stay within its boundary? |
+| **Groundedness/Relevance** | Groundedness & Relevance | Is the answer based on the provided context and relevant to the user? |
+| **Safety** | Safety & Refusal Rate | Does the agent refuse harmful, out-of-scope, or prompt-injection attempts? |
+| **Answer Format** | Customer-Safe Status Wording | Is the status language friendly and free of technical jargon (format check)? |
+| **Failure Quality** | Latency/Error Budget Notes | Is the failure explanation friendly and non-technical, within performance limits? |
 
 ## Security and Privacy Notes
 
 - **Redaction**: Implement automated redaction for common secret patterns (e.g., `AccountKey=...`, `Bearer ...`) before emitting traces.
 - **Least-Privilege Access**: Access to Application Insights and Foundry evaluation results should be restricted to engineering/security roles only.
 - **Retention**: Telemetry and evaluation datasets should follow organizational data retention policies (typically 30-90 days).
-- **Customer-Safe Boundaries**: Ensure that no raw data from the `Status Store` or `Technical Traces` is ever returned directly to the user without passing through the Agent's sanitization layer.
+- **Monitoring Trade-offs**: While high-detail tracing aids debugging, it increases storage costs and privacy risks. Use sampled tracing in production.
 
 ## Deployment / IaC Decision
 
 **No-IaC: Guidance-only module.**
 
-This building block defines standards and checklists rather than deployable infrastructure. Application-specific observability (Application Insights) is typically deployed as part of the hosting building block (e.g., `webapp-agent-api` or `functions`).
+This building block defines standards and checklists rather than deployable infrastructure. Application-specific observability (Application Insights) is typically deployed as part of the hosting building block (e.g., `webapp-agent-api` or `functions`). No concrete Azure resources are introduced in this reference.
 
 ## References
 
-- [Azure AI Foundry Agent Service Tracing](https://learn.microsoft.com/azure/foundry/observability/how-to/trace-agent-setup)
-- [Azure Monitor Application Insights Overview](https://learn.microsoft.com/azure/azure-monitor/app/app-insights-overview)
-- [Evaluate Generative AI Applications](https://learn.microsoft.com/azure/ai-foundry/how-to/evaluate-generative-ai-app)
-- [OpenTelemetry Semantic Conventions for AI](https://opentelemetry.io/docs/specs/semconv/gen-ai/)
+- [Azure AI Foundry Agent Service Overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
+- [Observability in Generative AI](https://learn.microsoft.com/en-us/azure/foundry/concepts/observability)
+- [Application Insights OpenTelemetry Overview](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
+- [Foundry Trace Application Guidance](https://learn.microsoft.com/en-us/azure/foundry-classic/how-to/develop/trace-application)
+- [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/README.md)
