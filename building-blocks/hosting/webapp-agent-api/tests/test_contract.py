@@ -30,6 +30,8 @@ def test_readme_has_required_sections():
         "## Comparison with Other Hosting Options",
         "## API Boundary",
         "## Local / Demo Flow",
+        "## Environment Variables",
+        "## Validation Commands",
         "## Azure Hosting Notes",
         "## Security Notes",
         "## Cost & Ops Trade-offs",

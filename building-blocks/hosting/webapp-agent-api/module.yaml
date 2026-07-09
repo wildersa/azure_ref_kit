@@ -2,8 +2,8 @@ name: webapp-agent-api
 type: building-block
 category: hosting
 status: stable
-purpose: Reference for hosting an agent-facing API on Azure App Service/Web App using native Python runtime.
-runtime: Python / App Service
+purpose: Reference for hosting an agent-facing API on Azure App Service/Web App.
+runtime: App Service / Docker
 azure_resources:
   - azurerm_linux_web_app
   - azurerm_service_plan
@@ -19,17 +19,34 @@ customer_safe_boundary:
   forbid_stack_traces: true
   forbid_sas_tokens: true
 inputs:
-  - name: python_version
+  - name: container_image
     type: string
-    description: The Python version to use (e.g., 3.12, 3.14).
+    description: The container image URI to deploy.
+  - name: docker_registry_url
+    type: string
+    description: The URL of the Docker registry.
+  - name: docker_registry_username
+    type: string
+    description: The username for the Docker registry (if not using Managed Identity).
+  - name: docker_registry_password
+    type: string
+    description: The password for the Docker registry (if not using Managed Identity).
+  - name: sku_name
+    type: string
+    description: The SKU name for the App Service Plan (e.g., B1, S1, P1v3).
   - name: startup_command
     type: string
-    description: Custom startup command for the web app (e.g., gunicorn command).
+    description: Custom startup command for the web app.
 outputs:
   - name: app_service_url
     type: string
     description: The default FQDN of the deployed web app.
+  - name: api_endpoint
+    type: string
+    description: The public URL of the hosted API.
 contracts:
   reads: []
   writes: []
-  emits: []
+  emits:
+    - name: agent-status
+      description: Customer-safe agent status response.
