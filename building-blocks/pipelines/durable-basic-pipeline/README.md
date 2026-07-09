@@ -50,9 +50,21 @@ To maintain security and clarity, the following rules apply to status updates:
 
 ## Deploy
 
-- **Hosting**: Azure Functions (Linux, Flex Consumption or Premium recommended).
+- **Hosting**: Azure Functions (Linux, Flex Consumption recommended).
 - **Storage**: Azure Storage Account (required for Durable Functions state).
 - **Observability**: Application Insights.
+
+### Terraform Deployment
+
+A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Application Insights, and the Flex Consumption Function App.
+
+**Required Configuration (Identity-First):**
+
+This module enforces an **identity-first security boundary**. Shared access keys are disabled on the storage account (`shared_access_key_enabled = false`), and all communication is authorized via Microsoft Entra ID (Managed Identity).
+
+- `AzureWebJobsStorage__accountName`: The name of the storage account.
+- `AzureWebJobsStorage__credential`: Set to `managedidentity`.
+- `APPLICATIONINSIGHTS_CONNECTION_STRING`: The connection string for Application Insights.
 
 ## Failure behavior
 

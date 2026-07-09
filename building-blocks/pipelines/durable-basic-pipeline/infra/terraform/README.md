@@ -26,7 +26,7 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 
 - `AzureWebJobsStorage__accountName`: Name of the storage account.
 - `AzureWebJobsStorage__credential`: Set to `managedidentity` for identity-based connection.
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Connection string for Application Insights.
+- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Connection string for Application Insights (set automatically via Terraform).
 
 ## Identity and Storage Decisions
 
@@ -34,6 +34,7 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 - The Function App is granted the following roles on the storage account:
   - `Storage Blob Data Owner` (required for AzureWebJobsStorage when keys are disabled)
   - `Storage Queue Data Contributor` (for Durable Functions orchestration queues)
+  - `Storage Queue Data Message Processor` (required for identity-first Durable Functions)
   - `Storage Table Data Contributor` (for Durable Functions orchestration history/tracking)
 
 ## Durable Functions Limits
