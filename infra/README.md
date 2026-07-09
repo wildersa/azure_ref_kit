@@ -53,6 +53,8 @@ flowchart TD
 
 ## References
 
+- [azd Reference Index](./azd/README.md)
+- [Terraform Reference Index](./terraform/README.md)
 - [Azure Developer CLI (azd) Overview](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview)
 - [Terraform on Azure documentation](https://learn.microsoft.com/en-us/azure/developer/terraform/)
 - [Terraform AzureRM Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
