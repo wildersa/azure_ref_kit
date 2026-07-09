@@ -43,9 +43,5 @@ resource "azurerm_linux_web_app" "webapp" {
     container_registry_use_managed_identity = length(regexall("azurecr.io", var.docker_registry_url)) > 0
   }
 
-  app_settings = {
-    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true"
-  }
-
   tags = var.tags
 }
