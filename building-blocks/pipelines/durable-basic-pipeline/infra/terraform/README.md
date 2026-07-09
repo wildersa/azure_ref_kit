@@ -26,7 +26,7 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 
 - `AzureWebJobsStorage__accountName`: Name of the storage account.
 - `AzureWebJobsStorage__credential`: Set to `managedidentity` for identity-based connection.
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Connection string for Application Insights.
+- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Connection string for Application Insights (set automatically via Terraform).
 
 ## Identity and Storage Decisions
 
