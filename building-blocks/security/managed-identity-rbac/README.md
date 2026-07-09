@@ -64,12 +64,13 @@ For a seamless transition, use the `DefaultAzureCredential` class from the `azur
 
 ### Python Implementation
 ```python
+import os
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
-# Use DefaultAzureCredential to automatically pick up the right identity
-# (Azure CLI locally, Managed Identity in Azure)
-credential = DefaultAzureCredential()
+# Best practice: Check for an explicit Client ID if using User-Assigned Identity
+client_id = os.environ.get("AZURE_CLIENT_ID")
+credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
 
 # Initialize client using identity, not a connection string
 blob_service_client = BlobServiceClient(
@@ -86,7 +87,8 @@ In this pattern, the Function App is granted `Storage Blob Data Contributor` and
 
 **Configuration (App Settings):**
 - `STORAGE_CONNECTION__accountName = "mystorageaccount"`
-- `STORAGE_CONNECTION__credential = "managedidentity"` (In Azure)
+- `STORAGE_CONNECTION__credential = "managedidentity"`
+- `STORAGE_CONNECTION__clientId = "<client-id>"` (Optional for User-Assigned)
 
 **Code:**
 ```python
@@ -97,8 +99,13 @@ from azure.storage.queue import QueueClient
 # Azure Functions can use identity-based triggers and bindings
 # For manual client initialization:
 account_name = os.environ["STORAGE_CONNECTION__accountName"]
+client_id = os.environ.get("STORAGE_CONNECTION__clientId")
+
+# Pass client_id to ensure the correct User-Assigned identity is used
+credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
+
 queue_url = f"https://{account_name}.queue.core.windows.net/my-task-queue"
-client = QueueClient(queue_url, credential=DefaultAzureCredential())
+client = QueueClient(queue_url, credential=credential)
 
 def send_task(message):
     client.send_message(message)
@@ -110,6 +117,7 @@ When a containerized API needs to retrieve a configuration secret, it uses its i
 
 **Configuration (Environment Variables):**
 - `KEYVAULT_URL = "https://my-vault.vault.azure.net/"`
+- `AZURE_CLIENT_ID = "<client-id>"` (Optional for User-Assigned)
 
 **Code:**
 ```python
@@ -118,7 +126,8 @@ from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
 vault_url = os.environ["KEYVAULT_URL"]
-credential = DefaultAzureCredential()
+client_id = os.environ.get("AZURE_CLIENT_ID")
+credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
 client = SecretClient(vault_url=vault_url, credential=credential)
 
 def get_config_secret(name):
@@ -145,7 +154,9 @@ from azure.search.documents import SearchClient
 # The tool uses its own identity to perform the action
 endpoint = os.environ["SEARCH_ENDPOINT"]
 index_name = os.environ["SEARCH_INDEX_NAME"]
-credential = DefaultAzureCredential()
+client_id = os.environ.get("AZURE_CLIENT_ID")
+
+credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
 search_client = SearchClient(endpoint, index_name, credential=credential)
 
 def perform_search(query):
@@ -173,7 +184,7 @@ flowchart TD
         Entra -->|Issue Token| SDK
     end
 
-    subgraph "Target Resource"
+    subgraph "Resource Access"
         SDK -->|Authorized Request| Resource[Target Resource\ne.g. Blob Storage]
         Role[RBAC Role Assignment\ne.g. Storage Blob Data Reader] -.->|Scopes Access| Resource
         MI -.->|Principal| Role
