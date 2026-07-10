@@ -52,9 +52,9 @@ def queue_trigger(msg: func.QueueMessage, outputQueue: func.Out[str]):
         logging.info("Sending result for CorrelationId: %s", correlation_id)
         outputQueue.set(json.dumps(response_message))
 
-    except Exception as e:
-        # Avoid returning raw stack traces to the agent for security reasons.
-        logging.error("Error processing tool call: %s", str(e))
+    except Exception:
+        # Avoid returning raw stack traces or internal errors to the agent or logs.
+        logging.error("Error processing tool call.")
 
         # Return a safe error envelope to the agent
         try:
