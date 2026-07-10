@@ -42,6 +42,7 @@ The function must return a message to the output queue with this structure:
 ## Security and Boundaries
 
 - **No Raw Logs:** The function must not include raw technical logs, stack traces, or internal metadata in the `Value` field returned to the agent.
+- **Customer-Safe Logging Boundary:** The function follows a strict safe logging boundary. It never logs raw exception strings, stack traces, queue payloads, provider internals, tokens, or secrets. Only opaque correlation IDs and generic status messages are emitted to internal logs.
 - **Secrets Boundary:** No secrets, connection strings, or tokens should ever be included in queue messages.
 - **Read-Only vs. Mutation:** While queue-based tools can perform mutations, this reference emphasizes safe, business-level operations.
 - **Correlation ID:** The `CorrelationId` is mandatory for the agent to successfully associate the result with the original call.
