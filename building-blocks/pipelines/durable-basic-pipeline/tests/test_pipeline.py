@@ -1,7 +1,9 @@
 import pytest
 import sys
 import os
+import logging
 from unittest.mock import MagicMock
+import azure.functions as func
 import azure.durable_functions as df
 from datetime import datetime, timezone
 
@@ -9,6 +11,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the orchestrator and activities
+from function_app import http_start
 from src.orchestrator import pipeline_orchestrator
 from src.activities import (
     update_pipeline_run_status,
@@ -181,10 +184,96 @@ def test_orchestrator_safety_boundary(mock_context, valid_input, caplog):
     assert "12345" not in last_call_args["friendly_error"]
     assert "An error occurred" in last_call_args["friendly_error"]
 
-    # 2. Check internal logs (must NOT contain the sensitive error text)
+    # 2. Check internal logs (must NOT contain the sensitive error text or run_id)
     assert "secret-endpoint" not in caplog.text
     assert "12345" not in caplog.text
-    assert "failed during execution" in caplog.text
+    assert "test-run-id" not in caplog.text
+    assert "Pipeline execution failed" in caplog.text
+
+
+def test_http_start_logging_safety(caplog):
+    """
+    Verify that http_start does not log the instance_id.
+    """
+    caplog.set_level(logging.INFO)
+    req = MagicMock(spec=func.HttpRequest)
+    req.route_params = {"functionName": "pipeline_orchestrator"}
+    req.get_json.return_value = {"pipeline_run": {"id": "test-run-id"}}
+
+    # Mock start_new to be an async function returning a string
+    async def mock_start_new(function_name, client_input=None):
+        return "test-instance-id"
+
+    client = MagicMock(spec=df.DurableOrchestrationClient)
+    client.start_new = mock_start_new
+
+    # We need to run the async function
+    import asyncio
+
+    # Access the original function behind the Azure Functions decorators
+    # http_start is decorated with @app.route and @app.durable_client_input
+    # Standard decorators use __wrapped__, but let's check if it exists.
+    # If not, we can call the function and mock the 'client' kwarg if the decorator allows.
+
+    # Access the original function behind the Azure Functions decorators
+    # In azure-functions v2, the FunctionBuilder object stores the original
+    # user function in _function._func, but it might still be wrapped by
+    # durable-functions decorators.
+    if hasattr(http_start, "_function") and hasattr(http_start._function, "_func"):
+        func_to_call = http_start._function._func
+        # If it's a closure (as seen in durable functions decorators),
+        # the real function might be in the closure.
+        if func_to_call.__closure__:
+            for cell in func_to_call.__closure__:
+                if callable(cell.cell_contents) and cell.cell_contents.__name__ == "http_start":
+                    func_to_call = cell.cell_contents
+                    break
+        asyncio.run(func_to_call(req, client))
+    elif hasattr(http_start, "__wrapped__"):
+        # Fallback for standard decorators
+        func_to_call = http_start.__wrapped__
+        while hasattr(func_to_call, "__wrapped__"):
+            func_to_call = func_to_call.__wrapped__
+        asyncio.run(func_to_call(req, client))
+    else:
+        # Fallback to direct call
+        asyncio.run(http_start(req, client=client))
+
+    assert "test-instance-id" not in caplog.text
+    assert "Orchestration started" in caplog.text
+
+
+def test_activities_logging_safety(caplog):
+    """
+    Verify that activities do not log the run_id or status.
+    """
+    caplog.set_level(logging.INFO)
+    run_id = "test-run-id-123"
+
+    # 1. update_pipeline_run_status
+    caplog.clear()
+    update_pipeline_run_status({"id": run_id, "status": "running"})
+    assert run_id not in caplog.text
+    assert "running" not in caplog.text
+    assert "Activity: Updating pipeline run status" in caplog.text
+
+    # 2. ocr_document_intelligence
+    caplog.clear()
+    ocr_document_intelligence({"run_id": run_id})
+    assert run_id not in caplog.text
+    assert "Activity: Starting OCR process" in caplog.text
+
+    # 3. field_validation_worker
+    caplog.clear()
+    field_validation_worker({"run_id": run_id})
+    assert run_id not in caplog.text
+    assert "Activity: Starting field validation" in caplog.text
+
+    # 4. final_result_publisher
+    caplog.clear()
+    final_result_publisher({"run_id": run_id})
+    assert run_id not in caplog.text
+    assert "Activity: Finalizing publication" in caplog.text
 
 
 def test_activities_basic():

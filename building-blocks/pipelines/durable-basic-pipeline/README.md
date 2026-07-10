@@ -34,7 +34,7 @@ This module adheres to the following shared contracts:
 To maintain security and clarity, the following rules apply to status updates:
 
 - **Allowed**: Business status (e.g., "Processing document"), friendly step names, safe summaries, artifact metadata, estimated costs, and correlation IDs.
-- **Forbidden**: Raw logs, prompts, model/tool payloads, stack traces, secrets, and internal tenant details.
+- **Forbidden**: Raw logs, prompts, model/tool payloads, stack traces, secrets, internal tenant details, and raw identifiers (e.g., `run_id`, `instance_id`) in runtime logs.
 
 ## Local run
 

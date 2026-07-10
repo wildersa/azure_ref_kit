@@ -131,7 +131,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
     except Exception:
         # Safely capture failure without leaking internals in technical logs.
         # Avoid logging the exception object directly as it may contain SAS tokens or other secrets.
-        logging.error(f"Pipeline {run_id} failed during execution.")
+        logging.error("Pipeline execution failed.")
         error_time = context.current_utc_datetime.replace(
             tzinfo=timezone.utc
         ).isoformat()
