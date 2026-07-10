@@ -9,13 +9,13 @@ It provides a concrete reference for exposing enterprise data to agents without 
 ## Architecture
 
 ```mermaid
-flowchart LR
-    Agent[AI Agent] -->|GET /api/system_status| Tool[HTTP Function Agent Tool]
-    Tool -->|Controlled Tool Response| Agent
-    subgraph "Safe Boundary"
-        Tool
+flowchart TD
+    Caller[AI Agent / Tool Caller] -->|HTTP GET /api/system_status| Func[HTTP Function]
+    subgraph "Safe Tool Boundary"
+        Func --> Handler[Controlled Handler]
+        Handler --> Sanitize[Pydantic Validation / Sanitization]
     end
-    Tool -.->|Internal Query| Azure[Azure Resources]
+    Sanitize -->|Sanitized JSON Response| Caller
 ```
 
 ## Tool Contract

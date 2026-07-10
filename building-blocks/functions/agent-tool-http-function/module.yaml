@@ -16,7 +16,7 @@ contracts:
   reads: []
   writes: []
   emits:
-    - type: mcp-tool
+    - type: http-function-tool
       name: system_status
       description: Returns a safe, filtered summary of system status.
       schema:

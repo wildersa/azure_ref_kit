@@ -3,6 +3,7 @@ import sys
 import os
 import azure.functions as func
 import pytest
+import pydantic
 from datetime import datetime
 
 # Add the parent directory to sys.path so we can import function_app and src
@@ -75,7 +76,7 @@ def test_get_system_status_safe_boundary():
 
 def test_system_status_model_extra_fields_forbidden():
     # Test that the model itself forbids extra fields
-    with pytest.raises(Exception):
+    with pytest.raises(pydantic.ValidationError):
         SystemStatusResponse(
             business_status="operational",
             service_health="healthy",
