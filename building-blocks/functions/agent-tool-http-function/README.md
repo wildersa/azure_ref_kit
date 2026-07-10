@@ -36,12 +36,13 @@ Returns a high-level summary of the system status.
 
 The response is deterministically validated using Pydantic models defined in `src/models.py`.
 
-## Security and Boundaries
+## Security Notes
 
 - **Read-Only:** This tool does not accept parameters that modify state.
 - **Deterministic Validation:** Uses Pydantic for strict output schema enforcement.
 - **Customer-Safe Errors:** Implements friendly error responses to prevent leaking internal technical details.
-- **Data Redaction:** The implementation explicitly filters internal metadata, raw logs, and stack traces.
+- **Safe Logging Boundary:** The implementation explicitly forbids logging raw exception strings (`str(e)`), stack traces, or provider payloads to prevent accidental exposure of secrets, tokens, or internal technical detail in telemetry.
+- **Data Redaction:** The implementation explicitly filters internal metadata, raw logs, and stack traces from the response.
 - **Authentication:** In Azure, this function should be protected via Function Keys or Microsoft Entra ID.
 - **No Passthrough:** This is not a generic proxy to other Azure APIs; it returns a specific, pre-defined contract.
 

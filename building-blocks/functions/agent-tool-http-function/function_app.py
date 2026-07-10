@@ -38,8 +38,10 @@ def get_system_status(req: func.HttpRequest) -> func.HttpResponse:
             status_code=200,
         )
 
-    except Exception as e:
-        logging.error(f"Error in system status tool: {str(e)}")
+    except Exception:
+        # Standardized customer-safe logging boundary: do not log str(e) or raw exception objects.
+        # This prevents leaking secrets, tokens, internal URLs, or provider internals in logs.
+        logging.error("An unexpected error occurred in the system status tool.")
 
         # Return a customer-safe, friendly error message
         error_response = ErrorResponse(
