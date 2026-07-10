@@ -45,11 +45,9 @@ resource "azurerm_function_app_flex_consumption" "function" {
   runtime_name    = "python"
   runtime_version = "3.11"
 
-  storage {
-    name                = "AzureWebJobsStorage"
-    storage_account_id  = azurerm_storage_account.storage.id
-    authentication_type = "SystemAssignedIdentity"
-  }
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.storage.primary_blob_endpoint}deploymentpackage"
+  storage_authentication_type = "SystemAssignedIdentity"
 
   identity {
     type = "SystemAssigned"
