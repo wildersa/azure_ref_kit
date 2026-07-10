@@ -1,5 +1,5 @@
 name: document-ai-portal
-status: scaffold
+status: partial
 purpose: "A customer-facing portal for monitoring and interacting with a Document AI pipeline, featuring OCR extraction and an AI assistant."
 
 entrypoints:
@@ -11,17 +11,61 @@ entrypoints:
     target: building-blocks/portals/static-status-portal/
 
 building_blocks:
-  - building-blocks/portals/static-status-portal/
-  - building-blocks/functions/portal-api-functions/
-  - building-blocks/functions/blob-trigger-start-pipeline/
-  - building-blocks/storage/blob-artifact-store/
-  - building-blocks/pipelines/durable-basic-pipeline/
-  - building-blocks/functions/ocr-document-intelligence/
-  - building-blocks/functions/field-validation-worker/
-  - building-blocks/functions/final-result-publisher/
-  - building-blocks/agents/pipeline-assistant-foundry/
-  - building-blocks/observability/appinsights-observability/
-  - building-blocks/observability/cost-ledger-capture/
+  - id: static-status-portal
+    path: building-blocks/portals/static-status-portal/
+    role: portal
+    status: scaffold
+    deploy_target: portal
+  - id: portal-api-functions
+    path: building-blocks/functions/portal-api-functions/
+    role: api
+    status: implemented
+    deploy_target: api_function_app
+  - id: blob-trigger-start-pipeline
+    path: building-blocks/functions/blob-trigger-start-pipeline/
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: blob-artifact-store
+    path: building-blocks/storage/blob-artifact-store/
+    role: security
+    status: scaffold
+    deploy_target: none
+  - id: durable-basic-pipeline
+    path: building-blocks/pipelines/durable-basic-pipeline/
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: ocr-document-intelligence
+    path: building-blocks/functions/ocr-document-intelligence/
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: field-validation-worker
+    path: building-blocks/functions/field-validation-worker/
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: final-result-publisher
+    path: building-blocks/functions/final-result-publisher/
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: pipeline-assistant-foundry
+    path: building-blocks/agents/pipeline-assistant-foundry/
+    role: api
+    status: implemented
+    deploy_target: none
+  - id: appinsights-observability
+    path: building-blocks/observability/appinsights-observability/
+    role: observer
+    status: scaffold
+    deploy_target: none
+  - id: cost-ledger-capture
+    path: building-blocks/observability/cost-ledger-capture/
+    role: observer
+    status: scaffold
+    deploy_target: none
 
 infra:
   - solutions/document-ai-portal/infra/terraform/
