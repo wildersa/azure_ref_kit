@@ -109,6 +109,18 @@ The `deploy/package.sh` script performs a deterministic local assembly of the po
 
 ---
 
+## Deployment Boundary & Preflight
+
+This solution follows a three-step deployment boundary:
+
+1. **Package**: `bash deploy/package.sh` assembles building blocks into `dist/`.
+2. **Preflight**: `bash deploy/deploy.sh` validates the local environment and artifacts.
+3. **Deploy**: Manual execution of `terraform apply` and Azure CLI/SWA CLI commands, or automated CI/CD.
+
+The `deploy/deploy.sh` script is explicitly designed to be **non-destructive**. It does not create cloud resources or run credentialed commands. Its purpose is to ensure that the solution is "ready to fly" before any real deployment starts.
+
+---
+
 ## 4. AI Assistant Agent (`agent`)
 
 The agent provides natural language interaction over the pipeline data.
