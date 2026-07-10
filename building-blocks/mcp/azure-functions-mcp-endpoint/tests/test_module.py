@@ -21,6 +21,7 @@ def test_tool_definition_static():
     assert "@app.mcp_tool_trigger" in content
     assert 'tool_name="get_service_info"' in content
     assert 'tool_name="get_resource_health"' in content
+    assert 'tool_name="get_server_time"' in content
     assert "def get_service_info(context: str) -> str:" in content
     assert "def get_resource_health(context: str) -> str:" in content
 
