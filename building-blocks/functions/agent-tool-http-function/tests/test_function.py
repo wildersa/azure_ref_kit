@@ -10,6 +10,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from function_app import get_system_status
 from src.models import SystemStatusResponse, ErrorResponse
+from unittest.mock import patch
 
 
 @pytest.fixture
@@ -95,3 +96,30 @@ def test_error_response_model():
     model = ErrorResponse(**error_data)
     assert model.error_code == "TEST_ERROR"
     assert model.friendly_message == "A safe error message."
+
+
+def test_get_system_status_logs_safe_exception(caplog):
+    # Verify that raw exception details are NOT logged.
+    with patch("function_app.SystemStatusResponse") as mock_model:
+        sensitive_error_msg = (
+            "Database connection failed: user=admin password=secret123"
+        )
+        mock_model.side_effect = Exception(sensitive_error_msg)
+
+        req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
+        resp = get_system_status(req)
+
+        # Verify the response remains safe
+        assert resp.status_code == 500
+        body = json.loads(resp.get_body())
+        assert body["error_code"] == "INTERNAL_ERROR"
+
+        # Verify the logs do NOT contain the sensitive information
+        assert not any(
+            sensitive_error_msg in record.message for record in caplog.records
+        )
+        # Verify a safe generic message is logged instead
+        assert any(
+            "An unexpected error occurred in the system status tool" in record.message
+            for record in caplog.records
+        )
