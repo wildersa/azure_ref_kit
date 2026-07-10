@@ -1,6 +1,12 @@
 name: replace-me
-status: scaffold
+status: scaffold # scaffold, partial, executable
 purpose: Replace with the customer scenario.
 entrypoints: {}
-building_blocks: []
+building_blocks:
+  # - id: example-block
+  #   path: building-blocks/category/block-name
+  #   role: worker # worker, api, portal, observer, security
+  #   status: implemented # implemented, mock, scaffold, future, external
+  #   deploy_target: api_function_app # pipeline_function_app, api_function_app, portal, none
+  #   entrypoint: function_app.py
 contracts: []

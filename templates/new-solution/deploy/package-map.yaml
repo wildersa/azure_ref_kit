@@ -1,0 +1,10 @@
+artifacts:
+  - name: api_function_app
+    type: azure_function
+    sources:
+      # List of building blocks or shared paths to include in the package
+      # - building-blocks/category/block-name
+  - name: portal
+    type: static_web_app
+    sources:
+      # - building-blocks/portals/static-status-portal
