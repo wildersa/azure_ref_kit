@@ -1,9 +1,28 @@
 # FastMCP Basic Server Reference
 
 ## Purpose
-This building block provides a minimal reference implementation of a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server using the [FastMCP](https://github.com/jlowin/fastmcp) framework. It demonstrates how to expose local tools to AI agents through a standardized, secure boundary.
+This building block provides a minimal reference implementation of a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server using the [FastMCP](https://github.com/jlowin/fastmcp) framework. It demonstrates how to expose local tools to AI agents through a standardized, secure, and read-only protocol boundary.
 
-## Architecture
+## When to Use
+- When you need a minimal, local-first reference for MCP protocol behavior.
+- When you want to demonstrate how to expose a Python function as an MCP tool.
+- When testing MCP client integrations (e.g., Claude Desktop, Azure AI Foundry) with a predictable, safe server.
+
+## When Not to Use
+- Do not use for production tool hosting.
+- Do not use when you need an Azure-hosted endpoint (use `building-blocks/mcp/azure-functions-mcp-endpoint/` instead).
+- Do not use for complex, stateful tool logic.
+
+## Comparison with Other Hosting Options
+
+| Feature | Local FastMCP (This) | Azure Functions MCP | Container-hosted MCP |
+| :--- | :--- | :--- | :--- |
+| **Transport** | stdio | SSE / HTTP | SSE / HTTP |
+| **Hosting** | Local process | Serverless (Azure Functions) | Azure Container Apps / AKS |
+| **Scalability** | Manual | Automatic | Managed |
+| **Best For** | Development & Debugging | Enterprise Tooling | High-performance / Custom Runtimes |
+
+## API Boundary
 
 ```mermaid
 flowchart LR
@@ -22,51 +41,58 @@ flowchart LR
     Server --> Tool1
 ```
 
-## MCP vs. Other Tooling Patterns
+## Local / Demo Flow
 
-| Feature | Direct Function Calling | OpenAPI / REST | MCP |
-| :--- | :--- | :--- | :--- |
-| **Discovery** | Manual schema definition | OpenAPI Spec (JSON/YAML) | Protocol-level introspection |
-| **Portability** | Low (code-dependent) | High (platform-agnostic) | High (AI-native standard) |
-| **Complexity** | Low | Medium/High | Medium (managed by FastMCP) |
-| **Statefulness** | Stateless | Typically Stateless | Supports stateful resources |
-| **Best For** | Internal application logic | External web services | Composable agent ecosystems |
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Why choose MCP?
-MCP is preferable when you want to build a **reusable tool catalog** that can be consumed by different agents or platforms (e.g., Azure AI Foundry, Claude Desktop) without writing custom integration code for every tool. It decouples the tool execution environment from the agent's reasoning environment.
+2. **Run the server**:
+   The server defaults to `stdio` transport, suitable for integration with MCP clients.
+   ```bash
+   python src/server.py
+   ```
 
-### Why choose OpenAPI?
-OpenAPI is better for legacy integrations or when you already have a robust HTTP/REST infrastructure with established OAuth2/Security patterns.
+3. **Inspect the server**:
+   FastMCP provides built-in inspection capabilities (requires `mcp` CLI):
+   ```bash
+   mcp dev src/server.py
+   ```
 
-### Why choose Direct Function Calling?
-Direct calling is best for high-performance, local-only operations that don't need to be exposed outside a single codebase.
+## Environment Variables
+This module does not require any environment variables for its default configuration.
 
-## Local Execution
-
-### Prerequisites
-- Python 3.10+
-- `fastmcp` library
-
-### Run the server
-The server uses `stdio` (standard input/output) as its transport mechanism.
+## Validation Commands
+Run style and logic checks:
 
 ```bash
-python3 src/server.py
+# Style check
+ruff check src/ tests/
+
+# Format check
+ruff format --check src/ tests/
+
+# Run tests
+pytest tests/
 ```
 
-### Validation
-You can verify the tool definitions by running the server with the help flag:
+## Azure Hosting Notes
+This specific module is a **local-only reference**. It uses the `stdio` transport which is not directly compatible with Azure's HTTP-based serverless hosting without a transport bridge.
 
-```bash
-python3 src/server.py --help
-```
+For Azure-native MCP hosting patterns (using SSE), refer to `building-blocks/mcp/azure-functions-mcp-endpoint/`.
 
-## Security & Customer Safety
-- **Read-Only**: This reference contains only read-only tools.
-- **Bounded Inputs**: No external inputs are accepted in this minimal reference to maximize safety.
-- **No Secrets**: No API keys or connection strings are stored or logged in this reference.
+## Security Notes
+- **Read-Only**: The `get_system_status` tool is strictly read-only and returns static data.
+- **No Mutations**: No tools are provided for system modification.
+- **No Secrets**: This reference does not handle or store secrets, tokens, or PII.
+- **Process Isolation**: The server runs as a local process; ensure the parent agent runtime is trusted.
 
-## Deployment / IaC Decision
-**Status: No-IaC (Local Reference Only)**
+## Cost & Ops Trade-offs
+- **Cost**: Zero (local execution).
+- **Ops**: Low complexity, but manual lifecycle management. It does not benefit from Azure's managed observability or scaling.
 
-This module is a local-first pattern. Deployment to Azure (e.g., via Azure Functions) requires different transport negotiation (SSE). Reference patterns for Azure-hosted MCP can be found in `building-blocks/mcp/azure-functions-mcp-endpoint/`.
+## Known Limits
+- **Transport**: Supports `stdio` only.
+- **Concurrency**: Limited by the local Python runtime environment.
+- **Stateless**: Does not persist state between requests or restarts.

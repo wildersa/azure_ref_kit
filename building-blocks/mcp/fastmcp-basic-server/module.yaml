@@ -1,23 +1,25 @@
 name: fastmcp-basic-server
 type: building-block
 category: mcp
-status: implemented
+status: stable
 purpose: Minimal local MCP server reference using FastMCP to demonstrate the protocol boundary.
 inputs: []
 outputs:
-  - name: get_system_status_response
+  - name: api_endpoint
     type: string
-    description: "Response from the system status tool. Example: 'Status: Operational. ...'"
-    contract: "read-only"
+    description: "Standardized output name for hosting blocks, set to 'local' for this reference."
 dependencies:
   - python >= 3.10
-  - fastmcp >= 3.4.3
+  - fastmcp >= 3.4.4
 azure_resources: []
 contracts:
+  reads: []
+  writes: []
   emits:
     - type: mcp-tool
       name: get_system_status
       description: Returns the general operational status of the MCP server.
 customer_safe_boundary:
   policy: "Read-only access to mock system metadata. No access to real PII, secrets, or mutation operations."
-  enforcement: "FastMCP decorator-based tool registration and no-op implementation in server.py."
+  enforcement: "FastMCP decorator-based tool registration and static implementation in server.py."
+  security_boundary: "Local process boundary using stdio transport. No network ingress."

@@ -10,6 +10,9 @@ mcp = FastMCP("fastmcp-basic-server")
 def get_system_status() -> str:
     """
     Returns the general operational status of the MCP server.
+
+    This is a safe, read-only tool that returns static demo data only.
+    It does not accept any inputs and does not access any system resources.
     """
     return "Status: Operational. FastMCP Basic Server is ready to handle tool requests via stdio."
 
