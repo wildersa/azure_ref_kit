@@ -14,9 +14,17 @@ def log_info(message: str):
 def validate_solution(solution_path: str) -> bool:
     valid = True
     solution_yaml_path = os.path.join(solution_path, "solution.yaml")
+    readme_path = os.path.join(solution_path, "README.md")
 
     if not os.path.exists(solution_yaml_path):
         log_error(f"Missing solution.yaml in {solution_path}")
+        valid = False
+
+    if not os.path.exists(readme_path):
+        log_error(f"Missing README.md in {solution_path}")
+        valid = False
+
+    if not valid:
         return False
 
     try:
@@ -62,16 +70,17 @@ def validate_solution(solution_path: str) -> bool:
             log_error(f"Missing runtime-map.md in {solution_path} (required for status '{status}')")
             valid = False
 
-    if status == "executable":
-        package_map_path = os.path.join(solution_path, "deploy", "package-map.yaml")
-        if not os.path.exists(package_map_path):
-            log_error(f"Missing deploy/package-map.yaml in {solution_path} (required for status 'executable')")
-            valid = False
-        else:
-            try:
-                with open(package_map_path, 'r') as f:
-                    pkg_config = yaml.safe_load(f)
+    # Check package-map.yaml whenever it is present
+    package_map_path = os.path.join(solution_path, "deploy", "package-map.yaml")
+    if os.path.exists(package_map_path):
+        try:
+            with open(package_map_path, 'r') as f:
+                pkg_config = yaml.safe_load(f)
 
+            if not pkg_config or not isinstance(pkg_config, dict) or "artifacts" not in pkg_config:
+                log_error(f"Malformed deploy/package-map.yaml in {solution_path}: Missing 'artifacts' root.")
+                valid = False
+            else:
                 artifacts = pkg_config.get("artifacts", [])
                 for art in artifacts:
                     sources = art.get("sources", [])
@@ -79,10 +88,14 @@ def validate_solution(solution_path: str) -> bool:
                         if not os.path.exists(src):
                             log_error(f"Source path in package-map.yaml does not exist: {src} (referenced in {package_map_path})")
                             valid = False
-            except Exception as e:
-                log_error(f"Failed to parse deploy/package-map.yaml in {solution_path}: {e}")
-                valid = False
+        except Exception as e:
+            log_error(f"Failed to parse deploy/package-map.yaml in {solution_path}: {e}")
+            valid = False
+    elif status == "executable":
+        log_error(f"Missing deploy/package-map.yaml in {solution_path} (required for status 'executable')")
+        valid = False
 
+    if status == "executable":
         infra_path = os.path.join(solution_path, "infra", "terraform")
         if not os.path.exists(infra_path):
             log_error(f"Missing infra/terraform/ in {solution_path} (required for status 'executable')")

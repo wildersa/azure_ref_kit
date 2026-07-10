@@ -19,6 +19,9 @@ def temp_solution(tmp_path):
         with open(sol_dir / "solution.yaml", "w") as f:
             yaml.dump(config, f)
 
+        # All solutions require README.md
+        (sol_dir / "README.md").touch()
+
         if files:
             for file_path in files:
                 full_path = sol_dir / file_path
@@ -36,9 +39,15 @@ def test_validate_scaffold_minimal(temp_solution):
     path = temp_solution("scaffold-sol", "scaffold")
     assert validate_solution(path) is True
 
+def test_validate_scaffold_missing_readme(temp_solution):
+    path = temp_solution("no-readme", "scaffold")
+    os.remove(os.path.join(path, "README.md"))
+    assert validate_solution(path) is False
+
 def test_validate_scaffold_missing_yaml(tmp_path):
     sol_dir = tmp_path / "missing-yaml"
     sol_dir.mkdir()
+    (sol_dir / "README.md").touch()
     assert validate_solution(str(sol_dir)) is False
 
 def test_validate_partial_missing_runtime_map(temp_solution):
@@ -105,6 +114,7 @@ def test_validate_package_map_sources(temp_solution, tmp_path):
         yaml.dump(pkg_config, f)
 
     # Still need other executable files
+    (sol_dir / "README.md").touch()
     (sol_dir / "runtime-map.md").touch()
     (sol_dir / "infra/terraform").mkdir(parents=True)
     (sol_dir / "tests").mkdir()
@@ -137,8 +147,18 @@ def test_validate_package_map_source_missing(temp_solution, tmp_path):
     with open(pkg_dir / "package-map.yaml", "w") as f:
         yaml.dump(pkg_config, f)
 
+    (sol_dir / "README.md").touch()
     (sol_dir / "runtime-map.md").touch()
     (sol_dir / "infra/terraform").mkdir(parents=True)
     (sol_dir / "tests").mkdir()
 
     assert validate_solution(str(sol_dir)) is False
+
+def test_validate_malformed_package_map_in_partial(temp_solution, tmp_path):
+    path = temp_solution("partial-malformed-pkg", "partial", files=["runtime-map.md"])
+    pkg_dir = os.path.join(path, "deploy")
+    os.makedirs(pkg_dir)
+    with open(os.path.join(pkg_dir, "package-map.yaml"), "w") as f:
+        yaml.dump({"not_artifacts": []}, f)
+
+    assert validate_solution(path) is False
