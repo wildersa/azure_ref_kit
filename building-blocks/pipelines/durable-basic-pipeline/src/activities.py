@@ -8,9 +8,7 @@ def update_pipeline_run_status(status_data: dict):
     In a real implementation, this would write to a database (e.g., Cosmos DB).
     Follows shared/contracts/pipeline-run.schema.json
     """
-    run_id = status_data.get("id")
-    status = status_data.get("status")
-    logging.info(f"Activity: Updating PipelineRun {run_id} to {status}")
+    logging.info("Activity: Updating pipeline run status.")
 
     # Safety check: Ensure no internal Azure IDs or secrets are in the business_summary or friendly_error
     # This is a reference implementation, so we assume the input is already sanitized
@@ -25,7 +23,7 @@ def ocr_document_intelligence(input_data: dict):
     Follows shared/contracts/pipeline-step.schema.json behavior.
     """
     run_id = input_data.get("run_id")
-    logging.info(f"Activity: Starting OCR for RunID: {run_id}")
+    logging.info("Activity: Starting OCR process.")
 
     # Mock success
     return {
@@ -44,7 +42,7 @@ def field_validation_worker(input_data: dict):
     Follows shared/contracts/pipeline-step.schema.json behavior.
     """
     run_id = input_data.get("run_id")
-    logging.info(f"Activity: Starting Field Validation for RunID: {run_id}")
+    logging.info("Activity: Starting field validation.")
 
     # Mock success
     return {
@@ -63,7 +61,7 @@ def final_result_publisher(input_data: dict):
     Mock final result publisher activity.
     """
     run_id = input_data.get("run_id")
-    logging.info(f"Activity: Finalizing publication for RunID: {run_id}")
+    logging.info("Activity: Finalizing publication.")
 
     # Mock success
     return {

@@ -36,7 +36,7 @@ async def http_start(req: func.HttpRequest, client: df.DurableOrchestrationClien
         input_data = None
 
     instance_id = await client.start_new(function_name, client_input=input_data)
-    logging.info(f"Started orchestration with ID = '{instance_id}'.")
+    logging.info("Orchestration started.")
     return client.create_check_status_response(req, instance_id)
 
 
