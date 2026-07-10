@@ -1,0 +1,17 @@
+artifacts:
+  - name: pipeline_function_app
+    type: azure_function
+    sources:
+      - building-blocks/pipelines/durable-basic-pipeline/
+      - building-blocks/functions/blob-trigger-start-pipeline/
+      - building-blocks/functions/ocr-document-intelligence/
+      - building-blocks/functions/field-validation-worker/
+      - building-blocks/functions/final-result-publisher/
+  - name: api_function_app
+    type: azure_function
+    sources:
+      - building-blocks/functions/portal-api-functions/
+  - name: portal
+    type: static_web_app
+    sources:
+      - building-blocks/portals/static-status-portal/

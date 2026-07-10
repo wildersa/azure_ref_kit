@@ -20,19 +20,26 @@ This solution is a composition of several building blocks. See the [Composition 
 6. **Monitoring**: The customer monitors progress through a Static Web Apps portal.
 7. **Assistance**: A Pipeline Assistant (Azure AI Foundry Agent) provides grounded answers to customer queries using the status and artifact data.
 
-## Composed Building Blocks
+## Composition & Runtime Map
 
-- [Static Status Portal](../../building-blocks/portals/static-status-portal/): The React-based frontend.
-- [Portal API Functions](../../building-blocks/functions/portal-api-functions/): Backend API for the portal.
-- [Blob Trigger](../../building-blocks/functions/blob-trigger-start-pipeline/): Entrypoint for new documents.
-- [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results.
-- [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration.
-- [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker.
-- [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker.
-- [Final Result Publisher](../../building-blocks/functions/final-result-publisher/): Finalizes and publishes safe results.
-- [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction.
-- [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing.
-- [Cost Ledger Capture](../../building-blocks/observability/cost-ledger-capture/): Internal cost estimate capture.
+This solution is composed of multiple building blocks that are packaged into specific Azure runtime targets.
+
+- **[Runtime Map](./runtime-map.md)**: Detailed breakdown of runtime targets, entrypoints, and required settings.
+- **[Package Map](./deploy/package-map.yaml)**: Defines how source building blocks map to deployable artifacts.
+
+### Composed Building Blocks
+
+- [Static Status Portal](../../building-blocks/portals/static-status-portal/): The React-based frontend (Status: Scaffold).
+- [Portal API Functions](../../building-blocks/functions/portal-api-functions/): Backend API for the portal (Status: Implemented).
+- [Blob Trigger](../../building-blocks/functions/blob-trigger-start-pipeline/): Entrypoint for new documents (Status: Implemented).
+- [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results (Status: Scaffold).
+- [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration (Status: Implemented).
+- [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker (Status: Implemented).
+- [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker (Status: Implemented).
+- [Final Result Publisher](../../building-blocks/functions/final-result-publisher/): Finalizes and publishes safe results (Status: Implemented).
+- [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction (Status: Implemented).
+- [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing (Status: Scaffold).
+- [Cost Ledger Capture](../../building-blocks/observability/cost-ledger-capture/): Internal cost estimate capture (Status: Scaffold).
 
 ## Service-Level Diagram
 
@@ -117,12 +124,26 @@ Enforcement is performed at the [Portal API Functions](../../building-blocks/fun
 
 The solution provides a [Terraform foundation](./infra/terraform/) for provisioning these resources.
 
+## Packaging & Deployment
+
+To package the solution artifacts:
+```bash
+./deploy/package.sh
+```
+
+To deploy the infrastructure and application:
+```bash
+./deploy/deploy.sh
+```
+
+Refer to the [Solution Composition Contract](../../docs/solution-composition-contract.md) for details on the standard packaging and deployment model.
+
 ## Local / Demo Flow
 
-1. Use [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local) to run the Functions project.
-2. Use Azurite for local storage emulation.
-3. Use the Static Web Apps CLI (`swa start`) to run the portal locally against the Functions API.
-4. Upload a sample file to the local `input` container to trigger the pipeline.
+1. **Prerequisites**: [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local), [Azurite](https://github.com/azure/azurite), and [SWA CLI](https://github.com/Azure/static-web-apps-cli).
+2. **Start Services**: Run the `api_function_app` and `pipeline_function_app` using Core Tools.
+3. **Run Portal**: Use `swa start` in the `building-blocks/portals/static-status-portal/` directory.
+4. **Trigger**: Upload a file to the local `input` container in Azurite to trigger the processing pipeline.
 
 ## Validation
 

@@ -11,7 +11,12 @@ def test_solution_yaml_paths_exist():
         config = yaml.safe_load(f)
 
     # Check building_blocks
-    for bb_path in config.get("building_blocks", []):
+    for block in config.get("building_blocks", []):
+        if isinstance(block, str):
+            bb_path = block
+        else:
+            bb_path = block.get("path")
+
         full_path = REPO_ROOT / bb_path
         assert full_path.exists(), f"Building block path does not exist: {bb_path}"
 
