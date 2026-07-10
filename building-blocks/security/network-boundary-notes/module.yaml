@@ -9,6 +9,13 @@ azure_resources: []
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
+customer_safe_boundary:
+  forbid:
+    - "Internal Managed Identity Object IDs"
+    - "Tenant IDs"
+    - "Subscription IDs"
+    - "Raw Access Tokens"
+    - "Private IP Addresses"
 contracts:
   reads: []
   writes: []
