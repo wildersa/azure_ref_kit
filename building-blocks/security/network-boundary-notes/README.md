@@ -97,7 +97,9 @@ To maintain a secure customer-facing surface, the following technical details mu
 - **Private Endpoint**: Storage account with `public_network_access_enabled = false` and a Private Endpoint in the VNet.
 
 ### 3. Key Vault and Application Insights Boundaries
-- **Key Vault**: Secure secrets using a Private Endpoint. For serverless compute (Functions), ensure `vnet_route_all_enabled = true` is set to force Key Vault reference lookups through the VNet integration.
+- **Key Vault**: Secure secrets using a Private Endpoint.
+    - **Flex Consumption**: All traffic is routed through the VNet by default; no additional configuration is required for Key Vault reference lookups.
+    - **Premium/Dedicated Plans**: Ensure `vnet_route_all_enabled = true` is set in the site configuration to force Key Vault reference lookups through the VNet integration.
 - **Application Insights**: Use **Azure Monitor Private Link Scope (AMPLS)** to ensure telemetry stays within the private network boundary. If AMPLS is not used, ensure that the ingestion endpoints are only reachable via the Microsoft backbone.
 
 ## Customer-Safe Network/Status Checklist
