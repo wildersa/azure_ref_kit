@@ -43,3 +43,6 @@ local-runtimes/vlm/models/
 *.gguf
 *.safetensors
 *.bin
+
+# Build artifacts
+dist/

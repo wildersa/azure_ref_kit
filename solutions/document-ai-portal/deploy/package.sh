@@ -3,15 +3,19 @@ set -e
 
 # Package script for Document AI Portal
 # This script follows the global solution-composition-contract.
-# It uses deploy/package-map.yaml to assemble building blocks into deployable artifacts.
+# It uses deploy/package-map.yaml via deploy/package.py to assemble building blocks into deployable artifacts.
 
-echo "Packaging Document AI Portal..."
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+PYTHON_SCRIPT="$SCRIPT_DIR/package.py"
 
-# 1. Read package-map.yaml (In a real implementation, this would be a shared tool)
-# 2. For each artifact in package-map.yaml:
-#    - Create staging area
-#    - Copy sources
-#    - Perform language-specific build (e.g., pip install, npm build)
-#    - Create .zip or directory artifact in solutions/document-ai-portal/dist/
+echo "Starting packaging for Document AI Portal..."
 
-echo "NOTE: This is a placeholder script. Real packaging logic is handled by the global CI/CD templates."
+if [ ! -f "$PYTHON_SCRIPT" ]; then
+    echo "ERROR: Packaging script not found at $PYTHON_SCRIPT"
+    exit 1
+fi
+
+# Run the python packaging logic
+python3 "$PYTHON_SCRIPT"
+
+echo "Packaging process finished successfully."

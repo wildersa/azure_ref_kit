@@ -53,6 +53,9 @@ This app handles the asynchronous processing of documents.
 | `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT` | Endpoint for the OCR service. |
 | `AZURE_STORAGE_ACCOUNT_URL` | Base URL for artifact storage access. |
 
+### Packaging Flow
+The `deploy/package.sh` script aggregates all required building block source folders into `dist/pipeline_function_app/`. This staging area is ready for Zip deployment or local execution.
+
 ---
 
 ## 2. Portal API Function App (`api_function_app`)
@@ -78,6 +81,9 @@ The API acts as the primary enforcement point. It reads raw technical data from 
 |---------|-------------|
 | `AZURE_STORAGE_ACCOUNT_URL` | Access to status tables and artifact blobs. |
 
+### Packaging Flow
+The `deploy/package.sh` script stages the `portal-api-functions` building block into `dist/api_function_app/`.
+
 ---
 
 ## 3. Portal Static Web App (`portal_static_web_app`)
@@ -97,6 +103,9 @@ The frontend UI for end-users.
 # From the portal directory
 swa start http://localhost:5173 --api-location http://localhost:7071
 ```
+
+### Packaging Flow
+The `deploy/package.sh` script performs a deterministic local assembly of the portal building block. It does not perform an NPM build; it stages the source files into `dist/portal/` for deployment.
 
 ---
 

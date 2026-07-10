@@ -126,14 +126,15 @@ The solution provides a [Terraform foundation](./infra/terraform/) for provision
 
 ## Packaging & Deployment
 
-To package the solution artifacts:
+To package the solution artifacts locally:
 ```bash
-./deploy/package.sh
+bash solutions/document-ai-portal/deploy/package.sh
 ```
+The packaging script assembles building blocks into a local `dist/` directory, following the `deploy/package-map.yaml` definition. It produces staging directories for each runtime target, including an `artifact-manifest.json` and a global `package-manifest.json`.
 
 To deploy the infrastructure and application:
 ```bash
-./deploy/deploy.sh
+bash solutions/document-ai-portal/deploy/deploy.sh
 ```
 
 Refer to the [Solution Composition Contract](../../docs/solution-composition-contract.md) for details on the standard packaging and deployment model.
