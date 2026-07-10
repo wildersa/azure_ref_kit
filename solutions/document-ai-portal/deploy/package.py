@@ -27,14 +27,18 @@ def load_package_map():
     with open(PACKAGE_MAP_PATH, "r") as f:
         return yaml.safe_load(f)
 
-def copy_source(source_rel_path, target_dir):
-    source_full_path = REPO_ROOT / source_rel_path
+def copy_source(source_rel_path, artifact_dir):
+    source_full_path = (REPO_ROOT / source_rel_path).resolve()
     if not source_full_path.exists():
         raise FileNotFoundError(f"Source path does not exist: {source_full_path}")
 
-    logger.info(f"  Copying {source_rel_path} to {target_dir.relative_to(SOLUTION_ROOT)}")
+    # Use the building block directory name as a subdirectory to avoid collisions
+    # This ensures that files like function_app.py from different BBs don't overwrite each other.
+    source_name = source_full_path.name
+    target_dir = artifact_dir / source_name
 
-    # We want to copy the contents of the building block to the target directory
+    logger.info(f"  Assembling {source_rel_path} into {target_dir.relative_to(SOLUTION_ROOT)}")
+
     if source_full_path.is_dir():
         # Exclude common non-runtime files
         exclude_patterns = shutil.ignore_patterns(
@@ -42,6 +46,7 @@ def copy_source(source_rel_path, target_dir):
         )
         shutil.copytree(source_full_path, target_dir, dirs_exist_ok=True, ignore=exclude_patterns)
     else:
+        target_dir.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source_full_path, target_dir)
 
 def package_solution():

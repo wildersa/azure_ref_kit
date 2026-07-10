@@ -130,7 +130,7 @@ To package the solution artifacts locally:
 ```bash
 bash solutions/document-ai-portal/deploy/package.sh
 ```
-The packaging script assembly building blocks into a local `dist/` directory, following the `deploy/package-map.yaml` definition. It produces staging directories for each runtime target, including an `artifact-manifest.json` and a global `package-manifest.json`.
+The packaging script assembles building blocks into a local `dist/` directory, following the `deploy/package-map.yaml` definition. It produces staging directories for each runtime target, including an `artifact-manifest.json` and a global `package-manifest.json`.
 
 To deploy the infrastructure and application:
 ```bash

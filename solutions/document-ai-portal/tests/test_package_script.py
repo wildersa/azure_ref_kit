@@ -47,9 +47,13 @@ def test_package_script_execution():
             art_manifest = json.load(f)
             assert art_manifest["name"] == art_name
 
-    # Verify some content from one of the artifacts
-    # pipeline_function_app should have function_app.py from one of its sources
-    # Note: our copy_source copies contents, so if multiple sources have function_app.py, they might overwrite.
-    # In this specific solution, several BBs are functions, they all have function_app.py at their root.
-    # The last one wins. This is expected behavior for this simple script.
-    assert (DIST_DIR / "pipeline_function_app" / "function_app.py").exists()
+            # Verify that sources are staged in subdirectories
+            for source_rel_path in art_manifest["sources"]:
+                source_name = Path(source_rel_path).name
+                assert (art_dir / source_name).exists(), f"Source subdirectory {source_name} was not created in {art_name}"
+                assert (art_dir / source_name).is_dir(), f"Source {source_name} should be a directory in {art_name}"
+
+    # Verify specific content from one of the artifacts
+    # pipeline_function_app should have blob-trigger-start-pipeline/function_app.py
+    assert (DIST_DIR / "pipeline_function_app" / "blob-trigger-start-pipeline" / "function_app.py").exists()
+    assert (DIST_DIR / "pipeline_function_app" / "durable-basic-pipeline" / "function_app.py").exists()
