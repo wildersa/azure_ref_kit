@@ -118,9 +118,10 @@ This module uses Azure Key Vault to manage sensitive values.
 ```
 
 ### Snippet: Local Development (for README.md)
-```markdown
+````markdown
 ### Local Development
 To run this module locally, create a `local.settings.json` (for Functions) or `.env` (for APIs) using placeholders:
+
 ```json
 {
   "Values": {
@@ -128,20 +129,27 @@ To run this module locally, create a `local.settings.json` (for Functions) or `.
   }
 }
 ```
+
 > [!WARNING]
 > Never commit real secrets to source control.
-```
+````
 
 ### Snippet: Customer-Safe Redaction
 ```python
 import os
 import logging
+import uuid
 
-def get_safe_status(internal_error):
-    # Mapping sensitive errors to customer-safe messages
+def get_safe_status(error_status_code):
+    # Generate a correlation ID for internal tracking
+    correlation_id = str(uuid.uuid4())
+
+    # Log only safe, non-sensitive metadata internally
     # Reference: building-blocks/security/customer-safe-status-boundary/
-    logging.error(f"Internal technical error: {internal_error}") # Logged to App Insights (Internal)
-    return "The service is currently unavailable. Please try again later." # Returned to Customer
+    logging.error(f"Status: {error_status_code} | CorrelationID: {correlation_id}")
+
+    # Return a friendly, business-level message to the customer
+    return f"The service is currently unavailable (ID: {correlation_id}). Please try again later."
 ```
 
 ### Snippet: Terraform Outputs
