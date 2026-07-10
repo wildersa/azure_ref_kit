@@ -132,10 +132,11 @@ bash solutions/document-ai-portal/deploy/package.sh
 ```
 The packaging script assembles building blocks into a local `dist/` directory, following the `deploy/package-map.yaml` definition. It produces staging directories for each runtime target, including an `artifact-manifest.json` and a global `package-manifest.json`.
 
-To deploy the infrastructure and application:
+To run the deployment preflight:
 ```bash
 bash solutions/document-ai-portal/deploy/deploy.sh
 ```
+The `deploy.sh` script performs a non-destructive local preflight that verifies prerequisites, package artifacts in `dist/`, and validates Terraform files when available. It provides explicit "Next Steps" for manual or CI/CD-driven deployment.
 
 Refer to the [Solution Composition Contract](../../docs/solution-composition-contract.md) for details on the standard packaging and deployment model.
 
