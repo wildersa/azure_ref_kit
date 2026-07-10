@@ -1,0 +1,7 @@
+{
+  "business_status": "operational",
+  "service_health": "healthy",
+  "active_regions": ["eastus", "westus2"],
+  "last_updated": "2024-03-20T12:00:00Z",
+  "environment": "production-reference"
+}

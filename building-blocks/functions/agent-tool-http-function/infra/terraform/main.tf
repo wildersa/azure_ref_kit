@@ -45,9 +45,11 @@ resource "azurerm_function_app_flex_consumption" "function" {
   runtime_name    = "python"
   runtime_version = "3.11"
 
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.storage.primary_blob_endpoint}deploymentpackage"
-  storage_authentication_type = "SystemAssignedIdentity"
+  storage {
+    name                = "AzureWebJobsStorage"
+    storage_account_id  = azurerm_storage_account.storage.id
+    authentication_type = "SystemAssignedIdentity"
+  }
 
   identity {
     type = "SystemAssigned"
@@ -58,6 +60,7 @@ resource "azurerm_function_app_flex_consumption" "function" {
   app_settings = {
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.storage.name
     "AzureWebJobsStorage__credential"  = "managedidentity"
+    # Note: APPLICATIONINSIGHTS_CONNECTION_STRING would be added here for observability
   }
 
   tags = var.tags
