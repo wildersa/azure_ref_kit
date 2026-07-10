@@ -1,0 +1,41 @@
+name: key-vault-secret-handling
+type: security
+category: policy
+status: active
+purpose: Reference guidance for secure Key Vault secret handling using Managed Identity and secret references.
+description: >
+  This building block provides the repository standard for managing secrets without
+  exposing them in code, logs, or customer-facing interfaces. It enforces an identity-first
+  posture and leverages platform-level Key Vault references.
+inputs: []
+outputs: []
+dependencies:
+  - name: azure-keyvault-secrets
+    type: sdk
+    version: "^4.7.0"
+  - name: azure-identity
+    type: sdk
+    version: "^1.12.0"
+azure_resources:
+  - Azure Key Vault
+  - Managed Identity
+security_boundary:
+  policy: "Identity-first secret access via Key Vault references"
+  forbid_wildcards: true
+  forbid_secrets: true
+  recommended_roles:
+    - role: "Key Vault Secrets User"
+      description: "Required for the service identity to resolve secret references at runtime."
+customer_safe_boundary:
+  forbid:
+    - "Raw Secret Values"
+    - "Key Vault Secret URIs"
+    - "Internal Managed Identity Object IDs"
+    - "Tenant IDs"
+    - "Subscription IDs"
+    - "Private IP Addresses"
+    - "Raw Provider Payloads"
+contracts:
+  reads: []
+  writes: []
+  emits: []
