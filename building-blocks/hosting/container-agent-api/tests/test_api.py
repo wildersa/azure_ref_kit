@@ -1,13 +1,28 @@
 from fastapi.testclient import TestClient
 from src.main import app
 
-client = TestClient(app)
+client = TestClient(app, raise_server_exceptions=False)
 
 
 def test_health_endpoint():
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"
+
+
+def test_agent_request_valid():
+    payload = {"request_type": "summarize", "payload": "Helpful content"}
+    response = client.post("/agent/request", json=payload)
+    assert response.status_code == 202
+    data = response.json()
+    assert data["status"] == "accepted"
+    assert "summary" in data
+
+
+def test_agent_request_invalid():
+    payload = {"request_type": "summarize"}  # Missing payload
+    response = client.post("/agent/request", json=payload)
+    assert response.status_code == 422
 
 
 def test_status_endpoint_valid():
@@ -35,3 +50,27 @@ def test_status_endpoint_too_long():
     task_id = "a" * 65
     response = client.get(f"/status/{task_id}")
     assert response.status_code == 422
+
+
+def test_error_boundary_logs_safe_and_returns_500(caplog):
+    # Force an error by patching a dependency or using a route that fails
+    # Since it's a small app, we can mock get_status to raise an exception
+    from unittest.mock import patch
+
+    with patch("src.main.handle_get_status") as mock_handle:
+        mock_handle.side_effect = Exception("Sensitive database error: user=admin")
+
+        response = client.get("/status/test-123")
+
+        assert response.status_code == 500
+        data = response.json()
+        assert data["error_code"] == "INTERNAL_ERROR"
+        assert (
+            data["friendly_message"]
+            == "An unexpected error occurred while processing the agent request."
+        )
+
+        # Verify the sensitive info is NOT in the logs if we were checking specific strings,
+        # but our handler specifically logs a generic message.
+        assert "An unexpected error occurred in the agent API" in caplog.text
+        assert "Sensitive database error" not in caplog.text

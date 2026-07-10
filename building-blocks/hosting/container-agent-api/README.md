@@ -153,3 +153,20 @@ terraform validate
 - **Port Limits:** Azure App Service generally expects only one exposed port (defaults to 80 or 8080).
 - **Ephemeral Storage:** Local disk changes are lost when the container restarts. Use Azure Files or Blob Storage for persistence.
 - **Registry Dependency:** Requires an Azure Container Registry (ACR) or similar for deployment.
+
+## Deployment / IaC Decision
+
+This building block **includes module-local Terraform** to demonstrate the recommended Infrastructure-as-Code (IaC) pattern for Azure Container Apps.
+
+The decision to provide IaC is based on:
+1. **Azure Native Best Practices:** Showing the correct configuration for Azure Container Apps, including serverless scaling and managed identity.
+2. **Security-First Setup:** Explicitly demonstrating a system-assigned managed identity and secure ingress configuration.
+3. **Repeatability:** Ensuring developers can provision the exact environment required to host this containerized agent API reference.
+
+## Microsoft Documentation
+
+- [Azure Container Apps overview](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+- [Deploy an application to Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/get-started)
+- [Comparing Azure container options](https://learn.microsoft.com/azure/developer/python/containers-in-azure-overview-python)
+- [Deploy a containerized Flask or FastAPI web app on Azure App Service](https://learn.microsoft.com/azure/developer/python/tutorial-containerize-simple-web-app-for-app-service)
+- [Terraform on Azure](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
