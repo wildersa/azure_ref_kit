@@ -1,5 +1,5 @@
 name: webapp-agent-api
-type: hosting-adapter
+type: building-block
 category: hosting
 status: stable
 purpose: Reference for hosting the containerized agent API on Azure App Service.

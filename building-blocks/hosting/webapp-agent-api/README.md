@@ -6,14 +6,14 @@ Reference building block for hosting a containerized agent API on Azure App Serv
 
 This module provides a hosting adapter for deploying the [Container-hosted Agent API](../container-agent-api/README.md) to Azure App Service (Web App for Containers). It demonstrates how to provision the smallest Linux App Service plan and configuration needed to host an existing container image without duplicating application logic.
 
-## When to Use
+## When to Use Web Apps
 
 - **Managed Platform:** You want the simplicity of a managed platform with the control of a custom container.
 - **Persistent Connections:** You require support for WebSockets or long-lived streaming responses (common in AI agents).
 - **Stability:** You prefer the mature hosting environment and features of App Service (e.g., Staging Slots, EasyAuth).
 - **Long-Running Tasks:** The workload may exceed the default timeouts of serverless functions.
 
-## When NOT to Use
+## When NOT to Use Web Apps
 
 - **Sparse Traffic:** If the API is rarely used and can tolerate cold starts, [Azure Functions](../../functions/agent-tool-http-function/README.md) may be more cost-effective.
 - **Complex Orchestration:** For a large collection of interdependent microservices, [Azure Container Apps](../container-agent-api/README.md) or Azure Kubernetes Service (AKS) might be better.
