@@ -21,6 +21,9 @@ inputs:
   - name: container_image
     type: string
     description: The container image URI to deploy.
+  - name: use_managed_identity_for_registry
+    type: boolean
+    description: Whether to use the system-assigned identity to pull the container image (set to true for private ACR).
   - name: listen_port
     type: integer
     description: The port the container listens on (default 80 or 8080).
@@ -31,6 +34,9 @@ outputs:
   - name: webapp_name
     type: string
     description: The name of the deployed web app.
+  - name: resource_group_name
+    type: string
+    description: The name of the resource group.
   - name: api_endpoint
     type: string
     description: The public URL of the hosted API.

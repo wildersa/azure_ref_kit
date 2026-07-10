@@ -15,6 +15,12 @@ variable "container_image" {
   description = "The container image to deploy (e.g., mcr.microsoft.com/azuredocs/containerapps-helloworld:latest or <registry>.azurecr.io/agent-api:v1)"
 }
 
+variable "use_managed_identity_for_registry" {
+  type        = bool
+  description = "Whether to use the system-assigned managed identity to pull the container image from the registry."
+  default     = false
+}
+
 variable "listen_port" {
   type        = number
   description = "The port the container listens on."

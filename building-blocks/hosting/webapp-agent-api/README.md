@@ -101,7 +101,7 @@ ls -R building-blocks/hosting/webapp-agent-api/ | grep -E "src/|tests/|schemas/|
 ## Azure Hosting Notes
 
 - **Managed Identity:** This module uses a **System-Assigned Managed Identity**.
-- **Private Registry Pulls:** If pulling from a private registry (like Azure Container Registry), you must grant the Web App's Managed Identity the `AcrPull` role on the registry. Registry credentials should not be hardcoded.
+- **Private Registry Pulls:** To pull from a private registry (like Azure Container Registry) using Managed Identity, set `use_managed_identity_for_registry = true` and grant the Web App's Managed Identity the `AcrPull` role on the registry. Registry credentials should not be hardcoded.
 - **HTTPS Only:** The Web App is configured to enforce HTTPS-only traffic.
 
 ## Security Notes
