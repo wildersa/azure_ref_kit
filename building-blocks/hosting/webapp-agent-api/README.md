@@ -1,69 +1,77 @@
-# Web App Hosted Agent API (Web App for Containers)
+# Web App Hosted Agent API
 
-Reference building block defining when and how to host an agent-facing API on Azure App Service using custom containers.
+Reference building block for hosting a containerized agent API on Azure App Service.
 
 ## Purpose
 
-This building block provides a standard hosting contract for agentic workloads that benefit from the stability and features of Azure App Service. It specifically demonstrates the **Web App for Containers** pattern, allowing for a secure and observable interface while reusing the API implementation from the [container-hosted reference](../container-agent-api/README.md) without duplicating code.
+This module provides a hosting adapter for deploying the [Container-hosted Agent API](../container-agent-api/README.md) to Azure App Service (Web App for Containers). It demonstrates how to provision the smallest Linux App Service plan and configuration needed to host an existing container image without duplicating application logic.
 
-## When to Use Web Apps (Containers)
+## When to Use
 
-- **Managed Container Platform:** You want the simplicity of App Service but need the control of a custom container.
-- **Reuse Existing Containers:** You already have a containerized agent API (like the one in `container-agent-api`) and want to host it on a mature PaaS.
-- **Web Frameworks:** Your agent API is built using standard Python web frameworks like FastAPI, Django, or Flask and packaged as a container.
-- **Long-Running Requests:** The agent task may exceed the default timeout limits of Azure Functions (typically 10 minutes).
-- **Persistent Connections:** You need support for WebSockets or long-lived streaming responses.
-- **Feature Rich Hosting:** You want to leverage App Service features like Staging Slots, easy integrated authentication (EasyAuth), and simple "Always On" capability to avoid cold starts.
+- **Managed Platform:** You want the simplicity of a managed platform with the control of a custom container.
+- **Persistent Connections:** You require support for WebSockets or long-lived streaming responses (common in AI agents).
+- **Stability:** You prefer the mature hosting environment and features of App Service (e.g., Staging Slots, EasyAuth).
+- **Long-Running Tasks:** The workload may exceed the default timeouts of serverless functions.
 
-## When NOT to Use Web Apps
+## When NOT to Use
 
-- **Complex System Dependencies:** Your agent requires OS-level libraries or non-Python binaries not included in the standard App Service Python image. Use [Container-hosted Agent API](../container-agent-api/README.md) instead.
-- **Event-Driven / Sparse Traffic:** If the API is rarely called and can tolerate cold starts, [Azure Functions](../../functions/agent-tool-http-function/README.md) may be more cost-effective due to scale-to-zero.
-- **Microservices Orchestration:** If you are deploying a large collection of interdependent microservices, Azure Container Apps might be a better fit.
+- **Sparse Traffic:** If the API is rarely used and can tolerate cold starts, [Azure Functions](../../functions/agent-tool-http-function/README.md) may be more cost-effective.
+- **Complex Orchestration:** For a large collection of interdependent microservices, [Azure Container Apps](../container-agent-api/README.md) or Azure Kubernetes Service (AKS) might be better.
 
 ## Comparison with Other Hosting Options
 
-| Feature | Azure Functions | Web App (Native) | Web App for Containers |
-| :--- | :--- | :--- | :--- |
-| **Primary Use** | Event-driven, small tasks | Monolithic APIs | This Reference / Custom runtimes |
-| **Scaling** | Scale to zero (Consumption) | Plan-based (Auto/Manual) | Plan-based (Auto/Manual) |
-| **Runtime** | Managed by platform | Managed (Native Python) | Full control (Docker) |
-| **Cold Starts** | Possible on Consumption | Minimal (with Always On) | Minimal (with Always On) |
-| **Execution Time** | Limited (5-10 mins) | Unbounded | Unbounded |
+| Feature | Azure Functions | Container Apps | App Service (Web App) |
+|---------|-----------------|----------------|-----------------------|
+| **Best For** | Event-driven, small tasks | Microservices, scale-to-zero | Monolithic APIs, stability |
+| **Scaling** | Fast, scale-to-zero | Fast, scale-to-zero (KEDA) | Slower, plan-based |
+| **Cold Starts** | Yes (on Consumption) | Yes (on scale-to-zero) | Minimal (with Always On) |
+| **Cost Model** | Pay-per-execution | Pay-per-use (CPU/Mem) | Plan-based (Fixed) |
 
 ## API Boundary
 
-The Web App hosted API acts as a secure gateway, enforcing the `customer-safe-status-boundary` before returning data to the caller. This reference reuses the API implementation from [Container-hosted Agent API](../container-agent-api/README.md).
+The Web App hosted API acts as a secure gateway, enforcing the `customer-safe-status-boundary` before returning data to the client.
 
 ```mermaid
-flowchart LR
-    Client[Agent Client / Portal] --> API[Web App API Entrypoint]
-    subgraph WebApp[Azure App Service Boundary]
-        API --> AgentLogic[Agent / Tool Logic]
-        AgentLogic --> Security[Customer-Safe Boundary]
+flowchart TD
+    subgraph "Public Internet"
+        Client[Agent Client / Portal]
     end
-    Security -->|Safe JSON Response| Client
-    AgentLogic --> AI[Azure AI Foundry / Models]
-    AgentLogic --> Tools[Internal Tools / MCP Servers]
-    WebApp -.-> Obs[Azure Monitor / App Insights]
+
+    subgraph "Azure App Service Boundary"
+        WebApp[Linux Web App]
+        subgraph "Container"
+            API[Agent API Container]
+        end
+    end
+
+    subgraph "Internal / Protected Services"
+        LLM[Azure AI Foundry / Models]
+        Tools[Agent Tools]
+    end
+
+    Client -->|HTTPS| WebApp
+    WebApp --> API
+    API -->|Inference| LLM
+    API -->|Tool Call| Tools
+    API -.->|Safe Status| Client
 ```
 
 ## Local / Demo Flow
 
-This building block reuses the FastAPI application from `container-agent-api`. To run it locally:
+This module reuses the container image defined in `building-blocks/hosting/container-agent-api/`.
 
-1. **Navigate to the container API source:**
+1. **Build the image locally:**
    ```bash
    cd building-blocks/hosting/container-agent-api/
-   ```
-
-2. **Follow the local run instructions in its README:**
-   ```bash
    docker build -t agent-api .
-   docker run -p 8080:8080 agent-api
    ```
 
-3. **Verify:**
+2. **Run the container:**
+   ```bash
+   docker run -p 8080:8080 -e PORT=8080 agent-api
+   ```
+
+3. **Verify the endpoint:**
    ```bash
    curl http://localhost:8080/health
    ```
@@ -72,62 +80,57 @@ This building block reuses the FastAPI application from `container-agent-api`. T
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PORT` | The port the API listens on (mapped by App Service). | `8080` |
-| `DOCKER_REGISTRY_SERVER_URL` | URL for the container registry. | - |
-| `DOCKER_REGISTRY_SERVER_USERNAME` | Username for the registry (if using keys). | - |
-| `DOCKER_REGISTRY_SERVER_PASSWORD` | Password for the registry (if using keys). | - |
+| `WEBSITES_PORT` | The port the container listens on (mapped by App Service). | `8080` |
 
 ## Validation Commands
 
-### Contract Validation
-```bash
-pytest building-blocks/hosting/webapp-agent-api/tests/test_contract.py
-```
-
 ### Infrastructure Validation
 ```bash
-cd building-blocks/hosting/webapp-agent-api/infra/terraform
+cd infra/terraform
 terraform init -backend=false
 terraform validate
 ```
 
-### Linting
+### File Inspection
+Verify that no application code was duplicated:
 ```bash
-ruff check building-blocks/hosting/webapp-agent-api
+ls -R building-blocks/hosting/webapp-agent-api/ | grep -E "src/|tests/|schemas/|Dockerfile"
 ```
+*(Only `infra/` and `module.yaml` should be present outside this README)*
 
 ## Azure Hosting Notes
 
-### Deployment Methods
-- **Azure CLI:** Use `az webapp config container set` to update the image and registry settings.
-- **GitHub Actions:** See the [GitHub Actions Example](./examples/github-actions/README.md) for a full deployment workflow.
-- **Azure Pipelines:** See the [Azure Pipelines Example](./examples/azure-pipelines/README.md) for a YAML-based deployment workflow.
-
-### Configuration
-- **Startup Command:** If the container doesn't have an `ENTRYPOINT` or `CMD`, provide the startup command in the App Service configuration.
-- **Always On:** Enable for Production/Basic+ tiers to eliminate cold starts and keep the agent API responsive.
+- **Managed Identity:** This module uses a **System-Assigned Managed Identity**.
+- **Private Registry Pulls:** If pulling from a private registry (like Azure Container Registry), you must grant the Web App's Managed Identity the `AcrPull` role on the registry. Registry credentials should not be hardcoded.
+- **HTTPS Only:** The Web App is configured to enforce HTTPS-only traffic.
 
 ## Security Notes
 
-- **Managed Identity:** Always use System-Assigned or User-Assigned Managed Identity for accessing downstream Azure services (AI Foundry, Key Vault, Storage).
-- **Redaction:** Implement strict response filtering to ensure no raw prompts, internal Azure resource IDs, or technical stack traces are exposed to the client.
-- **Integrated Auth:** Use App Service Authentication (EasyAuth) to restrict access to the API without writing custom auth code.
+- **Authentication:** External authentication (like Entra ID) and network restrictions are outside the scope of this hosting example but should be implemented for production.
+- **Customer-Safe Boundary:** Ensure the underlying container implementation adheres to the redaction rules defined in `module.yaml`.
 
 ## Cost & Ops Trade-offs
 
-- **Predictable Cost:** App Service Plans (B, S, P tiers) have a fixed monthly cost regardless of traffic.
-- **Ops Overhead:** Requires managing a container registry (like Azure Container Registry) and ensuring the App Service has permission to pull images (Managed Identity is recommended).
-- **Scaling:** Vertical scaling (Up) and horizontal scaling (Out) are mature and well-integrated into the portal and CLI.
+- **Fixed Cost:** The App Service Plan (default B1) has a fixed monthly cost, which may be higher than Consumption-based serverless for low-traffic scenarios.
+- **Operations:** Managed platform reduces the overhead of managing underlying infrastructure while providing advanced diagnostics and monitoring.
 
 ## Known Limits
 
-- **Startup Latency:** App Service may have slightly higher startup latency than Azure Functions if not using "Always On".
-- **Ephemeral Disk:** Files written to the local disk (outside of `/home`) are lost on restart. Use Azure Blob Storage for persistence.
-- **Port Mapping:** App Service expects the app to listen on the port provided by the `PORT` environment variable (usually 80 or 8080 is mapped by the platform).
+- **Startup Latency:** Containers may have a delay during the initial pull and start if "Always On" is not enabled.
+- **Ephemeral Storage:** Any data written to the container's local file system is lost on restart.
 
-## References
+## Deployment / IaC Decision
+
+This building block **includes module-local Terraform** to demonstrate the recommended Infrastructure-as-Code (IaC) pattern for Azure App Service for Containers.
+
+The decision to provide IaC is based on:
+1. **Azure Native Best Practices:** Showing the correct configuration for Linux Web App for Containers, including system-assigned managed identity and `WEBSITES_PORT` setting.
+2. **Security-First Setup:** Explicitly demonstrating HTTPS-only configuration and managed identity.
+3. **Reproducibility:** Allowing developers to provision the hosting environment independently of the container build process.
+
+## Microsoft Documentation
 
 - [Azure App Service overview](https://learn.microsoft.com/en-us/azure/app-service/overview)
-- [Configure a Linux Python app for Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-language-python)
-- [Managed identities for App Service](https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity)
-- [Microsoft Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
+- [Configure a custom container for Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-custom-container)
+- [Deploy Flask/FastAPI container to App Service](https://learn.microsoft.com/en-us/azure/developer/python/tutorial-containerize-simple-web-app-for-app-service)
+- [azurerm_linux_web_app (Terraform)](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_web_app)

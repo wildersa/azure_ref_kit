@@ -30,17 +30,14 @@ resource "azurerm_linux_web_app" "webapp" {
     type = "SystemAssigned"
   }
 
+  app_settings = {
+    WEBSITES_PORT = tostring(var.listen_port)
+  }
+
   site_config {
     application_stack {
-      docker_image_name        = var.container_image
-      docker_registry_url      = var.docker_registry_url
-      docker_registry_username = var.docker_registry_username
-      docker_registry_password = var.docker_registry_password
+      docker_image_name = var.container_image
     }
-    app_command_line = var.startup_command
-
-    # Enable Managed Identity for ACR pulls if registry URL suggests ACR
-    container_registry_use_managed_identity = length(regexall("azurecr.io", var.docker_registry_url)) > 0
   }
 
   tags = var.tags
