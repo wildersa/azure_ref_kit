@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentRequest",
+  "type": "object",
+  "properties": {
+    "request_type": {
+      "type": "string",
+      "description": "The type of agent request (e.g., 'summarize')"
+    },
+    "payload": {
+      "type": "string",
+      "description": "The content or context for the agent to process"
+    }
+  },
+  "required": [
+    "request_type",
+    "payload"
+  ],
+  "additionalProperties": false
+}

@@ -33,6 +33,15 @@ outputs:
 contracts:
   reads: []
   writes: []
+  receives:
+    - type: agent-request
+      name: create_request
+      description: Receives a controlled agent request.
+      schema:
+        $ref: "./schemas/agent_request.schema.json"
   emits:
-    - name: agent-status
-      description: Customer-safe agent status response.
+    - type: agent-status
+      name: agent_status
+      description: Returns a customer-safe agent status response.
+      schema:
+        $ref: "./schemas/agent_status_response.schema.json"
