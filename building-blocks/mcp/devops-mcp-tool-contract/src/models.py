@@ -98,3 +98,37 @@ class GetLatestBuildSummaryResponse(BaseModel):
     portal_url: HttpUrl = Field(
         ..., description="A sanitized link to the build in the Azure DevOps portal."
     )
+
+
+class ListRecentPipelineRunsRequest(BaseModel):
+    """Request to list recent runs of a specific pipeline."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    pipeline_id: SafeId = Field(..., description="The ID or name of the pipeline.")
+    top: Annotated[int, Field(ge=1, le=20)] = Field(
+        5, description="Number of recent runs to return (default: 5, max: 20)."
+    )
+
+
+class PipelineRunSummary(BaseModel):
+    """Brief summary of a single pipeline run."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: str = Field(..., description="The unique identifier for the specific run.")
+    status: PipelineStatus = Field(..., description="The current state of the run.")
+    result: PipelineResult = Field(..., description="The outcome of a completed run.")
+    branch: str = Field(..., description="The source branch for the run.")
+    start_time: datetime = Field(..., description="When the run started (ISO 8601).")
+
+
+class ListRecentPipelineRunsResponse(BaseModel):
+    """Response containing a list of recent pipeline runs."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    pipeline_name: str = Field(
+        ..., description="The name of the Azure DevOps pipeline."
+    )
+    runs: list[PipelineRunSummary] = Field(..., description="List of recent runs.")
