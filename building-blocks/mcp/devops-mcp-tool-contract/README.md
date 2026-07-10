@@ -64,7 +64,7 @@ Returns the status and summary of a specific Azure DevOps pipeline run.
   "commit_sha": "a1b2c3d",
   "start_time": "2024-01-01T10:00:00Z",
   "end_time": "2024-01-01T10:05:00Z",
-  "summary": "Step 'Unit Tests' failed on agent 'Linux-01'.",
+  "summary": "Step 'Unit Tests' failed; see the Azure DevOps portal for authorized details.",
   "portal_url": "https://dev.azure.com/org/proj/_build/results?buildId=12345"
 }
 ```
