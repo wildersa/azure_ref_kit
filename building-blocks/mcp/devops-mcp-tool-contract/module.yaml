@@ -16,3 +16,9 @@ contracts:
     - type: mcp-tool
       name: get_latest_build_summary
       description: Returns the summary of the most recent build for a specified pipeline or branch.
+    - type: mcp-tool
+      name: list_recent_pipeline_runs
+      description: Returns a list of recent runs for a specific pipeline.
+customer_safe_boundary:
+  policy: "Strictly read-only access to DevOps business status. Forbids access to technical logs, secrets, mutation operations, and developer PII."
+  enforcement: "Schema-level restriction of allowed fields and Pydantic-based input validation for safe identifiers."
