@@ -1,6 +1,7 @@
 import azure.functions as func
 import logging
 import json
+from datetime import datetime, timezone
 
 app = func.FunctionApp()
 
@@ -73,8 +74,24 @@ def get_resource_health(context: str) -> str:
     health_status = {
         "resource": resource_id,
         "health": "Healthy",
-        "last_check": "2024-05-20T10:00:00Z",
+        "last_check": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "message": "All systems operational.",
     }
 
     return json.dumps(health_status)
+
+
+@app.mcp_tool_trigger(
+    arg_name="context",
+    tool_name="get_server_time",
+    description="Returns the current server time in UTC.",
+    tool_properties=json.dumps({"type": "object", "properties": {}}),
+)
+def get_server_time(context: str) -> str:
+    """
+    MCP tool trigger function that returns the current server time.
+    """
+    logging.info("MCP tool 'get_server_time' invoked.")
+    return json.dumps(
+        {"server_time": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")}
+    )

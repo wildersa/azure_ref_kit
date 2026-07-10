@@ -25,6 +25,10 @@ outputs:
     type: object
     description: "Response from the get_resource_health tool. Example: {'resource': 'system', 'health': 'Healthy', 'message': 'All systems operational.'}"
     contract: "read-only"
+  - name: get_server_time_response
+    type: object
+    description: "Response from the get_server_time tool. Example: {'server_time': '2024-05-20T10:00:00Z'}"
+    contract: "read-only"
 dependencies:
   - python >= 3.10
   - azure-functions >= 1.24.0
@@ -46,6 +50,9 @@ contracts:
     - type: mcp-tool
       name: get_resource_health
       description: Returns a mock health status for a given resource or the overall system.
+    - type: mcp-tool
+      name: get_server_time
+      description: Returns the current server time in UTC.
 customer_safe_boundary:
   policy: "Read-only access to mock service metadata and health status. No access to real PII, secrets, or technical internals."
   enforcement: "Azure Functions MCP decorator-based tool registration and explicit field filtering."

@@ -5,6 +5,17 @@ This building block provides a reference implementation for hosting a [Model Con
 
 By hosting MCP tools on Azure Functions, agents can access enterprise systems and complex business logic with scale-to-zero pricing, managed identity security, and standardized tool discovery via the Streamable HTTP transport.
 
+## When to Use
+- When you need to host custom tools for Azure AI Foundry agents or other MCP-capable clients.
+- When you want serverless, scale-to-zero hosting with enterprise-grade security (Managed Identity).
+- When you require identity-first access to other Azure services (Key Vault, SQL, Blob) within your tools.
+- When you need a standardized protocol (MCP) for tool discovery and invocation.
+
+## When Not to Use
+- Do not use if your tools are local-only or for dev-time only (use `fastmcp-basic-server` instead).
+- Do not use if you require a transport other than Streamable HTTP or SSE (e.g., custom WebSockets).
+- Do not use for extremely high-frequency, low-latency sub-millisecond tools where the cold start of serverless could be a factor (though Flex Consumption mitigates this).
+
 ## Architecture
 
 ```mermaid
@@ -22,6 +33,7 @@ flowchart LR
         Extension[MCP Binding Extension]
         Tool1[get_service_info]
         Tool2[get_resource_health]
+        Tool3[get_server_time]
     end
 
     Agent <--> Foundry
@@ -29,6 +41,7 @@ flowchart LR
     Endpoint <--> Extension
     Extension --> Tool1
     Extension --> Tool2
+    Extension --> Tool3
 ```
 
 ## MCP on Azure Functions vs. Standard FastMCP
@@ -62,6 +75,12 @@ Returns a mock health status for a given resource identifier.
 - `health` (string): Health status (e.g., "Healthy").
 - `last_check` (string): Timestamp of the last health check.
 - `message` (string): Human-readable status message.
+
+### Tool: `get_server_time`
+Returns the current server time in UTC.
+
+**Outputs:**
+- `server_time` (string): Current server time in ISO 8601 format.
 
 ## Local Development & Validation
 
@@ -107,6 +126,11 @@ This module includes a Terraform/OpenTofu reference for deploying the MCP server
 - `function_app_name`: Name of the deployed Function App.
 
 For detailed instructions, see [infra/terraform/README.md](infra/terraform/README.md).
+
+## Known Limits
+- **Extension Support**: The MCP extension is currently in preview; check official Microsoft docs for the latest GA status.
+- **Language Support**: This reference focuses on Python; other languages (C#, Java, TypeScript) are supported by the extension but not implemented in this specific block.
+- **Identity Passthrough**: Complex per-user OAuth passthrough requires additional configuration in App Service/Entra ID.
 
 ## Microsoft Learn References
 - [Azure Functions MCP extension overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-mcp)
