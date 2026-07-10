@@ -57,3 +57,7 @@ def test_package_script_execution():
     # pipeline_function_app should have blob-trigger-start-pipeline/function_app.py
     assert (DIST_DIR / "pipeline_function_app" / "blob-trigger-start-pipeline" / "function_app.py").exists()
     assert (DIST_DIR / "pipeline_function_app" / "durable-basic-pipeline" / "function_app.py").exists()
+
+    # Verify ZIP files exist for Azure Functions
+    assert (DIST_DIR / "pipeline_function_app.zip").exists()
+    assert (DIST_DIR / "api_function_app.zip").exists()

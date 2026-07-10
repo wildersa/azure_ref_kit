@@ -42,7 +42,18 @@ for art in $ARTIFACTS; do
         echo "ERROR: Artifact manifest missing: $ART_DIR/artifact-manifest.json" >&2
         exit 1
     fi
-    echo "  [OK] Artifact: $art"
+
+    # Check if ZIP exists for azure_function artifacts
+    ART_TYPE=$(python3 -c "import json; m=json.load(open('$ART_DIR/artifact-manifest.json')); print(m['type'])")
+    if [ "$ART_TYPE" == "azure_function" ]; then
+        if [ ! -f "$DIST_DIR/$art.zip" ]; then
+            echo "ERROR: ZIP package missing for $art: $DIST_DIR/$art.zip" >&2
+            exit 1
+        fi
+        echo "  [OK] Artifact: $art (and .zip)"
+    else
+        echo "  [OK] Artifact: $art"
+    fi
 done
 echo "  [OK] All artifacts present"
 
@@ -79,8 +90,9 @@ echo "   terraform -chdir=solutions/document-ai-portal/infra/terraform apply"
 echo ""
 echo "3. Deploy Function Apps (using Azure CLI or Core Tools):"
 echo "   az functionapp deployment source config-zip -g <rg> -n <app-name> --src solutions/document-ai-portal/dist/pipeline_function_app.zip"
+echo "   az functionapp deployment source config-zip -g <rg> -n <app-name> --src solutions/document-ai-portal/dist/api_function_app.zip"
 echo ""
 echo "4. Deploy Static Web App (using SWA CLI or GitHub Actions):"
-echo "   swa deploy ./solutions/document-ai-portal/dist/portal --env production"
+echo "   swa deploy ./solutions/document-ai-portal/dist/portal/static-status-portal --env production"
 echo ""
 echo "NOTE: Real deployment is typically handled by CI/CD pipelines using the artifacts in dist/."

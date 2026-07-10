@@ -64,6 +64,9 @@ def test_deploy_preflight_success_with_artifacts(clean_dist):
         with open(art_path / "artifact-manifest.json", "w") as f:
             json.dump(art, f)
 
+        if art["type"] == "azure_function":
+            (DIST_DIR / f"{art['name']}.zip").touch()
+
     manifest = {
         "solution": "document-ai-portal",
         "artifacts": artifacts

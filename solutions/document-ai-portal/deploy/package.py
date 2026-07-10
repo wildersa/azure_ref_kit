@@ -79,6 +79,12 @@ def package_solution():
             with open(artifact_dir / "artifact-manifest.json", "w") as f:
                 json.dump(manifest, f, indent=2)
 
+            # Create ZIP for Azure Functions
+            if art_type == "azure_function":
+                logger.info(f"  Creating ZIP package for {name}...")
+                shutil.make_archive(str(DIST_DIR / name), 'zip', str(artifact_dir))
+                manifest["zip_path"] = f"dist/{name}.zip"
+
             artifacts_manifest.append(manifest)
 
         # Create global manifest
