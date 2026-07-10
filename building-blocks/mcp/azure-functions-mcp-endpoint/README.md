@@ -33,6 +33,7 @@ flowchart LR
         Extension[MCP Binding Extension]
         Tool1[get_service_info]
         Tool2[get_resource_health]
+        Tool3[get_server_time]
     end
 
     Agent <--> Foundry
@@ -40,6 +41,7 @@ flowchart LR
     Endpoint <--> Extension
     Extension --> Tool1
     Extension --> Tool2
+    Extension --> Tool3
 ```
 
 ## MCP on Azure Functions vs. Standard FastMCP
@@ -73,6 +75,12 @@ Returns a mock health status for a given resource identifier.
 - `health` (string): Health status (e.g., "Healthy").
 - `last_check` (string): Timestamp of the last health check.
 - `message` (string): Human-readable status message.
+
+### Tool: `get_server_time`
+Returns the current server time in UTC.
+
+**Outputs:**
+- `server_time` (string): Current server time in ISO 8601 format.
 
 ## Local Development & Validation
 
