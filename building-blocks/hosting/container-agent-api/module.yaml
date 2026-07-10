@@ -40,7 +40,7 @@ contracts:
       schema:
         $ref: "./schemas/agent_request.schema.json"
   emits:
-    - type: mcp-tool
+    - type: agent-status
       name: agent_status
       description: Returns a customer-safe agent status response.
       schema:
