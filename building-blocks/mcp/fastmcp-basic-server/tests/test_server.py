@@ -19,5 +19,11 @@ async def test_tool_registration():
 @pytest.mark.asyncio
 async def test_get_system_status():
     """Verify general system status tool response."""
+    # Expected static response
+    expected_response = "Status: Operational. FastMCP Basic Server is ready to handle tool requests via stdio."
+
     result = await mcp.call_tool("get_system_status")
-    assert "Operational" in result.content[0].text
+
+    # Assert basic structure of FastMCP response
+    assert len(result.content) > 0
+    assert result.content[0].text == expected_response
