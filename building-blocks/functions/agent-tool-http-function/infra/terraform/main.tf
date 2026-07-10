@@ -58,6 +58,7 @@ resource "azurerm_function_app_flex_consumption" "function" {
   app_settings = {
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.storage.name
     "AzureWebJobsStorage__credential"  = "managedidentity"
+    # Note: APPLICATIONINSIGHTS_CONNECTION_STRING would be added here for observability
   }
 
   tags = var.tags
