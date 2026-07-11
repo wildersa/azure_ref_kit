@@ -46,3 +46,6 @@ local-runtimes/vlm/models/
 
 # Build artifacts
 dist/
+
+# Node.js
+node_modules/
