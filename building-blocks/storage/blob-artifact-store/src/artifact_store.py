@@ -17,6 +17,10 @@ SAFE_ID_REGEX = re.compile(SAFE_ID_PATTERN)
 CONTAINER_NAME_PATTERN = r"^[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]$"
 CONTAINER_NAME_REGEX = re.compile(CONTAINER_NAME_PATTERN)
 
+# Storage account names: 3-24 chars, lowercase and numbers
+ACCOUNT_URL_PATTERN = r"^https://[a-z0-9]{3,24}\.blob\.[a-z0-9\.]+$"
+ACCOUNT_URL_REGEX = re.compile(ACCOUNT_URL_PATTERN)
+
 
 class BlobArtifactStore:
     """
@@ -35,14 +39,19 @@ class BlobArtifactStore:
         self.container_name = container_name or os.environ.get(
             "ARTIFACT_CONTAINER_NAME", "artifacts"
         )
+
+        if not isinstance(sas_max_lifetime_hours, int) or not (
+            1 <= sas_max_lifetime_hours <= 48
+        ):
+            raise ValueError("sas_max_lifetime_hours must be an integer between 1 and 48.")
         self.sas_max_lifetime_hours = sas_max_lifetime_hours
 
-        if not self.account_url or not self.account_url.startswith("https://"):
+        if not self.account_url or not ACCOUNT_URL_REGEX.match(self.account_url):
             raise ValueError(
-                "ARTIFACT_STORE_BLOB_ENDPOINT is required and must be an https URL."
+                "account_url is required and must be a valid https Azure Blob Storage endpoint."
             )
 
-        if not CONTAINER_NAME_REGEX.match(self.container_name):
+        if not self.container_name or not CONTAINER_NAME_REGEX.match(self.container_name):
             raise ValueError(
                 f"Invalid container name: {self.container_name}. Must follow Azure naming rules."
             )
@@ -62,6 +71,9 @@ class BlobArtifactStore:
     def _validate_id(self, identifier: str, name: str):
         if not identifier or not isinstance(identifier, str):
             raise ValueError(f"{name} must be a non-empty string.")
+        # Prevent path traversal before regex check
+        if ".." in identifier or "/" in identifier or "\\" in identifier:
+            raise ValueError(f"{name} cannot contain path traversal characters.")
         if not SAFE_ID_REGEX.match(identifier):
             raise ValueError(
                 f"{name} contains invalid characters. Pattern: {SAFE_ID_PATTERN}"
@@ -81,12 +93,28 @@ class BlobArtifactStore:
         if not isinstance(content, bytes):
             raise ValueError("Artifact content must be bytes.")
 
+        if not isinstance(metadata, dict):
+            raise ValueError("metadata must be a dictionary.")
+
         # Content boundary check (minimal example: 100MB)
         max_size = int(os.environ.get("ARTIFACT_MAX_SIZE_BYTES", 104857600))
         if len(content) > max_size:
             raise ValueError(
                 f"Artifact content exceeds maximum size of {max_size} bytes."
             )
+
+        # Validate metadata fields
+        kind = metadata.get("kind")
+        if kind and (not isinstance(kind, str) or not SAFE_ID_REGEX.match(kind)):
+            raise ValueError("metadata['kind'] must be a safe alphanumeric string.")
+
+        safe_name = metadata.get("safe_name")
+        if safe_name and (not isinstance(safe_name, str) or not SAFE_ID_REGEX.match(safe_name)):
+            raise ValueError("metadata['safe_name'] must be a safe alphanumeric string.")
+
+        content_type = metadata.get("content_type")
+        if content_type and (not isinstance(content_type, str) or "/" not in content_type):
+            raise ValueError("metadata['content_type'] must be a valid MIME type string.")
 
         # Prepare blob path and metadata
         blob_name = f"{run_id}/{artifact_id}"
@@ -95,14 +123,17 @@ class BlobArtifactStore:
         blob_metadata = {
             "run_id": run_id,
             "id": artifact_id,
-            "kind": str(metadata.get("kind", "generic")),
-            "safe_name": str(metadata.get("safe_name", artifact_id)),
+            "kind": str(kind or "generic"),
+            "safe_name": str(safe_name or artifact_id),
             "is_customer_visible": str(
                 metadata.get("is_customer_visible", False)
             ).lower(),
         }
         if metadata.get("step_name"):
-            blob_metadata["step_name"] = str(metadata["step_name"])
+            step_name = metadata["step_name"]
+            if not isinstance(step_name, str) or not SAFE_ID_REGEX.match(step_name):
+                raise ValueError("metadata['step_name'] must be a safe alphanumeric string.")
+            blob_metadata["step_name"] = step_name
 
         # Upload
         try:
@@ -136,6 +167,16 @@ class BlobArtifactStore:
         """
         Generates a short-lived, read-only, user-delegation SAS URL.
         """
+        if not isinstance(artifact, Artifact):
+            raise ValueError("artifact must be an instance of Artifact.")
+
+        if not artifact.storage_ref or not isinstance(artifact.storage_ref, str):
+            raise ValueError("Artifact storage_ref must be a non-empty string.")
+
+        # Ensure storage_ref doesn't contain path traversal
+        if ".." in artifact.storage_ref or artifact.storage_ref.startswith("/"):
+            raise ValueError("Invalid Artifact storage_ref.")
+
         if expires_in_hours <= 0 or expires_in_hours > self.sas_max_lifetime_hours:
             raise ValueError(
                 f"expires_in_hours must be between 1 and {self.sas_max_lifetime_hours}."

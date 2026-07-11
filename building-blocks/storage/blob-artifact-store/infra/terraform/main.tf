@@ -43,12 +43,13 @@ resource "random_id" "storage_suffix" {
 }
 
 resource "azurerm_role_assignment" "storage_blob_data_owner_runtime" {
-  count                = var.runtime_principal_id != null ? 1 : 0
   scope                = azurerm_storage_account.artifact_store.id
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = var.runtime_principal_id
 }
 
+# Explicitly separate management plane and data plane.
+# Deployment principal gets management access only.
 resource "azurerm_role_assignment" "storage_account_contributor_deployer" {
   scope                = azurerm_storage_account.artifact_store.id
   role_definition_name = "Storage Account Contributor"
