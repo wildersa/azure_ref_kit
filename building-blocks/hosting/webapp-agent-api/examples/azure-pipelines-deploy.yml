@@ -21,15 +21,6 @@ variables:
   # Container image to deploy
   - name: CONTAINER_IMAGE
     value: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
-  # Terraform Backend Variables (Should be provided via Variable Group or Environment)
-  - name: BACKEND_RESOURCE_GROUP_NAME
-    value: 'rg-terraform-state'
-  - name: BACKEND_STORAGE_ACCOUNT_NAME
-    value: 'stterraformstate'
-  - name: BACKEND_CONTAINER_NAME
-    value: 'tfstate'
-  - name: BACKEND_KEY
-    value: 'webapp-api.tfstate'
 
 stages:
 - stage: Static_Validation
@@ -69,6 +60,14 @@ stages:
         inlineScript: |
           set -e
           cd $(TF_WORKING_DIR)
+
+          # Map Workload Identity Federation (OIDC) values to Terraform environment variables
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_TENANT_ID=$tenantId
+          export ARM_SUBSCRIPTION_ID=$subscriptionId
+          export ARM_OIDC_TOKEN=$idToken
+          export ARM_USE_OIDC=true
+
           terraform init \
             -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
             -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \
@@ -98,6 +97,14 @@ stages:
               inlineScript: |
                 set -e
                 cd $(TF_WORKING_DIR)
+
+                # Map Workload Identity Federation (OIDC) values to Terraform environment variables
+                export ARM_CLIENT_ID=$servicePrincipalId
+                export ARM_TENANT_ID=$tenantId
+                export ARM_SUBSCRIPTION_ID=$subscriptionId
+                export ARM_OIDC_TOKEN=$idToken
+                export ARM_USE_OIDC=true
+
                 terraform init \
                   -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
                   -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \

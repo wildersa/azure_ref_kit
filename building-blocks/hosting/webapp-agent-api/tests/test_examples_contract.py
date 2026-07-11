@@ -1,7 +1,6 @@
 import os
 import yaml
 import re
-import hcl2
 import pytest
 
 def get_examples():
@@ -41,10 +40,8 @@ def test_example_no_secrets_or_keys(example_path):
     ]
 
     for pattern in forbidden_patterns:
-        # This is a bit naive but helps catch hardcoded values that aren't placeholders
         matches = re.findall(pattern, content)
         for match in matches:
-            # If it contains a placeholder like ${{ or $( or var., it's probably fine
             if not any(placeholder in match for placeholder in ["${{", "$(", "var.", "sig="]):
                 pytest.fail(f"Potential hardcoded secret found in {example_path}: {match}")
 
@@ -74,27 +71,39 @@ def test_examples_use_valid_module_inputs():
         with open(example_path, "r") as f:
             content = f.read()
 
-        # Look for -var="name=..." or -var="name=$(...)" or -var="name=${{...}}"
         var_matches = re.findall(r'-var=["\']([^=]+)=', content)
 
         for var_name in var_matches:
-            # Note: prefix and location are common Terraform vars but might not be in module.yaml
-            # However, the task says align with real Web App module contract.
-            # Let's check against module.yaml and common base vars.
             allowed_vars = module_inputs + ["prefix", "location"]
             assert var_name in allowed_vars, f"Example {example_path} uses variable '{var_name}' not defined in module.yaml inputs"
 
-def test_no_production_identifiers():
-    examples = get_examples()
-    # Reject things that look like real production resource names or IDs
-    prod_patterns = [
+@pytest.mark.parametrize("example_path", get_examples())
+def test_no_production_or_literal_backend_identifiers(example_path):
+    with open(example_path, "r") as f:
+        content = f.read().lower()
+
+    # Reject things that look like real production resource names or literal backend/state values
+    forbidden_patterns = [
         r"prod-",
         r"-production",
         r"account_key",
+        r"rg-terraform-state", # Literal backend resource group
+        r"stterraformstate",   # Literal backend storage account
+        r"tfstate",           # Literal backend container
+        r"\.tfstate",          # Literal state file extension (if hardcoded)
     ]
 
-    for example_path in examples:
-        with open(example_path, "r") as f:
-            content = f.read().lower()
-            for pattern in prod_patterns:
-                assert not re.search(pattern, content), f"Found production-like identifier '{pattern}' in {example_path}"
+    for pattern in forbidden_patterns:
+        # Check if pattern exists in content
+        if re.search(pattern, content):
+            # Check if it's within a placeholder
+            matches = re.finditer(pattern, content)
+            for match in matches:
+                # Get some context around the match
+                start = max(0, match.start() - 10)
+                end = min(len(content), match.end() + 10)
+                context = content[start:end]
+
+                # If it's not wrapped in placeholders, it's a literal violation
+                if not ("${{" in context or "$(" in context):
+                    pytest.fail(f"Found forbidden literal or production-like identifier '{pattern}' in {example_path} at context: ...{context}...")
