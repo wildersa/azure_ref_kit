@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def validate_portal_url(portal_url: str, organization_url: str) -> None:
     """
     Validates that the portal URL returned by the provider is safe.
-    Must be HTTPS and match the host of the requested organization.
+    Must be HTTPS and match the host and organization of the requested organization.
     """
     portal_parsed = urlparse(portal_url)
     org_parsed = urlparse(organization_url)
@@ -21,10 +21,39 @@ def validate_portal_url(portal_url: str, organization_url: str) -> None:
         raise ValueError("Provider returned an unsafe non-HTTPS portal URL.")
 
     # Azure DevOps portal URLs usually match the org host or dev.azure.com
-    # To be safe, we ensure it's either the exact org host or dev.azure.com
+    # Both host and path segments are checked for cross-tenant spoofing.
+
+    # 1. Host validation
+    # Standard hosts allowed: dev.azure.com and visualstudio.com
+    # We allow the specific requested host and dev.azure.com as a fallthrough.
     allowed_hosts = {org_parsed.netloc, "dev.azure.com"}
-    if portal_parsed.netloc not in allowed_hosts:
+    if portal_parsed.netloc not in allowed_hosts and not portal_parsed.netloc.endswith(
+        ".visualstudio.com"
+    ):
         raise ValueError("Provider returned a portal URL with an untrusted host.")
+
+    # 2. Cross-tenant check: ensure the organization name matches
+    # For dev.azure.com/{org}, the first path segment is the org name
+    # For {org}.visualstudio.com, the netloc contains the org name
+    def get_org_name(parsed_url: Any) -> str:
+        if parsed_url.netloc == "dev.azure.com":
+            # path is usually /org/project/...
+            parts = [p for p in parsed_url.path.split("/") if p]
+            return parts[0] if parts else ""
+        elif ".visualstudio.com" in parsed_url.netloc:
+            # host is org.visualstudio.com
+            return parsed_url.netloc.split(".")[0]
+        else:
+            # Unexpected format, return netloc for comparison if no better option
+            return parsed_url.netloc
+
+    requested_org = get_org_name(org_parsed)
+    returned_org = get_org_name(portal_parsed)
+
+    if not requested_org or requested_org.lower() != returned_org.lower():
+        # This prevents a malicious or misconfigured response from redirecting
+        # an agent to a different organization on the same host.
+        raise ValueError("Provider returned a portal URL for a different organization.")
 
 
 def get_build_status(
@@ -87,7 +116,7 @@ def get_build_status(
         if not portal_url:
             raise ValueError("Build portal URL is missing in provider response.")
 
-        # Safety Check: Validate the portal URL host and scheme
+        # Safety Check: Validate the portal URL host and organization
         validate_portal_url(portal_url, str(request.organization_url))
 
         # Friendly business-level summary

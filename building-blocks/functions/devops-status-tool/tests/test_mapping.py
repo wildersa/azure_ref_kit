@@ -176,3 +176,53 @@ def test_get_build_status_non_https_portal(mock_client):
         ValueError, match="Provider returned an unsafe non-HTTPS portal URL."
     ):
         get_build_status(request_params, mock_client)
+
+
+def test_get_build_status_different_org_same_host(mock_client):
+    mock_client.get_build.return_value = {
+        "id": 123,
+        "status": "completed",
+        "definition": {"name": "Test"},
+        "startTime": "2026-07-03T10:00:00Z",
+        "_links": {
+            "web": {
+                "href": "https://dev.azure.com/other-org/p/_build/results?buildId=123"
+            }
+        },
+    }
+
+    request_params = {
+        "organization_url": "https://dev.azure.com/real-org",
+        "project": "p",
+        "build_id": 123,
+    }
+
+    with pytest.raises(
+        ValueError, match="Provider returned a portal URL for a different organization."
+    ):
+        get_build_status(request_params, mock_client)
+
+
+def test_get_build_status_different_org_visualstudio(mock_client):
+    mock_client.get_build.return_value = {
+        "id": 123,
+        "status": "completed",
+        "definition": {"name": "Test"},
+        "startTime": "2026-07-03T10:00:00Z",
+        "_links": {
+            "web": {
+                "href": "https://other.visualstudio.com/p/_build/results?buildId=123"
+            }
+        },
+    }
+
+    request_params = {
+        "organization_url": "https://real.visualstudio.com",
+        "project": "p",
+        "build_id": 123,
+    }
+
+    with pytest.raises(
+        ValueError, match="Provider returned a portal URL for a different organization."
+    ):
+        get_build_status(request_params, mock_client)

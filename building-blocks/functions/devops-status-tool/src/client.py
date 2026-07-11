@@ -51,7 +51,7 @@ class DevOpsClient:
                     return json.loads(response.read().decode("utf-8"))
                 else:
                     # This branch might not be hit for some status codes as urlopen raises HTTPError
-                    logger.error(f"Unexpected response status: {response.status}")
+                    logger.error("Unexpected response status from Azure DevOps.")
                     raise RuntimeError("Failed to retrieve build status.")
 
         except urllib.error.HTTPError as e:
@@ -62,11 +62,12 @@ class DevOpsClient:
                 logger.error("Authentication failed. Check AZURE_DEVOPS_PAT.")
                 raise PermissionError("Authentication failed.")
             else:
-                logger.error(f"HTTP error occurred: {e.code}")
+                logger.error("Azure DevOps API HTTP error.")
                 raise RuntimeError("Azure DevOps API error.")
 
-        except urllib.error.URLError as e:
-            logger.error(f"URL error occurred: {e.reason}")
+        except urllib.error.URLError:
+            # Customer-Safe Logging: Redact internal technical details (e.g. e.reason which may contain IPs)
+            logger.error("Failed to connect to Azure DevOps.")
             raise ConnectionError("Failed to connect to Azure DevOps.")
 
         except Exception:
