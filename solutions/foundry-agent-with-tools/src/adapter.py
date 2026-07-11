@@ -34,6 +34,7 @@ class FoundryAgentAdapter:
                 credential=DefaultAzureCredential(),
             )
         except Exception:
+            # Customer-Safe Logging: Redact technical details in the exception message
             logger.error("Failed to initialize AI Project Client.")
             raise RuntimeError("Could not connect to the Azure AI service.")
 
@@ -53,6 +54,7 @@ class FoundryAgentAdapter:
                 ),
             )
         except Exception:
+            # Customer-Safe Logging: Do NOT log the agent name on failure as it is an Azure resource identifier
             logger.error("Failed to resolve agent.")
             raise RuntimeError("The agent service encountered an error.")
 
@@ -110,8 +112,9 @@ class FoundryAgentAdapter:
                                         output=json.dumps(result),
                                     )
                                 )
-                            except Exception as e:
-                                logger.error(f"Tool execution failed: {e}")
+                            except Exception:
+                                # Customer-Safe Logging: Do not log raw exception strings or provider payloads
+                                logger.error("Tool execution failed.")
                                 # Provide a sanitized error back to the agent
                                 input_list.append(
                                     FunctionCallOutput(
@@ -123,13 +126,14 @@ class FoundryAgentAdapter:
                                     )
                                 )
                         else:
-                            logger.warning(f"Agent requested unknown tool: {call.name}")
+                            # Customer-Safe Logging: Do not log the raw tool name requested by the agent
+                            logger.warning("Agent requested unknown tool.")
                             input_list.append(
                                 FunctionCallOutput(
                                     type="function_call_output",
                                     call_id=call.call_id,
                                     output=json.dumps(
-                                        {"error": f"Unknown tool: {call.name}"}
+                                        {"error": "The tool requested is unavailable."}
                                     ),
                                 )
                             )

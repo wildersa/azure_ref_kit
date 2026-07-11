@@ -33,14 +33,15 @@ def validate_tool_output(data: Dict[str, Any]) -> None:
     """Validates the tool output against the defined contract."""
     try:
         if not SCHEMA_PATH.exists():
-            raise FileNotFoundError(f"Schema file not found at {SCHEMA_PATH}")
+            raise FileNotFoundError("Schema file not found.")
 
         with open(SCHEMA_PATH, "r") as f:
             schema = json.load(f)
 
         jsonschema.validate(instance=data, schema=schema)
-    except (jsonschema.ValidationError, json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Tool contract validation failed: {e}")
+    except (jsonschema.ValidationError, json.JSONDecodeError, FileNotFoundError):
+        # Customer-Safe Logging: Redact internal technical details (e.g. schema validation errors)
+        logger.error("Tool contract validation failed.")
         # Redact internal technical details in the error returned to the agent
         raise RuntimeError("The status tool returned an invalid response format.")
 
@@ -51,7 +52,8 @@ def validate_tool_arguments(arguments: Dict[str, Any]) -> None:
     For get_system_status, no arguments are expected.
     """
     if arguments:
-        logger.warning(f"Unexpected arguments received for system-status: {arguments}")
+        # Customer-Safe Logging: Do not log the raw input arguments
+        logger.warning("Unexpected arguments received for system-status tool.")
         # Reject if any arguments are provided, as the contract defines an empty properties object
         raise ValueError(
             "Invalid tool arguments: get_system_status does not accept parameters."
