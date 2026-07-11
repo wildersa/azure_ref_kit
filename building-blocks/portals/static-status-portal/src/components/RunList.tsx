@@ -5,32 +5,18 @@ import { StatusBadge } from './StatusBadge';
 interface RunListProps {
   runs: PipelineRun[];
   onSelectRun: (id: string) => void;
-  onStartRun: () => void;
 }
 
-export const RunList: React.FC<RunListProps> = ({ runs, onSelectRun, onStartRun }) => {
+export const RunList: React.FC<RunListProps> = ({ runs, onSelectRun }) => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2>Pipeline Runs</h2>
-        <button
-          onClick={onStartRun}
-          style={{
-            backgroundColor: '#2563eb',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          New Processing Run
-        </button>
       </div>
 
       {runs.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>
-          No runs found. Start a new run to see it here.
+          No runs found.
         </div>
       ) : (
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>

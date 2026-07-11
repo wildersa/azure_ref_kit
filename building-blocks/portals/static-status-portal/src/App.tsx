@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from './api';
-import { PipelineRun, PipelineRunDetail, Artifact } from './types';
+import { PipelineRun, PipelineRunDetail, Artifact, CostSummary } from './types';
 import { RunList } from './components/RunList';
 import { RunDetail } from './components/RunDetail';
 
@@ -9,7 +9,7 @@ function App() {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [runDetail, setRunDetail] = useState<PipelineRunDetail | null>(null);
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
-  const [cost, setCost] = useState<number | null>(null);
+  const [costSummary, setCostSummary] = useState<CostSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +23,7 @@ function App() {
     } else {
       setRunDetail(null);
       setArtifacts([]);
-      setCost(null);
+      setCostSummary(null);
     }
   }, [selectedRunId]);
 
@@ -51,21 +51,11 @@ function App() {
       ]);
       setRunDetail(detail);
       setArtifacts(artifactData);
-      setCost(costData);
+      setCostSummary(costData);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch run details');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStartRun = async () => {
-    try {
-      const newRun = await api.startRun();
-      setSelectedRunId(newRun.id);
-      fetchRuns();
-    } catch (err: any) {
-      alert(err.message || 'Failed to start new run');
     }
   };
 
@@ -96,7 +86,7 @@ function App() {
           <RunDetail
             run={runDetail}
             artifacts={artifacts}
-            cost={cost}
+            costSummary={costSummary}
             onBack={() => setSelectedRunId(null)}
             getDownloadUrl={api.getDownloadUrl}
           />
@@ -104,7 +94,6 @@ function App() {
           <RunList
             runs={runs}
             onSelectRun={setSelectedRunId}
-            onStartRun={handleStartRun}
           />
         )}
       </main>

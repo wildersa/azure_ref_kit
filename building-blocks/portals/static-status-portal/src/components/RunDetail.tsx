@@ -1,16 +1,16 @@
 import React from 'react';
-import { PipelineRunDetail, Artifact } from '../types';
+import { PipelineRunDetail, Artifact, CostSummary } from '../types';
 import { StatusBadge } from './StatusBadge';
 
 interface RunDetailProps {
   run: PipelineRunDetail;
   artifacts: Artifact[];
-  cost: number | null;
+  costSummary: CostSummary | null;
   onBack: () => void;
   getDownloadUrl: (id: string) => string;
 }
 
-export const RunDetail: React.FC<RunDetailProps> = ({ run, artifacts, cost, onBack, getDownloadUrl }) => {
+export const RunDetail: React.FC<RunDetailProps> = ({ run, artifacts, costSummary, onBack, getDownloadUrl }) => {
   return (
     <div style={{ padding: '20px' }}>
       <button
@@ -27,9 +27,9 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, artifacts, cost, onBa
         </div>
         <div style={{ textAlign: 'right' }}>
           <StatusBadge status={run.status} />
-          {cost !== null && (
+          {costSummary !== null && (
             <div style={{ marginTop: '8px', fontWeight: 'bold' }}>
-              Est. Cost: ${cost.toFixed(2)}
+              Est. Cost: {costSummary.total_estimated_amount.toFixed(2)} {costSummary.currency}
             </div>
           )}
         </div>
@@ -100,7 +100,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, artifacts, cost, onBa
                       {artifact.size_bytes && <span>{(artifact.size_bytes / 1024).toFixed(1)} KB</span>}
                     </div>
                     <a
-                      href={getDownloadUrl(artifact.id)}
+                      href={artifact.download_url || getDownloadUrl(artifact.id)}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -118,6 +118,20 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, artifacts, cost, onBa
               </ul>
             )}
           </div>
+
+          {costSummary && costSummary.breakdown.length > 0 && (
+            <div style={{ marginTop: '30px' }}>
+              <h3 style={{ borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>Cost Breakdown</h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '16px 0 0 0', fontSize: '0.875rem' }}>
+                {costSummary.breakdown.map((item, idx) => (
+                  <li key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ textTransform: 'capitalize' }}>{item.category.replace('_', ' ')}</span>
+                    <span>{item.estimated_amount.toFixed(2)} {costSummary.currency}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>

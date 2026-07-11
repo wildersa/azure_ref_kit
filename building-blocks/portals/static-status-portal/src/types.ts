@@ -42,20 +42,19 @@ export interface Artifact {
   size_bytes?: number | null;
   is_customer_visible: boolean;
   created_at?: string | null;
+  download_url?: string;
 }
 
-export interface CostLedgerEntry {
-  run_id: string;
-  step_name?: string | null;
-  category: 'ai_tokens' | 'document_ai' | 'storage' | 'function_execution' | 'integration' | 'other';
-  provider?: string | null;
-  model_or_service?: string | null;
-  input_units?: number | null;
-  output_units?: number | null;
-  unit_name?: string | null;
+export interface CostBreakdownItem {
+  category: string;
   estimated_amount: number;
+}
+
+export interface CostSummary {
+  run_id: string;
+  total_estimated_amount: number;
   currency: string;
-  created_at?: string | null;
+  breakdown: CostBreakdownItem[];
 }
 
 export interface PipelineRunDetail extends PipelineRun {

@@ -1,4 +1,4 @@
-import { Artifact, PipelineRun, PipelineRunDetail } from './types';
+import { Artifact, PipelineRun, PipelineRunDetail, CostSummary } from './types';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -42,16 +42,9 @@ export const api = {
     return handleResponse<Artifact[]>(response);
   },
 
-  async getCost(runId: string): Promise<number> {
+  async getCost(runId: string): Promise<CostSummary> {
     const response = await fetch(`/api/runs/${runId}/cost`);
-    return handleResponse<number>(response);
-  },
-
-  async startRun(): Promise<PipelineRun> {
-    const response = await fetch('/api/runs/start', {
-      method: 'POST',
-    });
-    return handleResponse<PipelineRun>(response);
+    return handleResponse<CostSummary>(response);
   },
 
   getDownloadUrl(artifactId: string): string {

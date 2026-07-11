@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from './App';
 import { api } from './api';
+import { Artifact, CostSummary, PipelineRun, PipelineRunDetail } from './types';
 
 vi.mock('./api', () => ({
   api: {
@@ -9,12 +10,11 @@ vi.mock('./api', () => ({
     getRunDetail: vi.fn(),
     getArtifacts: vi.fn(),
     getCost: vi.fn(),
-    startRun: vi.fn(),
     getDownloadUrl: vi.fn((id) => `/api/artifacts/${id}/download`)
   }
 }));
 
-const mockRuns = [
+const mockRuns: PipelineRun[] = [
   {
     id: 'run-1',
     customer_id: 'cust-1',
@@ -24,11 +24,21 @@ const mockRuns = [
   }
 ];
 
-const mockDetail = {
+const mockDetail: PipelineRunDetail = {
   ...mockRuns[0],
   business_summary: 'Success summary',
   steps: [
-    { name: 'OCR Step', status: 'completed', output_summary: 'Text extracted' }
+    { run_id: 'run-1', name: 'OCR Step', status: 'completed', output_summary: 'Text extracted' }
+  ]
+};
+
+const mockCostSummary: CostSummary = {
+  run_id: 'run-1',
+  total_estimated_amount: 1.50,
+  currency: 'USD',
+  breakdown: [
+    { category: 'ai_tokens', estimated_amount: 1.00 },
+    { category: 'storage', estimated_amount: 0.50 }
   ]
 };
 
@@ -69,8 +79,8 @@ describe('App Component', () => {
   it('switches to detail view when clicking View Details', async () => {
     vi.mocked(api.getRuns).mockResolvedValue(mockRuns);
     vi.mocked(api.getRunDetail).mockResolvedValue(mockDetail);
-    vi.mocked(api.getArtifacts).mockResolvedValue([]);
-    vi.mocked(api.getCost).mockResolvedValue(1.50);
+    vi.mocked(api.getArtifacts).mockResolvedValue([] as Artifact[]);
+    vi.mocked(api.getCost).mockResolvedValue(mockCostSummary);
 
     render(<App />);
 
@@ -86,14 +96,16 @@ describe('App Component', () => {
 
     expect(screen.getByText('Success summary')).toBeInTheDocument();
     expect(screen.getByText('OCR Step')).toBeInTheDocument();
-    expect(screen.getByText('Est. Cost: $1.50')).toBeInTheDocument();
+    expect(screen.getByText('Est. Cost: 1.50 USD')).toBeInTheDocument();
+    expect(screen.getByText(/ai tokens/i)).toBeInTheDocument();
+    expect(screen.getByText('1.00 USD')).toBeInTheDocument();
   });
 
   it('goes back to list view when clicking Back', async () => {
     vi.mocked(api.getRuns).mockResolvedValue(mockRuns);
     vi.mocked(api.getRunDetail).mockResolvedValue(mockDetail);
-    vi.mocked(api.getArtifacts).mockResolvedValue([]);
-    vi.mocked(api.getCost).mockResolvedValue(0);
+    vi.mocked(api.getArtifacts).mockResolvedValue([] as Artifact[]);
+    vi.mocked(api.getCost).mockResolvedValue(mockCostSummary);
 
     render(<App />);
 
