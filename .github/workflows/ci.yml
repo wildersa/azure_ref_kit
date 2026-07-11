@@ -178,8 +178,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # webapp-agent-api doesn't have a requirements.txt yet, using direct install for contract tests
-          pip install pytest pyyaml
+          pip install -r requirements-test.txt
 
       - name: Run pytest
         run: pytest tests/test_contract.py
