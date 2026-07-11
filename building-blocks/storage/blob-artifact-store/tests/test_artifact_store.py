@@ -87,5 +87,23 @@ def test_get_safe_read_url_validates_lifetime(artifact_store):
         safe_name="doc.pdf",
         storage_ref="run-1/art-1",
     )
-    with pytest.raises(ValueError, match="expires_in_hours must be a positive integer"):
+    with pytest.raises(ValueError, match="must be between 1 and 24"):
         artifact_store.get_safe_read_url(artifact, expires_in_hours=0)
+    with pytest.raises(ValueError, match="must be between 1 and 24"):
+        artifact_store.get_safe_read_url(artifact, expires_in_hours=25)
+
+
+def test_artifact_store_validates_container_name():
+    with pytest.raises(ValueError, match="Invalid container name"):
+        BlobArtifactStore(
+            account_url="https://test.blob.core.windows.net",
+            container_name="Upper-Case",
+            credential=MagicMock(),
+        )
+
+
+def test_store_artifact_validates_content_type(artifact_store):
+    with pytest.raises(ValueError, match="Artifact content must be bytes"):
+        artifact_store.store_artifact(
+            run_id="run", artifact_id="art", content="not bytes", metadata={}
+        )

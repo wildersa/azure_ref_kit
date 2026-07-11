@@ -49,9 +49,9 @@ resource "azurerm_role_assignment" "storage_blob_data_owner_runtime" {
   principal_id         = var.runtime_principal_id
 }
 
-resource "azurerm_role_assignment" "storage_blob_data_owner_deployer" {
+resource "azurerm_role_assignment" "storage_account_contributor_deployer" {
   scope                = azurerm_storage_account.artifact_store.id
-  role_definition_name = "Storage Blob Data Owner"
+  role_definition_name = "Storage Account Contributor"
   principal_id         = data.azurerm_client_config.current.object_id
 }
 

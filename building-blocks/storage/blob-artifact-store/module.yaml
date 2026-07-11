@@ -13,6 +13,15 @@ inputs:
   - name: ARTIFACT_STORE_BLOB_ENDPOINT
     description: "Primary blob service endpoint (environment variable)."
     type: string
+  - name: ARTIFACT_CONTAINER_NAME
+    description: "Name of the blob container (environment variable)."
+    type: string
+  - name: ARTIFACT_MAX_SIZE_BYTES
+    description: "Maximum allowed artifact size (environment variable)."
+    type: integer
+  - name: SAS_MAX_LIFETIME_HOURS
+    description: "Maximum lifetime for generated SAS tokens (in hours)."
+    type: integer
 outputs:
   - name: artifact_reference
     description: "A customer-safe Artifact reference conforming to artifact.schema.json."

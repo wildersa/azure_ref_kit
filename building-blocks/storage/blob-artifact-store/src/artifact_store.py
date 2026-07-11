@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 SAFE_ID_PATTERN = r"^[a-zA-Z0-9_\-\. ]+$"
 SAFE_ID_REGEX = re.compile(SAFE_ID_PATTERN)
 
+# https://learn.microsoft.com/en-us/rest/api/storageservices/naming-and-referencing-containers-blobs-and-metadata
+CONTAINER_NAME_PATTERN = r"^[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]$"
+CONTAINER_NAME_REGEX = re.compile(CONTAINER_NAME_PATTERN)
+
 
 class BlobArtifactStore:
     """
@@ -25,14 +29,23 @@ class BlobArtifactStore:
         account_url: str = None,
         container_name: str = None,
         credential: Any = None,
+        sas_max_lifetime_hours: int = 24,
     ):
         self.account_url = account_url or os.environ.get("ARTIFACT_STORE_BLOB_ENDPOINT")
         self.container_name = container_name or os.environ.get(
             "ARTIFACT_CONTAINER_NAME", "artifacts"
         )
+        self.sas_max_lifetime_hours = sas_max_lifetime_hours
 
-        if not self.account_url:
-            raise ValueError("ARTIFACT_STORE_BLOB_ENDPOINT is required.")
+        if not self.account_url or not self.account_url.startswith("https://"):
+            raise ValueError(
+                "ARTIFACT_STORE_BLOB_ENDPOINT is required and must be an https URL."
+            )
+
+        if not CONTAINER_NAME_REGEX.match(self.container_name):
+            raise ValueError(
+                f"Invalid container name: {self.container_name}. Must follow Azure naming rules."
+            )
 
         self.credential = credential or DefaultAzureCredential()
         self.blob_service_client = BlobServiceClient(
@@ -61,9 +74,12 @@ class BlobArtifactStore:
         Validates inputs, uploads content to Blob Storage with metadata,
         and returns a customer-safe Artifact reference.
         """
-        # Validate Identifiers
+        # Validate Inputs
         self._validate_id(run_id, "run_id")
         self._validate_id(artifact_id, "artifact_id")
+
+        if not isinstance(content, bytes):
+            raise ValueError("Artifact content must be bytes.")
 
         # Content boundary check (minimal example: 100MB)
         max_size = int(os.environ.get("ARTIFACT_MAX_SIZE_BYTES", 104857600))
@@ -120,8 +136,10 @@ class BlobArtifactStore:
         """
         Generates a short-lived, read-only, user-delegation SAS URL.
         """
-        if expires_in_hours <= 0:
-            raise ValueError("expires_in_hours must be a positive integer.")
+        if expires_in_hours <= 0 or expires_in_hours > self.sas_max_lifetime_hours:
+            raise ValueError(
+                f"expires_in_hours must be between 1 and {self.sas_max_lifetime_hours}."
+            )
 
         try:
             # 1. Get user delegation key
@@ -143,7 +161,10 @@ class BlobArtifactStore:
                 start=now,
             )
 
-            return f"{self.account_url}/{self.container_name}/{artifact.storage_ref}?{sas_token}"
+            base_url = self.account_url.rstrip("/")
+            return (
+                f"{base_url}/{self.container_name}/{artifact.storage_ref}?{sas_token}"
+            )
 
         except Exception:
             logger.error("Failed to generate SAS. Redacting internal details.")

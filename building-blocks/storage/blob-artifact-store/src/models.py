@@ -11,7 +11,7 @@ class Artifact(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     id: str
-    run_id: str = Field(..., alias="run_id")
+    run_id: str
     step_name: Optional[str] = None
     kind: str
     safe_name: str
