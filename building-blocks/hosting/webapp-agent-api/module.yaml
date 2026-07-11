@@ -2,8 +2,7 @@ name: webapp-agent-api
 type: building-block
 category: hosting
 status: stable
-purpose: Reference for hosting an agent-facing API on Azure App Service/Web App.
-runtime: App Service / Docker
+purpose: Reference for hosting the containerized agent API on Azure App Service.
 azure_resources:
   - azurerm_linux_web_app
   - azurerm_service_plan
@@ -22,31 +21,40 @@ inputs:
   - name: container_image
     type: string
     description: The container image URI to deploy.
-  - name: docker_registry_url
-    type: string
-    description: The URL of the Docker registry.
-  - name: docker_registry_username
-    type: string
-    description: The username for the Docker registry (if not using Managed Identity).
-  - name: docker_registry_password
-    type: string
-    description: The password for the Docker registry (if not using Managed Identity).
+  - name: use_managed_identity_for_registry
+    type: boolean
+    description: Whether to use the system-assigned identity to pull the container image (set to true for private ACR).
+  - name: listen_port
+    type: integer
+    description: The port the container listens on (default 80 or 8080).
   - name: sku_name
     type: string
-    description: The SKU name for the App Service Plan (e.g., B1, S1, P1v3).
-  - name: startup_command
-    type: string
-    description: Custom startup command for the web app.
+    description: The SKU name for the App Service Plan (default B1).
 outputs:
-  - name: app_service_url
+  - name: webapp_name
     type: string
-    description: The default FQDN of the deployed web app.
+    description: The name of the deployed web app.
+  - name: resource_group_name
+    type: string
+    description: The name of the resource group.
   - name: api_endpoint
     type: string
     description: The public URL of the hosted API.
+  - name: principal_id
+    type: string
+    description: The principal ID of the system-assigned managed identity.
 contracts:
   reads: []
   writes: []
+  receives:
+    - type: agent-request
+      name: create_request
+      description: Receives a controlled agent request (defined in container-agent-api).
+      schema:
+        $ref: "../container-agent-api/schemas/agent_request.schema.json"
   emits:
-    - name: agent-status
-      description: Customer-safe agent status response.
+    - type: agent-status
+      name: agent_status
+      description: Returns a customer-safe agent status response (defined in container-agent-api).
+      schema:
+        $ref: "../container-agent-api/schemas/agent_status_response.schema.json"
