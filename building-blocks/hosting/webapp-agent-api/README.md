@@ -85,7 +85,7 @@ This module reuses the container image defined in `building-blocks/hosting/conta
 ## Validation Commands
 
 ### Contract Validation
-Verify that the `module.yaml` contract is in sync with the Terraform interface and follows repository standards.
+Verify that the `module.yaml` contract is in sync with the Terraform interface, deployment examples follow security best practices, and the module follows repository standards.
 
 To run tests in a clean environment:
 ```bash
@@ -93,8 +93,13 @@ To run tests in a clean environment:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements-test.txt
-python3 -m pytest tests/test_contract.py
+python3 -m pytest tests/
 ```
+
+The validation suite ensures:
+- **Contract Alignment:** Module inputs/outputs match the Terraform interface.
+- **Example Security:** Deployment examples (GitHub Actions, Azure Pipelines) use identity-based authentication (OIDC/WIF) and do not contain literal secrets or Azure identifiers (Tenant/Subscription IDs).
+- **Security Boundary:** No unsafe patterns or raw technical internals are exposed in the documentation or contract.
 
 ### Infrastructure Validation
 ```bash
