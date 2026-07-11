@@ -28,13 +28,42 @@ def test_settings_from_env_missing_vars(monkeypatch):
         Settings.from_env()
 
 
-def test_settings_from_env_invalid_endpoint(monkeypatch):
+@pytest.mark.parametrize(
+    "invalid_name",
+    [
+        "!",  # Invalid character
+        "a" * 65,  # Too long
+    ],
+)
+def test_settings_from_env_invalid_names(monkeypatch, invalid_name):
+    """Test that Settings.from_env raises ValueError for invalid agent/model names."""
+    monkeypatch.setenv(
+        "AZURE_AI_PROJECT_ENDPOINT", "https://test.ai.azure.com/api/projects/123"
+    )
+    monkeypatch.setenv("AZURE_AI_AGENT_NAME", invalid_name)
+    monkeypatch.setenv("AZURE_AI_MODEL_NAME", "gpt-4o")
+
+    with pytest.raises(ValueError, match="Invalid AZURE_AI_AGENT_NAME"):
+        Settings.from_env()
+
+
+@pytest.mark.parametrize(
+    "invalid_endpoint",
+    [
+        "http://test.ai.azure.com/api/projects/123",  # Non-HTTPS
+        "https://user:pass@test.ai.azure.com/api/projects/123",  # Credentials
+        "https://test.ai.azure.com/api/projects/123?query=1",  # Query
+        "https://test.ai.azure.com/api/projects/123#frag",  # Fragment
+        "https://test.ai.azure.com/wrong/path",  # Invalid path
+    ],
+)
+def test_settings_from_env_invalid_endpoint(monkeypatch, invalid_endpoint):
     """Test that Settings.from_env raises ValueError for an invalid endpoint format."""
-    monkeypatch.setenv("AZURE_AI_PROJECT_ENDPOINT", "invalid-endpoint")
+    monkeypatch.setenv("AZURE_AI_PROJECT_ENDPOINT", invalid_endpoint)
     monkeypatch.setenv("AZURE_AI_AGENT_NAME", "test-agent")
     monkeypatch.setenv("AZURE_AI_MODEL_NAME", "gpt-4o")
 
-    with pytest.raises(ValueError, match="Invalid AZURE_AI_PROJECT_ENDPOINT format"):
+    with pytest.raises(ValueError, match="AZURE_AI_PROJECT_ENDPOINT"):
         Settings.from_env()
 
 

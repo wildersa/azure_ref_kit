@@ -46,7 +46,8 @@ class FoundryAgentAdapter:
                 ),
             )
         except Exception:
-            logger.error("Failed to resolve agent: %s", self.settings.agent_name)
+            # Do NOT log the agent name on failure as it is an Azure resource identifier
+            logger.error("Failed to resolve agent.")
             raise RuntimeError("The agent service encountered an error.")
 
     def get_chat_response(self, user_input: str) -> str:
@@ -67,7 +68,16 @@ class FoundryAgentAdapter:
                     }
                 },
             )
-            return str(response.output_text)
+
+            output_text = response.output_text
+            if not output_text or not str(output_text).strip():
+                logger.error("Agent returned an empty or missing response.")
+                raise RuntimeError("The agent was unable to provide a response.")
+
+            return str(output_text)
+        except RuntimeError:
+            # Re-raise sanitized errors
+            raise
         except Exception:
             logger.error("Error during response generation.")
             # Sanitize failures: do not return stack traces or raw provider payloads

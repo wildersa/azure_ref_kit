@@ -75,6 +75,29 @@ def test_get_chat_response_success(mock_settings):
     mock_openai.responses.create.assert_called_once()
 
 
+@pytest.mark.parametrize("empty_response", ["", None, "   "])
+def test_get_chat_response_empty_output(mock_settings, empty_response):
+    """Test that get_chat_response raises a sanitized RuntimeError for empty response."""
+    mock_client = MagicMock()
+    mock_agent = MagicMock()
+    mock_agent.name = "test-agent-name"
+    mock_openai = MagicMock()
+    mock_response = MagicMock()
+    mock_response.output_text = empty_response
+
+    mock_client.agents.create_version.return_value = mock_agent
+    mock_client.get_openai_client.return_value = mock_openai
+    mock_openai.responses.create.return_value = mock_response
+
+    adapter = FoundryAgentAdapter(mock_settings)
+    adapter._project_client = mock_client
+
+    with pytest.raises(
+        RuntimeError, match="The agent was unable to provide a response"
+    ):
+        adapter.get_chat_response("Hello")
+
+
 def test_get_chat_response_failure(mock_settings):
     """Test that get_chat_response raises a sanitized RuntimeError on failure."""
     mock_client = MagicMock()
@@ -83,7 +106,5 @@ def test_get_chat_response_failure(mock_settings):
     adapter = FoundryAgentAdapter(mock_settings)
     adapter._project_client = mock_client
 
-    with pytest.raises(
-        RuntimeError, match="The agent was unable to provide a response"
-    ):
+    with pytest.raises(RuntimeError, match="The agent service encountered an error"):
         adapter.get_chat_response("Hello")

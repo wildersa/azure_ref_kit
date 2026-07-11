@@ -2,6 +2,7 @@ import os
 import re
 from dataclasses import dataclass
 from typing import Optional
+from urllib.parse import urlparse
 
 
 @dataclass(frozen=True)
@@ -32,14 +33,36 @@ class Settings:
                 f"Missing required configuration environment variables: {', '.join(missing)}"
             )
 
-        # Basic validation for endpoint format
-        if (
-            not project_endpoint.startswith("https://")
-            or "/api/projects/" not in project_endpoint
-        ):
+        # Strict validation for agent and model names
+        # Constraints: 1-64 chars, alphanumeric, hyphens, or underscores
+        name_regex = r"^[a-zA-Z0-9_\-]{1,64}$"
+        if not re.match(name_regex, agent_name):
             raise ValueError(
-                "Invalid AZURE_AI_PROJECT_ENDPOINT format. "
-                "Expected: https://<resource>.ai.azure.com/api/projects/<project-id>"
+                "Invalid AZURE_AI_AGENT_NAME. Must be 1-64 characters and contain only "
+                "alphanumeric, hyphens, or underscores."
+            )
+        if not re.match(name_regex, model_name):
+            raise ValueError(
+                "Invalid AZURE_AI_MODEL_NAME. Must be 1-64 characters and contain only "
+                "alphanumeric, hyphens, or underscores."
+            )
+
+        # Deterministic validation for project endpoint
+        parsed = urlparse(project_endpoint)
+        if parsed.scheme != "https":
+            raise ValueError("AZURE_AI_PROJECT_ENDPOINT must use HTTPS.")
+        if parsed.username or parsed.password:
+            raise ValueError("AZURE_AI_PROJECT_ENDPOINT must not contain credentials.")
+        if parsed.query or parsed.fragment:
+            raise ValueError(
+                "AZURE_AI_PROJECT_ENDPOINT must not contain query or fragment."
+            )
+
+        # Expected path: /api/projects/<project-id>
+        if not re.match(r"^/api/projects/[a-zA-Z0-9_\-]+$", parsed.path):
+            raise ValueError(
+                "Invalid AZURE_AI_PROJECT_ENDPOINT path. "
+                "Expected format: https://<resource>.ai.azure.com/api/projects/<project-id>"
             )
 
         return cls(
@@ -62,7 +85,6 @@ def validate_user_input(user_input: Optional[str]) -> str:
 
     # Basic check for suspicious patterns (minimal)
     # Note: Full safety is handled by the model's content filters and system instructions.
-    # Here we just do a basic sanity check.
     if re.search(r"ignore previous instructions", user_input, re.IGNORECASE):
         raise ValueError("Suspicious input detected.")
 
