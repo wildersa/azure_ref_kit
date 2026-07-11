@@ -2,32 +2,49 @@ name: blob-artifact-store
 type: storage
 category: artifacts
 status: implemented
-purpose: Store input, intermediate, and output artifacts for pipeline executions.
+purpose: Store input, intermediate, and output artifacts for pipeline executions with hardened validation and secure artifact delivery.
 inputs:
   - name: artifact_content
-    description: "Raw binary content of the artifact to store."
+    description: "Raw binary content of the artifact to store. Must be bytes."
     type: bytes
   - name: artifact_metadata
-    description: "Dictionary of metadata including kind, safe_name, and visibility."
+    description: "Dictionary of metadata including kind, safe_name, content_type, and is_customer_visible."
     type: object
   - name: ARTIFACT_STORE_BLOB_ENDPOINT
-    description: "Primary blob service endpoint (environment variable)."
+    description: "Primary blob service endpoint (environment variable). Must be a valid HTTPS Azure Blob Storage URL."
     type: string
   - name: ARTIFACT_CONTAINER_NAME
-    description: "Name of the blob container (environment variable)."
+    description: "Name of the blob container (environment variable). Follows Azure naming rules."
     type: string
   - name: ARTIFACT_MAX_SIZE_BYTES
-    description: "Maximum allowed artifact size (environment variable)."
+    description: "Maximum allowed artifact size (environment variable). Default 100MB."
     type: integer
   - name: SAS_MAX_LIFETIME_HOURS
-    description: "Maximum lifetime for generated SAS tokens (in hours)."
+    description: "Maximum lifetime for generated SAS tokens (in hours). Cap is 48 hours."
     type: integer
+  - name: runtime_principal_id
+    description: "The principal ID of the runtime managed identity (Terraform variable) to grant 'Storage Blob Data Owner' access."
+    type: string
+  - name: allowed_ips
+    description: "List of public IP addresses or CIDR blocks allowed to access the storage account (Terraform variable)."
+    type: array
 outputs:
   - name: artifact_reference
     description: "A customer-safe Artifact reference conforming to artifact.schema.json."
     type: object
+  - name: signed_read_url
+    description: "Short-lived, read-only, user-delegation SAS URL for the artifact."
+    type: string
 azure_resources:
   - Blob Storage
+deployment:
+  identity:
+    runtime: "Storage Blob Data Owner (via runtime_principal_id)"
+    deployer: "Storage Account Contributor (management-plane only)"
+  network:
+    default_action: "Deny"
+    bypass: ["AzureServices", "Logging", "Metrics"]
+    public_access: "Disabled (containers)"
 contracts:
   emits:
     - shared/contracts/artifact.schema.json

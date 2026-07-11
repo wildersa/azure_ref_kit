@@ -49,22 +49,25 @@ PYTHONPATH=. pytest tests/
 ```
 
 ## Environment Variables
-- `ARTIFACT_STORE_BLOB_ENDPOINT`: Primary blob service endpoint (e.g., `https://<account>.blob.core.windows.net`).
-- `ARTIFACT_CONTAINER_NAME`: Name of the blob container (default: `artifacts`).
+- `ARTIFACT_STORE_BLOB_ENDPOINT`: Primary blob service endpoint (e.g., `https://<account>.blob.core.windows.net`). Must be a valid HTTPS URL.
+- `ARTIFACT_CONTAINER_NAME`: Name of the blob container (default: `artifacts`). Follows Azure naming rules.
 - `ARTIFACT_MAX_SIZE_BYTES`: Maximum allowed artifact size (default: 100MB).
+- `SAS_MAX_LIFETIME_HOURS`: Maximum allowed lifetime for generated SAS tokens (default: 24, max: 48).
 
 ## Security Boundary
+- **Hardened Validation**: All inputs (account URL, container name, IDs, metadata) are validated against strict patterns before any SDK interaction.
 - **Managed Identity**: Uses `DefaultAzureCredential` for all Azure service calls.
 - **No Keys**: Storage account keys are disabled in Terraform; all access is via Microsoft Entra ID (RBAC).
-- **Short-lived SAS**: Downloads use User-Delegation SAS tokens valid for 1 hour by default.
-- **Redaction**: Internal exceptions and technical identifiers (account names, connection strings) are redacted from business-level outputs.
+- **Network Isolation**: The storage account defaults to 'Deny' public access. Connectivity must be explicitly configured via `allowed_ips` or private endpoints.
+- **Short-lived SAS**: Downloads use User-Delegation SAS tokens valid for 1 hour by default, capped by `sas_max_lifetime_hours`.
+- **Redaction**: Internal exceptions and technical identifiers (connection strings, raw provider errors) are redacted from business-level outputs.
 
 ## Azure Hosting Notes
 The module is designed to run within Azure Functions, Container Apps, or App Service using a System-Assigned Managed Identity.
 
 ### Required RBAC Roles:
-- **Storage Blob Data Owner**: To upload artifacts and generate user delegation keys.
-- **Storage Blob Data Reader**: (Minimal requirement for read-only consumers).
+- **Storage Blob Data Owner**: Required for the runtime identity to upload artifacts and generate user delegation keys.
+- **Storage Account Contributor**: Used by the deployment principal for management-plane operations only (does not include data-plane access).
 
 ## Known Limits
 - User Delegation SAS requires Entra ID authentication and cannot be generated using account keys.
