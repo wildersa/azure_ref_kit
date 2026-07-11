@@ -132,7 +132,7 @@ class BlobArtifactStore:
         if metadata.get("step_name"):
             step_name = metadata["step_name"]
             if not isinstance(step_name, str) or not SAFE_ID_REGEX.match(step_name):
-                 raise ValueError("metadata['step_name'] must be a safe alphanumeric string.")
+                raise ValueError("metadata['step_name'] must be a safe alphanumeric string.")
             blob_metadata["step_name"] = step_name
 
         # Upload

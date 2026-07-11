@@ -26,8 +26,9 @@ variable "container_name" {
   default     = "artifacts"
 
   validation {
-    condition     = can(regex("^[a-z0-9](?!.*--)[a-z0-9-]{1,61}[a-z0-9]$", var.container_name))
-    error_message = "Invalid container name. Must follow Azure naming rules: 3-63 characters, lowercase, numbers, and hyphens."
+    # RE2 does not support lookahead. Use simpler regex + strcontains.
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$", var.container_name)) && !strcontains(var.container_name, "--")
+    error_message = "Invalid container name. Must follow Azure naming rules: 3-63 characters, lowercase, numbers, and hyphens. No consecutive hyphens allowed."
   }
 }
 
