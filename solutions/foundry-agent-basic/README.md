@@ -9,13 +9,24 @@ A developer or application needs to interact with an AI agent managed entirely b
 ## Architecture
 
 ```mermaid
-flowchart LR
-    User[User/App] --> AgentService[Foundry Agent Service]
-    subgraph Foundry Boundary
-        AgentService --> Model[Foundry Model]
-        AgentService --> Tools[Built-in Tools]
-    end
-    AgentService --> Obs[Azure Monitor / Tracing]
+sequenceDiagram
+    participant User as User/App
+    participant CLI as Python CLI
+    participant SDK as AI Projects SDK
+    participant Service as Foundry Agent Service
+    participant Model as Foundry Model
+
+    User->>CLI: run src.main "Hello"
+    CLI->>CLI: Validate Config & Input
+    CLI->>SDK: Initialize Client (DefaultAzureCredential)
+    SDK->>Service: Create/Resolve Prompt Agent
+    CLI->>SDK: Invoke Responses API
+    SDK->>Service: POST /responses
+    Service->>Model: Generate Text
+    Model-->>Service: Text Response
+    Service-->>SDK: Response Payload
+    SDK-->>CLI: Response Object
+    CLI->>User: Print output_text
 ```
 
 ## Design Decisions
@@ -27,83 +38,69 @@ For this basic reference, we use the **Prompt Agent** pattern.
 
 Choosing Prompt Agent minimizes operational overhead and focuses on the core Agent Service capabilities.
 
-## Configuration Assumptions
+### Unified Responses API
+This reference uses the unified Responses API, which is the recommended entry point for both Prompt and Hosted agents, providing a consistent interaction model.
 
-- **Model**: Assumes `gpt-4o-mini` or `gpt-4o` is deployed in the Foundry project.
-- **SDK**: Uses `azure-ai-projects` and `azure-identity` Python packages.
-- **Auth**: Relies on Microsoft Entra ID (`DefaultAzureCredential`).
+## Configuration
 
-## Environment Variables
+The runtime requires the following environment variables.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `AZURE_AI_PROJECT_ENDPOINT` | The Foundry project discovery URL. | `https://<res-name>.ai.azure.com/api/projects/<proj-id>` |
+| `AZURE_AI_AGENT_NAME` | The name of the agent to create or resolve. | `basic-prompt-agent` |
+| `AZURE_AI_MODEL_NAME` | The deployment name of the model to use. | `gpt-4o-mini` |
 
-## Local Validation
+## Local Run
 
 1. **Prerequisites**:
    - Python 3.10+
-   - `pip install azure-ai-projects azure-identity`
    - Logged in via Azure CLI: `az login`
+   - Existing Azure AI Foundry project and model deployment.
 
-2. **Python Snippet (Responses API)**:
-   ```python
-   import os
-   from azure.identity import DefaultAzureCredential
-   from azure.ai.projects import AIProjectClient
-   from azure.ai.projects.models import PromptAgentDefinition
-
-   # Initialize project client
-   project = AIProjectClient(
-       endpoint=os.environ["AZURE_AI_PROJECT_ENDPOINT"],
-       credential=DefaultAzureCredential(),
-   )
-
-   # Define and create a Prompt Agent version
-   # Note: Instructions and model choice are part of the definition
-   agent = project.agents.create_version(
-       agent_name="basic-prompt-agent",
-       definition=PromptAgentDefinition(
-           model="gpt-4o-mini",
-           instructions="You are a helpful assistant.",
-       ),
-   )
-
-   # Get the specialized OpenAI client for Responses API
-   openai = project.get_openai_client()
-
-   # Invoke the agent using the Responses API
-   response = openai.responses.create(
-       input="What can you do?",
-       extra_body={
-           "agent_reference": {
-               "name": agent.name,
-               "type": "agent_reference"
-           }
-       },
-   )
-
-   print(f"Response: {response.output_text}")
+2. **Setup**:
+   ```bash
+   pip install -r requirements.txt
    ```
 
-*Note: This reference uses the unified Responses API, which is the recommended entry point for both Prompt and Hosted agents.*
+3. **Execution**:
+   ```bash
+   export AZURE_AI_PROJECT_ENDPOINT="https://<res-name>.ai.azure.com/api/projects/<proj-id>"
+   export AZURE_AI_AGENT_NAME="basic-prompt-agent"
+   export AZURE_AI_MODEL_NAME="gpt-4o-mini"
+
+   # Run with prompt argument
+   PYTHONPATH=. python -m src.main "What can you do?"
+
+   # Or run interactively
+   PYTHONPATH=. python -m src.main
+   ```
+
+## Security Boundary
+
+- **Authentication**: Uses `DefaultAzureCredential`. No API keys or connection strings are stored or used.
+- **Sanitized Failures**: Internal technical details (stack traces, raw provider payloads, internal IDs) are caught and redacted. The CLI returns only safe, high-level error messages.
+- **Input Validation**: Rejects empty, overly long, or suspicious input before SDK interaction.
+- **Safe Logging**: Logs do not contain user prompts, tokens, or raw Azure identifiers.
+
+## Validation Commands
+
+```bash
+python --version
+ruff check .
+ruff format --check .
+PYTHONPATH=. python -m pytest tests/
+```
 
 ## Known Limits and Trade-offs
 
-- **Managed Only**: Prompt agents cannot execute arbitrary code outside of the Code Interpreter tool.
-- **Regional Availability**: Foundry Agent Service is currently available in specific regions. See the [official regional support page](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/limits-quotas-regions) for the current list.
-- **No Custom Tools**: This reference does not include custom Functions or MCP servers.
-
-## Follow-ups
-
-- [ ] **Tools**: Add built-in tools like Code Interpreter or File Search.
-- [ ] **MCP**: Connect the agent to a Model Context Protocol (MCP) server.
-- [ ] **Observability**: Enable end-to-end tracing and evaluation.
-- [ ] **DevOps**: Integrate agent definition into a CI/CD pipeline.
+- **Managed Only**: Prompt agents cannot execute arbitrary code outside of the Code Interpreter tool (not included in this basic reference).
+- **Regional Availability**: Foundry Agent Service is currently available in specific regions.
+- **No Persistence**: This basic CLI does not persist conversation history beyond the single invocation.
 
 ## References
 
-- [Microsoft Learn: Foundry Agent Service Overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
-- [Microsoft Learn: Foundry Agent Tool Catalog](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
-- [Microsoft Learn: Quotas, limits, and regional support](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/limits-quotas-regions)
-- [Azure Samples: Get Started with AI Agents](https://github.com/Azure-Samples/get-started-with-ai-agents)
+- [Foundry Agent Service overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
+- [Prompt agent quickstart](https://learn.microsoft.com/en-us/azure/foundry/agents/quickstarts/prompt-agent?tabs=python)
+- [Azure AI Projects Python SDK reference](https://learn.microsoft.com/en-us/python/api/overview/azure/ai-projects-readme)
+- [Customer-Safe Status Boundary](../../building-blocks/security/customer-safe-status-boundary/README.md)
