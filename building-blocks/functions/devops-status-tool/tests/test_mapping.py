@@ -128,3 +128,51 @@ def test_project_with_spaces(mock_client):
     mock_client.get_build.assert_called_once_with(
         "https://dev.azure.com/org", "Project With Spaces", 456
     )
+
+
+def test_get_build_status_untrusted_portal_host(mock_client):
+    mock_client.get_build.return_value = {
+        "id": 123,
+        "status": "completed",
+        "definition": {"name": "Test"},
+        "startTime": "2026-07-03T10:00:00Z",
+        "_links": {
+            "web": {
+                "href": "https://malicious-site.com/org/p/_build/results?buildId=123"
+            }
+        },
+    }
+
+    request_params = {
+        "organization_url": "https://dev.azure.com/org",
+        "project": "p",
+        "build_id": 123,
+    }
+
+    with pytest.raises(
+        ValueError, match="Provider returned a portal URL with an untrusted host."
+    ):
+        get_build_status(request_params, mock_client)
+
+
+def test_get_build_status_non_https_portal(mock_client):
+    mock_client.get_build.return_value = {
+        "id": 123,
+        "status": "completed",
+        "definition": {"name": "Test"},
+        "startTime": "2026-07-03T10:00:00Z",
+        "_links": {
+            "web": {"href": "http://dev.azure.com/org/p/_build/results?buildId=123"}
+        },
+    }
+
+    request_params = {
+        "organization_url": "https://dev.azure.com/org",
+        "project": "p",
+        "build_id": 123,
+    }
+
+    with pytest.raises(
+        ValueError, match="Provider returned an unsafe non-HTTPS portal URL."
+    ):
+        get_build_status(request_params, mock_client)

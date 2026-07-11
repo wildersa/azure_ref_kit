@@ -34,8 +34,6 @@ def test_validation_invalid_build_id(mock_client):
         "project": "proj",
         "build_id": "not-an-int",
     }
-    # Pydantic raises ValidationError for type mismatch
-    from pydantic import ValidationError
 
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError, match="Invalid request parameters."):
         get_build_status(request_params, mock_client)

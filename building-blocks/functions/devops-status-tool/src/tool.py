@@ -1,11 +1,30 @@
 import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
+from urllib.parse import urlparse
 from .models import DevOpsStatusRequest, DevOpsStatusResponse, BuildStatus, BuildResult
 from .client import DevOpsClient
 from .config import validate_organization_url, validate_project_identifier, Settings
 
 logger = logging.getLogger(__name__)
+
+
+def validate_portal_url(portal_url: str, organization_url: str) -> None:
+    """
+    Validates that the portal URL returned by the provider is safe.
+    Must be HTTPS and match the host of the requested organization.
+    """
+    portal_parsed = urlparse(portal_url)
+    org_parsed = urlparse(organization_url)
+
+    if portal_parsed.scheme != "https":
+        raise ValueError("Provider returned an unsafe non-HTTPS portal URL.")
+
+    # Azure DevOps portal URLs usually match the org host or dev.azure.com
+    # To be safe, we ensure it's either the exact org host or dev.azure.com
+    allowed_hosts = {org_parsed.netloc, "dev.azure.com"}
+    if portal_parsed.netloc not in allowed_hosts:
+        raise ValueError("Provider returned a portal URL with an untrusted host.")
 
 
 def get_build_status(
@@ -17,7 +36,13 @@ def get_build_status(
     """
     try:
         # 1. Validate request parameters
-        request = DevOpsStatusRequest(**request_params)
+        try:
+            request = DevOpsStatusRequest(**request_params)
+        except Exception:
+            # Customer-Safe Logging: Do not log the raw exception/parameters
+            logger.warning("Invalid request parameters received.")
+            raise ValueError("Invalid request parameters.")
+
         validate_organization_url(request.organization_url)
         validate_project_identifier(request.project)
 
@@ -30,7 +55,6 @@ def get_build_status(
         # Documentation: https://learn.microsoft.com/en-us/rest/api/azure/devops/build/builds/get?view=azure-devops-rest-7.1#build
 
         # Safely extract values from the provider payload
-        # status and result are enums in the API and our model
         status = raw_build.get("status", "none")
         result = raw_build.get("result", "none")
 
@@ -43,8 +67,11 @@ def get_build_status(
         def parse_timestamp(ts: Optional[str]) -> Optional[datetime]:
             if not ts:
                 return None
-            # Standard Python datetime can handle Z since 3.11, or replace Z with +00:00
-            return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            try:
+                # Standard Python datetime can handle Z since 3.11, or replace Z with +00:00
+                return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            except Exception:
+                return None
 
         queue_time = parse_timestamp(queue_time_str)
         start_time = parse_timestamp(start_time_str)
@@ -59,6 +86,9 @@ def get_build_status(
         portal_url = raw_build.get("_links", {}).get("web", {}).get("href")
         if not portal_url:
             raise ValueError("Build portal URL is missing in provider response.")
+
+        # Safety Check: Validate the portal URL host and scheme
+        validate_portal_url(portal_url, str(request.organization_url))
 
         # Friendly business-level summary
         pipeline_name = raw_build.get("definition", {}).get("name", "Unknown Pipeline")
@@ -82,8 +112,9 @@ def get_build_status(
 
         return response
 
-    except ValueError as e:
-        logger.warning(f"Validation error or missing data: {str(e)}")
+    except ValueError:
+        # Customer-Safe Logging: Log a fixed message without technical detail
+        logger.warning("Build status request failed due to validation or missing data.")
         raise
     except Exception:
         # Customer-Safe Logging: Redact internal technical details
