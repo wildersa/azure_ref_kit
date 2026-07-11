@@ -85,10 +85,15 @@ This module reuses the container image defined in `building-blocks/hosting/conta
 ## Validation Commands
 
 ### Contract Validation
-Verify that the `module.yaml` contract is in sync with the Terraform interface and follows repository standards:
+Verify that the `module.yaml` contract is in sync with the Terraform interface and follows repository standards.
+
+To run tests in a clean environment:
 ```bash
 # From the module root
-python3 -m pytest tests/
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-test.txt
+python3 -m pytest tests/test_contract.py
 ```
 
 ### Infrastructure Validation
