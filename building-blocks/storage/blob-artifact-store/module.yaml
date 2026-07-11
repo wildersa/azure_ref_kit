@@ -26,7 +26,7 @@ inputs:
     description: "The principal ID of the runtime managed identity (Terraform variable) to grant 'Storage Blob Data Owner' access."
     type: string
   - name: allowed_ips
-    description: "List of public IP addresses or CIDR blocks allowed to access the storage account (Terraform variable)."
+    description: "Required list of public IP addresses or CIDR blocks allowed to access the storage account. At least one entry must be provided to ensure a usable network path when public access is restricted. Private endpoints are not supported."
     type: array
 outputs:
   - name: artifact_reference
