@@ -20,3 +20,15 @@ variable "container_name" {
   type        = string
   default     = "artifacts"
 }
+
+variable "runtime_principal_id" {
+  description = "The principal ID of the runtime managed identity (e.g. Function App) to grant access."
+  type        = string
+  default     = null
+}
+
+variable "allowed_ips" {
+  description = "List of IP addresses allowed to access the storage account."
+  type        = list(string)
+  default     = []
+}

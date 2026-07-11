@@ -77,3 +77,15 @@ def test_get_safe_read_url(mock_generate_sas, artifact_store):
     assert "mock-sas-token" in url
     assert "https://testaccount.blob.core.windows.net/testcontainer/run-1/art-1" in url
     artifact_store.blob_service_client.get_user_delegation_key.assert_called_once()
+
+
+def test_get_safe_read_url_validates_lifetime(artifact_store):
+    artifact = Artifact(
+        id="art-1",
+        run_id="run-1",
+        kind="pdf",
+        safe_name="doc.pdf",
+        storage_ref="run-1/art-1",
+    )
+    with pytest.raises(ValueError, match="expires_in_hours must be a positive integer"):
+        artifact_store.get_safe_read_url(artifact, expires_in_hours=0)

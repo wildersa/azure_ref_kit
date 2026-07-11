@@ -8,8 +8,14 @@ resource "azurerm_storage_account" "artifact_store" {
   # Secure defaults
   https_only_enabled            = true
   min_tls_version                = "TLS1_2"
-  public_network_access_enabled  = false
+  public_network_access_enabled  = true # Enable but restrict via network_rules
   shared_access_key_enabled      = false # Prefer Entra/RBAC
+
+  network_rules {
+    default_action = "Deny"
+    ip_rules       = var.allowed_ips
+    bypass         = ["AzureServices", "Logging", "Metrics"]
+  }
 
   blob_properties {
     delete_retention_policy {
@@ -36,7 +42,14 @@ resource "random_id" "storage_suffix" {
   byte_length = 4
 }
 
-resource "azurerm_role_assignment" "storage_blob_data_owner" {
+resource "azurerm_role_assignment" "storage_blob_data_owner_runtime" {
+  count                = var.runtime_principal_id != null ? 1 : 0
+  scope                = azurerm_storage_account.artifact_store.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = var.runtime_principal_id
+}
+
+resource "azurerm_role_assignment" "storage_blob_data_owner_deployer" {
   scope                = azurerm_storage_account.artifact_store.id
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = data.azurerm_client_config.current.object_id

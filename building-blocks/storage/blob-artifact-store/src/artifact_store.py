@@ -120,6 +120,9 @@ class BlobArtifactStore:
         """
         Generates a short-lived, read-only, user-delegation SAS URL.
         """
+        if expires_in_hours <= 0:
+            raise ValueError("expires_in_hours must be a positive integer.")
+
         try:
             # 1. Get user delegation key
             now = datetime.datetime.now(datetime.timezone.utc)
