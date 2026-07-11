@@ -49,11 +49,35 @@ def test_terraform_variables_contract():
     assert 'variable "runtime_principal_id"' in content
     assert 'default     = null' not in content, "runtime_principal_id must be required (no default)."
     assert 'variable "allowed_ips"' in content
+    assert 'default     = []' not in content, "allowed_ips must be required (no default) to enforce explicit network path."
+    assert 'length(var.allowed_ips) > 0' in content, "allowed_ips must have a validation rule for non-empty list."
     assert 'variable "container_name"' in content
 
     # Verify RE2 compliance (no lookahead)
     assert "(?!.*--)" not in content, "RE2 does not support lookahead. Use !strcontains instead."
     assert "strcontains" in content
+
+
+def test_terraform_security_contract():
+    """Verify Terraform security settings meet P0 criteria."""
+    path = os.path.join(MODULE_ROOT, "infra", "terraform", "main.tf")
+    assert os.path.exists(path)
+
+    with open(path, "r") as f:
+        content = f.read()
+
+    # Verify network security
+    assert 'default_action = "Deny"' in content
+    assert 'public_network_access_enabled  = true' in content
+    assert 'ip_rules       = var.allowed_ips' in content
+
+    # Verify identity and access security
+    assert 'shared_access_key_enabled      = false' in content
+    assert 'https_only_enabled            = true' in content
+    assert 'min_tls_version                = "TLS1_2"' in content
+
+    # Verify public access disabled on container
+    assert 'container_access_type = "private"' in content
 
 
 def test_readme_standard_sections():

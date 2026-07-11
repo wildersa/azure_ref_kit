@@ -58,7 +58,7 @@ PYTHONPATH=. pytest tests/
 - **Hardened Validation**: All inputs (account URL, container name, IDs, metadata) are validated against strict patterns before any SDK interaction.
 - **Managed Identity**: Uses `DefaultAzureCredential` for all Azure service calls.
 - **No Keys**: Storage account keys are disabled in Terraform; all access is via Microsoft Entra ID (RBAC).
-- **Network Isolation**: The storage account defaults to 'Deny' public access. Connectivity must be explicitly configured via `allowed_ips` or private endpoints.
+- **Network Isolation**: The storage account defaults to 'Deny' public access. Connectivity must be explicitly configured via a public IP allowlist (`allowed_ips`). This module requires at least one allowed IP to ensure a usable network path.
 - **Short-lived SAS**: Downloads use User-Delegation SAS tokens valid for 1 hour by default, capped by `sas_max_lifetime_hours`.
 - **Redaction**: Internal exceptions and technical identifiers (connection strings, raw provider errors) are redacted from business-level outputs.
 
@@ -70,5 +70,6 @@ The module is designed to run within Azure Functions, Container Apps, or App Ser
 - **Storage Account Contributor**: Used by the deployment principal for management-plane operations only (does not include data-plane access).
 
 ## Known Limits
-- User Delegation SAS requires Entra ID authentication and cannot be generated using account keys.
-- Maximum artifact size is enforced client-side before upload.
+- **Network Path**: Requires an explicit public IP allowlist. Private endpoints and VNet service endpoints are not supported by this module.
+- **SAS Authentication**: User Delegation SAS requires Entra ID authentication and cannot be generated using account keys.
+- **Upload Size**: Maximum artifact size is enforced client-side before upload.

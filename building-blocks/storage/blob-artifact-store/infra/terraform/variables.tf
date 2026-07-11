@@ -38,9 +38,13 @@ variable "runtime_principal_id" {
 }
 
 variable "allowed_ips" {
-  description = "List of public IP addresses or CIDR blocks allowed to access the storage account. Required if 'default_action' is 'Deny' and access is needed from specific networks."
+  description = "List of public IP addresses or CIDR blocks allowed to access the storage account. This is required to ensure at least one usable network path (public allowlist) when default_action is 'Deny'. Private endpoints are not supported by this module."
   type        = list(string)
-  default     = []
+
+  validation {
+    condition     = length(var.allowed_ips) > 0
+    error_message = "At least one IP address or CIDR block must be provided in allowed_ips to ensure connectivity. This module does not support private endpoints."
+  }
 
   validation {
     condition     = alltrue([for ip in var.allowed_ips : can(regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$", ip))])
