@@ -47,7 +47,7 @@ variable "allowed_ips" {
   }
 
   validation {
-    condition     = alltrue([for ip in var.allowed_ips : can(regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$", ip))])
-    error_message = "All allowed_ips must be valid IPv4 addresses or CIDR blocks."
+    condition     = alltrue([for ip in var.allowed_ips : can(regex("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.){3}(25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\/(3[0-2]|[1-2]\\d|\\d))?$", ip))])
+    error_message = "All allowed_ips must be valid IPv4 addresses (0-255) or CIDR blocks (0-32)."
   }
 }

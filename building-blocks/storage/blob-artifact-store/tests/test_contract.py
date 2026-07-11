@@ -80,6 +80,45 @@ def test_terraform_security_contract():
     assert 'container_access_type = "private"' in content
 
 
+def test_terraform_ip_validation_regex():
+    """Verify that the IP validation regex correctly identifies valid and invalid IPs/CIDRs."""
+    path = os.path.join(MODULE_ROOT, "infra", "terraform", "variables.tf")
+    with open(path, "r") as f:
+        content = f.read()
+
+    # Extract the regex pattern from variables.tf specifically for allowed_ips
+    # Use re.DOTALL to match across lines if necessary, and look for allowed_ips context
+    match = re.search(r'variable "allowed_ips".*?regex\("([^"]+)"', content, re.DOTALL)
+    assert match, "Could not find IP validation regex for allowed_ips in variables.tf"
+    pattern = match.group(1).replace("\\\\", "\\")
+
+    # Test valid cases
+    valid_ips = [
+        "192.168.1.1",
+        "0.0.0.0",
+        "255.255.255.255",
+        "8.8.8.8/32",
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "1.1.1.1/0",
+    ]
+    for ip in valid_ips:
+        assert re.match(pattern, ip), f"Regex failed to match valid IP: {ip}"
+
+    # Test invalid cases
+    invalid_ips = [
+        "256.256.256.256",
+        "1.2.3.4.5",
+        "1.2.3",
+        "a.b.c.d",
+        "192.168.1.1/33",
+        "1.1.1.1/-1",
+        "999.999.999.999",
+    ]
+    for ip in invalid_ips:
+        assert not re.match(pattern, ip), f"Regex incorrectly matched invalid IP: {ip}"
+
+
 def test_readme_standard_sections():
     """Verify README has all mandatory sections from standard."""
     path = os.path.join(MODULE_ROOT, "README.md")
