@@ -1,13 +1,31 @@
 name: blob-artifact-store
 type: storage
 category: artifacts
-status: scaffold
+status: implemented
 purpose: Store input, intermediate, and output artifacts for pipeline executions.
 inputs:
-  - artifact_content
-  - artifact_metadata
+  - name: artifact_content
+    description: "Raw binary content of the artifact to store."
+    type: bytes
+  - name: artifact_metadata
+    description: "Dictionary of metadata including kind, safe_name, and visibility."
+    type: object
+  - name: ARTIFACT_STORE_BLOB_ENDPOINT
+    description: "Primary blob service endpoint (environment variable)."
+    type: string
+  - name: ARTIFACT_CONTAINER_NAME
+    description: "Name of the blob container (environment variable)."
+    type: string
+  - name: ARTIFACT_MAX_SIZE_BYTES
+    description: "Maximum allowed artifact size (environment variable)."
+    type: integer
+  - name: SAS_MAX_LIFETIME_HOURS
+    description: "Maximum lifetime for generated SAS tokens (in hours)."
+    type: integer
 outputs:
-  - artifact_reference
+  - name: artifact_reference
+    description: "A customer-safe Artifact reference conforming to artifact.schema.json."
+    type: object
 azure_resources:
   - Blob Storage
 contracts:

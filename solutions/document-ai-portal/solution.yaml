@@ -29,8 +29,8 @@ building_blocks:
   - id: blob-artifact-store
     path: building-blocks/storage/blob-artifact-store/
     role: security
-    status: scaffold
-    deploy_target: none
+    status: implemented
+    deploy_target: storage
   - id: durable-basic-pipeline
     path: building-blocks/pipelines/durable-basic-pipeline/
     role: worker
