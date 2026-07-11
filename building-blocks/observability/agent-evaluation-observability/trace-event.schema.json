@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Safe Trace Event",
+  "description": "Deterministic contract for customer-safe agent technical telemetry.",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Correlation ID for the end-to-end request."
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "Identifier for the agent version."
+    },
+    "operation_type": {
+      "type": "string",
+      "enum": ["agent_turn", "tool_call", "reasoning_step", "safety_check"],
+      "description": "The category of the operation being traced."
+    },
+    "tool_name": {
+      "type": "string",
+      "description": "Allowlisted tool name if operation_type is tool_call."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failure", "refusal", "error"],
+      "description": "High-level outcome category."
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Latency of the operation in milliseconds."
+    },
+    "error_category": {
+      "type": "string",
+      "description": "Friendly error category (e.g., 'rate_limit', 'tool_timeout') without stack traces."
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Optional secondary correlation ID."
+    }
+  },
+  "required": ["request_id", "operation_type", "status", "duration_ms"],
+  "additionalProperties": false
+}

@@ -14,23 +14,26 @@ Technical telemetry should be strictly separated from business status. Tracing f
 flowchart TD
     subgraph "Agent Execution (Private)"
         A[Foundry Agent] -->|Tool Call| T[Agent Tools]
-        A -->|Step Outcome| R[Internal Results]
+        A -->|Internal Result| R[Raw Trace Event]
     end
 
-    subgraph "Trace/Evaluation Boundary"
-        A -.->|OpenTelemetry| O[Azure Monitor / App Insights]
-        A -.->|Evaluation Signal| F[Foundry Observability]
+    subgraph "Safe Telemetry Adapter"
+        R -->|Filter & Redact| SA[Redactor / Filter]
+        SA -->|Allowlisted Fields Only| ST[Safe Trace Event]
     end
 
-    subgraph "Observability Views (Internal)"
-        O -->|End-to-end Traces| D1[App Insights Dashboard]
-        F -->|Quality/Safety Scores| D2[Foundry Monitoring]
+    subgraph "Azure Observability (Internal)"
+        ST -->|OpenTelemetry| O[Azure Monitor / App Insights]
+        ST -->|Evaluation Signal| F[Foundry Observability]
     end
 
     subgraph "Customer Boundary (Safe)"
         A -->|Safe Status| S[Status Store]
         S -->|Business Status| P[Customer Portal]
     end
+
+    O -->|Diagnostics| D[Engineering Dashboards]
+    F -->|Quality| Q[Quality Scores]
 ```
 
 ## Trace and Evaluation Checklist
@@ -84,6 +87,27 @@ Every agent iteration must be evaluated against these pillars:
 | **Safety** | Safety & Refusal Rate | Does the agent refuse harmful, out-of-scope, or prompt-injection attempts? |
 | **Answer Format** | Customer-Safe Status Wording | Is the status language friendly and free of technical jargon (format check)? |
 | **Failure Quality** | Latency/Error Budget Notes | Is the failure explanation friendly and non-technical, within performance limits? |
+| **Redaction** | Redaction Compliance | Does the trace output strictly adhere to the redaction rules and contain no forbidden fields? |
+
+## Local Validation
+
+To validate the observability contract and redaction logic locally:
+
+1. **Contract Validation**: Ensures the README and `module.yaml` are synchronized and meet P0 requirements.
+   ```bash
+   pytest tests/test_contract.py
+   ```
+
+2. **Redaction Validation**: Proves that forbidden fields are correctly identified and removed from telemetry payloads.
+   ```bash
+   pytest tests/test_redaction.py
+   ```
+
+## Known Limits
+
+- **Shared Responsibility**: This reference defines the *what* and *how* of safe tracing, but the final implementation in the agent runtime or adapter is responsible for correctly applying these rules.
+- **Pattern-Based Redaction**: Simple regex-based redaction may not catch all sophisticated prompt injection attempts or obfuscated secrets.
+- **Local Simulation**: Local tests use static payloads and do not account for dynamic behavior or platform-level tracing injected by the Azure AI Foundry SDK.
 
 ## Security and Privacy Notes
 
