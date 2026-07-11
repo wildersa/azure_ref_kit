@@ -31,11 +31,6 @@ export const api = {
     const response = await fetch(`/api/runs/${id}`);
     const run = await handleResponse<PipelineRun>(response);
 
-    // In a real implementation, the API might return steps within the run detail
-    // or we might need a separate call. Based on the README, GET /runs/{id}
-    // should include the timeline components (steps).
-    // If the API doesn't include them, we'd mock it here or adjust.
-    // For now, we'll assume it returns them or we'll need to mock them for the UI.
     return {
         ...run,
         steps: (run as any).steps || []
