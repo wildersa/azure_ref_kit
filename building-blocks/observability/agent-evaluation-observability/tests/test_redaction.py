@@ -58,9 +58,25 @@ def test_redactor_only_allows_allowlisted_fields():
     assert "internal_debugging_flag" not in safe_payload
     assert "another_hidden_field" not in safe_payload
 
-def test_is_safe_check():
-    """Verify the is_safe check correctly identifies dirty payloads."""
-    assert TelemetryRedactor.is_safe({"request_id": "123"}) is True
-    assert TelemetryRedactor.is_safe({"prompt": "hello"}) is False
-    assert TelemetryRedactor.is_safe({"tokens": 10}) is False
-    assert TelemetryRedactor.is_safe({"tenant_id": "uuid"}) is False
+def test_tool_name_allowlist_validation():
+    """Verify that only allowlisted tool names are preserved."""
+    # Allowed tool
+    payload_allowed = {"request_id": "1", "operation_type": "tool_call", "status": "success", "duration_ms": 1, "tool_name": "get_pipeline_status"}
+    safe_allowed = TelemetryRedactor.filter_payload(payload_allowed)
+    assert safe_allowed["tool_name"] == "get_pipeline_status"
+
+    # Unauthorized tool
+    payload_unauthorized = {"request_id": "1", "operation_type": "tool_call", "status": "success", "duration_ms": 1, "tool_name": "delete_all_resources"}
+    safe_unauthorized = TelemetryRedactor.filter_payload(payload_unauthorized)
+    assert safe_unauthorized["tool_name"] == "[UNAUTHORIZED_TOOL]"
+
+def test_strict_allowlist_check():
+    """Verify the strict allowlist check identifies unknown fields."""
+    # Valid
+    assert TelemetryRedactor.has_only_allowlisted_fields({"request_id": "123", "status": "success", "duration_ms": 10, "operation_type": "agent_turn"}) is True
+
+    # Forbidden field
+    assert TelemetryRedactor.has_only_allowlisted_fields({"request_id": "123", "prompt": "hello"}) is False
+
+    # Unknown field (not allowlisted)
+    assert TelemetryRedactor.has_only_allowlisted_fields({"request_id": "123", "unknown_technical_field": "val"}) is False

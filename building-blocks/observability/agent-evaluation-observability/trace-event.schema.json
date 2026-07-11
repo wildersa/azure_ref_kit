@@ -19,7 +19,8 @@
     },
     "tool_name": {
       "type": "string",
-      "description": "Allowlisted tool name if operation_type is tool_call."
+      "enum": ["get_pipeline_status", "list_artifacts", "get_build_log_summary"],
+      "description": "Controlled allowlist of tool names."
     },
     "status": {
       "type": "string",
