@@ -1,0 +1,113 @@
+# building-blocks/hosting/webapp-agent-api/examples/azure-pipelines-deploy.yml
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - building-blocks/hosting/webapp-agent-api/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Name of the Azure Resource Manager service connection (Workload Identity Federation recommended)
+  - name: AZURE_SERVICE_CONNECTION_NAME
+    value: 'AZURE_RM_SVC_CONN'
+  # Path to the Terraform module
+  - name: TF_WORKING_DIR
+    value: 'building-blocks/hosting/webapp-agent-api/infra/terraform'
+  # Container image to deploy
+  - name: CONTAINER_IMAGE
+    value: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+
+stages:
+- stage: Static_Validation
+  displayName: 'Static Validation'
+  jobs:
+  - job: Validate
+    steps:
+    - script: |
+        cd $(TF_WORKING_DIR)
+        terraform fmt -check
+      displayName: 'Terraform Format Check'
+    - task: AzureCLI@2
+      displayName: 'Terraform Init & Validate'
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          set -e
+          cd $(TF_WORKING_DIR)
+          terraform init -backend=false
+          terraform validate
+
+- stage: Plan
+  displayName: 'Infrastructure Plan'
+  dependsOn: Static_Validation
+  jobs:
+  - job: Plan
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Terraform Plan'
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        inlineScript: |
+          set -e
+          cd $(TF_WORKING_DIR)
+
+          # Map Workload Identity Federation (OIDC) values to Terraform environment variables
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_TENANT_ID=$tenantId
+          export ARM_SUBSCRIPTION_ID=$subscriptionId
+          export ARM_OIDC_TOKEN=$idToken
+          export ARM_USE_OIDC=true
+
+          terraform init \
+            -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
+            -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \
+            -backend-config="container_name=$(BACKEND_CONTAINER_NAME)" \
+            -backend-config="key=$(BACKEND_KEY)"
+          terraform plan -input=false -var="container_image=$(CONTAINER_IMAGE)"
+
+- stage: Deploy
+  displayName: 'Infrastructure Deploy'
+  dependsOn: Plan
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: Apply
+    environment: 'webapp-api-deploy'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
+              inlineScript: |
+                set -e
+                cd $(TF_WORKING_DIR)
+
+                # Map Workload Identity Federation (OIDC) values to Terraform environment variables
+                export ARM_CLIENT_ID=$servicePrincipalId
+                export ARM_TENANT_ID=$tenantId
+                export ARM_SUBSCRIPTION_ID=$subscriptionId
+                export ARM_OIDC_TOKEN=$idToken
+                export ARM_USE_OIDC=true
+
+                terraform init \
+                  -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
+                  -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \
+                  -backend-config="container_name=$(BACKEND_CONTAINER_NAME)" \
+                  -backend-config="key=$(BACKEND_KEY)"
+                terraform apply -auto-approve -input=false -var="container_image=$(CONTAINER_IMAGE)"

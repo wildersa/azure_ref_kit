@@ -1,7 +1,6 @@
 import os
 import yaml
 import hcl2
-import pytest
 
 def test_module_terraform_alignment():
     module_root = os.path.join(os.path.dirname(__file__), "..")

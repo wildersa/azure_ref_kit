@@ -181,7 +181,7 @@ jobs:
           pip install -r requirements-test.txt
 
       - name: Run pytest
-        run: pytest tests/test_contract.py
+        run: pytest tests/
 
   # Job to test HTTP function tool
   test-func-http:
