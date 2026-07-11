@@ -1,4 +1,5 @@
 from src.agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
+from src.config import Settings
 
 
 def test_system_instructions_safety_keywords():
@@ -21,16 +22,24 @@ def test_system_instructions_safety_keywords():
 
 def test_mcp_tool_configuration():
     """Verify the MCP tool is configured correctly in the definition."""
-    tools = get_tool_definitions()
+    settings = Settings(
+        project_endpoint="https://res.ai.azure.com/api/projects/proj-123",
+        agent_name="my-agent",
+        model_name="gpt-4o",
+        mcp_server_url="https://mcp.com/api",
+        mcp_server_label="test-mcp",
+        allowed_tool_names=["get_status"],
+    )
+    tools = get_tool_definitions(settings)
     assert len(tools) == 1
     mcp_tool = tools[0]
 
     # Verify attributes (matches mock_sdk or real SDK MCPTool)
     assert mcp_tool.type == "mcp"
-    assert mcp_tool.server_label == "system-status-server"
+    assert mcp_tool.server_label == "test-mcp"
     assert mcp_tool.require_approval == "always"
-    assert mcp_tool.server_url is not None
-    assert mcp_tool.allowed_tools == ["get_system_status"]
+    assert mcp_tool.server_url == "https://mcp.com/api"
+    assert mcp_tool.allowed_tools == ["get_status"]
 
 
 def test_no_secrets_in_instructions():

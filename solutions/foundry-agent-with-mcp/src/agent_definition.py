@@ -3,8 +3,9 @@ Foundry Agent with MCP - Agent Definition.
 This module defines the customer-safe boundary and MCP tool integration for the agent.
 """
 
-import os
 from typing import List
+
+from .config import Settings
 
 # Use real SDK if available, otherwise use mock for local validation
 try:
@@ -29,28 +30,20 @@ Your goal is to help users understand the health and operational status of the e
 - Provide friendly, non-technical explanations for any issues.
 
 ### Tool Usage:
-1. Use the tools from the `system-status-server` to answer questions about the overall health, active regions, or current environment state.
+1. Use the tools from the configured MCP server to answer questions about the overall health, active regions, or current environment state.
 """
 
 
-def get_tool_definitions() -> List[Tool]:
+def get_tool_definitions(settings: Settings) -> List[Tool]:
     """
     Returns the list of tool definitions for use with the Azure AI Projects SDK.
     Uses the MCPTool class to connect to a remote MCP server endpoint.
     """
-    # In a real scenario, these would come from environment variables or project config
-    mcp_server_url = os.environ.get(
-        "MCP_SERVER_URL",
-        "https://your-mcp-server.azurewebsites.net/runtime/webhooks/mcp",
-    )
-
     return [
         MCPTool(
-            server_label="system-status-server",
-            server_url=mcp_server_url,
+            server_label=settings.mcp_server_label,
+            server_url=settings.mcp_server_url,
             require_approval="always",  # Security best practice: always require approval for MCP tools
-            allowed_tools=[
-                "get_system_status"
-            ],  # Constraint the agent to specific safe tools
+            allowed_tools=settings.allowed_tool_names,  # Constraint the agent to specific safe tools
         )
     ]
