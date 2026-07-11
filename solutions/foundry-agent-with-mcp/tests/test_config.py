@@ -40,6 +40,33 @@ def test_settings_invalid_names(monkeypatch):
         Settings.from_env()
 
 
+def test_settings_mcp_url_security(monkeypatch):
+    monkeypatch.setenv(
+        "AZURE_AI_PROJECT_ENDPOINT", "https://res.ai.azure.com/api/projects/proj-123"
+    )
+    monkeypatch.setenv("AZURE_AI_AGENT_NAME", "my-agent")
+    monkeypatch.setenv("AZURE_AI_MODEL_NAME", "gpt-4o")
+    monkeypatch.setenv("MCP_SERVER_LABEL", "my-mcp")
+    monkeypatch.setenv("ALLOWED_TOOL_NAMES", "tool1")
+
+    # Remote HTTP rejected
+    monkeypatch.setenv("MCP_SERVER_URL", "http://remote-mcp.com/api")
+    with pytest.raises(
+        ValueError, match="HTTP MCP_SERVER_URL is only allowed for localhost"
+    ):
+        Settings.from_env()
+
+    # Localhost HTTP accepted
+    monkeypatch.setenv("MCP_SERVER_URL", "http://localhost:8000/api")
+    settings = Settings.from_env()
+    assert settings.mcp_server_url == "http://localhost:8000/api"
+
+    # HTTPS remote accepted
+    monkeypatch.setenv("MCP_SERVER_URL", "https://remote-mcp.com/api")
+    settings = Settings.from_env()
+    assert settings.mcp_server_url == "https://remote-mcp.com/api"
+
+
 def test_validate_user_input():
     assert validate_user_input("hello") == "hello"
     assert validate_user_input("  hello  ") == "hello"

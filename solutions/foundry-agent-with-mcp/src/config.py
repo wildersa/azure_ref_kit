@@ -87,6 +87,12 @@ class Settings:
         if parsed_mcp.username or parsed_mcp.password:
             raise ValueError("MCP_SERVER_URL must not contain credentials.")
 
+        # Security: HTTP is only allowed for localhost/127.0.0.1
+        if parsed_mcp.scheme == "http":
+            hostname = parsed_mcp.hostname
+            if hostname not in ("localhost", "127.0.0.1"):
+                raise ValueError("HTTP MCP_SERVER_URL is only allowed for localhost.")
+
         allowed_tool_names = [
             t.strip() for t in allowed_tools_raw.split(",") if t.strip()
         ]

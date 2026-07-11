@@ -134,3 +134,38 @@ def test_get_chat_response_unknown_mcp_tool_sanitized(
     # Check approval sent to agent (should be False)
     second_call_input = mock_openai.responses.create.call_args_list[1][1]["input"]
     assert second_call_input[0]["approve"] is False
+
+
+@patch("src.adapter.AIProjectClient")
+def test_get_chat_response_loop_exhaustion_fail_closed(
+    mock_client_class, mock_settings
+):
+    """Verify fail-closed on loop exhaustion with pending approvals."""
+    adapter = FoundryAgentAdapter(mock_settings)
+    mock_client = MagicMock()
+    adapter._project_client = mock_client
+
+    mock_agent = MagicMock()
+    mock_client.agents.create_version.return_value = mock_agent
+
+    mock_openai = MagicMock()
+    mock_openai_cm = MagicMock()
+    mock_openai_cm.__enter__.return_value = mock_openai
+    mock_client.get_openai_client.return_value = mock_openai_cm
+
+    # Mock response that ALWAYS asks for approval
+    mock_req = MagicMock()
+    mock_req.type = "mcp_approval_request"
+    mock_req.server_label = "test-mcp"
+    mock_req.name = "get_status"
+    mock_req.id = "req_1"
+
+    mock_response = MagicMock()
+    mock_response.output = [mock_req]
+    mock_response.output_text = "Progressing..."
+    mock_response.id = "resp_1"
+
+    mock_openai.responses.create.return_value = mock_response
+
+    with pytest.raises(RuntimeError, match="The agent exceeded the tool call limit"):
+        adapter.get_chat_response("Infinite tool calls")

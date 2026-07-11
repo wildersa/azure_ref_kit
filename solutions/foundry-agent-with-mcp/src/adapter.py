@@ -134,6 +134,16 @@ class FoundryAgentAdapter:
                             }
                         },
                     )
+                else:
+                    # Loop finished without breaking: check if there are still pending approvals
+                    pending_requests = [
+                        item
+                        for item in response.output
+                        if item.type == "mcp_approval_request"
+                    ]
+                    if pending_requests:
+                        logger.error("Exceeded maximum tool call iterations.")
+                        raise RuntimeError("The agent exceeded the tool call limit.")
 
                 output_text = response.output_text
                 if not output_text or not str(output_text).strip():
