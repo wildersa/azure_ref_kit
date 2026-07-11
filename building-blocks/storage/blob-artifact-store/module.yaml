@@ -1,7 +1,7 @@
 name: blob-artifact-store
 type: storage
 category: artifacts
-status: scaffold
+status: implemented
 purpose: Store input, intermediate, and output artifacts for pipeline executions.
 inputs:
   - artifact_content
