@@ -1,0 +1,4 @@
+azure-ai-projects>=1.0.0b2
+azure-identity
+openai
+fastmcp

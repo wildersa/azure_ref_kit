@@ -3,6 +3,7 @@ status: active
 purpose: Reference solution for a Foundry agent using a Model Context Protocol (MCP) tool boundary.
 entrypoints:
   sdk_invocation: AIProjectClient
+  cli: solutions.foundry-agent-with-mcp.src.main
 building_blocks:
   - building-blocks/mcp/fastmcp-basic-server
 contracts: []
