@@ -43,7 +43,6 @@ resource "random_id" "storage_suffix" {
 }
 
 resource "azurerm_role_assignment" "storage_blob_data_owner_runtime" {
-  count                = var.runtime_principal_id != null ? 1 : 0
   scope                = azurerm_storage_account.artifact_store.id
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = var.runtime_principal_id
@@ -55,17 +54,6 @@ resource "azurerm_role_assignment" "storage_account_contributor_deployer" {
   scope                = azurerm_storage_account.artifact_store.id
   role_definition_name = "Storage Account Contributor"
   principal_id         = data.azurerm_client_config.current.object_id
-}
-
-# Explicitly document the runtime access mode.
-# This resource serves as a placeholder to ensure the deployer is aware
-# of the required runtime identity configuration when 'runtime_principal_id' is null.
-resource "null_resource" "runtime_identity_warning" {
-  count = var.runtime_principal_id == null ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "echo 'WARNING: No runtime_principal_id provided. The storage account will be inaccessible to the runtime application by default.'"
-  }
 }
 
 data "azurerm_client_config" "current" {}

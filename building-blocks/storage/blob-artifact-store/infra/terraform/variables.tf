@@ -33,9 +33,8 @@ variable "container_name" {
 }
 
 variable "runtime_principal_id" {
-  description = "The principal ID of the runtime managed identity (e.g. Function App) to grant 'Storage Blob Data Owner' access. If null, no runtime data-plane access is granted."
+  description = "The principal ID of the runtime managed identity (e.g. Function App) to grant 'Storage Blob Data Owner' access."
   type        = string
-  default     = null
 }
 
 variable "allowed_ips" {

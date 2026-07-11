@@ -47,6 +47,7 @@ def test_terraform_variables_contract():
 
     # Verify P0 variable existence
     assert 'variable "runtime_principal_id"' in content
+    assert 'default     = null' not in content, "runtime_principal_id must be required (no default)."
     assert 'variable "allowed_ips"' in content
     assert 'variable "container_name"' in content
 
@@ -78,6 +79,14 @@ def test_readme_standard_sections():
     # Verify Mermaid diagram
     assert "```mermaid" in content
     assert "sequenceDiagram" in content
+
+
+def test_terraform_no_null_resource():
+    """Verify that the warning null_resource is removed in favor of a required variable."""
+    path = os.path.join(MODULE_ROOT, "infra", "terraform", "main.tf")
+    with open(path, "r") as f:
+        content = f.read()
+    assert "null_resource" not in content
 
 
 def test_no_secrets_in_code():
