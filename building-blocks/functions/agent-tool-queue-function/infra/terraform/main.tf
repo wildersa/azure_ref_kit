@@ -14,6 +14,12 @@ resource "azurerm_storage_account" "main" {
   shared_access_key_enabled = false
 }
 
+resource "azurerm_storage_container" "deploy" {
+  name                  = "function-releases"
+  storage_account_name  = azurerm_storage_account.main.name
+  container_access_type = "private"
+}
+
 resource "azurerm_storage_queue" "input" {
   name                 = "agent-tool-input"
   storage_account_name = azurerm_storage_account.main.name
@@ -37,16 +43,25 @@ resource "azurerm_function_app_flex_consumption" "main" {
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
-  storage_account_name       = azurerm_storage_account.main.name
-  service_plan_id            = azurerm_service_plan.main.id
+  service_plan_id = azurerm_service_plan.main.id
+
+  storage {
+    type                     = "blobContainer"
+    account_name             = azurerm_storage_account.main.name
+    container_name           = azurerm_storage_container.deploy.name
+    authentication_type      = "SystemAssignedIdentity"
+  }
 
   identity {
     type = "SystemAssigned"
   }
 
   site_config {
-    application_stack {
-      python_version = "3.11"
+    instance_memory_mb = 2048
+
+    runtime {
+      name    = "python"
+      version = "3.11"
     }
   }
 
@@ -55,7 +70,7 @@ resource "azurerm_function_app_flex_consumption" "main" {
   }
 }
 
-# RBAC for the Function App to access queues
+# RBAC for the Function App to access queues and storage
 resource "azurerm_role_assignment" "queue_processor" {
   scope                = azurerm_storage_account.main.id
   role_definition_name = "Storage Queue Data Message Processor"
@@ -68,7 +83,7 @@ resource "azurerm_role_assignment" "queue_contributor" {
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
 }
 
-# Required for Flex Consumption host operations
+# Required for Flex Consumption host operations and deployment container access
 resource "azurerm_role_assignment" "blob_owner" {
   scope                = azurerm_storage_account.main.id
   role_definition_name = "Storage Blob Data Owner"

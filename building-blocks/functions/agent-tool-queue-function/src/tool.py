@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict
-from .models import JobInput, JobResult, JobStatus
+from .models import JobInput, JobResult, JobStatus, is_valid_correlation_id
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +52,12 @@ def process_queue_job(payload: Dict[str, Any]) -> JobResult:
 
     except ValueError as e:
         # Validation errors return a safe failure record if correlation_id is available
-        cid = payload.get("correlation_id", "unknown-id") if payload else "unknown-id"
-        # Ensure cid is at least valid enough for the model if we can
-        if not isinstance(cid, str) or len(cid) < 8:
-            cid = "invalid-correlation-id"
+        cid = payload.get("correlation_id") if payload else None
+        if not is_valid_correlation_id(cid):
+            cid = "invalid-id-format"
 
         return JobResult(
-            correlation_id=cid if len(cid) <= 64 else cid[:64],
+            correlation_id=cid,
             status=JobStatus.FAILED,
             error_message=str(e),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -66,11 +65,12 @@ def process_queue_job(payload: Dict[str, Any]) -> JobResult:
     except Exception:
         # P0: Redact internal technical details in logs and output
         logger.error("An unhandled exception occurred during job processing.")
-        cid = payload.get("correlation_id", "unknown-id") if payload else "unknown-id"
+        cid = payload.get("correlation_id") if payload else None
+        if not is_valid_correlation_id(cid):
+            cid = "invalid-id-format"
+
         return JobResult(
-            correlation_id=cid
-            if isinstance(cid, str) and 8 <= len(cid) <= 64
-            else "unknown-id",
+            correlation_id=cid,
             status=JobStatus.FAILED,
             error_message="An internal error occurred while processing the request.",
             timestamp=datetime.now(timezone.utc).isoformat(),

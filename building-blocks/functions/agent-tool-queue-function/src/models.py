@@ -7,6 +7,13 @@ import re
 CORRELATION_ID_PATTERN = re.compile(r"^[a-zA-Z0-9-]{8,64}$")
 
 
+def is_valid_correlation_id(v: Any) -> bool:
+    """Checks if a value is a valid correlation ID string."""
+    if not isinstance(v, str):
+        return False
+    return bool(CORRELATION_ID_PATTERN.match(v))
+
+
 class JobStatus(str, Enum):
     """Explicit job status transitions."""
 

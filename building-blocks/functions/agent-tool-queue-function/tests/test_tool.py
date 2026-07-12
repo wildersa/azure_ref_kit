@@ -57,7 +57,7 @@ def test_process_queue_job_invalid_schema():
     assert "Invalid job payload" in result.error_message
 
 
-def test_process_queue_job_invalid_correlation_id():
+def test_process_queue_job_invalid_correlation_id_length():
     # Too short
     payload = {
         "correlation_id": "short",
@@ -67,7 +67,20 @@ def test_process_queue_job_invalid_correlation_id():
     result = process_queue_job(payload)
 
     assert result.status == JobStatus.FAILED
-    assert result.correlation_id == "invalid-correlation-id"
+    assert result.correlation_id == "invalid-id-format"
+
+
+def test_process_queue_job_invalid_correlation_id_pattern():
+    # Correct length but invalid characters
+    payload = {
+        "correlation_id": "!!!!!!!!",
+        "operation_type": "ping",
+        "parameters": {},
+    }
+    result = process_queue_job(payload)
+
+    assert result.status == JobStatus.FAILED
+    assert result.correlation_id == "invalid-id-format"
 
 
 def test_process_queue_job_redacts_unexpected_error(monkeypatch):
