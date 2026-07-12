@@ -1,7 +1,11 @@
 import azure.functions as func
 import logging
 import json
-from src.tool import get_resource_info_safe
+
+try:
+    from .src.tool import get_resource_info_safe
+except ImportError:
+    from src.tool import get_resource_info_safe
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -43,9 +47,7 @@ def get_resource_info_trigger(req: func.HttpRequest) -> func.HttpResponse:
         # P0: Do not log stack traces (logging.exception)
         logging.error("An unhandled exception occurred in the tool boundary.")
         return func.HttpResponse(
-            json.dumps(
-                {"error": "An internal error occurred while processing the request."}
-            ),
+            json.dumps({"error": "An internal error occurred while processing the request."}),
             status_code=500,
             mimetype="application/json",
         )

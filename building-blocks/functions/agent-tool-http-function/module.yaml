@@ -26,6 +26,15 @@ outputs:
     type: object
     description: Customer-safe resource information.
 
+azure_resources:
+  - Resource Group
+  - Storage Account
+  - App Service Plan
+  - Linux Function App
+  - Application Insights
+
+deployment_path: infra/terraform
+
 security:
   read_only: true
   auth_level: function

@@ -57,9 +57,9 @@ def get_resource_info(request_params: Dict[str, Any]) -> ResourceInfoResponse:
     except ValueError:
         logger.warning("Resource info request failed due to validation.")
         raise
-    except Exception as e:
-        # Customer-Safe Logging: Redact internal technical details
-        logger.error(f"Error in get_resource_info: {str(e)}")  # Internal log
+    except Exception:
+        # Customer-Safe Logging: Redact internal technical details (P0: do not log str(e))
+        logger.error("An unexpected error occurred in get_resource_info.")
         raise RuntimeError("Failed to retrieve resource information.")
 
 
