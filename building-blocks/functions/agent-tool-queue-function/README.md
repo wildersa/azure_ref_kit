@@ -1,109 +1,95 @@
-# Queue Function as Agent Tool
+# Agent Tool Queue Function
+
+Async queue-based Azure Function reference for longer-running agent tool execution. This building block demonstrates how to decouple an agent's tool call from its execution using Azure Storage Queues and a correlation-based status pattern.
 
 ## Purpose
 
-This building block demonstrates an asynchronous, queue-triggered Azure Function designed to serve as a **long-running tool boundary** for AI agents.
+When an agent needs to perform a task that exceeds the typical timeout of a synchronous HTTP call (e.g., complex analysis, multi-step validation), a queue-based pattern is preferred. This module provides a deterministic, customer-safe reference for such a flow.
 
-It provides a concrete reference for executing complex or time-consuming tasks (up to the Function's timeout limit) without blocking the agent's immediate conversation flow.
-
-## Architecture
+## Service-Level Mermaid Diagram
 
 ```mermaid
-flowchart LR
-    Agent[AI Agent / Foundry] -->|Writes to| InputQueue[Input Queue]
-    InputQueue -->|Triggers| Function[Azure Function]
-    Function -->|Writes to| OutputQueue[Output Queue]
-    OutputQueue -->|Read by| Agent[AI Agent / Foundry]
+sequenceDiagram
+    participant Agent
+    participant InputQueue as Azure Storage Queue (Input)
+    participant Function as Azure Function (Queue Trigger)
+    participant OutputQueue as Azure Storage Queue (Output)
 
-    subgraph "Azure Functions Tool Boundary"
-        Function
-    end
+    Agent->>InputQueue: Submit Job (CorrelationId, operation_type, parameters)
+    InputQueue-->>Function: Trigger Function
+    Function->>Function: Validate & Process Job
+    Function->>OutputQueue: Emit Result (CorrelationId, status, result_data)
+    Agent->>OutputQueue: Poll/Retrieve Result (by CorrelationId)
 ```
 
-## Tool Contract
+## Schema Examples
 
-The agent communicates with the function through Azure Storage Queues.
+### Input Message (Queue)
 
-### Input Message Schema (Input Queue)
-
-The message placed in the input queue must follow this structure:
-
-- `function_args` (object): Arguments required by the tool (e.g., `{"location": "Seattle"}`).
-- `CorrelationId` (string): A unique identifier provided by the agent to track the request.
-
-### Output Message Schema (Output Queue)
-
-The function must return a message to the output queue with this structure:
-
-- `Value` (string/object): The result of the tool execution.
-- `Error` (string, optional): A safe error message if the tool execution fails.
-- `CorrelationId` (string): The matching identifier from the input message.
-
-## Security and Boundaries
-
-- **No Raw Logs:** The function must not include raw technical logs, stack traces, or internal metadata in the `Value` field returned to the agent.
-- **Customer-Safe Logging Boundary:** The function follows a strict safe logging boundary. It never logs raw exception strings, stack traces, queue payloads, provider internals, tokens, or secrets. Only opaque correlation IDs and generic status messages are emitted to internal logs.
-- **Secrets Boundary:** No secrets, connection strings, or tokens should ever be included in queue messages.
-- **Read-Only vs. Mutation:** While queue-based tools can perform mutations, this reference emphasizes safe, business-level operations.
-- **Correlation ID:** The `CorrelationId` is mandatory for the agent to successfully associate the result with the original call.
-
-## Local Run
-
-Prerequisites:
-- [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [Azurite](https://github.com/Azure/Azurite) (for local storage emulation)
-- Python 3.10+
-
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Start Azurite:
-   ```bash
-   azurite
-   ```
-
-3. Start the function locally:
-   ```bash
-   func start
-   ```
-
-## Local Validation
-
-Run tests to verify the tool logic and `CorrelationId` handling:
-
-```bash
-PYTHONPATH=. python3 -m pytest tests
+```json
+{
+  "correlation_id": "job-12345678",
+  "operation_type": "analyze_text",
+  "parameters": {
+    "text": "The quick brown fox jumps over the lazy dog."
+  }
+}
 ```
 
-## Azure Deployment
+### Output Message (Queue)
 
-This module should be deployed to an Azure Function App.
+```json
+{
+  "correlation_id": "job-12345678",
+  "status": "succeeded",
+  "result_data": {
+    "length": 43,
+    "word_count": 9,
+    "is_upper": false
+  },
+  "error_message": null,
+  "timestamp": "2024-07-03T12:00:00Z"
+}
+```
 
-**Recommended SKU:** Flex Consumption.
+## Status Model
 
-### Terraform Deployment
+- `queued`: Job received and waiting in the input queue.
+- `running`: Job picked up by the Function (internal state).
+- `succeeded`: Job completed successfully; results in `result_data`.
+- `failed`: Job failed; customer-safe error in `error_message`.
 
-A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Storage Queues, and the Flex Consumption Function App.
+## Security Notes
 
-**Required Configuration (Identity-First):**
-
-This module enforces an **identity-first security boundary**. Shared access keys are disabled on the storage account (`shared_access_key_enabled = false`), and all communication is authorized via Microsoft Entra ID (Managed Identity).
-
-- `AzureWebJobsStorage__accountName`: The name of the storage account.
-- `AzureWebJobsStorage__credential`: Set to `managedidentity`.
-- `STORAGE_CONNECTION__accountName`: The name of the storage account for queues.
-- `STORAGE_CONNECTION__credential`: Set to `managedidentity`.
-
-**Required RBAC Roles:**
-- `Storage Blob Data Owner` on the storage account.
-- `Storage Queue Data Contributor` on the storage account.
-- `Storage Queue Data Message Processor` on the storage account.
-- `Storage Table Data Contributor` on the storage account.
+- **Redaction**: Raw exceptions and stack traces are never returned to the output queue or logged.
+- **Validation**: Strict validation of `correlation_id` (alphanumeric, 8-64 chars) and job schema.
+- **Least Privilege**: Requires `Storage Queue Data Contributor` and `Storage Queue Data Message Processor` roles.
 
 ## Known Limits
 
-- Queue-based tools are asynchronous; the agent will wait for the message to appear in the output queue.
-- Standard Function execution limits apply.
-- Ensure the agent's timeout settings match the expected execution time of the function.
+- **Message Size**: Azure Storage Queue messages are limited to 64KB.
+- **Latency**: Not suitable for real-time interactive tools; intended for background work.
+
+## Local Commands
+
+### Install dependencies
+```bash
+python -m pip install -r requirements.txt -r requirements-test.txt
+```
+
+### Run tests
+```bash
+pytest tests/
+```
+
+### Linting
+```bash
+ruff check .
+ruff format --check .
+```
+
+## Microsoft Learn References
+
+- [Azure Functions overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview)
+- [Azure Queue Storage trigger and bindings](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-storage-queue)
+- [Use Azure Functions with Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions)

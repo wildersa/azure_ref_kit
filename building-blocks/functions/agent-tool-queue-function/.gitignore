@@ -1,5 +1,7 @@
-__pycache__/
+bin/
+obj/
 .python_packages/
-.env
-local.settings.json
+__pycache__/
 .vscode/
+local.settings.json
+.env

@@ -8,42 +8,27 @@ outputs:
   - name: queue_tool_result
     type: queue-function-tool
     description: Result of the asynchronous tool execution returned via an output queue.
-  - name: api_endpoint
-    type: string
-    description: The base URL of the Function App API.
 azure_resources:
   - azurerm_function_app_flex_consumption
-  - azurerm_service_plan
   - azurerm_storage_account
   - azurerm_storage_queue
+deployment_path: infra/terraform
 contracts:
   reads:
     - type: storage-queue-message
-      description: Input message containing function arguments and CorrelationId.
+      description: Input message containing operation_type, parameters, and correlation_id.
   writes:
     - type: storage-queue-message
-      description: Output message containing the execution result and the matching CorrelationId.
-  emits:
-    - type: queue-function-tool
-      schema:
-        type: object
-        properties:
-          Value: {type: string}
-          Error: {type: string}
-          CorrelationId: {type: string}
+      description: Output message containing the execution result and the matching correlation_id.
 security_boundary:
   policy: "Enforces async boundary through controlled storage queues and filtered response schemas."
   forbid_wildcards: true
   forbid_secrets: true
   required_roles:
-    - role: "Storage Blob Data Owner"
-      description: "Allows the Function App to manage deployment packages and internal host coordination."
     - role: "Storage Queue Data Contributor"
       description: "Allows reading from input queue and writing to output queue."
     - role: "Storage Queue Data Message Processor"
       description: "Allows the Function App to process messages from queue triggers."
-    - role: "Storage Table Data Contributor"
-      description: "Required for internal Function host operations and diagnostic events in identity-first configurations."
 customer_safe_boundary:
   forbid:
     - "Raw Azure Function logs or internal execution traces"
@@ -51,4 +36,3 @@ customer_safe_boundary:
     - "Storage account keys, SAS tokens, or connection strings"
     - "System prompts or LLM grounding instructions"
     - "Internal Azure Resource IDs, Tenant IDs, or Subscription IDs"
-    - "Raw provider payloads from Document Intelligence or OpenAI"
