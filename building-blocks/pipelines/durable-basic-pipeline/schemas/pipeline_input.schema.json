@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PipelineInput",
+  "type": "object",
+  "required": ["pipeline_run"],
+  "properties": {
+    "pipeline_run": {
+      "type": "object",
+      "required": ["id", "customer_id", "pipeline_type", "status", "created_at"],
+      "properties": {
+        "id": { "type": "string" },
+        "customer_id": { "type": "string" },
+        "pipeline_type": { "type": "string" },
+        "status": { "type": "string", "const": "pending" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "source_blob": { "type": ["string", "null"] }
+  }
+}
