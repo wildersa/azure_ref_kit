@@ -1,56 +1,51 @@
 import azure.functions as func
 import logging
-from datetime import datetime, timezone
-
-try:
-    from .src.models import SystemStatusResponse, ErrorResponse
-except ImportError:
-    from src.models import SystemStatusResponse, ErrorResponse
+import json
+from src.tool import get_resource_info_safe
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 
-@app.route(route="system_status", methods=["GET"])
-def get_system_status(req: func.HttpRequest) -> func.HttpResponse:
+@app.route(route="get_resource_info", methods=["POST"])
+def get_resource_info_trigger(req: func.HttpRequest) -> func.HttpResponse:
     """
-    Returns the current operational status of the system.
-    This is a safe, read-only tool boundary example using Pydantic for validation.
+    HTTP trigger for the Resource Info tool.
+    Accepts JSON POST requests only.
     """
-    logging.info("System status tool invoked.")
+    logging.info("Python HTTP trigger function processed a request.")
 
     try:
-        # Example of a safe, bounded response schema
-        # In a real scenario, this would fetch data from a database or service.
-        status_data = {
-            "business_status": "operational",
-            "service_health": "healthy",
-            "active_regions": ["eastus", "westus2"],
-            "last_updated": datetime.now(timezone.utc),
-            "environment": "production-reference",
-        }
+        # 1. Parse and validate JSON body
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid JSON body."}),
+                status_code=400,
+                mimetype="application/json",
+            )
 
-        # Use Pydantic for deterministic validation and serialization
-        response_model = SystemStatusResponse(**status_data)
+        # 2. Call the safe tool logic
+        result = get_resource_info_safe(req_body)
 
+        # 3. Return the sanitized result
         return func.HttpResponse(
-            body=response_model.model_dump_json(),
-            mimetype="application/json",
-            status_code=200,
+            json.dumps(result), status_code=200, mimetype="application/json"
         )
 
+    except ValueError as e:
+        # Expected validation errors
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}), status_code=400, mimetype="application/json"
+        )
     except Exception:
-        # Standardized customer-safe logging boundary: do not log str(e) or raw exception objects.
-        # This prevents leaking secrets, tokens, internal URLs, or provider internals in logs.
-        logging.error("An unexpected error occurred in the system status tool.")
-
-        # Return a customer-safe, friendly error message
-        error_response = ErrorResponse(
-            error_code="INTERNAL_ERROR",
-            friendly_message="An internal error occurred while retrieving system status.",
-        )
-
+        # Unexpected errors are redacted for customer safety
+        # P0: Do not log stack traces (logging.exception)
+        logging.error("An unhandled exception occurred in the tool boundary.")
         return func.HttpResponse(
-            body=error_response.model_dump_json(),
-            mimetype="application/json",
+            json.dumps(
+                {"error": "An internal error occurred while processing the request."}
+            ),
             status_code=500,
+            mimetype="application/json",
         )

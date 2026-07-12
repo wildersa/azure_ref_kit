@@ -1,23 +1,34 @@
 name: agent-tool-http-function
 type: building-block
 category: functions
-status: stable
-purpose: Minimal HTTP Azure Function reference for a safe, read-only agent tool boundary.
-inputs: []
+description: A minimal Azure Function HTTP endpoint that exposes a controlled read-only agent-tool contract.
+version: 1.0.0
+
+runtime:
+  language: python
+  entrypoint: src.tool:get_resource_info_safe
+  dependencies:
+    - pydantic>=2.0.0
+    - azure-functions
+
+inputs:
+  resource_id:
+    type: string
+    description: The unique identifier for the resource.
+    required: true
+  resource_type:
+    type: string
+    description: The type of the resource (virtual_machine, storage_account, database).
+    required: true
+
 outputs:
-  - name: system_status
-    type: http-function-tool
-    description: Returns the current operational status of the system.
-azure_resources:
-  - azurerm_function_app_flex_consumption
-  - azurerm_service_plan
-  - azurerm_storage_account
-contracts:
-  reads: []
-  writes: []
-  emits:
-    - type: http-function-tool
-      name: system_status
-      description: Returns a safe, filtered summary of system status.
-      schema:
-        $ref: "./schemas/system_status_response.schema.json"
+  resource_info:
+    type: object
+    description: Customer-safe resource information.
+
+security:
+  read_only: true
+  auth_level: function
+  redacted_fields:
+    - internal_ids
+    - connection_strings
