@@ -11,6 +11,9 @@ outputs:
   - name: evaluation_checklist
     type: object
     description: Core quality and safety pillars for agent verification.
+  - name: trace_event_schema
+    type: file
+    description: JSON schema for allowlisted technical telemetry.
   - name: trace_checklist
     type: object
     description: Required technical telemetry fields for diagnostics.
@@ -36,3 +39,6 @@ contracts:
     - Quality metrics
     - Safety metrics
     - Diagnostic traces
+  references:
+    - trace-event.schema.json
+    - src/redactor.py

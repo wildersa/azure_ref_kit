@@ -93,3 +93,17 @@ def test_module_yaml_valid_and_complete():
     assert "outputs" in data
     assert "dependencies" in data
     assert "status" in data
+
+
+def test_trace_event_schema_exists_and_valid():
+    """Verify trace-event.schema.json exists and is valid JSON."""
+    schema_path = os.path.join(os.path.dirname(__file__), "../trace-event.schema.json")
+    import json
+
+    assert os.path.exists(schema_path)
+    with open(schema_path, "r") as f:
+        data = json.load(f)
+
+    assert data["title"] == "Safe Trace Event"
+    assert "properties" in data
+    assert "required" in data
