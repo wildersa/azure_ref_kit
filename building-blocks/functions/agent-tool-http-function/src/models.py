@@ -1,42 +1,56 @@
-from datetime import datetime
-from typing import List
+from enum import Enum
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class SystemStatusResponse(BaseModel):
-    """
-    Deterministic response model for the system status tool.
-    Ensures a safe, read-only boundary for AI agents.
-    """
+class ResourceType(str, Enum):
+    """Supported resource types for the tool."""
+
+    VIRTUAL_MACHINE = "virtual_machine"
+    STORAGE_ACCOUNT = "storage_account"
+    DATABASE = "database"
+
+
+class ResourceStatus(str, Enum):
+    """Resource status enum."""
+
+    RUNNING = "running"
+    STOPPED = "stopped"
+    DEGRADED = "degraded"
+    UNKNOWN = "unknown"
+
+
+class ResourceInfoRequest(BaseModel):
+    """Request model for retrieving resource information."""
 
     model_config = ConfigDict(extra="forbid")
 
-    business_status: str = Field(
+    resource_id: str = Field(
         ...,
-        description="Friendly operational status (e.g., 'operational', 'degraded').",
+        description="The unique identifier for the resource.",
+        min_length=1,
+        max_length=128,
     )
-    service_health: str = Field(
-        ..., description="Technical health indicator (e.g., 'healthy', 'unhealthy')."
-    )
-    active_regions: List[str] = Field(
-        ..., description="List of regions currently serving traffic."
-    )
-    last_updated: datetime = Field(
-        ..., description="ISO8601 timestamp of the last status update."
-    )
-    environment: str = Field(
-        ..., description="Name of the environment (e.g., 'production', 'staging')."
-    )
+    resource_type: ResourceType = Field(..., description="The type of the resource.")
 
 
-class ErrorResponse(BaseModel):
+class ResourceInfoResponse(BaseModel):
     """
-    Customer-safe error response model.
+    Customer-safe resource info response model.
     """
 
     model_config = ConfigDict(extra="forbid")
 
-    error_code: str = Field(..., description="Machine-readable error code.")
-    friendly_message: str = Field(
-        ..., description="Human-readable message safe for customer exposure."
+    resource_id: str = Field(..., description="The unique identifier for the resource.")
+    resource_type: ResourceType = Field(..., description="The type of the resource.")
+    status: ResourceStatus = Field(
+        ..., description="The current status of the resource."
+    )
+    location: str = Field(
+        ..., description="The Azure region where the resource is located."
+    )
+    tags: dict[str, str] = Field(
+        default_factory=dict, description="Tags associated with the resource."
+    )
+    summary: str = Field(
+        ..., description="A friendly business-level summary of the resource status."
     )

@@ -1,125 +1,50 @@
 import json
-import sys
-import os
 import azure.functions as func
-import pytest
-import pydantic
-from datetime import datetime
-
-# Add the parent directory to sys.path so we can import function_app and src
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from function_app import get_system_status
-from src.models import SystemStatusResponse, ErrorResponse
-from unittest.mock import patch
+from function_app import get_resource_info_trigger
 
 
-@pytest.fixture
-def success_fixture():
-    with open(
-        os.path.join(os.path.dirname(__file__), "../fixtures/success_status.json"), "r"
-    ) as f:
-        return json.load(f)
+def test_get_resource_info_trigger_success():
+    """Test the HTTP trigger with a valid request."""
+    req_body = {"resource_id": "vm-prod-a", "resource_type": "virtual_machine"}
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(req_body).encode("utf-8"),
+        url="/api/get_resource_info",
+    )
 
+    resp = get_resource_info_trigger(req)
 
-def test_get_system_status_returns_200_and_valid_model():
-    # Construct a mock HTTP request
-    req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
-
-    # Call the function
-    resp = get_system_status(req)
-
-    # Validate the response
     assert resp.status_code == 200
-    assert resp.mimetype == "application/json"
-
-    body = json.loads(resp.get_body())
-
-    # Validate against Pydantic model
-    model = SystemStatusResponse(**body)
-    assert model.business_status == "operational"
-    assert model.service_health == "healthy"
-    assert "eastus" in model.active_regions
-    assert isinstance(model.last_updated, datetime)
+    resp_data = json.loads(resp.get_body())
+    assert resp_data["resource_id"] == "vm-prod-a"
+    assert resp_data["status"] == "running"
 
 
-def test_system_status_matches_success_fixture(success_fixture):
-    # This ensures our runtime behavior matches our documented success fixture
-    # Note: last_updated will differ, so we check other fields
-    req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
-    resp = get_system_status(req)
-    body = json.loads(resp.get_body())
+def test_get_resource_info_trigger_invalid_json():
+    """Test the HTTP trigger with invalid JSON."""
+    req = func.HttpRequest(
+        method="POST", body=b"not a json", url="/api/get_resource_info"
+    )
 
-    assert body["business_status"] == success_fixture["business_status"]
-    assert body["service_health"] == success_fixture["service_health"]
-    assert body["active_regions"] == success_fixture["active_regions"]
-    assert body["environment"] == success_fixture["environment"]
+    resp = get_resource_info_trigger(req)
 
-
-def test_get_system_status_safe_boundary():
-    # Verify it doesn't leak sensitive fields
-    req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
-
-    resp = get_system_status(req)
-    body = json.loads(resp.get_body())
-
-    forbidden_fields = [
-        "secret",
-        "token",
-        "connection_string",
-        "raw_logs",
-        "stack_trace",
-        "subscription_id",
-        "internal_url",
-    ]
-    for field in forbidden_fields:
-        assert field not in body, f"Leaked forbidden field: {field}"
+    assert resp.status_code == 400
+    resp_data = json.loads(resp.get_body())
+    assert "error" in resp_data
+    assert resp_data["error"] == "Invalid JSON body."
 
 
-def test_system_status_model_extra_fields_forbidden():
-    # Test that the model itself forbids extra fields
-    with pytest.raises(pydantic.ValidationError):
-        SystemStatusResponse(
-            business_status="operational",
-            service_health="healthy",
-            active_regions=["eastus"],
-            last_updated=datetime.now(),
-            environment="prod",
-            extra_field="should_not_be_here",
-        )
+def test_get_resource_info_trigger_validation_error():
+    """Test the HTTP trigger with missing fields."""
+    req_body = {"resource_id": "only-id"}
+    req = func.HttpRequest(
+        method="POST",
+        body=json.dumps(req_body).encode("utf-8"),
+        url="/api/get_resource_info",
+    )
 
+    resp = get_resource_info_trigger(req)
 
-def test_error_response_model():
-    error_data = {
-        "error_code": "TEST_ERROR",
-        "friendly_message": "A safe error message.",
-    }
-    model = ErrorResponse(**error_data)
-    assert model.error_code == "TEST_ERROR"
-    assert model.friendly_message == "A safe error message."
-
-
-def test_get_system_status_logs_safe_exception(caplog):
-    # Verify that raw exception details are NOT logged.
-    with patch("function_app.SystemStatusResponse") as mock_model:
-        sensitive_error_msg = (
-            "Database connection failed: user=admin password=secret123"
-        )
-        mock_model.side_effect = Exception(sensitive_error_msg)
-
-        req = func.HttpRequest(method="GET", body=None, url="/api/system_status")
-        resp = get_system_status(req)
-
-        # Verify the response remains safe
-        assert resp.status_code == 500
-        body = json.loads(resp.get_body())
-        assert body["error_code"] == "INTERNAL_ERROR"
-
-        # Verify the logs do NOT contain the sensitive information
-        assert not any(
-            sensitive_error_msg in record.message for record in caplog.records
-        )
-        # Verify a safe generic message is logged instead
-        assert any(
-            "An unexpected error occurred in the system status tool" in record.message
-            for record in caplog.records
-        )
+    assert resp.status_code == 400
+    resp_data = json.loads(resp.get_body())
+    assert "error" in resp_data

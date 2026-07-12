@@ -1,116 +1,101 @@
-# HTTP Function as Agent Tool
+# Agent Tool HTTP Function
 
 ## Purpose
 
-This building block demonstrates a minimal HTTP-triggered Azure Function designed to serve as a **safe read-only tool boundary** for AI agents.
-
-It provides a concrete reference for exposing enterprise data to agents without allowing arbitrary API passthrough or mutation operations, following the [Microsoft Foundry tool catalog](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog) principles.
+This building block demonstrates a **minimal Python Azure Functions HTTP endpoint** that exposes a controlled **read-only agent-tool contract**. It serves as a reference for how to bridge AI agents (like those in Azure AI Foundry) with internal systems or data sources using a safe, validated, and serverless boundary.
 
 ## Architecture
 
 ```mermaid
-flowchart TD
-    Caller[AI Agent / Tool Caller] -->|HTTP GET /api/system_status| Func[HTTP Function]
-    subgraph "Safe Tool Boundary"
-        Func --> Handler[Controlled Handler]
-        Handler --> Sanitize[Pydantic Validation / Sanitization]
+flowchart LR
+    Agent[AI Agent] -->|POST JSON| Function[HTTP Function Endpoint]
+    subgraph "Safe Boundary (Azure Function)"
+        Function --> Validation[Input Validation]
+        Validation --> Logic[Tool Logic]
+        Logic --> Redaction[Output Sanitization]
     end
-    Sanitize -->|Sanitized JSON Response| Caller
+    Redaction -->|Customer-Safe JSON| Agent
 ```
 
 ## Tool Contract
 
-### GET `/api/system_status`
+### Input Parameters (JSON POST)
 
-Returns a high-level summary of the system status.
+- `resource_id` (string): The unique identifier for the resource (1-128 chars).
+- `resource_type` (string): The type of the resource. Supported: `virtual_machine`, `storage_account`, `database`.
 
-**Inputs:**
-- None (GET request with no parameters).
+### Output Contract
 
-**Outputs:**
-- `business_status` (string): Friendly operational status (e.g., "operational").
-- `service_health` (string): Technical health indicator.
-- `active_regions` (array of strings): List of regions currently serving traffic.
-- `last_updated` (string): ISO8601 timestamp of the last status update.
-- `environment` (string): Name of the environment.
+- `resource_id` (string): The identifier of the resource.
+- `resource_type` (string): The confirmed type.
+- `status` (string): Current status (`running`, `stopped`, `degraded`, `unknown`).
+- `location` (string): The Azure region.
+- `tags` (object): Metadata tags.
+- `summary` (string): A friendly business-level status summary.
 
-The response is deterministically validated using Pydantic models defined in `src/models.py`.
+## Security and Safety
 
-## Security Notes
+- **Read-Only:** The implementation only provides information and does not support any mutation operations.
+- **Input Validation:** Strict Pydantic-based validation rejects malformed or oversized requests before processing.
+- **Safe Errors:** Internal stack traces and technical details are redacted. The API returns bounded, generic error messages for unhandled exceptions.
+- **Authentication:** Configured with `Function` level authorization for Azure deployment. Anonymous access is disabled by default.
+- **No Technical Leakage:** Does not log request bodies, tokens, or raw internal payloads.
 
-- **Read-Only:** This tool does not accept parameters that modify state.
-- **Deterministic Validation:** Uses Pydantic for strict output schema enforcement.
-- **Customer-Safe Errors:** Implements friendly error responses to prevent leaking internal technical details.
-- **Safe Logging Boundary:** The implementation explicitly forbids logging raw exception strings (`str(e)`), stack traces, or provider payloads to prevent accidental exposure of secrets, tokens, or internal technical detail in telemetry.
-- **Data Redaction:** The implementation explicitly filters internal metadata, raw logs, and stack traces from the response.
-- **Authentication:** In Azure, this function should be protected via Function Keys or Microsoft Entra ID.
-- **No Passthrough:** This is not a generic proxy to other Azure APIs; it returns a specific, pre-defined contract.
+## Local Development
 
-## Known Limits
+### Prerequisites
 
-- This reference uses a synchronous HTTP trigger. For long-running tasks (>230 seconds), use the asynchronous pattern described in [Use Azure Functions with Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions).
-- This is a reference implementation; real-world status checks should be backed by actual resource monitoring or a status database.
-
-## Local Run
-
-Prerequisites:
+- Python 3.10+
 - [Azure Functions Core Tools](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- Python 3.11+
 
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Start the function locally:
-   ```bash
-   func start
-   ```
-
-3. Test the endpoint:
-   ```bash
-   curl http://localhost:7071/api/system_status
-   ```
-
-## Local Validation
-
-Run tests to verify the tool logic and boundary:
+### Local Run
 
 ```bash
-# From the module root
-PYTHONPATH=. pytest tests/test_function.py
+# Navigate to the module directory
+cd building-blocks/functions/agent-tool-http-function
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the function locally
+func start
 ```
 
-## Dependencies
+### Example Request
 
-- `azure-functions`: Python SDK for Azure Functions.
-- `pydantic`: For deterministic validation.
-- `pytest`: For running unit tests.
-
-## Deployment / IaC Decision
-
-This building block **includes module-local Terraform** to demonstrate the recommended Infrastructure-as-Code (IaC) pattern for Azure Functions Flex Consumption.
-
-The decision to provide IaC is based on:
-1. **Azure Native Best Practices:** Showing the correct configuration for Flex Consumption, including scale-to-zero and managed identity.
-2. **Security-First Setup:** Explicitly demonstrating an identity-first storage configuration (secret-less) in Terraform.
-3. **Repeatability:** Ensuring developers can provision the exact environment required to host this safe agent tool boundary.
+```bash
+curl -X POST http://localhost:7071/api/get_resource_info \
+  -H "Content-Type: application/json" \
+  -d '{"resource_id": "vm-prod-01", "resource_type": "virtual_machine"}'
+```
 
 ## Azure Deployment
 
-This module can be deployed using the provided Terraform in `infra/terraform/`.
+This module includes minimal Terraform for deployment.
 
-**Recommended SKU:** Flex Consumption (for scale-to-zero and managed identity support).
+### Authentication Assumptions
 
-**Identity-First Configuration:**
-This reference uses Managed Identity for all storage operations. The following App Settings are handled by the provided Terraform:
-- `AzureWebJobsStorage__accountName`: The name of the storage account.
-- `AzureWebJobsStorage__credential`: Set to `managedidentity` to use the Function's identity.
+- The deployed function uses **Function Key** authentication.
+- For production use cases, it is recommended to place this behind **Azure API Management (APIM)** or use **Microsoft Entra ID** authentication.
 
-## Microsoft Documentation
+## Validation Commands
 
-- [Azure Functions Overview](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview)
-- [Azure Functions Python Developer Guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
-- [Azure AI Foundry Agents Tool Catalog](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/tool-catalog)
-- [Use Azure Functions with Foundry Agent Service](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions)
-- [Terraform on Azure](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
+```bash
+# Run tests
+pytest tests/
+
+# Linting
+ruff check src/
+ruff format --check src/
+```
+
+## Known Limits
+
+- This is a reference implementation with mocked logic; it does not connect to real Azure resources.
+- Designed for small, stateless tool calls. For long-running work, consider the `agent-tool-queue-function` pattern (Track 3.2).
+
+## Microsoft Documentation Consulted
+
+- [Azure Functions HTTP trigger](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook-trigger)
+- [Azure Functions Python developer guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
+- [Foundry Azure Functions tools](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/azure-functions) (Consulted for distinction from queue-based tools).

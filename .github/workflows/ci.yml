@@ -148,7 +148,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run pytest
-        run: pytest
+        run: PYTHONPATH=. python -m pytest tests/
 
   # Job to test Web App agent API module
   test-webapp-agent-api:
@@ -181,7 +181,7 @@ jobs:
           pip install -r requirements-test.txt
 
       - name: Run pytest
-        run: pytest tests/
+        run: PYTHONPATH=. python -m pytest tests/
 
   # Job to test HTTP function tool
   test-func-http:
@@ -211,10 +211,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-test.txt
 
       - name: Run pytest
-        run: pytest
+        run: PYTHONPATH=. python -m pytest tests/
 
   # Job to test Queue function tool
   test-func-queue:
