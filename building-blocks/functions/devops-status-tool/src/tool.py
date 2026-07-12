@@ -2,9 +2,9 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
 from urllib.parse import urlparse
-from .models import DevOpsStatusRequest, DevOpsStatusResponse, BuildStatus, BuildResult
-from .client import DevOpsClient
-from .config import validate_organization_url, validate_project_identifier, Settings
+from models import DevOpsStatusRequest, DevOpsStatusResponse, BuildStatus, BuildResult
+from client import DevOpsClient
+from config import validate_organization_url, validate_project_identifier, Settings
 
 logger = logging.getLogger(__name__)
 

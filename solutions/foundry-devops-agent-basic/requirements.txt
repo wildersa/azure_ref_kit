@@ -1,0 +1,5 @@
+azure-ai-projects>=2.3.0
+azure-identity
+pydantic>=2.0.0
+pytest
+ruff

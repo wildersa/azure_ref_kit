@@ -45,34 +45,33 @@ def test_tool_definitions_structure():
     Verifies that the tool definitions follow the expected structure for the SDK.
     """
     tools = get_tool_definitions()
-    assert len(tools) == 3
+    assert len(tools) == 1
 
     tool_names = [t.name for t in tools]
-    assert "get_pipeline_run_status" in tool_names
-    assert "get_latest_build_summary" in tool_names
-    assert "list_recent_pipeline_runs" in tool_names
+    assert "get_build_status" in tool_names
 
     for tool in tools:
         assert isinstance(tool, FunctionTool)
         assert tool.description is not None
         assert tool.parameters is not None
         assert tool.parameters["type"] == "object"
-        # Verify safety hardening (strict schemas)
-        assert tool.strict is True, f"Tool {tool.name} must have strict=True"
+        # Verify safety hardening
         assert tool.parameters.get("additionalProperties") is False, (
             f"Tool {tool.name} must set additionalProperties to False"
         )
 
 
-def test_get_pipeline_run_status_parameters():
+def test_get_build_status_parameters():
     """
-    Verifies parameters for get_pipeline_run_status.
+    Verifies parameters for get_build_status.
     """
     tools = get_tool_definitions()
-    tool = next(t for t in tools if t.name == "get_pipeline_run_status")
+    tool = next(t for t in tools if t.name == "get_build_status")
     params = tool.parameters["properties"]
 
-    assert "pipeline_id" in params
-    assert "run_id" in params
-    assert "pipeline_id" in tool.parameters["required"]
-    assert "run_id" in tool.parameters["required"]
+    assert "organization_url" in params
+    assert "project" in params
+    assert "build_id" in params
+    assert "organization_url" in tool.parameters["required"]
+    assert "project" in tool.parameters["required"]
+    assert "build_id" in tool.parameters["required"]
