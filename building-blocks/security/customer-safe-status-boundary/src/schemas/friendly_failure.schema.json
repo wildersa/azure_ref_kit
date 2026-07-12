@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/security/customer-safe-status-boundary/src/schemas/friendly_failure.schema.json",
+  "title": "FriendlyFailure",
+  "type": "object",
+  "required": ["error_code", "message"],
+  "properties": {
+    "error_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Z0-9_]+$",
+      "description": "A stable, friendly error code for categorization."
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "description": "A human-readable, safe error message without technical details."
+    },
+    "correlation_id": {
+      "type": ["string", "null"],
+      "minLength": 8,
+      "maxLength": 64,
+      "pattern": "^[a-zA-Z0-9_\\-]+$",
+      "description": "Safe correlation identifier for support."
+    }
+  },
+  "additionalProperties": false
+}
