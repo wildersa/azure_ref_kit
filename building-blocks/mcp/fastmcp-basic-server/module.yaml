@@ -17,9 +17,9 @@ contracts:
   writes: []
   emits:
     - type: mcp-tool
-      name: get_system_status
-      description: Returns the general operational status of the MCP server.
+      name: get_synthetic_resource
+      description: Returns synthetic metadata for a requested resource type.
 customer_safe_boundary:
-  policy: "Read-only access to mock system metadata. No access to real PII, secrets, or mutation operations."
-  enforcement: "FastMCP decorator-based tool registration and static implementation in server.py."
+  policy: "Read-only access to mock resource metadata. No access to real PII, secrets, or mutation operations."
+  enforcement: "FastMCP decorator-based tool registration, Literal type hints, and explicit value validation in server.py."
   security_boundary: "Local process boundary using stdio transport. No network ingress."
