@@ -1,19 +1,20 @@
-variable "location" {
-  description = "The Azure region where resources will be deployed."
+variable "name_prefix" {
+  description = "Prefix for resource naming."
   type        = string
-  default     = "eastus2"
-}
-
-variable "prefix" {
-  description = "A prefix to use for naming resources."
-  type        = string
-  default     = "queue-tool"
-}
-
-variable "tags" {
-  description = "A map of tags to apply to all resources."
-  type        = map(string)
-  default = {
-    module = "agent-tool-queue-function"
+  validation {
+    condition     = can(regex("^[a-z0-9]{3,12}$", var.name_prefix))
+    error_message = "Prefix must be 3-12 lowercase alphanumeric characters."
   }
+}
+
+variable "location" {
+  description = "Azure region for resources."
+  type        = string
+  default     = "eastus"
+}
+
+variable "environment" {
+  description = "Deployment environment name."
+  type        = string
+  default     = "dev"
 }
