@@ -4,8 +4,8 @@ variable "name_prefix" {
   default     = "atool"
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{3,12}$", var.name_prefix))
-    error_message = "name_prefix must be 3-12 characters, lowercase alphanumeric and hyphens."
+    condition     = can(regex("^[a-z0-9][a-z0-9-]{1,10}[a-z0-9]$", var.name_prefix))
+    error_message = "name_prefix must be 3-12 characters, lowercase alphanumeric and hyphens, starting and ending with alphanumeric."
   }
 }
 
