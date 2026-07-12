@@ -2,9 +2,9 @@ import argparse
 import json
 import logging
 import sys
-from .config import Settings
-from .client import DevOpsClient
-from .tool import get_build_status
+from config import Settings
+from client import DevOpsClient
+from tool import get_build_status
 
 
 def main():

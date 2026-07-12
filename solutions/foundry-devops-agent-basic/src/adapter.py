@@ -18,12 +18,12 @@ from .agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 # Add the building block to the path to allow importing the tool implementation
 # This allows us to reuse the tool without duplicating the code.
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
-DEVOPS_TOOL_ROOT = REPO_ROOT / "building-blocks" / "functions" / "devops-status-tool"
-if str(DEVOPS_TOOL_ROOT) not in sys.path:
-    sys.path.append(str(DEVOPS_TOOL_ROOT))
+DEVOPS_TOOL_SRC = REPO_ROOT / "building-blocks" / "functions" / "devops-status-tool" / "src"
+if str(DEVOPS_TOOL_SRC) not in sys.path:
+    sys.path.append(str(DEVOPS_TOOL_SRC))
 
-# Now we can import the tool safely
-from src.tool import get_build_status_safe  # noqa: E402 # type: ignore
+# Now we can import the tool safely from the flat 'src' directory
+import tool  # noqa: E402
 
 # Redact technical details in logs
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -101,14 +101,37 @@ class FoundryDevOpsAgentAdapter:
                     for call in tool_calls:
                         if call.name == "get_build_status":
                             try:
-                                # Tool arguments are validated by the tool implementation itself
+                                # 1. Parse arguments from the agent
                                 args = (
                                     json.loads(call.arguments) if call.arguments else {}
                                 )
 
-                                # Execute the existing DevOps status tool
+                                # 2. SAFETY: Enforce the configured scope from Settings.
+                                # This solution is bounded to exactly one organization, project, and build.
+                                # If the agent attempts to query a different scope, we reject it.
+                                if (
+                                    args.get("organization_url")
+                                    != self.settings.organization_url
+                                    or args.get("project") != self.settings.project
+                                    or args.get("build_id") != self.settings.build_id
+                                ):
+                                    logger.warning("Agent attempted to query out-of-scope build.")
+                                    input_list.append(
+                                        FunctionCallOutput(
+                                            type="function_call_output",
+                                            call_id=call.call_id,
+                                            output=json.dumps(
+                                                {
+                                                    "error": "The tool requested is unavailable for the specified scope."
+                                                }
+                                            ),
+                                        )
+                                    )
+                                    continue
+
+                                # 3. Execute the existing DevOps status tool
                                 # It handles its own environment variables for PAT
-                                result = get_build_status_safe(args)
+                                result = tool.get_build_status_safe(args)
 
                                 input_list.append(
                                     FunctionCallOutput(
