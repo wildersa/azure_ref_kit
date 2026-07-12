@@ -9,10 +9,10 @@ from azure.ai.projects.models import FunctionTool
 # System instructions that enforce the customer-safe boundary and safety rules.
 SYSTEM_INSTRUCTIONS = """
 You are a helpful DevOps Status Assistant.
-Your goal is to help users understand the status and results of their Azure DevOps pipelines and builds.
+Your goal is to help users understand the status and results of their Azure DevOps builds.
 
 ### Safety and Privacy Rules:
-- ONLY use the provided tools to answer questions about pipeline/build runs.
+- ONLY use the provided tools to answer questions about build runs.
 - You operate within a strict READ-ONLY tool boundary.
 - DO NOT expose internal technical details such as:
     - Raw Azure DevOps logs or technical stack traces.
@@ -26,76 +26,36 @@ Your goal is to help users understand the status and results of their Azure DevO
 - NEVER perform any mutation actions (trigger, cancel, approve, etc.) as they are outside your tool boundary.
 
 ### Tool Usage:
-1. Use `get_pipeline_run_status` for high-level status of a specific run.
-2. Use `get_latest_build_summary` for the most recent build status of a pipeline or branch.
-3. Use `list_recent_pipeline_runs` to show a history of recent activity.
+1. Use `get_build_status` to answer questions about the status of a specific build.
 """
 
 
 def get_tool_definitions() -> List[FunctionTool]:
     """
     Returns the list of tool definitions for use with the Azure AI Projects SDK.
-    These follow the devops-mcp-tool-contract for read-only DevOps status.
     """
     return [
         FunctionTool(
-            name="get_pipeline_run_status",
-            description="Get the status and summary of a specific Azure DevOps pipeline run.",
+            name="get_build_status",
+            description="Get the current business status and summary of a specific Azure DevOps build.",
             parameters={
                 "type": "object",
                 "properties": {
-                    "pipeline_id": {
+                    "organization_url": {
                         "type": "string",
-                        "description": "The ID or name of the pipeline.",
+                        "description": "The URL of the Azure DevOps organization (e.g., https://dev.azure.com/org).",
                     },
-                    "run_id": {
+                    "project": {
                         "type": "string",
-                        "description": "The specific run ID to query.",
+                        "description": "The name or ID of the project.",
                     },
-                },
-                "required": ["pipeline_id", "run_id"],
-                "additionalProperties": False,
-            },
-            strict=True,
-        ),
-        FunctionTool(
-            name="get_latest_build_summary",
-            description="Get the summary of the most recent build for a specified pipeline or branch.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "pipeline_id": {
-                        "type": "string",
-                        "description": "The ID or name of the pipeline.",
-                    },
-                    "branch": {
-                        "type": "string",
-                        "description": "Optional: Filter by branch name (defaults to default branch).",
-                    },
-                },
-                "required": ["pipeline_id"],
-                "additionalProperties": False,
-            },
-            strict=True,
-        ),
-        FunctionTool(
-            name="list_recent_pipeline_runs",
-            description="List recent pipeline runs with their results and basic metadata.",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "pipeline_id": {
-                        "type": "string",
-                        "description": "The ID or name of the pipeline.",
-                    },
-                    "top": {
+                    "build_id": {
                         "type": "integer",
-                        "description": "Optional: Number of recent runs to return (default: 5, max: 10).",
+                        "description": "The unique identifier for the build.",
                     },
                 },
-                "required": ["pipeline_id"],
+                "required": ["organization_url", "project", "build_id"],
                 "additionalProperties": False,
             },
-            strict=True,
-        ),
+        )
     ]
