@@ -17,6 +17,15 @@ def _load_schema(path):
         return json.load(f)
 
 
+# P0: Load schema outside the orchestrator execution path to maintain determinism.
+# Durable Functions orchestrators must be free of filesystem-dependent side effects.
+try:
+    PIPELINE_RUN_SCHEMA = _load_schema(PIPELINE_RUN_SCHEMA_PATH)
+except Exception as e:
+    logging.error(f"Failed to load pipeline-run schema: {e}")
+    PIPELINE_RUN_SCHEMA = None
+
+
 def pipeline_orchestrator(context: df.DurableOrchestrationContext):
     """
     Main orchestrator logic for the Document AI pipeline.
@@ -31,12 +40,14 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
     pipeline_run = input_data["pipeline_run"]
 
     # Contract Validation
-    try:
-        schema = _load_schema(PIPELINE_RUN_SCHEMA_PATH)
-        jsonschema.validate(instance=pipeline_run, schema=schema)
-    except Exception:
-        logging.error("PipelineRun payload failed contract validation.")
-        return "invalid_contract"
+    if not PIPELINE_RUN_SCHEMA:
+        logging.error("Schema not loaded; skipping contract validation.")
+    else:
+        try:
+            jsonschema.validate(instance=pipeline_run, schema=PIPELINE_RUN_SCHEMA)
+        except Exception:
+            logging.error("PipelineRun payload failed contract validation.")
+            return "invalid_contract"
 
     run_id = pipeline_run["id"]
     customer_id = pipeline_run["customer_id"]

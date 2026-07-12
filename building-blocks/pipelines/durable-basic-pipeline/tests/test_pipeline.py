@@ -364,3 +364,22 @@ def test_orchestrator_validation_failure_no_retry(mock_context, valid_input):
         == "update_pipeline_run_status"
     )
     assert mock_context.call_activity.call_args_list[2][0][1]["status"] == "failed"
+
+
+def test_orchestrator_determinism_no_file_io(mock_context, valid_input):
+    """
+    Verify that the orchestrator does not perform any filesystem I/O during execution.
+    This is a strict Durable Functions constraint for determinism and replay safety.
+    """
+    mock_context.get_input.return_value = valid_input
+
+    from unittest.mock import patch
+
+    # Mock 'open' to raise an error if called during orchestration
+    with patch("builtins.open", side_effect=IOError("Filesystem access forbidden during orchestration")):
+        gen = pipeline_orchestrator(mock_context)
+        # Run through the orchestration (triggering the first yield)
+        next(gen)
+
+    # If we reached here without an IOError, the orchestrator did not call open()
+    assert mock_context.call_activity.call_args_list[0][0][0] == "update_pipeline_run_status"
