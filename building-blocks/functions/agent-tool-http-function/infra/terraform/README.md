@@ -8,7 +8,6 @@ This directory contains minimal Terraform to deploy the Agent Tool HTTP Function
 - **Storage Account**: Required by Azure Functions for state and code management.
 - **App Service Plan**: Consumption (serverless) plan.
 - **Linux Function App**: Hosts the Python function.
-- **Application Insights**: Provides observability and logs.
 
 ## Deployment
 

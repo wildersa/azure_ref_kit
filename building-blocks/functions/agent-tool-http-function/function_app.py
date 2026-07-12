@@ -47,7 +47,9 @@ def get_resource_info_trigger(req: func.HttpRequest) -> func.HttpResponse:
         # P0: Do not log stack traces (logging.exception)
         logging.error("An unhandled exception occurred in the tool boundary.")
         return func.HttpResponse(
-            json.dumps({"error": "An internal error occurred while processing the request."}),
+            json.dumps(
+                {"error": "An internal error occurred while processing the request."}
+            ),
             status_code=500,
             mimetype="application/json",
         )

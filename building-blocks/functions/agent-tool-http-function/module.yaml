@@ -31,7 +31,6 @@ azure_resources:
   - Storage Account
   - App Service Plan
   - Linux Function App
-  - Application Insights
 
 deployment_path: infra/terraform
 
