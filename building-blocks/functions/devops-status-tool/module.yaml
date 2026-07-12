@@ -1,0 +1,39 @@
+name: devops-status-tool
+type: building-block
+category: functions
+description: Safe read-only Azure DevOps build status tool for AI agents.
+version: 1.0.0
+
+runtime:
+  language: python
+  entrypoint: src.tool:get_build_status_safe
+  dependencies:
+    - pydantic>=2.0.0
+
+inputs:
+  organization_url:
+    type: string
+    description: Azure DevOps organization URL.
+    required: true
+  project:
+    type: string
+    description: Project name or ID.
+    required: true
+  build_id:
+    type: integer
+    description: Build ID.
+    required: true
+
+outputs:
+  status_contract:
+    type: object
+    description: Customer-safe build status matching devops-status.schema.json.
+
+security:
+  read_only: true
+  redacted_fields:
+    - branch
+    - sourceVersion
+    - repository
+    - commit_message
+  auth_type: PAT
