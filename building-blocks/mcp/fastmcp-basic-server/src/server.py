@@ -1,10 +1,21 @@
 from typing import Literal
+from pydantic import BaseModel, Field
 from fastmcp import FastMCP
 
 # Initialize FastMCP server
 # This server provides a minimal reference implementation of the Model Context Protocol (MCP)
 # for local tool integration. It demonstrates safe, read-only tool exposure.
 mcp = FastMCP("fastmcp-basic-server")
+
+
+class SyntheticResource(BaseModel):
+    """Synthetic metadata for a resource."""
+
+    id: str = Field(description="Unique identifier for the synthetic resource")
+    type: str = Field(description="Resource type specification")
+    status: str = Field(description="Current operational status")
+    region: str = Field(description="Deployment region for the resource")
+
 
 # Synthetic data for demonstration purposes
 SYNTHETIC_DATA = {
@@ -26,7 +37,7 @@ SYNTHETIC_DATA = {
 @mcp.tool()
 def get_synthetic_resource(
     resource_type: Literal["compute", "storage"],
-) -> dict:
+) -> SyntheticResource:
     """
     Returns synthetic metadata for a requested resource type.
 
@@ -39,13 +50,13 @@ def get_synthetic_resource(
     # Note: Literal at the type level provides hint to the agent,
     # but we still validate to ensure fail-closed behavior for the implementation.
     if resource_type not in SYNTHETIC_DATA:
-        # We return a generic error message to the agent, avoiding raw exceptions or stack traces.
-        return {
-            "error": "Unsupported resource type",
-            "supported_types": list(SYNTHETIC_DATA.keys()),
-        }
+        # If this were a production tool, we might raise a custom error
+        # that FastMCP handles. For this reference, Pydantic validation
+        # usually catches this before we reach here if called via MCP.
+        # If called directly, we return a default object or raise.
+        raise ValueError(f"Unsupported resource type: {resource_type}")
 
-    return SYNTHETIC_DATA[resource_type]
+    return SyntheticResource(**SYNTHETIC_DATA[resource_type])
 
 
 if __name__ == "__main__":

@@ -19,17 +19,34 @@ async def test_tool_registration():
 
 
 @pytest.mark.asyncio
+async def test_tool_output_schema():
+    """Verify that the tool publishes a bounded typed output schema."""
+    # If we call the tool, the response should be the JSON string of the model
+    result = await mcp.call_tool(
+        "get_synthetic_resource", arguments={"resource_type": "compute"}
+    )
+    data = json.loads(result.content[0].text)
+
+    expected_fields = {"id", "type", "status", "region"}
+    assert set(data.keys()) == expected_fields
+
+
+@pytest.mark.asyncio
 async def test_get_synthetic_resource_valid():
     """Verify valid resource retrieval."""
     # Test compute
-    result = await mcp.call_tool("get_synthetic_resource", arguments={"resource_type": "compute"})
+    result = await mcp.call_tool(
+        "get_synthetic_resource", arguments={"resource_type": "compute"}
+    )
     assert len(result.content) > 0
     data = json.loads(result.content[0].text)
     assert data["id"] == "comp-001"
     assert data["status"] == "running"
 
     # Test storage
-    result = await mcp.call_tool("get_synthetic_resource", arguments={"resource_type": "storage"})
+    result = await mcp.call_tool(
+        "get_synthetic_resource", arguments={"resource_type": "storage"}
+    )
     assert len(result.content) > 0
     data = json.loads(result.content[0].text)
     assert data["id"] == "stg-001"
@@ -41,7 +58,9 @@ async def test_get_synthetic_resource_invalid():
     """Verify handling of unsupported resource types (fail-closed)."""
     # FastMCP uses Pydantic to validate Literals and raises ValidationError for invalid inputs
     with pytest.raises(ValidationError) as excinfo:
-        await mcp.call_tool("get_synthetic_resource", arguments={"resource_type": "invalid"})
+        await mcp.call_tool(
+            "get_synthetic_resource", arguments={"resource_type": "invalid"}
+        )
 
     assert "resource_type" in str(excinfo.value)
     assert "Input should be 'compute' or 'storage'" in str(excinfo.value)
@@ -57,16 +76,12 @@ async def test_get_synthetic_resource_no_args():
 
 def test_get_synthetic_resource_internal_logic():
     """Verify the internal logic of the tool function directly."""
-    # Valid input
-    assert get_synthetic_resource("compute")["id"] == "comp-001"
+    # Valid input returns the Pydantic model
+    result = get_synthetic_resource("compute")
+    assert result.id == "comp-001"
+    assert result.status == "running"
 
-    # Invalid input (simulating bypass of Pydantic validation if called directly)
-    result = get_synthetic_resource("unknown")
-    assert "error" in result
-    assert result["error"] == "Unsupported resource type"
-    assert "supported_types" in result
-
-    # Verify no leakage of internal paths/secrets even in manual call
-    result_str = str(result)
-    assert "src/" not in result_str
-    assert "Traceback" not in result_str
+    # Invalid input raises ValueError in direct call
+    with pytest.raises(ValueError) as excinfo:
+        get_synthetic_resource("unknown")
+    assert "Unsupported resource type" in str(excinfo.value)

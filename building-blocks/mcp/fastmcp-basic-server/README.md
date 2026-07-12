@@ -68,8 +68,11 @@ Returns synthetic metadata for a requested resource type.
 **Arguments:**
 - `resource_type` (string, required): The type of resource to retrieve. Must be one of: `compute`, `storage`.
 
-**Returns:**
-- A JSON object containing synthetic resource metadata (id, type, status, region) or an error message if the type is unsupported.
+**Returns (SyntheticResource):**
+- `id` (string): Unique identifier for the synthetic resource.
+- `type` (string): Resource type specification.
+- `status` (string): Current operational status.
+- `region` (string): Deployment region for the resource.
 
 ## Environment Variables
 This module does not require any environment variables for its default configuration.
@@ -95,7 +98,8 @@ For Azure-native MCP hosting patterns (using SSE), refer to `building-blocks/mcp
 
 ## Security Notes
 - **Read-Only**: All tools are strictly read-only and return synthetic data.
-- **Fail-Closed**: Rejects unsupported inputs with a generic error message.
+- **Typed Contracts**: Uses Pydantic models to define and enforce a bounded output schema.
+- **Fail-Closed**: Rejects unsupported inputs with a generic error message or validation error.
 - **No Mutations**: No tools are provided for system modification.
 - **No Secrets**: This reference does not handle or store secrets, tokens, or PII.
 - **Data Redaction**: Does not leak internal exceptions, stack traces, or filesystem paths.
