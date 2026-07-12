@@ -23,6 +23,7 @@ azure_resources:
   - azurerm_storage_account
   - azurerm_application_insights
   - azurerm_log_analytics_workspace
+deployment_path: infra/terraform
 contracts:
   reads: []
   writes:

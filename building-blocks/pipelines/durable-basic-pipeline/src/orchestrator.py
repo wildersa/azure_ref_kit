@@ -60,10 +60,17 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         },
     )
 
+    # Retry policy for retryable activities (OCR, Publication)
+    # We use a bounded retry policy to avoid infinite loops and excessive costs.
+    retry_options = df.RetryOptions(
+        first_retry_interval_in_milliseconds=5000, max_number_of_attempts=3
+    )
+
     try:
-        # 2. OCR Step
-        ocr_result = yield context.call_activity(
+        # 2. OCR Step (Retryable)
+        ocr_result = yield context.call_activity_with_retry(
             "ocr_document_intelligence",
+            retry_options,
             {
                 "run_id": run_id,
                 "artifact_id": "source-document",
@@ -73,26 +80,30 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         )
 
         if ocr_result.get("status") == "failed":
-            raise Exception(ocr_result.get("friendly_error") or "OCR step failed.")
+            # Business failure (e.g. invalid document) should not be retried by Durable Functions
+            # because the same input will likely fail again.
+            raise ValueError(ocr_result.get("friendly_error") or "OCR step failed.")
 
-        # 3. Field Validation Step
+        # 3. Field Validation Step (Non-retryable)
+        # Validation is deterministic based on input; retrying won't change the outcome.
         validation_result = yield context.call_activity(
             "field_validation_worker",
             {
                 "run_id": run_id,
-                "artifact_id": "ocr-result",  # Assumption: OCR produces this artifact
+                "artifact_id": "ocr-result",
                 "ruleset_id": "default-ruleset",
             },
         )
 
         if validation_result.get("status") == "failed":
-            raise Exception(
+            raise ValueError(
                 validation_result.get("friendly_error") or "Field validation failed."
             )
 
-        # 4. Final Result Publishing
-        publish_result = yield context.call_activity(
+        # 4. Final Result Publishing (Retryable)
+        publish_result = yield context.call_activity_with_retry(
             "final_result_publisher",
+            retry_options,
             {
                 "run_id": run_id,
                 "validation_status": validation_result.get(
@@ -104,7 +115,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         )
 
         if publish_result.get("status") == "failed":
-            raise Exception(
+            raise ValueError(
                 publish_result.get("friendly_error") or "Final publication failed."
             )
 
