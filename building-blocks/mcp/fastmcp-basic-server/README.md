@@ -33,7 +33,7 @@ flowchart LR
     subgraph "MCP Boundary (Server)"
         Transport[Transport Layer: stdio]
         Server[FastMCP Server]
-        Tool1[get_system_status]
+        Tool1[get_synthetic_resource]
     end
 
     Agent <-->|JSON-RPC over stdio| Transport
@@ -60,6 +60,20 @@ flowchart LR
    mcp dev src/server.py
    ```
 
+## Tool Contract
+
+### `get_synthetic_resource`
+Returns synthetic metadata for a requested resource type.
+
+**Arguments:**
+- `resource_type` (string, required): The type of resource to retrieve. Must be one of: `compute`, `storage`.
+
+**Returns (SyntheticResource):**
+- `id` (string): Unique identifier for the synthetic resource.
+- `type` (string): Resource type specification.
+- `status` (string): Current operational status.
+- `region` (string): Deployment region for the resource.
+
 ## Environment Variables
 This module does not require any environment variables for its default configuration.
 
@@ -74,7 +88,7 @@ ruff check src/ tests/
 ruff format --check src/ tests/
 
 # Run tests
-pytest tests/
+PYTHONPATH=src pytest tests/
 ```
 
 ## Azure Hosting Notes
@@ -83,9 +97,12 @@ This specific module is a **local-only reference**. It uses the `stdio` transpor
 For Azure-native MCP hosting patterns (using SSE), refer to `building-blocks/mcp/azure-functions-mcp-endpoint/`.
 
 ## Security Notes
-- **Read-Only**: The `get_system_status` tool is strictly read-only and returns static data.
+- **Read-Only**: All tools are strictly read-only and return synthetic data.
+- **Typed Contracts**: Uses Pydantic models to define and enforce a bounded output schema.
+- **Fail-Closed**: Rejects unsupported inputs with a generic error message or validation error.
 - **No Mutations**: No tools are provided for system modification.
 - **No Secrets**: This reference does not handle or store secrets, tokens, or PII.
+- **Data Redaction**: Does not leak internal exceptions, stack traces, or filesystem paths.
 - **Process Isolation**: The server runs as a local process; ensure the parent agent runtime is trusted.
 
 ## Cost & Ops Trade-offs
