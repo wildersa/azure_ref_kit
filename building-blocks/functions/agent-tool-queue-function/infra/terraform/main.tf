@@ -45,25 +45,21 @@ resource "azurerm_function_app_flex_consumption" "main" {
 
   service_plan_id = azurerm_service_plan.main.id
 
-  storage {
-    type                     = "blobContainer"
-    account_name             = azurerm_storage_account.main.name
-    container_name           = azurerm_storage_container.deploy.name
-    authentication_type      = "SystemAssignedIdentity"
-  }
+  runtime_name    = "python"
+  runtime_version = "3.11"
+
+  instance_memory_in_mb = 2048
+
+  # Flex Consumption specific deployment configuration
+  storage_container_type      = "blobContainer"
+  storage_container_endpoint  = "${azurerm_storage_account.main.primary_blob_endpoint}${azurerm_storage_container.deploy.name}"
+  storage_authentication_type = "SystemAssignedIdentity"
 
   identity {
     type = "SystemAssigned"
   }
 
-  site_config {
-    instance_memory_mb = 2048
-
-    runtime {
-      name    = "python"
-      version = "3.11"
-    }
-  }
+  site_config {}
 
   app_settings = {
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.main.name
