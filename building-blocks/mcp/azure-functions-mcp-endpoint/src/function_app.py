@@ -1,97 +1,79 @@
 import azure.functions as func
 import logging
 import json
-from datetime import datetime, timezone
 
 app = func.FunctionApp()
 
-# Tool properties definitions
-get_service_info_properties = json.dumps(
-    {"type": "object", "properties": {}, "required": []}
-)
+# Synthetic data for demonstration purposes, matching fastmcp-basic-server
+SYNTHETIC_DATA = {
+    "compute": {
+        "id": "comp-001",
+        "type": "Standard_DS1_v2",
+        "status": "running",
+        "region": "local-synth-1",
+    },
+    "storage": {
+        "id": "stg-001",
+        "type": "Locally-redundant",
+        "status": "available",
+        "region": "local-synth-1",
+    },
+}
 
-get_resource_health_properties = json.dumps(
+get_synthetic_resource_properties = json.dumps(
     {
         "type": "object",
         "properties": {
-            "resource_id": {
+            "resource_type": {
                 "type": "string",
-                "description": "Optional identifier for the resource to check health for.",
+                "enum": ["compute", "storage"],
+                "description": "The type of resource to retrieve ('compute' or 'storage').",
             }
         },
-        "required": [],
+        "required": ["resource_type"],
     }
 )
 
 
 @app.mcp_tool_trigger(
     arg_name="context",
-    tool_name="get_service_info",
-    description="Returns basic information about the MCP service.",
-    tool_properties=get_service_info_properties,
+    tool_name="get_synthetic_resource",
+    description="Returns synthetic metadata for a requested resource type. This is a safe, read-only tool.",
+    tool_properties=get_synthetic_resource_properties,
 )
-def get_service_info(context: str) -> str:
+def get_synthetic_resource(context: str) -> str:
     """
-    MCP tool trigger function that returns service information.
+    MCP tool trigger function that returns synthetic resource metadata.
 
     Args:
         context (str): The JSON string representation of the tool invocation context.
 
     Returns:
-        str: A JSON-formatted string containing service information.
+        str: A JSON-formatted string containing synthetic resource metadata or an error message.
     """
-    logging.info("MCP tool 'get_service_info' invoked.")
+    logging.info("MCP tool 'get_synthetic_resource' invoked.")
 
-    service_info = {
-        "service_name": "Azure Functions MCP Reference",
-        "status": "operational",
-        "version": "1.0.0",
-    }
-
-    return json.dumps(service_info)
-
-
-@app.mcp_tool_trigger(
-    arg_name="context",
-    tool_name="get_resource_health",
-    description="Returns a mock health status for a given resource or the overall system.",
-    tool_properties=get_resource_health_properties,
-)
-def get_resource_health(context: str) -> str:
-    """
-    MCP tool trigger function that returns resource health information.
-    """
-    logging.info("MCP tool 'get_resource_health' invoked.")
-
-    # Parse arguments if any
     try:
+        # Parse the execution context
         content = json.loads(context)
-        args = content.get("arguments", {})
-        resource_id = args.get("resource_id", "system")
-    except (json.JSONDecodeError, AttributeError):
-        resource_id = "system"
+        arguments = content.get("arguments", {})
+        resource_type = arguments.get("resource_type")
 
-    health_status = {
-        "resource": resource_id,
-        "health": "Healthy",
-        "last_check": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "message": "All systems operational.",
-    }
+        # Fail-closed: Validate input
+        if not resource_type:
+            return json.dumps({"error": "Missing required argument: resource_type"})
 
-    return json.dumps(health_status)
+        if resource_type not in SYNTHETIC_DATA:
+            return json.dumps({"error": f"Unsupported resource type: {resource_type}"})
 
+        # Return safe, synthetic data
+        return json.dumps(SYNTHETIC_DATA[resource_type])
 
-@app.mcp_tool_trigger(
-    arg_name="context",
-    tool_name="get_server_time",
-    description="Returns the current server time in UTC.",
-    tool_properties=json.dumps({"type": "object", "properties": {}}),
-)
-def get_server_time(context: str) -> str:
-    """
-    MCP tool trigger function that returns the current server time.
-    """
-    logging.info("MCP tool 'get_server_time' invoked.")
-    return json.dumps(
-        {"server_time": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")}
-    )
+    except json.JSONDecodeError:
+        logging.error("Failed to parse MCP tool invocation context.")
+        return json.dumps({"error": "Invalid tool invocation context."})
+    except Exception:
+        # Logging redacted error summary to prevent leakage
+        logging.error("Unexpected error in MCP tool execution.")
+        # Fail-closed: return a generic error message, no internal details
+        return json.dumps({"error": "An internal error occurred."})
