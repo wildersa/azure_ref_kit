@@ -2,20 +2,35 @@ name: azure-pipelines-azure-deploy
 type: devops
 category: devops
 status: reference
-purpose: Secure Azure Pipelines deployment reference pattern using Workload Identity Federation.
+purpose: Secure Azure Pipelines deployment reference pattern for Azure Static Web Apps using Workload Identity Federation.
 inputs:
   - name: AZURE_SERVICE_CONNECTION_NAME
-    description: The name of the Azure Resource Manager service connection in Azure DevOps.
+    description: "Name of the Azure Resource Manager service connection configured with Workload Identity Federation."
     type: string
-  - name: TF_WORKING_DIR
-    description: The relative path to the Terraform module to deploy.
+  - name: AZURE_SUBSCRIPTION_ID
+    description: "Subscription ID of the target Azure subscription."
     type: string
-  - name: ENVIRONMENT_NAME
-    description: The name of the Azure DevOps environment for deployment gating and approvals.
+  - name: AZURE_RESOURCE_GROUP_NAME
+    description: "Resource group name where the Static Web App is located."
     type: string
-outputs: []
-azure_resources: []
-contracts:
-  reads: []
-  writes: []
-  emits: []
+  - name: AZURE_STATIC_WEB_APP_NAME
+    description: "Name of the Azure Static Web App resource."
+    type: string
+  - name: DEPLOYMENT_ENVIRONMENT
+    description: "The name of the Azure Pipelines Environment for deployment gating and approvals."
+    type: string
+    required: false
+outputs:
+  - name: static_web_app_url
+    description: "The URL of the deployed Static Web App."
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+customer_safe_boundary:
+  forbid:
+    - "Azure Service Principal secrets, passwords, or certificates"
+    - "Azure DevOps PATs or agent tokens"
+    - "Static Web Apps deployment tokens/publish profiles"
+    - "Internal Azure resource identifiers (Tenant IDs) in logs"
+    - "Detailed technical logs from the build and deployment process"
+    - "Environment variables containing technical internals"

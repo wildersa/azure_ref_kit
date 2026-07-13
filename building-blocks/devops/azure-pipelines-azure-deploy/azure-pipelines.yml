@@ -1,0 +1,112 @@
+# Azure Pipelines Deployment Template for Static Status Portal
+# This reference uses Workload Identity Federation (OIDC) for secure deployment.
+
+parameters:
+  - name: azureServiceConnection
+    type: string
+    displayName: 'Azure Service Connection Name'
+  - name: staticWebAppName
+    type: string
+    displayName: 'Static Web App Name'
+  - name: resourceGroupName
+    type: string
+    displayName: 'Resource Group Name'
+  - name: environmentName
+    type: string
+    default: 'production'
+    displayName: 'Deployment Environment'
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - building-blocks/portals/static-status-portal/**
+      - building-blocks/devops/azure-pipelines-azure-deploy/**
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: BuildAndTest
+    displayName: 'Build and Test'
+    jobs:
+      - job: BuildAndTest
+        displayName: 'Build and Test Portal'
+        steps:
+          - checkout: self
+            submodules: true
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+            displayName: 'Install Node.js'
+
+          - script: |
+              cd building-blocks/portals/static-status-portal
+              npm install
+              npm run test
+              npm run build
+            displayName: 'npm install, test, and build'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'building-blocks/portals/static-status-portal/dist'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+            displayName: 'Publish Artifacts'
+
+  - stage: Deploy
+    displayName: 'Deploy to Azure'
+    dependsOn: BuildAndTest
+    condition: succeeded()
+    jobs:
+      - deployment: DeployPortal
+        displayName: 'Deploy Portal'
+        environment: ${{ parameters.environmentName }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
+
+                - task: DownloadBuildArtifacts@0
+                  inputs:
+                    buildType: 'current'
+                    downloadType: 'single'
+                    artifactName: 'drop'
+                    downloadPath: '$(System.ArtifactsDirectory)'
+                  displayName: 'Download Artifacts'
+
+                # Use Workload Identity Federation (via Service Connection) to fetch the deployment token.
+                # This avoids storing long-lived secrets in Azure DevOps.
+                - task: AzureCLI@2
+                  inputs:
+                    azureSubscription: ${{ parameters.azureServiceConnection }}
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      echo "Fetching deployment token for SWA: ${{ parameters.staticWebAppName }}"
+                      TOKEN=$(az staticwebapp secrets list \
+                        --name ${{ parameters.staticWebAppName }} \
+                        --resource-group ${{ parameters.resourceGroupName }} \
+                        --query "properties.apiKey" -o tsv)
+
+                      if [ -z "$TOKEN" ]; then
+                        echo "##vso[task.logissue type=error]Failed to fetch SWA deployment token."
+                        exit 1
+                      fi
+
+                      # Set the token as a secret variable for the next task
+                      echo "##vso[task.setvariable variable=SWA_DEPLOYMENT_TOKEN;isSecret=true]$TOKEN"
+                  displayName: 'Get SWA Deployment Token'
+
+                - task: AzureStaticWebApp@0
+                  inputs:
+                    app_location: '/'
+                    output_location: ''
+                    skip_app_build: true
+                    cwd: '$(System.ArtifactsDirectory)/drop'
+                    azure_static_web_apps_api_token: $(SWA_DEPLOYMENT_TOKEN)
+                  displayName: 'Deploy to Azure Static Web App'
