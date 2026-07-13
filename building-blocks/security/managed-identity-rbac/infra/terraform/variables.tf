@@ -24,8 +24,18 @@ variable "role_definition_name" {
   default     = "Storage Blob Data Reader"
 
   validation {
-    condition     = !contains(["Owner", "Contributor", "User Access Administrator"], var.role_definition_name) && !strcontains(var.role_definition_name, "*")
-    error_message = "Broad or wildcard roles (Owner, Contributor, User Access Administrator, *) are strictly forbidden for least-privilege service access."
+    condition = contains([
+      "Storage Blob Data Reader",
+      "Storage Blob Data Contributor",
+      "Storage Queue Data Message Processor",
+      "Storage Queue Data Contributor",
+      "Storage Table Data Contributor",
+      "Key Vault Secrets User",
+      "Cognitive Services User",
+      "Foundry User",
+      "Search Index Data Reader"
+    ], var.role_definition_name)
+    error_message = "Only specific narrow Data Plane roles are permitted for this reference implementation. See module.yaml for the recommended allowlist."
   }
 }
 
