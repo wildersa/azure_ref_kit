@@ -1,7 +1,7 @@
 name: customer-safe-status-boundary
 type: security
 category: policy
-status: scaffold
+status: active
 purpose: Defines the boundary between internal technical telemetry and customer-safe business status for agents, pipelines, and portals.
 contracts:
   applies_to:
@@ -9,3 +9,20 @@ contracts:
     - shared/contracts/pipeline-step.schema.json
     - shared/contracts/artifact.schema.json
     - shared/contracts/cost-ledger.schema.json
+  provided_schemas:
+    - src/schemas/customer_safe_status.schema.json
+    - src/schemas/friendly_failure.schema.json
+dependencies:
+  python:
+    - jsonschema
+security_assumptions:
+  - The module assumes that the enforcement point (API, Agent, etc.) is authenticated and trusted to perform the redaction.
+  - It does not implement authentication itself.
+customer_safe_policy:
+  - Allows: business status, summaries, safe artifacts, friendly errors, opaque IDs.
+  - Forbids: raw logs, prompts, secrets, tokens, stack traces, provider payloads, internal Azure resource IDs.
+known_limits:
+  - Sanitization is currently shallow (nested redaction is handled for safe_artifacts only).
+  - Does not prevent data leakage if a secret is embedded inside a business summary field (use a separate PII/Secret scanner for that).
+azure_resources: []
+deployment_path: null

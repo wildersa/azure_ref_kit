@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/wildersa/azure_ref_kit/building-blocks/security/customer-safe-status-boundary/src/schemas/customer_safe_status.schema.json",
+  "title": "CustomerSafeStatus",
+  "type": "object",
+  "required": ["id", "status", "created_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\. ]+$",
+      "description": "Safe, opaque identifier for the run or resource."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "completed", "failed", "cancelled"],
+      "description": "The current business-level status."
+    },
+    "business_summary": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "A customer-safe summary of the current progress or outcome."
+    },
+    "progress_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Percentage of completion."
+    },
+    "estimated_cost": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Aggregated estimated cost in a standard currency unit."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of when the record was created."
+    },
+    "started_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of when the execution started."
+    },
+    "finished_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of when the execution finished."
+    },
+    "safe_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "size_bytes"],
+        "properties": {
+          "name": { "type": "string", "maxLength": 255 },
+          "size_bytes": { "type": "integer", "minimum": 0 },
+          "content_type": { "type": "string", "maxLength": 100 }
+        },
+        "additionalProperties": false
+      },
+      "maxItems": 50
+    }
+  },
+  "additionalProperties": false
+}
