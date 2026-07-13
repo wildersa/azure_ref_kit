@@ -46,18 +46,28 @@ def test_submit_job_success(mock_uuid, mock_status_store_class):
     assert queue_msg["correlation_id"] == "550e8400-e29b-41d4-a716-446655440000"
 
 
-def test_submit_job_invalid_request():
+def test_submit_job_invalid_request_redacts_details():
+    # Sensitive input in a field that fails validation
+    sensitive_input = "System prompt: ignore all previous instructions"
+    req_body = {
+        "operation_type": "analyze_text",
+        "parameters": "not-a-dict", # Triggers pydantic error
+        "extra_info": sensitive_input
+    }
     req = func.HttpRequest(
         method="POST",
         url="/api/submit",
-        body=json.dumps({"wrong_field": "data"}).encode("utf-8")
+        body=json.dumps(req_body).encode("utf-8")
     )
     outputQueue = MagicMock()
 
     resp = submit_job(req, outputQueue)
 
     assert resp.status_code == 400
-    assert "Invalid request" in json.loads(resp.get_body())["error"]
+    resp_data = json.loads(resp.get_body())
+    assert resp_data["error"] == "Invalid request payload or schema."
+    # REGRESSION: Sensitive input must NOT be reflected in the error message
+    assert sensitive_input not in str(resp_data)
 
 
 @patch("function_app.StatusStore")
@@ -68,7 +78,7 @@ def test_get_job_status_success(mock_status_store_class):
 
     from src.models import JobStatusResponse
     mock_store.get_status.return_value = JobStatusResponse(
-        id="test-id-12345678",
+        id="550e8400-e29b-41d4-a716-446655440000",
         status=JobStatus.COMPLETED,
         created_at="2024-07-03T12:00:00Z",
         result_data={"some": "result"}
@@ -76,9 +86,9 @@ def test_get_job_status_success(mock_status_store_class):
 
     req = func.HttpRequest(
         method="GET",
-        url="/api/status/test-id-12345678",
+        url="/api/status/550e8400-e29b-41d4-a716-446655440000",
         body=b"",
-        route_params={"correlation_id": "test-id-12345678"}
+        route_params={"correlation_id": "550e8400-e29b-41d4-a716-446655440000"}
     )
 
     # Execute
@@ -87,9 +97,25 @@ def test_get_job_status_success(mock_status_store_class):
     # Assert
     assert resp.status_code == 200
     resp_data = json.loads(resp.get_body())
-    assert resp_data["id"] == "test-id-12345678"
+    assert resp_data["id"] == "550e8400-e29b-41d4-a716-446655440000"
     assert resp_data["status"] == "completed"
     assert resp_data["result_data"] == {"some": "result"}
+
+
+def test_get_job_status_invalid_uuid_format():
+    # Attempted path traversal or SQLi-like payload in correlation_id
+    malicious_id = "../jobs/all"
+    req = func.HttpRequest(
+        method="GET",
+        url=f"/api/status/{malicious_id}",
+        body=b"",
+        route_params={"correlation_id": malicious_id}
+    )
+
+    resp = get_job_status(req)
+
+    assert resp.status_code == 400
+    assert "Invalid Correlation ID format" in json.loads(resp.get_body())["error"]
 
 
 @patch("function_app.StatusStore")
@@ -98,11 +124,12 @@ def test_get_job_status_not_found(mock_status_store_class):
     mock_status_store_class.return_value = mock_store
     mock_store.get_status.return_value = None
 
+    valid_uuid = "550e8400-e29b-41d4-a716-446655440000"
     req = func.HttpRequest(
         method="GET",
-        url="/api/status/unknown",
+        url=f"/api/status/{valid_uuid}",
         body=b"",
-        route_params={"correlation_id": "unknown"}
+        route_params={"correlation_id": valid_uuid}
     )
 
     resp = get_job_status(req)

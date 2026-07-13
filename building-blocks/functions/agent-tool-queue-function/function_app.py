@@ -33,9 +33,10 @@ def submit_job(req: func.HttpRequest, outputQueue: func.Out[str]) -> func.HttpRe
         try:
             req_body = req.get_json()
             submit_req = SubmitRequest(**req_body)
-        except (ValueError, Exception) as e:
+        except (ValueError, Exception):
+            # P0: Do not echo str(e) back to caller as it may contain rejected input values.
             return func.HttpResponse(
-                json.dumps({"error": f"Invalid request: {str(e)}"}),
+                json.dumps({"error": "Invalid request payload or schema."}),
                 status_code=400,
                 mimetype="application/json",
             )
@@ -87,6 +88,16 @@ def get_job_status(req: func.HttpRequest) -> func.HttpResponse:
     if not correlation_id:
         return func.HttpResponse(
             json.dumps({"error": "Correlation ID is required."}),
+            status_code=400,
+            mimetype="application/json",
+        )
+
+    # P0: Validate correlation_id format as UUID to fail closed on malformed boundaries.
+    try:
+        uuid.UUID(correlation_id)
+    except ValueError:
+        return func.HttpResponse(
+            json.dumps({"error": "Invalid Correlation ID format."}),
             status_code=400,
             mimetype="application/json",
         )
