@@ -19,7 +19,8 @@ def test_agent_query_valid():
     data = response.json()
     assert data["status"] == "active"
     assert "summary" in data
-    assert "vm-123" in data["summary"]
+    # Ensure the resource_id is NOT reflected in the summary to maintain safe boundary
+    assert "vm-123" not in data["summary"]
 
 
 def test_agent_query_invalid_payload():

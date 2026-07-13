@@ -68,3 +68,10 @@ resource "azurerm_container_app" "agent_api" {
 
   tags = var.tags
 }
+
+resource "azurerm_role_assignment" "acr_pull" {
+  count                = var.container_registry_id != null ? 1 : 0
+  scope                = var.container_registry_id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_container_app.agent_api.identity[0].principal_id
+}

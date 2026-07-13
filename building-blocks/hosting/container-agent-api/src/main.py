@@ -110,9 +110,10 @@ async def agent_query(request: AgentQueryRequest):
     """
     # This is a stub implementation for the reference hosting block.
     # In a real scenario, this would call downstream services safely.
+    # We avoid reflecting the resource_id to maintain a strict safe boundary.
     return AgentQueryResponse(
         status="active",
-        summary=f"The resource '{request.resource_id}' is currently active and healthy. Technical details are redacted.",
+        summary="The requested resource is currently active and healthy. Technical details are redacted.",
     )
 
 

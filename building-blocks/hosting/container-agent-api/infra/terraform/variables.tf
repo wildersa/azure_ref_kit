@@ -20,6 +20,12 @@ variable "container_registry_server" {
   description = "The FQDN of the container registry"
 }
 
+variable "container_registry_id" {
+  type        = string
+  description = "The ID of the Azure Container Registry to grant AcrPull permissions (optional if image is public)"
+  default     = null
+}
+
 variable "tags" {
   type        = map(string)
   description = "Tags for resources"
