@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentQueryResponse",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": ["status", "updated_at", "summary"],
+  "additionalProperties": false
+}

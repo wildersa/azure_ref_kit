@@ -34,14 +34,14 @@ contracts:
   reads: []
   writes: []
   receives:
-    - type: agent-request
-      name: create_request
-      description: Receives a controlled agent request.
+    - type: agent-query
+      name: agent_query
+      description: Receives a bounded agent query.
       schema:
-        $ref: "./schemas/agent_request.schema.json"
+        $ref: "./schemas/agent_query.schema.json"
   emits:
-    - type: agent-status
-      name: agent_status
-      description: Returns a customer-safe agent status response.
+    - type: agent-query-response
+      name: agent_query_response
+      description: Returns a customer-safe agent query response.
       schema:
-        $ref: "./schemas/agent_status_response.schema.json"
+        $ref: "./schemas/agent_query_response.schema.json"
