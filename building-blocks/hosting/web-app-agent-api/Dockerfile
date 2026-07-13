@@ -22,8 +22,9 @@ COPY --chown=appuser:appuser src/ /app/src/
 # Switch to the non-root user
 USER appuser
 
-# Expose the port
+# Expose the default port (documentation only)
 EXPOSE 8080
 
-# Run the API
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the API using the Python entrypoint to ensure port-selection logic in main.py is honored.
+# This ensures consistency between local runs, Docker, and Azure App Service (honoring WEBSITES_PORT).
+CMD ["python", "src/main.py"]

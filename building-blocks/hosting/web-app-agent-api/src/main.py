@@ -125,6 +125,7 @@ async def agent_query(request: AgentQueryRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    # App Service for Containers typically uses PORT or WEBSITES_PORT
-    port = int(os.environ.get("PORT", 8080))
+    # App Service for Containers typically sets WEBSITES_PORT
+    # Locally or in other environments, PORT is standard
+    port = int(os.environ.get("WEBSITES_PORT", os.environ.get("PORT", 8080)))
     uvicorn.run(app, host="0.0.0.0", port=port)
