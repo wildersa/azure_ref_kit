@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, Callable
 from urllib.request import Request, urlopen
 from urllib.parse import quote, urlencode, urlparse
 
-from pydantic import ValidationError
+from pydantic import ValidationError, TypeAdapter
 
 # We assume the contract is available in the python path
 try:
@@ -15,6 +15,7 @@ try:
         PipelineResult,
         ListRecentPipelineRunsResponse,
         PipelineRunSummary,
+        SafeId,
     )
 except ImportError:
     # Fallback for local testing if needed, though CI/standard run should have it in PYTHONPATH
@@ -30,6 +31,7 @@ except ImportError:
         PipelineResult,
         ListRecentPipelineRunsResponse,
         PipelineRunSummary,
+        SafeId,
     )
 
 logger = logging.getLogger(__name__)
@@ -45,6 +47,7 @@ class DevOpsStatusAdapter:
     """Controlled read-only adapter for Azure DevOps status queries."""
 
     ALLOWED_HOSTS = ["dev.azure.com"]
+    _safe_id_adapter = TypeAdapter(SafeId)
 
     def __init__(
         self,
@@ -65,6 +68,9 @@ class DevOpsStatusAdapter:
             transport: Optional injectable HTTP transport for testing and isolation.
         """
         self._validate_url(organization_url)
+        # Validate project name at init
+        self._safe_id_adapter.validate_python(project)
+
         self.organization_url = organization_url.rstrip("/")
         self.project = quote(project)
         self.token = token
@@ -112,6 +118,10 @@ class DevOpsStatusAdapter:
 
         Maps to: GET https://dev.azure.com/{organization}/{project}/_apis/build/builds/{buildId}
         """
+        # Validate identifiers at the boundary
+        self._safe_id_adapter.validate_python(pipeline_id)
+        self._safe_id_adapter.validate_python(run_id)
+
         safe_run_id = quote(run_id)
         url = f"{self.organization_url}/{self.project}/_apis/build/builds/{safe_run_id}"
 
@@ -159,6 +169,15 @@ class DevOpsStatusAdapter:
 
         Maps to: GET https://dev.azure.com/{organization}/{project}/_apis/build/builds?definitions={pipeline_id}&branchName={branch}&$top={top}
         """
+        # Validate identifiers and bounds at the boundary
+        self._safe_id_adapter.validate_python(pipeline_id)
+        if branch:
+            self._safe_id_adapter.validate_python(branch)
+
+        # Enforce top bounds (1-20 as per contract ListRecentPipelineRunsRequest)
+        if not (1 <= top <= 20):
+            raise ValueError("top must be between 1 and 20")
+
         params = {
             "definitions": pipeline_id,
             "$top": top,
