@@ -1,0 +1,22 @@
+name: devops-status-adapter
+type: building-block
+category: mcp
+status: active
+purpose: Controlled read-only Azure DevOps adapter for the MCP tool contract.
+inputs:
+  - name: organization_url
+    description: Azure DevOps organization URL.
+  - name: project
+    description: Azure DevOps project name or ID.
+  - name: token
+    description: Azure DevOps Personal Access Token (PAT).
+outputs: []
+azure_resources: []
+deployment_path: null
+contracts:
+  reads:
+    - Azure DevOps Build REST API
+  writes: []
+customer_safe_boundary:
+  policy: "Strictly read-only access to DevOps status. Sanitizes raw ADO payloads to contract models."
+  enforcement: "Manual mapping to validated Pydantic models from the devops-mcp-tool-contract."
