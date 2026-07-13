@@ -35,6 +35,13 @@ resource "azurerm_container_app" "agent_api" {
     type = "SystemAssigned"
   }
 
+  registry {
+    server               = var.container_registry_server
+    identity             = "system"
+    username             = null
+    password_secret_name = null
+  }
+
   template {
     container {
       name   = "agent-api"

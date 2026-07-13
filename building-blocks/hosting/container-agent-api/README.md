@@ -1,172 +1,115 @@
 # Container-hosted Agent API
 
-Reference building block defining when and how to package an agent-facing API as a container instead of using serverless functions or static web apps.
+Reference building block defining when and how to package a bounded agent-facing API as a container instead of using serverless functions.
 
 ## Purpose
 
-Provide a standard hosting contract for agentic workloads that require custom runtimes, long-running processes, or specific system dependencies that exceed the limits of serverless environments like Azure Functions.
+Provide a standard hosting reference for agentic workloads that require custom runtimes, long-running processes, or specific system dependencies that exceed the limits of serverless environments like Azure Functions.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Caller[Agent / Client] -->|POST /agent/query| Ingress[Container Ingress]
+    subgraph "Azure Container Apps Boundary"
+        Ingress --> API[FastAPI Application]
+        subgraph "Safe API Boundary"
+            API --> Validation[Input Validation]
+            Validation --> Logic[Controlled Read-Only Handler]
+            Logic --> Sanitization[Output Sanitization]
+        end
+    end
+    Sanitization -->|Customer-Safe JSON| Caller
+```
 
 ## When to Use Containers
 
-- **Custom Dependencies:** Your agent requires OS-level libraries (e.g., PDF processing, specialized OCR engines, or ML runtimes) not available in standard serverless environments.
-- **Long-Running Requests:** The agent task exceeds the timeout limits of Azure Functions (typically 10 minutes).
+- **Custom Dependencies:** Your agent requires OS-level libraries (e.g., specialized PDF processing, OCR engines, or specific ML runtimes) not available in standard serverless environments.
 - **Consistent Execution Environment:** You need bit-for-bit parity between local development, CI/CD, and production.
-- **Streaming Responses:** You require long-lived HTTP connections for token-by-token streaming that may be throttled or interrupted in some serverless tiers.
 - **Resource Intensity:** The workload requires specific CPU/Memory ratios or GPU access not easily met by standard serverless plans.
+- **Long-Running Requests:** Tasks that consistently exceed the timeout limits of Azure Functions (typically 10 minutes).
 
 ## When NOT to Use Containers
 
-- **Simple Request/Response:** If the API just orchestrates a few calls to Azure AI services, Azure Functions is usually more cost-effective and easier to manage.
-- **Low Traffic:** Serverless functions scale to zero and cost nothing when idle. Containers (unless using specialized serverless tiers like Container Apps with scale-to-zero) often incur a base cost.
-- **Frontend Only:** Static content and simple React/Vue/Svelte frontends should use Azure Static Web Apps.
+- **Simple Request/Response:** If the API only orchestrates calls to Azure AI services, Azure Functions is often more cost-effective.
+- **Low Traffic:** Serverless functions scale to zero and cost nothing when idle. Containers (unless using scale-to-zero in Container Apps) often incur a base cost.
 
-## Comparison with Other Hosting Options
+## Security and Safety
 
-| Feature | Azure Functions | Container Apps | App Service (Web App) |
-|---------|-----------------|----------------|-----------------------|
-| **Best For** | Event-driven, small tasks | Microservices, custom runtimes | Monolithic APIs, legacy apps |
-| **Scaling** | Fast, scale-to-zero | Fast, scale-to-zero (KEDA) | Slower, plan-based |
-| **Runtime** | Managed stacks | Any (Container) | Managed or Container |
-| **Complexity** | Low | Medium | Low to Medium |
-| **Cost Model** | Pay-per-execution / Flex | Pay-per-use (CPU/Mem) | Plan-based (Reserved) |
+- **Non-Root User:** The container runs as a non-privileged `appuser` to minimize the blast radius of any potential vulnerability.
+- **No Technical Leakage:** The API implements a global exception handler that redacts internal stack traces and technical details, returning only customer-safe error messages.
+- **Strict Validation:** Input models use Pydantic v2 with regex patterns and length limits to prevent injection and oversized payloads.
+- **Read-Only by Design:** This reference demonstrates a read-only query pattern, avoiding any mutation operations that could affect system state.
 
-## API Boundary
+## Local Development
 
-The container-hosted API acts as a secure gateway between the agent client and the internal tools/services. It must enforce the `customer-safe-status-boundary`.
+### Prerequisites
 
-```mermaid
-flowchart TD
-    subgraph "Public Internet"
-        Client[Agent Client / UI]
-    end
+- Python 3.12+
+- Docker (optional, for container validation)
 
-    subgraph "Azure Container Boundary"
-        API[FastAPI / Flask / Node Container]
-        subgraph "Internal Logic"
-            Orch[Agent Orchestrator]
-        end
-    end
+### Local Run (Python)
 
-    subgraph "Internal / Protected Services"
-        Tools[Azure Functions Tools]
-        LLM[Azure OpenAI / Foundry]
-        Data[Blob Storage / Cosmos DB]
-    end
-
-    Client -->|REST API / WebSocket| API
-    API --> Orch
-    Orch -->|Tool Call| Tools
-    Orch -->|Inference| LLM
-    Orch -->|State| Data
-
-    API -.->|Safe Status| Client
-```
-
-## Local / Demo Flow
-
-To run the agent API locally using Docker:
-
-1. **Build the image:**
-   ```bash
-   docker build -t agent-api .
-   ```
-
-2. **Run the container:**
-   ```bash
-   # Use DefaultAzureCredential (Managed Identity / Azure CLI login) for local auth
-   docker run -p 8080:8080 \
-     -e AZURE_OPENAI_ENDPOINT="https://..." \
-     agent-api
-   ```
-
-3. **Test the endpoint:**
-   ```bash
-   curl http://localhost:8080/health
-   ```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | The port the API listens on. | `8080` |
-| `AZURE_OPENAI_ENDPOINT` | (Example) Endpoint for AI services. | - |
-
-## Validation Commands
-
-### Local Python Validation
 ```bash
+# Navigate to the module directory
+cd building-blocks/hosting/container-agent-api
+
 # Install dependencies
-pip install fastapi uvicorn pydantic httpx pytest
+pip install -r requirements.txt
 
-# Run tests
-PYTHONPATH=. pytest tests/test_api.py
+# Start the API locally
+python src/main.py
 
-# Linting
-ruff check src/
-ruff format --check src/
+# Alternatively, using uvicorn directly:
+# uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-### Docker Validation
+### Local Build and Run (Docker)
+
 ```bash
-docker build -t agent-api .
-# Run in background and check health
-docker run -d -p 8080:8080 --name agent-test agent-api
-sleep 5
-curl http://localhost:8080/health
-docker stop agent-test
-docker rm agent-test
+# Build the image
+docker build -t container-agent-api .
+
+# Run the container
+docker run -p 8080:8080 container-agent-api
 ```
 
-### Terraform Validation
+### Example Request
+
 ```bash
-cd infra/terraform
-terraform init -backend=false
-terraform validate
+curl -X POST http://localhost:8080/agent/query \
+  -H "Content-Type: application/json" \
+  -d '{"query_type": "status_summary", "resource_id": "vm-123"}'
 ```
 
 ## Azure Hosting Notes
 
 ### Azure Container Apps (Recommended)
-- **Scale to Zero:** Ideal for agent workloads that aren't constant.
-- **Dapr Integration:** Useful for state management and service-to-service communication.
-- **KEDA Scalers:** Can scale based on queue depth or custom metrics.
+- **Managed Identity:** Use System-Assigned or User-Assigned Managed Identity for secure access to Azure resources (like ACR for image pull).
+- **Scale to Zero:** Configure KEDA scalers to scale the container app to zero when not in use to save costs.
 
-### Azure App Service for Containers
-- **Stability:** Better suited for long-lived, high-throughput monolithic APIs.
-- **WebSockets:** Excellent support for persistent connections.
-- **Easy Transition:** Good for teams already familiar with App Service.
+## Validation Commands
 
-## Security Notes
+```bash
+# Linting and Formatting
+ruff check src/
+ruff format --check src/
 
-- **Managed Identity:** Use User-Assigned Managed Identity to access Azure OpenAI, Storage, and Key Vault. Avoid API keys in environment variables.
-- **Private Networking:** Deploy the container within a VNet and use Private Endpoints for downstream services.
-- **Customer-Safe Boundary:** Ensure the API filters raw model outputs and technical logs. Never expose internal stack traces or prompts to the client.
+# Focused Testing
+# From module root:
+PYTHONPATH=. pytest tests/
+```
 
-## Cost & Ops Trade-offs
+## Known Limits and Trade-offs
 
-- **Operational Overhead:** Managing Dockerfiles and container registries adds complexity compared to pure serverless.
-- **Cold Starts:** Containers may have longer "cold starts" than Functions if scaling from zero.
-- **Cost Predictability:** App Service Plans provide fixed costs, while Container Apps can be more variable but efficient for bursty workloads.
+- **Operational Overhead:** Managing Dockerfiles and registries adds complexity compared to pure serverless.
+- **Cold Starts:** Containers may have longer cold starts than Azure Functions if scaling from zero.
+- **Statelessness:** Local disk changes are ephemeral and lost on container restart.
 
-## Known Limits
-
-- **Port Limits:** Azure App Service generally expects only one exposed port (defaults to 80 or 8080).
-- **Ephemeral Storage:** Local disk changes are lost when the container restarts. Use Azure Files or Blob Storage for persistence.
-- **Registry Dependency:** Requires an Azure Container Registry (ACR) or similar for deployment.
-
-## Deployment / IaC Decision
-
-This building block **includes module-local Terraform** to demonstrate the recommended Infrastructure-as-Code (IaC) pattern for Azure Container Apps.
-
-The decision to provide IaC is based on:
-1. **Azure Native Best Practices:** Showing the correct configuration for Azure Container Apps, including serverless scaling and managed identity.
-2. **Security-First Setup:** Explicitly demonstrating a system-assigned managed identity and secure ingress configuration.
-3. **Repeatability:** Ensuring developers can provision the exact environment required to host this containerized agent API reference.
-
-## Microsoft Documentation
+## Microsoft Documentation Consulted
 
 - [Azure Container Apps overview](https://learn.microsoft.com/en-us/azure/container-apps/overview)
-- [Deploy an application to Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/get-started)
-- [Comparing Azure container options](https://learn.microsoft.com/azure/developer/python/containers-in-azure-overview-python)
-- [Deploy a containerized Flask or FastAPI web app on Azure App Service](https://learn.microsoft.com/azure/developer/python/tutorial-containerize-simple-web-app-for-app-service)
+- [Containers in Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-custom-container)
+- [FastAPI in containers](https://fastapi.tiangolo.com/deployment/docker/)
 - [Terraform on Azure](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
+- [Managed identity for Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/managed-identity)
