@@ -6,8 +6,18 @@ purpose: Defines the contract and architecture for a customer-safe static status
 contracts:
   consumes:
     - building-blocks/security/customer-safe-status-boundary/src/schemas/customer_safe_status.schema.json
-  reuses:
+  reads:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/artifact.schema.json
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+customer_safe_boundary:
+  forbid:
+    - "Raw Azure Function logs"
+    - "Internal exceptions and stack traces"
+    - "SAS tokens and connection strings"
+    - "System prompts"
+    - "Internal Azure Resource IDs"
 azure_resources: []
 deployment_path: null

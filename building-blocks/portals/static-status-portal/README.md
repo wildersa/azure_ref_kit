@@ -11,16 +11,17 @@ The goal of this portal is to keep customers informed of progress without exposi
 ## Architecture
 
 ```mermaid
-flowchart TD
-    Customer[Customer Browser] -->|HTTPS| SWA[Static Web Apps Shell]
-    SWA -->|REST API| Func[Controlled Functions API]
-    Func -->|Redact/Sanitize| Boundary[Customer-Safe Status Boundary]
-    Boundary -->|Safe Status| Source[Internal Status Source]
+flowchart LR
+    Source[Internal Status Source] -->|Safe Status| Boundary[Customer-Safe Status Boundary]
+    Boundary -->|Redact/Sanitize| Func[Controlled Functions API]
+    Func -->|REST API| SWA[Static Web Apps Shell]
+    SWA -->|HTTPS| Customer[Customer Browser]
 ```
 
-- **Static Web Apps Shell:** A React/TypeScript frontend that handles presentation and client-side routing.
+- **Internal Status Source:** The backend system (e.g., Durable Functions, Azure DevOps) that holds the raw, technical execution state.
+- **Customer-Safe Status Boundary:** A security layer that ensures only allowlisted fields are returned.
 - **Controlled Functions API:** An Azure Functions backend that acts as the only gateway to status data.
-- **Customer-Safe Status Boundary:** A security layer that ensures only allowlisted fields are returned to the browser.
+- **Static Web Apps Shell:** A React/TypeScript frontend that handles presentation and client-side routing.
 
 ## Minimum Portal Views
 
@@ -73,7 +74,7 @@ The following technical and internal data **must never reach the browser or the 
 | State | Portal Behavior |
 |-------|-----------------|
 | **Loading** | Displays a skeleton screen or non-technical loading indicator. |
-| **Empty** | Displays a \"No runs found\" message for the customer. |
+| **Empty** | Displays a "No runs found" message for the customer. |
 | **Not Found** | Displays a friendly 404 page for invalid or unauthorized IDs. |
 | **Failed** | Displays the `friendly_error` and a way to contact support or retry. |
 | **Completed** | Displays the final summary and links to safe artifacts. |
