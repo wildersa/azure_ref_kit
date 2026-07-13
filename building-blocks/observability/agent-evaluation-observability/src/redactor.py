@@ -28,6 +28,18 @@ FORBIDDEN_FIELDS = {
     "raw_response",
     "tenant_id",
     "subscription_id",
+    "customer_id",
+    "user_id",
+    "raw_logs",
+    "token",
+    "api_key",
+    "access_token",
+    "raw_request",
+    "raw_payload",
+    "raw_tool_payload",
+    "raw_provider_payload",
+    "connection_string",
+    "system_instruction",
 }
 
 # Allowlisted technical fields for safe tracing

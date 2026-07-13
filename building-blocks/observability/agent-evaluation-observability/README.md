@@ -103,6 +103,11 @@ To validate the observability contract and redaction logic locally:
    pytest tests/test_redaction.py
    ```
 
+3. **Schema Validation**: Ensures that the example trace and evaluation fixtures comply with the defined JSON schemas.
+   ```bash
+   pytest tests/test_schema_validation.py
+   ```
+
 ## Known Limits
 
 - **Shared Responsibility**: This reference defines the *what* and *how* of safe tracing, but the final implementation in the agent runtime or adapter is responsible for correctly applying these rules.

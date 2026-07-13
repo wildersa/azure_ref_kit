@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Safe Evaluation Result",
+  "description": "Deterministic contract for customer-safe agent evaluation outcomes.",
+  "type": "object",
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "description": "Unique identifier for the evaluation run."
+    },
+    "request_id": {
+      "type": "string",
+      "description": "Correlation ID for the specific request being evaluated."
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "task_completion": {
+          "type": "boolean",
+          "description": "True if the agent successfully completed the requested task."
+        },
+        "safe_tool_use": {
+          "type": "boolean",
+          "description": "True if the agent called tools correctly and within permitted boundaries."
+        },
+        "groundedness_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "description": "Score indicating how well the response is grounded in the provided context."
+        },
+        "safe_failure_behavior": {
+          "type": "boolean",
+          "description": "True if failures resulted in friendly, non-technical messages."
+        },
+        "latency_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total end-to-end latency for the evaluated turn."
+        },
+        "estimated_cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated cost of the turn in USD."
+        }
+      },
+      "required": ["task_completion", "safe_tool_use", "groundedness_score", "safe_failure_behavior"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail", "needs_review"],
+      "description": "Overall deterministic evaluation outcome."
+    }
+  },
+  "required": ["evaluation_id", "request_id", "metrics", "status"],
+  "additionalProperties": false
+}
