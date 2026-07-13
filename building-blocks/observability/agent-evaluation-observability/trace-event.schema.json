@@ -34,7 +34,8 @@
     },
     "error_category": {
       "type": "string",
-      "description": "Friendly error category (e.g., 'rate_limit', 'tool_timeout') without stack traces."
+      "enum": ["rate_limit", "tool_timeout", "authentication_failure", "policy_violation", "upstream_error", "validation_error"],
+      "description": "Controlled enum for friendly error categories without technical details."
     },
     "correlation_id": {
       "type": "string",

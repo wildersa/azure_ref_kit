@@ -14,6 +14,9 @@ outputs:
   - name: trace_event_schema
     type: file
     description: JSON schema for allowlisted technical telemetry.
+  - name: evaluation_result_schema
+    type: file
+    description: JSON schema for deterministic evaluation results.
   - name: trace_checklist
     type: object
     description: Required technical telemetry fields for diagnostics.
@@ -41,4 +44,5 @@ contracts:
     - Diagnostic traces
   references:
     - trace-event.schema.json
+    - evaluation-result.schema.json
     - src/redactor.py

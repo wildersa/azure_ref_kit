@@ -23,6 +23,41 @@ def test_redactor_removes_forbidden_fields():
     assert "credentials" not in safe_payload
     assert "stack_trace" not in safe_payload
 
+def test_redactor_removes_new_forbidden_fields():
+    """Verify that newly added forbidden fields are stripped from the payload."""
+    dirty_payload = {
+        "request_id": "req-123",
+        "operation_type": "agent_turn",
+        "status": "success",
+        "duration_ms": 150,
+        "customer_id": "cust-999",
+        "user_id": "user-888",
+        "raw_logs": "DEBUG: internal details",
+    }
+
+    safe_payload = TelemetryRedactor.filter_payload(dirty_payload)
+
+    assert "customer_id" not in safe_payload
+    assert "user_id" not in safe_payload
+    assert "raw_logs" not in safe_payload
+
+def test_redactor_removes_more_forbidden_fields():
+    """Verify that even more forbidden fields are stripped from the payload."""
+    dirty_payload = {
+        "request_id": "req-123",
+        "api_key": "sk-12345",
+        "connection_string": "Endpoint=sb://...;SharedAccessKey=...",
+        "raw_tool_payload": {"sensitive": "data"},
+        "system_instruction": "You are a secret agent.",
+    }
+
+    safe_payload = TelemetryRedactor.filter_payload(dirty_payload)
+
+    assert "api_key" not in safe_payload
+    assert "connection_string" not in safe_payload
+    assert "raw_tool_payload" not in safe_payload
+    assert "system_instruction" not in safe_payload
+
 def test_redactor_applies_pattern_redaction():
     """Verify that sensitive patterns in strings are redacted."""
     payload = {
