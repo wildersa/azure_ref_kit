@@ -113,7 +113,7 @@ def test_no_sensitive_terms_in_ui_contract():
             lines = ui_section.split("\n")
             for line in lines:
                 if term in line:
-                    # Original check from Turn 11 - no weakening allowed
+                    # Strict check: must be part of a negative constraint
                     assert any(
                         keyword in line.lower()
                         for keyword in [
