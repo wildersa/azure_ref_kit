@@ -31,17 +31,13 @@ flowchart LR
     subgraph "Azure Functions (MCP Server)"
         Endpoint["/runtime/webhooks/mcp (SSE/HTTP)"]
         Extension[MCP Binding Extension]
-        Tool1[get_service_info]
-        Tool2[get_resource_health]
-        Tool3[get_server_time]
+        Tool1[get_synthetic_resource]
     end
 
     Agent <--> Foundry
     Foundry <-->|Streamable HTTP| Endpoint
     Endpoint <--> Extension
     Extension --> Tool1
-    Extension --> Tool2
-    Extension --> Tool3
 ```
 
 ## MCP on Azure Functions vs. Standard FastMCP
@@ -56,31 +52,17 @@ flowchart LR
 
 ## Tool Contract
 
-### Tool: `get_service_info`
-Returns a safe, read-only summary of the service hosting the MCP tools.
-
-**Outputs:**
-- `service_name` (string): Name of the service.
-- `status` (string): Current operational status.
-- `version` (string): Version of the MCP server.
-
-### Tool: `get_resource_health`
-Returns a mock health status for a given resource identifier.
+### Tool: `get_synthetic_resource`
+Returns synthetic metadata for a requested resource type. This is a safe, read-only tool that returns static demo data only.
 
 **Inputs:**
-- `resource_id` (string, optional): Identifier for the resource to check health for.
+- `resource_type` (string, required): The type of resource to retrieve ('compute' or 'storage').
 
 **Outputs:**
-- `resource` (string): The resource identifier checked.
-- `health` (string): Health status (e.g., "Healthy").
-- `last_check` (string): Timestamp of the last health check.
-- `message` (string): Human-readable status message.
-
-### Tool: `get_server_time`
-Returns the current server time in UTC.
-
-**Outputs:**
-- `server_time` (string): Current server time in ISO 8601 format.
+- `id` (string): Unique identifier for the synthetic resource.
+- `type` (string): Resource type specification.
+- `status` (string): Current operational status.
+- `region` (string): Deployment region for the resource.
 
 ## Local Development & Validation
 
