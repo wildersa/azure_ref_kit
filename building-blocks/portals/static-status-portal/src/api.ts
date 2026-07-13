@@ -1,9 +1,16 @@
-import { CustomerSafeStatus, FriendlyFailure } from './types';
+import { CustomerSafeStatus, FriendlyFailure, PipelineStatus } from './types';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
     this.name = 'ApiError';
+  }
+}
+
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ValidationError';
   }
 }
 
@@ -59,38 +66,83 @@ const FIXTURE_FAILURES: Record<string, FriendlyFailure> = {
   }
 };
 
+const VALID_STATUSES: PipelineStatus[] = ['pending', 'running', 'completed', 'failed', 'cancelled'];
+
 /**
- * Sanitizes raw status data to ensure only allowlisted fields are used.
- * This acts as the final client-side boundary enforcement.
+ * Validates and sanitizes raw status data against the CustomerSafeStatus schema.
+ * Fails closed if required fields are missing or types are invalid.
  */
-function sanitizeStatus(data: any): CustomerSafeStatus {
-  return {
-    id: String(data.id),
-    status: data.status as any,
-    business_summary: data.business_summary ? String(data.business_summary) : undefined,
-    progress_percent: typeof data.progress_percent === 'number' ? data.progress_percent : undefined,
-    estimated_cost: typeof data.estimated_cost === 'number' ? data.estimated_cost : undefined,
-    created_at: String(data.created_at),
-    started_at: data.started_at ? String(data.started_at) : undefined,
-    finished_at: data.finished_at ? String(data.finished_at) : undefined,
-    safe_artifacts: Array.isArray(data.safe_artifacts)
-      ? data.safe_artifacts.map((a: any) => ({
-          name: String(a.name),
-          size_bytes: Number(a.size_bytes),
-          content_type: a.content_type ? String(a.content_type) : undefined
-        }))
-      : undefined
+function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
+  if (!data || typeof data !== 'object') throw new ValidationError('Invalid status object');
+
+  // Required fields
+  if (typeof data.id !== 'string' || !data.id) throw new ValidationError('Missing or invalid id');
+  if (!VALID_STATUSES.includes(data.status)) throw new ValidationError(`Invalid status: ${data.status}`);
+  if (typeof data.created_at !== 'string' || isNaN(Date.parse(data.created_at))) throw new ValidationError('Missing or invalid created_at');
+
+  const sanitized: CustomerSafeStatus = {
+    id: data.id,
+    status: data.status,
+    created_at: data.created_at
   };
+
+  // Optional fields with strict type checking
+  if (data.business_summary !== undefined) {
+    if (typeof data.business_summary !== 'string') throw new ValidationError('Invalid business_summary');
+    sanitized.business_summary = data.business_summary;
+  }
+
+  if (data.progress_percent !== undefined && data.progress_percent !== null) {
+    if (typeof data.progress_percent !== 'number' || data.progress_percent < 0 || data.progress_percent > 100) {
+        throw new ValidationError('Invalid progress_percent');
+    }
+    sanitized.progress_percent = data.progress_percent;
+  }
+
+  if (data.estimated_cost !== undefined && data.estimated_cost !== null) {
+    if (typeof data.estimated_cost !== 'number') throw new ValidationError('Invalid estimated_cost');
+    sanitized.estimated_cost = data.estimated_cost;
+  }
+
+  if (data.started_at) {
+    if (typeof data.started_at !== 'string' || isNaN(Date.parse(data.started_at))) throw new ValidationError('Invalid started_at');
+    sanitized.started_at = data.started_at;
+  }
+
+  if (data.finished_at) {
+    if (typeof data.finished_at !== 'string' || isNaN(Date.parse(data.finished_at))) throw new ValidationError('Invalid finished_at');
+    sanitized.finished_at = data.finished_at;
+  }
+
+  if (Array.isArray(data.safe_artifacts)) {
+    sanitized.safe_artifacts = data.safe_artifacts.map((a: any, idx: number) => {
+      if (typeof a.name !== 'string' || !a.name) throw new ValidationError(`Artifact at index ${idx} missing name`);
+      if (typeof a.size_bytes !== 'number') throw new ValidationError(`Artifact at index ${idx} missing or invalid size_bytes`);
+
+      return {
+        name: a.name,
+        size_bytes: a.size_bytes,
+        content_type: typeof a.content_type === 'string' ? a.content_type : undefined
+      };
+    });
+  }
+
+  return sanitized;
 }
 
 /**
- * Sanitizes raw failure data.
+ * Validates and sanitizes raw failure data.
  */
-function sanitizeFailure(data: any): FriendlyFailure {
+function validateAndSanitizeFailure(data: any): FriendlyFailure {
+  if (!data || typeof data !== 'object') throw new ValidationError('Invalid failure object');
+
+  if (typeof data.error_code !== 'string' || !data.error_code) throw new ValidationError('Missing or invalid error_code');
+  if (typeof data.message !== 'string' || !data.message) throw new ValidationError('Missing or invalid message');
+
   return {
-    error_code: String(data.error_code),
-    message: String(data.message),
-    correlation_id: data.correlation_id ? String(data.correlation_id) : undefined
+    error_code: data.error_code,
+    message: data.message,
+    correlation_id: typeof data.correlation_id === 'string' ? data.correlation_id : undefined
   };
 }
 
@@ -99,7 +151,7 @@ export const api = {
     if (useFixtures) {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 500));
-      return FIXTURE_RUNS.map(sanitizeStatus);
+      return FIXTURE_RUNS.map(validateAndSanitizeStatus);
     }
 
     const response = await fetch('/api/runs');
@@ -107,7 +159,8 @@ export const api = {
       throw new ApiError(response.status, 'Failed to fetch runs');
     }
     const data = await response.json();
-    return (Array.isArray(data) ? data : []).map(sanitizeStatus);
+    if (!Array.isArray(data)) throw new ValidationError('API response for runs is not an array');
+    return data.map(validateAndSanitizeStatus);
   },
 
   async getRunDetail(id: string): Promise<CustomerSafeStatus> {
@@ -115,7 +168,7 @@ export const api = {
       await new Promise(resolve => setTimeout(resolve, 300));
       const run = FIXTURE_RUNS.find(r => r.id === id);
       if (!run) throw new ApiError(404, 'Run not found');
-      return sanitizeStatus(run);
+      return validateAndSanitizeStatus(run);
     }
 
     const response = await fetch(`/api/runs/${id}`);
@@ -123,19 +176,19 @@ export const api = {
       throw new ApiError(response.status, 'Failed to fetch run details');
     }
     const data = await response.json();
-    return sanitizeStatus(data);
+    return validateAndSanitizeStatus(data);
   },
 
   async getRunFailure(id: string): Promise<FriendlyFailure | null> {
     if (useFixtures) {
-      return FIXTURE_FAILURES[id] ? sanitizeFailure(FIXTURE_FAILURES[id]) : null;
+      return FIXTURE_FAILURES[id] ? validateAndSanitizeFailure(FIXTURE_FAILURES[id]) : null;
     }
 
     const response = await fetch(`/api/runs/${id}/failure`);
     if (response.status === 404) return null;
     if (!response.ok) return null;
     const data = await response.json();
-    return sanitizeFailure(data);
+    return validateAndSanitizeFailure(data);
   },
 
   getDownloadUrl(runId: string, artifactName: string): string {
