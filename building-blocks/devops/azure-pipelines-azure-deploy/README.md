@@ -1,128 +1,100 @@
 # Azure Pipelines Azure Deployment Reference
 
-This building block defines the secure reference pattern for deploying Azure resources and applications using Azure Pipelines. It prioritizes identity-based authentication through Workload Identity Federation.
+Secure Azure Pipelines deployment pattern for publishing the [Static Status Portal](../../portals/static-status-portal/) to Azure Static Web Apps.
 
 ## Purpose
 
-The purpose of this reference is to provide a standardized, secure, and repeatable pattern for CI/CD workflows in Azure DevOps targeting Azure. By following this pattern, development teams can ensure that their deployment pipelines are:
+This building block defines secure reference patterns for deploying to Azure using Azure Pipelines. It prioritizes Workload Identity Federation (WIF) to eliminate the use of long-lived secrets like Service Principal keys or Static Web Apps deployment tokens in the pipeline configuration.
 
-- **Secure:** Using Workload Identity Federation (OIDC) to eliminate the need for long-lived Azure Service Principal secrets or certificates in Azure DevOps.
-- **Auditable:** Leveraging Microsoft Entra ID for identity management and access control.
-- **Consistent:** Providing a common structure for pipelines across different modules and solutions.
+## When to Use These Patterns
 
-## Workload Identity Federation (OIDC)
+- **Use when**: Deploying frontend applications to Azure Static Web Apps from an Azure DevOps repository.
+- **Use when**: You want to eliminate long-lived secrets in Azure DevOps using Workload Identity Federation.
+- **Do not use when**: Using legacy credential-based authentication (secrets/certificates) or when a simpler GitHub Actions flow is preferred for non-DevOps projects.
 
-Traditional CI/CD patterns in Azure DevOps often rely on storing a Service Principal's `client-secret` or a certificate within a Service Connection. This creates a security risk if the secret is leaked and requires manual rotation.
+## Deployment Architecture
 
-This reference recommends **Workload Identity Federation**. With this approach, Azure Pipelines requests a short-lived access token from Azure by presenting a token issued by Azure DevOps. Azure verifies this token against a **Federated Identity Credential** configured on the Microsoft Entra application or User-Assigned Managed Identity.
-
-### Why Workload Identity Federation is preferred:
-- **No long-lived secrets:** No Azure password, secret, or certificate is stored in Azure DevOps.
-- **Reduced management overhead:** Eliminates the need to rotate secrets.
-- **Automatic token expiration:** Access tokens are short-lived and valid only for the specific pipeline run.
-
-## Authentication Flow
-
-The following diagram illustrates the secure authentication boundary using Workload Identity Federation:
+The following diagram illustrates the secure deployment boundary:
 
 ```mermaid
 graph TD
-    subgraph AzDevOps ["Azure Pipelines"]
-        PR[Pipeline Run]
-        WIF[Request Federated Token]
+    Developer[Developer] -->|Push Code| AzDevOps[Azure DevOps Repository]
+    AzDevOps -->|Trigger| AzPipeline[Azure Pipeline]
+
+    subgraph "Azure Auth & Deploy Boundary"
+        AzPipeline -->|WIF Auth| Entra[Microsoft Entra ID]
+        Entra -->|Short-lived Token| AzCLI[Azure CLI Task]
+        AzCLI -->|Fetch Token| SWA[Azure Static Web App]
+        AzPipeline -->|Deploy| SWADeploy[AzureStaticWebApp Task]
     end
 
-    subgraph AzureAuth ["Azure Auth Boundary (Microsoft Entra ID)"]
-        FIC[Federated Identity Credential]
-        Ver[Verify Token & Issue Access Token]
+    subgraph "Hosting & Outcome"
+        SWADeploy -->|Upload Artifacts| SWAHost[Azure Static Web Apps Hosting]
+        SWAHost -->|Serves| Portal[Customer-Safe Portal]
     end
-
-    subgraph AzureTarget ["Target Azure Module"]
-        Deploy[Resource Provisioning / App Deploy]
-        Validation[Post-Deployment Validation]
-    end
-
-    PR --> WIF
-    WIF -- "OIDC Token" --> FIC
-    FIC --> Ver
-    Ver -- "Short-lived Access Token" --> Deploy
-    Deploy --> Validation
 ```
 
-## Required Variables and Service Connections
+## Configuration and Service Connection
 
-To implement this pattern, an **Azure Resource Manager service connection** must be configured in the Azure DevOps project.
+To implement this pattern securely, configure an **Azure Resource Manager service connection** using **Workload identity federation (automatic)**.
 
-### Service Connection Configuration
-- **Authentication Method:** Workload identity federation (automatic or manual).
-- **Scope:** Subscription, Management Group, or Machine Learning Workspace.
+### OIDC Configuration Prerequisites
+1. In Azure DevOps, go to **Project settings** > **Service connections**.
+2. Select **New service connection**, then **Azure Resource Manager**.
+3. Select **Workload identity federation (automatic)**.
+4. Scope the connection to the specific **Subscription** and **Resource Group** containing your Static Web App.
+5. **Security**: Do not select "Grant access permission to all pipelines". Instead, [authorize the pipeline individually](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops#authorize-pipelines).
 
-### Pipeline Variables
-The following variable is typically used in the YAML pipeline to reference the service connection:
+## Reference Pipeline: Deploy Static Status Portal
 
-| Name | Description |
-|------|-------------|
-| `AZURE_SERVICE_CONNECTION_NAME` | The name given to the service connection in Azure DevOps settings. |
+The following YAML snippet from `azure-pipelines.yml` demonstrates how to securely build and deploy the portal.
 
-## Implementation Guidance
+```yaml
+# ... build steps ...
+- stage: Deploy
+  jobs:
+    - deployment: DeployPortal
+      environment: 'production'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              # Fetch the SWA deployment token dynamically using the WIF service connection
+              - task: AzureCLI@2
+                inputs:
+                  azureSubscription: 'MyWIFServiceConnection'
+                  scriptType: 'bash'
+                  scriptLocation: 'inlineScript'
+                  inlineScript: |
+                    TOKEN=$(az staticwebapp secrets list \
+                      --name my-status-portal \
+                      --resource-group my-resource-group \
+                      --query "properties.apiKey" -o tsv)
+                    echo "##vso[task.setvariable variable=SWA_DEPLOYMENT_TOKEN;isSecret=true]$TOKEN"
 
-Concrete Azure Pipelines YAML files (`azure-pipelines.yml` or templates) should be added to the repository only when they are tied to a specific **deployable module** or **reference solution**.
-
-### Deployment Pattern: Durable Basic Pipeline
-
-The [Durable Basic Pipeline](../../pipelines/durable-basic-pipeline/infra/terraform/) includes a concrete Azure Pipelines reference: `durable-basic-pipeline-deploy.yml`.
-
-#### Requirements & Assumptions
-
-- **Azure Resource Manager Service Connection**: An ARM service connection named `AZURE_RM_SVC_CONN` (configured via `AZURE_SERVICE_CONNECTION_NAME` variable) must exist in the Azure DevOps project. **Workload Identity Federation** is the recommended authentication method.
-- **Environment & Review Gate**: The pipeline uses an environment named `durable-pipeline-deploy`. For security, this environment should be created in Azure DevOps with an **Approvals and Checks** gate to prevent unauthorized deployments to target subscriptions.
-- **Variables**:
-    - `AZURE_SERVICE_CONNECTION_NAME`: Name of the service connection.
-    - `TF_WORKING_DIR`: Relative path to the Terraform module.
-    - `ENVIRONMENT_NAME`: Name of the Azure DevOps environment for gating.
-
-#### Pipeline Stages
-
-1.  **Static Validation**: Performs `terraform fmt` and `terraform validate` (using `-backend=false` for non-destructive check).
-2.  **Infrastructure Plan**: Generates a Terraform plan. This stage requires a configured remote backend.
-3.  **Infrastructure Deploy**: Gated by an environment check; executes `terraform apply`. This stage requires a configured remote backend for state persistence.
-
-#### State Management & Remote Backend
-
-To use the Plan and Deploy stages, you must configure a remote backend in your Terraform configuration (e.g., `backend.tf`). Without a remote backend, Terraform state will not be persisted across pipeline runs.
-
-**Example Backend Configuration:**
-
-```hcl
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "rg-terraform-state"
-    storage_account_name = "stterraformstate"
-    container_name       = "tfstate"
-    key                  = "durable-pipeline.tfstate"
-    use_oidc             = true
-  }
-}
+              - task: AzureStaticWebApp@0
+                inputs:
+                  app_location: '/'
+                  output_location: ''
+                  skip_app_build: true
+                  cwd: '$(System.ArtifactsDirectory)/drop'
+                  azure_static_web_apps_api_token: $(SWA_DEPLOYMENT_TOKEN)
 ```
 
-## Local run
+## Security & Customer-Safe Boundary
 
-Deployment pipelines are designed to run in Azure Pipelines. For local simulation or testing of deployment scripts:
-1. Log in locally using `az login`.
-2. Ensure your local identity has the same RBAC permissions as the Service Principal/Managed Identity used in the Service Connection.
-3. Run deployment scripts (e.g., Terraform, Azure CLI) manually.
+- **Identity First**: Use Workload Identity Federation to avoid storing secrets in Azure DevOps.
+- **Least Privilege**: Scope the service connection only to the Resource Group or resource needed for the deployment.
+- **Secret Masking**: Azure Pipelines automatically masks variables marked as `isSecret=true`.
+- **Clean Logs**: Ensure technical identifiers like Tenant IDs or internal resource paths are not printed to standard output.
 
-## Deploy
+## Deployment/IaC Decision
 
-This is a documentation-first reference. Concrete deployment instructions depend on the target module.
-
-## Tests/proof
-
-Validation of this pattern involves:
-1. **Static Analysis:** Verifying that YAML pipelines use the correct service connection variable and recommended tasks.
-2. **End-to-End Test:** Successfully running a pipeline in an Azure DevOps environment with a configured Workload Identity Federation service connection.
+- **Pattern-Only**: This building block defines the *pipeline* contract.
+- **Reuse Existing IaC**: This pipeline reuses the infrastructure defined in [`building-blocks/portals/static-status-portal/infra/terraform/`](../../portals/static-status-portal/infra/terraform/). No new Terraform is required for this deployment pattern.
+- **Prerequisites**: The Azure Static Web App must already exist (deployed via the portal's Terraform) before running this pipeline.
 
 ## References
-- [Connect to Azure with an Azure Resource Manager service connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure?view=azure-devops)
-- [Azure Pipelines YAML schema](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/?view=azure-pipelines)
-- [Troubleshoot Azure Resource Manager service connections](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/azure-rm-endpoint?view=azure-devops)
+- [Azure Static Web Apps build configuration](https://learn.microsoft.com/en-us/azure/static-web-apps/build-configuration?tabs=azure-devops)
+- [Connect to Azure with an ARM service connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure)
+- [Azure Pipelines YAML schema](https://learn.microsoft.com/en-us/azure/devops/pipelines/yaml-schema/)
