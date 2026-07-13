@@ -14,6 +14,13 @@
       "maxLength": 128,
       "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
+    "branch": {
+      "type": "string",
+      "description": "Filter by branch name (defaults to all branches).",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
+    },
     "top": {
       "type": "integer",
       "description": "Number of recent runs to return (default: 5, max: 20).",

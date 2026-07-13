@@ -20,8 +20,6 @@ def load_schema(filename):
     [
         "get_pipeline_run_status_request.schema.json",
         "get_pipeline_run_status_response.schema.json",
-        "get_latest_build_summary_request.schema.json",
-        "get_latest_build_summary_response.schema.json",
         "list_recent_pipeline_runs_request.schema.json",
         "list_recent_pipeline_runs_response.schema.json",
     ],
@@ -38,6 +36,13 @@ def test_request_schema_validation():
     """Verify that the request schema correctly validates a sample payload."""
     schema = load_schema("get_pipeline_run_status_request.schema.json")
     payload = {"pipeline_id": "123", "run_id": "456"}
+    jsonschema.validate(instance=payload, schema=schema)
+
+
+def test_list_runs_request_schema_validation():
+    """Verify that the list runs request schema validates correctly."""
+    schema = load_schema("list_recent_pipeline_runs_request.schema.json")
+    payload = {"pipeline_id": "123", "branch": "main", "top": 10}
     jsonschema.validate(instance=payload, schema=schema)
 
 
@@ -135,7 +140,6 @@ def load_fixture(filename):
     "fixture_file, schema_file",
     [
         ("pipeline_run_status.json", "get_pipeline_run_status_response.schema.json"),
-        ("latest_build_summary.json", "get_latest_build_summary_response.schema.json"),
         ("recent_pipeline_runs.json", "list_recent_pipeline_runs_response.schema.json"),
     ],
 )

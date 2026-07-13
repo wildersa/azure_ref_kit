@@ -8,17 +8,18 @@ This building block defines the safe, **read-only DevOps status** [Model Context
 ```mermaid
 sequenceDiagram
     participant A as Foundry/Agent Consumer
-    participant MCP as MCP Tool Boundary
-    participant C as Safe DevOps Status Contract
+    participant MCP as MCP Tool Boundary (Contract)
+    participant C as Controlled DevOps Adapter
     participant D as Azure DevOps API
 
     A->>MCP: Request Status (pipeline_id, run_id)
-    MCP->>C: Validate Input (Safe Identifiers Only)
-    C->>D: Sanitized Request (GET /_apis/...)
+    MCP->>C: Route Validated Input
+    C->>C: Authorize & Authenticate (PAT/Identity)
+    C->>D: REST API Request (GET /_apis/...)
     D-->>C: Raw Response (Logs, Secrets, Internals)
     C->>C: Sanitize & Filter to Contract
     C-->>MCP: Sanitized Response (Safe Fields Only)
-    MCP-->>A: Business Status Outcome
+    MCP-->>A: Bounded Business Status
 ```
 
 ## Security Boundary
@@ -69,32 +70,12 @@ Returns the status and summary of a specific Azure DevOps pipeline run.
 }
 ```
 
-### 2. `get_latest_build_summary`
-Returns the summary of the most recent build for a specified pipeline or branch.
-
-**Inputs:**
-- `pipeline_id` (string): The ID or name of the pipeline.
-- `branch` (string, optional): Filter by branch name (defaults to default branch).
-
-**Output Example:**
-```json
-{
-  "pipeline_name": "Main CI",
-  "build_number": "20240102.1",
-  "status": "completed",
-  "result": "succeeded",
-  "branch": "main",
-  "finish_time": "2024-01-02T12:00:00Z",
-  "summary": "Build succeeded. All 150 tests passed.",
-  "portal_url": "https://dev.azure.com/org/proj/_build/results?buildId=12346"
-}
-```
-
-### 3. `list_recent_pipeline_runs`
+### 2. `list_recent_pipeline_runs`
 Returns a list of recent runs for a specific pipeline.
 
 **Inputs:**
 - `pipeline_id` (string): The ID or name of the pipeline.
+- `branch` (string, optional): Filter by branch name (defaults to all branches).
 - `top` (integer, optional): Number of recent runs to return (default: 5, max: 20).
 
 **Output Example:**
@@ -124,6 +105,15 @@ Returns a list of recent runs for a specific pipeline.
 - **Read-Only**: This contract intentionally excludes any mutation or configuration capabilities.
 - **Status Only**: It is designed for high-level status monitoring, not for deep technical debugging or log analysis.
 - **No Global Search**: It requires specific pipeline identifiers and does not support searching across multiple organizations or projects.
+
+## Authentication and Implementation
+This module defines the **declarative contract only**. It is the responsibility of a **Controlled DevOps Adapter** (the implementation) to:
+- Securely handle authentication (PATs, OAuth, Managed Identity).
+- Enforce authorization and project scoping.
+- Perform the actual Azure DevOps REST API calls.
+- Handle raw provider payloads and sensitive technical data.
+- Sanitize the response to match the fields defined in this contract *before* returning data to the agent.
+No credentials, tokens, or live cloud integration should be included in this module.
 
 ## Deployment / IaC Decision
 **No-IaC Decision**: This building block defines a contract and local validation logic. It does not introduce deployable Azure resources. Future implementations (e.g., an MCP server hosted on Azure Functions) will include their own infrastructure definitions.

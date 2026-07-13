@@ -63,15 +63,17 @@ def test_get_pipeline_run_status_response_invalid_url():
 
 def test_list_recent_pipeline_runs_request_valid():
     """Verify valid list request."""
-    req = ListRecentPipelineRunsRequest(pipeline_id="Main-CI", top=10)
+    req = ListRecentPipelineRunsRequest(pipeline_id="Main-CI", top=10, branch="main")
     assert req.pipeline_id == "Main-CI"
     assert req.top == 10
+    assert req.branch == "main"
 
 
 def test_list_recent_pipeline_runs_request_default():
     """Verify default value for top."""
     req = ListRecentPipelineRunsRequest(pipeline_id="Main-CI")
     assert req.top == 5
+    assert req.branch is None
 
 
 def test_list_recent_pipeline_runs_request_invalid_top():
