@@ -39,15 +39,16 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
 
     pipeline_run = input_data["pipeline_run"]
 
-    # Contract Validation
+    # Contract validation must fail closed if the schema could not be loaded.
     if not PIPELINE_RUN_SCHEMA:
-        logging.error("Schema not loaded; skipping contract validation.")
-    else:
-        try:
-            jsonschema.validate(instance=pipeline_run, schema=PIPELINE_RUN_SCHEMA)
-        except Exception:
-            logging.error("PipelineRun payload failed contract validation.")
-            return "invalid_contract"
+        logging.error("PipelineRun schema is unavailable; refusing unvalidated execution.")
+        return "invalid_contract"
+
+    try:
+        jsonschema.validate(instance=pipeline_run, schema=PIPELINE_RUN_SCHEMA)
+    except Exception:
+        logging.error("PipelineRun payload failed contract validation.")
+        return "invalid_contract"
 
     run_id = pipeline_run["id"]
     customer_id = pipeline_run["customer_id"]
