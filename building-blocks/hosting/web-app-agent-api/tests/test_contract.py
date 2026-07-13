@@ -10,7 +10,7 @@ def test_module_yaml_exists_and_valid():
     with open(module_yaml_path, "r") as f:
         content = yaml.safe_load(f)
 
-    assert content["name"] == "webapp-agent-api"
+    assert content["name"] == "web-app-agent-api"
     assert content["type"] == "building-block"
     assert "security_boundary" in content
     assert "customer_safe_boundary" in content
@@ -29,7 +29,7 @@ def test_readme_has_required_sections():
         "## When NOT to Use Web Apps",
         "## Comparison with Other Hosting Options",
         "## API Boundary",
-        "## Local / Demo Flow",
+        "## Local Development",
         "## Environment Variables",
         "## Validation Commands",
         "## Azure Hosting Notes",
@@ -71,6 +71,6 @@ def test_no_unsafe_output_wording():
         with open(file_path, "r") as f:
             content = f.read().lower()
             for pattern in unsafe_patterns:
-                assert not re.search(pattern, content), (
-                    f"Found unsafe pattern '{pattern}' in {file_path}"
-                )
+                assert not re.search(
+                    pattern, content
+                ), f"Found unsafe pattern '{pattern}' in {file_path}"

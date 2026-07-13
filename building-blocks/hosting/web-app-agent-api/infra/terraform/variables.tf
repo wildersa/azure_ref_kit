@@ -37,6 +37,6 @@ variable "tags" {
   type        = map(string)
   description = "Tags for all resources."
   default = {
-    module = "webapp-agent-api"
+    module = "web-app-agent-api"
   }
 }
