@@ -49,6 +49,31 @@ def test_validate_status_invalid_pattern():
         validate_status(invalid_status)
 
 
+def test_validate_status_oversized_artifacts():
+    invalid_status = {
+        "id": "run-123",
+        "status": "completed",
+        "created_at": "2026-07-03T12:00:00Z",
+        "safe_artifacts": [{"name": f"f{i}.txt", "size_bytes": 10} for i in range(51)],
+    }
+    with pytest.raises(jsonschema.ValidationError) as excinfo:
+        validate_status(invalid_status)
+    assert "is too long" in str(excinfo.value)
+
+
+def test_sanitize_status_deterministic():
+    input_data = {
+        "id": "run-123",
+        "status": "completed",
+        "created_at": "2026-07-03T12:00:00Z",
+        "internal_log": "DEBUG: internal info",
+    }
+    first_pass = sanitize_status(input_data)
+    second_pass = sanitize_status(input_data)
+    assert first_pass == second_pass
+    assert first_pass is not second_pass  # Should be a new object
+
+
 def test_sanitize_status_removes_forbidden_fields():
     input_data = {
         "id": "run-123",
