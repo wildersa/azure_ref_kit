@@ -1,8 +1,8 @@
 import React from 'react';
-import { PipelineStatus, StepStatus } from '../types';
+import { PipelineStatus } from '../types';
 
 interface StatusBadgeProps {
-  status: PipelineStatus | StepStatus;
+  status: PipelineStatus;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
@@ -16,8 +16,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
         return { bg: '#dbeafe', text: '#1e40af' }; // Blue
       case 'pending':
         return { bg: '#f3f4f6', text: '#374151' }; // Gray
-      case 'waiting_input':
-        return { bg: '#fef3c7', text: '#92400e' }; // Amber
       case 'cancelled':
         return { bg: '#f3f4f6', text: '#374151' }; // Gray
       default:
