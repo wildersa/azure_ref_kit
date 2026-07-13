@@ -15,6 +15,28 @@ def test_module_yaml_structure():
     assert "security_boundary" in module
     assert "customer_safe_boundary" in module
 
+    # Verify input alignment with Terraform
+    inputs = {i["name"] for i in module.get("inputs", [])}
+    expected_inputs = {
+        "workload_name",
+        "location",
+        "resource_group_name",
+        "target_resource_id",
+        "role_definition_name",
+    }
+    assert expected_inputs.issubset(inputs), f"Missing required inputs: {expected_inputs - inputs}"
+
+    # Verify output alignment with Terraform
+    outputs = {o["name"] for o in module.get("outputs", [])}
+    expected_outputs = {
+        "identity_principal_id",
+        "identity_client_id",
+        "role_assignment_id",
+    }
+    assert expected_outputs.issubset(
+        outputs
+    ), f"Missing required outputs: {expected_outputs - outputs}"
+
     # Check security invariants
     sec_boundary = module["security_boundary"]
     assert sec_boundary.get("forbid_wildcards") is True

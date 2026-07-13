@@ -22,6 +22,11 @@ variable "role_definition_name" {
   type        = string
   description = "The name of the built-in Azure RBAC role to assign (e.g., 'Storage Blob Data Reader')."
   default     = "Storage Blob Data Reader"
+
+  validation {
+    condition     = !contains(["Owner", "Contributor", "User Access Administrator"], var.role_definition_name) && !strcontains(var.role_definition_name, "*")
+    error_message = "Broad or wildcard roles (Owner, Contributor, User Access Administrator, *) are strictly forbidden for least-privilege service access."
+  }
 }
 
 variable "tags" {
