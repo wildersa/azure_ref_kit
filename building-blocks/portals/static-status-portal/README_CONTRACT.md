@@ -16,12 +16,18 @@ flowchart LR
     Boundary -->|Redact/Sanitize| Func[Controlled Functions API]
     Func -->|REST API| SWA[Static Web Apps Shell]
     SWA -->|HTTPS| Customer[Customer Browser]
+
+    subgraph SWA [Static Web Apps Shell]
+        Adapter[API Adapter + Defense-in-Depth Sanitizer]
+        UI[React UI]
+        Adapter <--> UI
+    end
 ```
 
 - **Internal Status Source:** The backend system (e.g., Durable Functions, Azure DevOps) that holds the raw, technical execution state.
 - **Customer-Safe Status Boundary:** A security layer that ensures only allowlisted fields are returned.
-- **Controlled Functions API:** An Azure Functions backend that acts as the only gateway to status data.
-- **Static Web Apps Shell:** A React/TypeScript frontend that handles presentation and client-side routing.
+- **Controlled Functions API:** An Azure Functions backend that acts as the primary gateway and security boundary.
+- **Static Web Apps Shell:** A React/TypeScript frontend that handles presentation and includes client-side sanitization as defense in depth.
 
 ## Minimum Portal Views
 
@@ -86,11 +92,6 @@ The following technical and internal data **must never reach the browser or the 
 - **Authorization:** Data must be scoped to the authenticated user's `customer_id`.
 - **Encryption:** All traffic must be over HTTPS.
 - **Write API:** This module does not define or allow an unauthenticated write API. All pipeline triggers must be handled through a separate, secure process.
-
-## Deployment Decision
-
-- **No-IaC Decision:** This module is currently a **documentation and contract only** module. No Azure resources (Static Web Apps, Functions, or Storage) are provisioned by this module yet.
-- Future implementation will use Terraform under an `infra/` folder.
 
 ## References
 

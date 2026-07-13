@@ -11,7 +11,7 @@ This shell is designed to be hosted as an Azure Static Web App, consuming a cont
 ## Features
 
 - **P0 Views:** Run list, progress tracking, friendly failures, and safe artifact metadata.
-- **Security First:** Explicit client-side sanitization ensures technical internals never reach the UI.
+- **Security First:** Explicit client-side sanitization in the adapter acts as **Defense in Depth**; the primary security boundary is enforced at the API level.
 - **Fixture Support:** Built-in mock data for local development without Azure dependencies.
 - **SWA Ready:** Includes `staticwebapp.config.json` with authenticated routes and security headers.
 - **Infrastructure:** Minimal Terraform for `azurerm_static_web_app`.
@@ -27,14 +27,18 @@ flowchart LR
 
     subgraph SWA [Static Web Apps Shell]
         UI[React UI]
-        Adapter[API Adapter + Sanitizer]
+        Adapter[API Adapter + Defense-in-Depth Sanitizer]
         UI <--> Adapter
     end
 ```
 
 ## Security Policy
 
-This portal strictly consumes only the `CustomerSafeStatus` and `FriendlyFailure` fields. It **never** renders:
+The primary security boundary is the **Controlled Functions API**, which must only return allowlisted `CustomerSafeStatus` and `FriendlyFailure` fields.
+
+The frontend API adapter provides **Defense in Depth** by explicitly sanitizing all incoming JSON to ensure technical internals never reach the React UI state, even if the backend returns unexpected fields.
+
+This portal **never** renders:
 - Raw Logs or stack traces.
 - AI system prompts.
 - Internal Azure Resource IDs or Subscription IDs.

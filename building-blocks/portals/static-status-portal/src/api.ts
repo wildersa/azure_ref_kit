@@ -9,7 +9,11 @@ export class ApiError extends Error {
 
 // In a real SWA, these would come from the /api route.
 // For the minimal shell, we support a fixture-backed mode for testing and local dev.
-const USE_FIXTURES = true; // Hardcoded for this minimal shell implementation
+let useFixtures = true;
+
+export const setUseFixtures = (value: boolean) => {
+  useFixtures = value;
+};
 
 const FIXTURE_RUNS: CustomerSafeStatus[] = [
   {
@@ -92,7 +96,7 @@ function sanitizeFailure(data: any): FriendlyFailure {
 
 export const api = {
   async getRuns(): Promise<CustomerSafeStatus[]> {
-    if (USE_FIXTURES) {
+    if (useFixtures) {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 500));
       return FIXTURE_RUNS.map(sanitizeStatus);
@@ -107,7 +111,7 @@ export const api = {
   },
 
   async getRunDetail(id: string): Promise<CustomerSafeStatus> {
-    if (USE_FIXTURES) {
+    if (useFixtures) {
       await new Promise(resolve => setTimeout(resolve, 300));
       const run = FIXTURE_RUNS.find(r => r.id === id);
       if (!run) throw new ApiError(404, 'Run not found');
@@ -123,7 +127,7 @@ export const api = {
   },
 
   async getRunFailure(id: string): Promise<FriendlyFailure | null> {
-    if (USE_FIXTURES) {
+    if (useFixtures) {
       return FIXTURE_FAILURES[id] ? sanitizeFailure(FIXTURE_FAILURES[id]) : null;
     }
 
