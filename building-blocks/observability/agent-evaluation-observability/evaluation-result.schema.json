@@ -44,7 +44,8 @@
           "description": "Estimated cost of the turn in USD."
         }
       },
-      "required": ["task_completion", "safe_tool_use", "groundedness_score", "safe_failure_behavior"]
+      "required": ["task_completion", "safe_tool_use", "groundedness_score", "safe_failure_behavior"],
+      "additionalProperties": false
     },
     "status": {
       "type": "string",

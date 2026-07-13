@@ -5,5 +5,6 @@
   "tool_name": "get_pipeline_status",
   "status": "success",
   "duration_ms": 450,
+  "error_category": "upstream_error",
   "correlation_id": "df-run-999"
 }
