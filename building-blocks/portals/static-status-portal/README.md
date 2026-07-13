@@ -1,118 +1,99 @@
-# Static Status Portal Shell Contract
+# Static Status Portal Contract
 
-Customer-facing portal reference for tracking AI pipeline executions using Azure Static Web Apps.
+Reference documentation and contract for a customer-safe static status portal.
 
 ## Purpose
 
-Expose business-friendly status for AI pipelines without requiring the customer to access Azure Portal, Functions logs, Foundry, or technical dashboards. This module defines the contract and UI shell for a React application hosted on Azure Static Web Apps.
+The Static Status Portal provides a read-only, business-level view of pipeline runs and outcomes. It is designed to be hosted as an Azure Static Web App, consuming a controlled API that enforces the [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/README.md).
 
-## Portal Responsibilities
+The goal of this portal is to keep customers informed of progress without exposing any technical internals, logs, or cloud resource details.
 
-- **Authentication Handling**: Leverage Azure Static Web Apps built-in authentication (EasyAuth) to identify the customer.
-- **Data Presentation**: Map technical JSON responses from the Portal API to human-readable UI components.
-- **Security Enforcement**: Ensure no technical internals are displayed by strictly adhering to the customer-safe boundary.
-- **State Management**: Provide real-time or polling-based updates for active pipeline runs.
-
-## Architecture Boundary
-
-The following Mermaid diagram represents the flow from the customer to the underlying status responses, mediated by the Portal API.
+## Architecture
 
 ```mermaid
-graph TD
-    Customer([Customer]) -->|HTTPS| Portal[Static Web Apps Portal]
-    Portal -->|REST| API[Portal API Functions]
-
-    subgraph "Customer-Safe API Responses"
-        API -->|JSON| RunList[Run List Response]
-        API -->|JSON| RunDetail[Run Detail/Timeline Response]
-        API -->|JSON| Artifacts[Artifact Metadata Response]
-        API -->|JSON| Cost[Cost Summary Response]
-    end
-
-    subgraph "Internal Enforcement"
-        API -.->|Filters| Boundary{Customer-Safe Boundary}
-    end
+flowchart TD
+    Customer[Customer Browser] -->|HTTPS| SWA[Static Web Apps Shell]
+    SWA -->|REST API| Func[Controlled Functions API]
+    Func -->|Redact/Sanitize| Boundary[Customer-Safe Status Boundary]
+    Boundary -->|Safe Status| Source[Internal Status Source]
 ```
 
-## UI Surface Contract
+- **Static Web Apps Shell:** A React/TypeScript frontend that handles presentation and client-side routing.
+- **Controlled Functions API:** An Azure Functions backend that acts as the only gateway to status data.
+- **Customer-Safe Status Boundary:** A security layer that ensures only allowlisted fields are returned to the browser.
 
-The portal defines the following primary UI surfaces. Implementation must use the fields provided by the `shared/contracts/` schemas.
+## Minimum Portal Views
 
-### 1. Run List (Dashboard)
-- **Source**: `GET /runs`
-- **Fields**: `id`, `pipeline_type`, `status`, `created_at`.
-- **Behavior**: Displays a table or list of recent executions. Status should be color-coded (e.g., green for `completed`, red for `failed`).
+The portal must implement at least the following views:
 
-### 2. Run Detail & Timeline
-- **Source**: `GET /runs/{id}`
-- **Fields**: `business_summary`, `progress_percent`, `friendly_error`, `started_at`, `finished_at`.
-- **Timeline Components**: Displays a list of `PipelineStep` objects showing `name` (Friendly Name), `status`, and `output_summary`.
+1. **Run List / Lookup:**
+   - Displays a list of recent runs for the authenticated customer.
+   - Allows lookup of a specific run by a safe, opaque ID.
+2. **Business Status & Progress:**
+   - Shows the current high-level status (`pending`, `running`, `completed`, `failed`, `cancelled`).
+   - Displays a visual progress bar based on `progress_percent`.
+   - Displays the `business_summary` providing a friendly description of the current state.
+3. **Friendly Failure:**
+   - When a run fails, displays a non-technical `friendly_error`.
+   - Forbids the display of stack traces or raw provider error messages.
+4. **Safe Artifact Metadata:**
+   - Lists output artifacts that are marked as customer-visible.
+   - Displays safe names, sizes, and content types.
 
-### 3. Artifacts List
-- **Source**: `GET /runs/{id}/artifacts`
-- **Fields**: `id`, `safe_name`, `kind`, `size_bytes`, `created_at`.
-- **Behavior**: Lists files available for download.
-- **Download Action**: Must use an opaque, customer-safe proxied route (e.g., `GET /api/artifacts/{id}/download`).
-- **Constraint**: The `storage_ref` field is **internal-only metadata** and must never be exposed or used by the frontend to construct direct storage URLs or SAS links.
+## API Contract
 
-### 4. Cost Summary
-- **Source**: `GET /runs/{id}/cost`
-- **Fields**: `estimated_amount`, `currency`.
-- **Behavior**: Displays the aggregated estimate for the specific run.
+The portal consumes the `CustomerSafeStatus` schema defined in the [Security Boundary](../../security/customer-safe-status-boundary/README.md).
 
-### 5. Friendly Error Panel
-- **Trigger**: Displayed when `PipelineRun.status` is `failed` or a step fails.
-- **Field**: `PipelineRun.friendly_error`.
-- **Constraint**: Must NEVER display `internal_log` or `stack_trace`.
+### Consumed Fields (Display-Only)
 
-### 6. Start Run Placeholder
-- **Source**: `POST /runs/start`
-- **Behavior**: A "New Processing Run" button that initiates a pipeline and redirects to the new Run Detail page.
+| Field | Type | Description | Source Schema |
+|-------|------|-------------|---------------|
+| `id` | string | Opaque, safe identifier. | `CustomerSafeStatus` |
+| `status` | enum | Business-level status. | `CustomerSafeStatus` |
+| `business_summary` | string | Friendly progress/outcome summary. | `CustomerSafeStatus` |
+| `progress_percent` | integer | 0-100 completion percentage. | `CustomerSafeStatus` |
+| `created_at` | string | ISO-8601 creation time. | `CustomerSafeStatus` |
+| `safe_artifacts` | array | List of safe artifact metadata. | `CustomerSafeStatus` |
+| `friendly_error` | string | Mapped, non-technical error message. | `CustomerSafeStatus` (via derived presentation) |
 
-## API Contract Usage
+### Forbidden Data
 
-The portal consumes the [Portal API Functions](../../functions/portal-api-functions/) contract.
+The following technical and internal data **must never reach the browser or the portal API response**:
 
-| Endpoint | Method | Response Schema | Description |
-|----------|--------|-----------------|-------------|
-| `/api/runs` | GET | `PipelineRun[]` | List recent runs. |
-| `/api/runs/{id}` | GET | `PipelineRun` | Detailed status and steps. |
-| `/api/runs/{id}/artifacts` | GET | `Artifact[]` | List customer-visible artifacts. |
-| `/api/artifacts/{id}/download` | GET | `Stream` | Opaque download route (proxied by API). |
-| `/api/runs/{id}/cost` | GET | `number` (Aggregate) | Get total estimated cost. |
-| `/api/runs/start` | POST | `PipelineRun` | Manually trigger a new run. |
+- **Raw Logs:** No execution traces, debug output, or stdout/stderr.
+- **Prompts:** No AI model system prompts or grounding instructions.
+- **Tokens/Secrets:** No API keys, bearer tokens, or connection strings.
+- **Stack Traces:** No internal code paths, line numbers, or raw exception details.
+- **Provider Payloads:** No raw JSON from Azure DevOps, GitHub, or Azure AI services.
+- **Internal IDs:** No Azure Resource IDs, Subscription IDs, or Tenant IDs.
+- **IaC State:** No Terraform state files or deployment plans.
 
-## Customer-Safe Status Boundary
+## UI States and Behavior
 
-This portal strictly enforces the [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/).
+| State | Portal Behavior |
+|-------|-----------------|
+| **Loading** | Displays a skeleton screen or non-technical loading indicator. |
+| **Empty** | Displays a \"No runs found\" message for the customer. |
+| **Not Found** | Displays a friendly 404 page for invalid or unauthorized IDs. |
+| **Failed** | Displays the `friendly_error` and a way to contact support or retry. |
+| **Completed** | Displays the final summary and links to safe artifacts. |
+| **Unavailable** | Displays a maintenance or service disruption message. |
 
-### Forbidden Data (Internal-Only)
-The following items **must never** be exposed in the UI or stored in the portal's local state:
-- **Raw Logs**: No technical stdout/stderr or function execution logs.
-- **Prompts**: No LLM system prompts, instructions, or grounding text.
-- **Provider Payloads**: No raw JSON from Document Intelligence or OpenAI.
-- **Azure Resource IDs**: No Azure Subscription IDs, Tenant IDs, or Resource Group names.
-- **Tenant IDs**: No technical tenant identifiers.
-- **Subscription IDs**: No technical subscription identifiers.
-- **Secrets**: No storage keys, SAS tokens, or connection strings.
-- **Storage Internals**: No `storage_ref` or raw container/blob names.
-- **Internal Exceptions**: No stack traces, file paths, or line numbers.
-- **Stack Traces**: No internal code execution details.
+## Authentication and Security
 
-## Local / Demo Flow
+- **Authentication:** Required for all views. The portal must use Azure Static Web Apps built-in authentication (Microsoft Entra ID or GitHub).
+- **Authorization:** Data must be scoped to the authenticated user's `customer_id`.
+- **Encryption:** All traffic must be over HTTPS.
+- **Write API:** This module does not define or allow an unauthenticated write API. All pipeline triggers must be handled through a separate, secure process.
 
-1. **Mock Data**: Use the schemas in `shared/contracts/` to generate mock JSON files.
-2. **Local Development**: Run a React dev server (e.g., Vite) and proxy `/api` requests to a local instance of `portal-api-functions` or a mock server.
-3. **SWA CLI**: Use `swa start http://localhost:5173 --api-location http://localhost:7071` to test the integrated experience.
+## Deployment Decision
 
-## Deployment Assumptions
+- **No-IaC Decision:** This module is currently a **documentation and contract only** module. No Azure resources (Static Web Apps, Functions, or Storage) are provisioned by this module yet.
+- Future implementation will use Terraform under an `infra/` folder.
 
-- **Host**: Azure Static Web Apps (SWA).
-- **API Integration**: Linked Azure Functions (Flex Consumption) providing the Portal API.
-- **Authentication**: SWA Built-in authentication (EasyAuth).
+## References
 
-## Known Limits
-
-- **Read-Only Focus**: The primary purpose is status monitoring; complex data mutation is out of scope.
-- **Latency**: UI updates are subject to the polling interval or the latency of the underlying status store.
-- **Authentication Scope**: Assumes `customer_id` is derived from the SWA authentication header and handled by the API.
+- [Azure Static Web Apps overview](https://learn.microsoft.com/en-us/azure/static-web-apps/overview)
+- [Azure Static Web Apps configuration](https://learn.microsoft.com/en-us/azure/static-web-apps/configuration)
+- [Azure Static Web Apps authentication](https://learn.microsoft.com/en-us/azure/static-web-apps/authentication-authorization)
+- [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/README.md)
