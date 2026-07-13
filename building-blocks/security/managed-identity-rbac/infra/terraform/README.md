@@ -1,61 +1,35 @@
-# Infrastructure Reference: Managed Identity and RBAC
+# Managed Identity and RBAC Reference Implementation
 
-This building block is a **Security Reference Pattern** and does not manage standalone Azure resources directly.
+This directory contains a concrete reference for implementing least-privilege identity and RBAC using Terraform.
 
-## Deployment/IaC Decision
+## Usage
 
-To prevent state management overhead for a pattern-only reference, no standalone Terraform modules are provided. Instead, use the illustrative HCL patterns below to implement these security standards in your specific solution or building block.
+This module is designed to be used as a reference or as a starting point for your own infrastructure. It creates a User-Assigned Managed Identity and assigns a built-in role to it over a target resource.
 
-## Illustrative Terraform Patterns
+### Prerequisites
 
-These patterns demonstrate the implementation of least-privilege identity and RBAC.
+- An existing target resource (e.g., a Storage Account or Blob Container) to which the identity will be granted access.
 
-### 1. User-Assigned Managed Identity
-Recommended for modularity and better lifecycle management.
+### Inputs
 
-```hcl
-resource "azurerm_user_assigned_identity" "example" {
-  name                = "id-example-processor"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-}
-```
+| Name | Type | Description |
+| :--- | :--- | :--- |
+| `workload_name` | `string` | Name of the workload, used for naming the identity. |
+| `location` | `string` | Azure region for the identity. |
+| `resource_group_name` | `string` | Resource group where the identity will be created. |
+| `target_resource_id` | `string` | Fully qualified Azure ID of the target resource (e.g., `/subscriptions/.../resourceGroups/.../providers/Microsoft.Storage/storageAccounts/.../blobServices/default/containers/mycontainer`). |
+| `role_definition_name` | `string` | Built-in role name (e.g., `Storage Blob Data Reader`). |
 
-### 2. Least-Privilege Data Plane Role Assignment
-Assign roles at the narrowest possible scope (e.g., a specific container).
+### Outputs
 
-```hcl
-resource "azurerm_role_assignment" "blob_reader" {
-  scope                = var.target_storage_container_id
-  role_definition_name = "Storage Blob Data Reader"
-  principal_id         = azurerm_user_assigned_identity.example.principal_id
-}
-```
+| Name | Description |
+| :--- | :--- |
+| `identity_principal_id` | The Principal ID (Object ID) of the identity. |
+| `identity_client_id` | The Client ID of the identity (used in application code). |
+| `role_assignment_id` | The ID of the RBAC assignment. |
 
-### 3. Identity-Based Connection for Azure Functions
-Configuring the service to use its identity instead of connection strings.
+## Least-Privilege Implementation
 
-```hcl
-resource "azurerm_linux_function_app" "example" {
-  # ... existing configuration ...
-
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.example.id]
-  }
-
-  app_settings = {
-    # Prefix 'STORAGE_CONNECTION' matches the name used in code
-    "STORAGE_CONNECTION__accountName" = var.storage_account_name
-    "STORAGE_CONNECTION__credential"  = "managedidentity"
-    "STORAGE_CONNECTION__clientId"    = azurerm_user_assigned_identity.example.client_id
-  }
-}
-```
-
-## Validation
-
-When implementing these patterns:
-- Verify that `DefaultAzureCredential` is used in the source code.
-- Ensure the role assignment scope is as narrow as possible.
-- Confirm that no secrets are committed to configuration.
+- **Resource-level scope:** The role is assigned directly to the `target_resource_id`.
+- **Built-in Data Plane role:** Only specific roles like `Storage Blob Data Reader` are recommended.
+- **No secrets:** No connection strings or account keys are used or generated.

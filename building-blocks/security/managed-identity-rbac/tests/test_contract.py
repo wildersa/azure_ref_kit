@@ -15,19 +15,60 @@ def test_module_yaml_structure():
     assert "security_boundary" in module
     assert "customer_safe_boundary" in module
 
+    # Verify input alignment with Terraform
+    inputs = {i["name"] for i in module.get("inputs", [])}
+    expected_inputs = {
+        "workload_name",
+        "location",
+        "resource_group_name",
+        "target_resource_id",
+        "role_definition_name",
+    }
+    assert expected_inputs.issubset(inputs), f"Missing required inputs: {expected_inputs - inputs}"
+
+    # Verify output alignment with Terraform
+    outputs = {o["name"] for o in module.get("outputs", [])}
+    expected_outputs = {
+        "identity_principal_id",
+        "identity_client_id",
+        "role_assignment_id",
+    }
+    assert expected_outputs.issubset(
+        outputs
+    ), f"Missing required outputs: {expected_outputs - outputs}"
+
     # Check security invariants
     sec_boundary = module["security_boundary"]
     assert sec_boundary.get("forbid_wildcards") is True
     assert sec_boundary.get("forbid_secrets") is True
 
     # Check recommended roles for wildcards
-    for role_entry in sec_boundary.get("recommended_roles", []):
-        role_name = role_entry.get("role", "")
+    recommended_roles = {
+        role_entry.get("role", "") for role_entry in sec_boundary.get("recommended_roles", [])
+    }
+    for role_name in recommended_roles:
         assert "*" not in role_name, f"Role '{role_name}' should not contain wildcards"
         assert "Owner" not in role_name, f"Role '{role_name}' should not be 'Owner'"
         assert "Contributor" not in role_name or "Data" in role_name, (
             f"Role '{role_name}' should be a Data Plane role if using Contributor"
         )
+
+    # Verify that the Terraform implementation enforces the recommended role allowlist
+    tf_variables_path = (
+        pathlib.Path(__file__).parent.parent / "infra" / "terraform" / "variables.tf"
+    )
+    with open(tf_variables_path, "r") as f:
+        tf_content = f.read()
+
+    # The validation condition should contain the recommended roles from module.yaml
+    for role in recommended_roles:
+        assert f'"{role}"' in tf_content, f"Role '{role}' missing from Terraform allowlist"
+
+    # Verify fail-closed: it should NOT contain generic permissive roles
+    for forbidden in ["Owner", "Contributor", "User Access Administrator", "*"]:
+        assert (
+            forbidden not in tf_content or f'"{forbidden}"' not in tf_content
+        ), f"Forbidden role/wildcard '{forbidden}' found in Terraform validation"
 
 
 def test_readme_sections():

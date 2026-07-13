@@ -47,11 +47,13 @@ Always assign roles at the **lowest possible scope** to minimize the "blast radi
 
 To maintain a secure environment, the following practices are strictly forbidden:
 
-- **Wildcard Permissions:** Never use `*` or `Owner` roles for runtime identities.
-- **Committed Secrets:** Do not commit API keys, connection strings, or service principal secrets to source control.
+- **Wildcard & Owner Roles:** Never use `*`, `Owner`, `Contributor`, or `User Access Administrator` roles for runtime identities.
+- **Broad Scopes:** Avoid subscription-wide or management-group-wide assignments by default.
+- **Secrets & Account Keys:** Do not use Shared Access Keys (SAK), account keys, connection strings, or API keys where identity-based access is supported.
+- **Committed Credentials:** Never commit client secrets, certificates, or `.env` files to source control.
 - **Hardcoded Identifiers:** Do not hardcode Tenant IDs, Subscription IDs, or Managed Identity Object IDs in application code.
 - **Raw Token Exposure:** Do not log, store, or return raw Entra ID access tokens to client-facing interfaces.
-- **Connection Strings:** Prefer identity-based connections over Shared Access Keys (SAK) or connection strings for supported services.
+- **Unintended Fallback:** Do not allow the Azure production environment to fall back to developer credentials (e.g., Azure CLI) if the managed identity fails. Use `exclude_cli_credential=True` or similar SDK options in production if needed.
 
 ## Local Development Fallback
 
@@ -79,115 +81,98 @@ blob_service_client = BlobServiceClient(
 )
 ```
 
-## Concrete Implementation Examples
+## Concrete Reference Example
 
-### Example 1: Azure Function to Storage (Identity-Based)
+This building block uses a **User-Assigned Managed Identity** for the concrete reference.
 
-In this pattern, the Function App is granted `Storage Blob Data Contributor` and `Storage Queue Data Message Processor` access to a specific storage account. No connection string is stored in App Settings.
+**Rationale for User-Assigned Identity:**
+- **Lifecycle Independence:** The identity can be created, managed, and authorized before the compute resource (e.g., Function App) is even provisioned.
+- **Modularity:** The same identity can be shared across multiple related resources (e.g., a producer and a consumer) without duplicating role assignments.
+- **Clean IaC:** Avoids circular dependencies in Terraform where the compute resource needs the identity, but the identity "belongs" to the compute resource (as in system-assigned).
 
-**Configuration (App Settings):**
-- `STORAGE_CONNECTION__accountName = "mystorageaccount"`
-- `STORAGE_CONNECTION__credential = "managedidentity"`
-- `STORAGE_CONNECTION__clientId = "<client-id>"` (Optional for User-Assigned)
+### Authorization Model
 
-**Code:**
+| Component | Value | Justification |
+| :--- | :--- | :--- |
+| **Workload Identity** | `id-storage-reader` (User-Assigned) | Distinct identity for the data-reading task. |
+| **Target Resource** | `blob-container-shared-data` | **Resource-level scope.** Access is granted only to a specific container, not the entire storage account or resource group. |
+| **Built-in Role** | `Storage Blob Data Reader` | **Least privilege.** Provides read-only data plane access without management permissions or write access. |
+
+**Scope Justification:**
+Subscription or Resource Group scopes are intentionally avoided. Broad scopes increase the blast radius; a compromised identity with RG-level access could read data from *all* storage accounts in that group. Resource-level scope ensures the identity only sees what it absolutely needs.
+
+### Implementation Pattern
+
+**Environment Variables:**
+- `AZURE_CLIENT_ID`: The Client ID of the User-Assigned Identity (required in Azure).
+- `STORAGE_ACCOUNT_URL`: `https://mystorage.blob.core.windows.net`
+- `BLOB_CONTAINER_NAME`: `shared-data`
+
+**Python Code:**
 ```python
 import os
 from azure.identity import DefaultAzureCredential
-from azure.storage.queue import QueueClient
+from azure.storage.blob import BlobClient
 
-# Azure Functions can use identity-based triggers and bindings
-# For manual client initialization:
-account_name = os.environ["STORAGE_CONNECTION__accountName"]
-client_id = os.environ.get("STORAGE_CONNECTION__clientId")
+# 1. Initialize credential.
+# For User-Assigned Identity, we MUST provide the client_id.
+# DefaultAzureCredential will automatically fall back to developer tools locally.
+client_id = os.environ.get("AZURE_CLIENT_ID")
+credential = DefaultAzureCredential(managed_identity_client_id=client_id)
 
-# Pass client_id to ensure the correct User-Assigned identity is used
-credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
+# 2. Initialize the client using identity
+blob_url = f"{os.environ['STORAGE_ACCOUNT_URL']}/{os.environ['BLOB_CONTAINER_NAME']}/data.json"
+client = BlobClient.from_blob_url(blob_url, credential=credential)
 
-queue_url = f"https://{account_name}.queue.core.windows.net/my-task-queue"
-client = QueueClient(queue_url, credential=credential)
-
-def send_task(message):
-    client.send_message(message)
+# 3. Use the client (requires 'Storage Blob Data Reader' role)
+def get_data():
+    return client.download_blob().readall()
 ```
 
-### Example 2: Web App for Containers to Key Vault
+## Local Development Configuration
 
-When a containerized API needs to retrieve a configuration secret, it uses its identity to access Key Vault directly.
+When developing locally, you use your personal developer credentials. The code remains the same because `DefaultAzureCredential` handles the complexity.
 
-**Configuration (Environment Variables):**
-- `KEYVAULT_URL = "https://my-vault.vault.azure.net/"`
-- `AZURE_CLIENT_ID = "<client-id>"` (Optional for User-Assigned)
+### Excluding Unsuitable Credentials
+In some environments (e.g., CI runners with ambient service principals), you may need to strictly control which credentials are attempted.
 
-**Code:**
 ```python
-import os
 from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 
-vault_url = os.environ["KEYVAULT_URL"]
-client_id = os.environ.get("AZURE_CLIENT_ID")
-credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
-client = SecretClient(vault_url=vault_url, credential=credential)
-
-def get_config_secret(name):
-    # Returns only the specific secret value
-    secret = client.get_secret(name)
-    return secret.value
-```
-
-### Example 3: AI Foundry Agent Tool Boundary
-
-When an AI Foundry Agent calls a tool (e.g., an Azure Function), the Function should use its own Managed Identity to access backend data, ensuring the agent itself never touches raw data or secrets.
-
-**Infrastructure (Conceptual):**
-1. Agent Identity: `id-foundry-agent`
-2. Tool Identity: `id-search-tool`
-3. Role Assignment: `id-search-tool` is granted `Search Index Data Reader` on the AI Search index.
-
-**Code (Tool Side):**
-```python
-import os
-from azure.identity import DefaultAzureCredential
-from azure.search.documents import SearchClient
-
-# The tool uses its own identity to perform the action
-endpoint = os.environ["SEARCH_ENDPOINT"]
-index_name = os.environ["SEARCH_INDEX_NAME"]
-client_id = os.environ.get("AZURE_CLIENT_ID")
-
-credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
-search_client = SearchClient(endpoint, index_name, credential=credential)
-
-def perform_search(query):
-    # Returns only safe, business-level results to the Agent
-    results = search_client.search(query)
-    return [r['content'] for r in results] # Minimal sanitization example
+# Ensure we don't accidentally pick up environment variables or
+# older token caches that might have broader permissions than intended.
+credential = DefaultAzureCredential(
+    exclude_environment_credential=True,
+    exclude_workload_identity_credential=True,
+    managed_identity_client_id=os.environ.get("AZURE_CLIENT_ID")
+)
 ```
 
 ## Architecture Flow
 
 ```mermaid
 flowchart TD
-    subgraph "Local Development"
-        Dev[Developer/Runner] -->|az login / env| LocalCreds[Local Credentials\nAzure CLI / VS Code]
+    subgraph "Local Development Path"
+        Developer[Developer Machine] -->|az login| CLI[Azure CLI]
+        CLI -->|Token Cache| DAC_Local[DefaultAzureCredential]
     end
 
-    subgraph "Azure Environment"
-        Service[Azure Service\nFunctions/Web App] -->|Assigned| MI[Managed Identity\nSystem or User Assigned]
+    subgraph "Azure Workload Path"
+        Workload[Azure Hosted Service] -->|Assigned| UAMI[User-Assigned Managed Identity]
+        UAMI -->|IMDS Endpoint| DAC_Azure[DefaultAzureCredential]
     end
 
-    subgraph "Authorization"
-        LocalCreds -->|DefaultAzureCredential| SDK[Azure SDK Client]
-        MI -->|DefaultAzureCredential| SDK
-        SDK -->|Request Token| Entra[Microsoft Entra ID]
-        Entra -->|Issue Token| SDK
+    subgraph "Entra ID Authorization"
+        DAC_Local -->|Request Token| Entra[Microsoft Entra ID]
+        DAC_Azure -->|Request Token| Entra
+        Entra -->|JWT Access Token| Client[Azure SDK Client]
     end
 
-    subgraph "Resource Access"
-        SDK -->|Authorized Request| Resource[Target Resource\ne.g. Blob Storage]
-        Role[RBAC Role Assignment\ne.g. Storage Blob Data Reader] -.->|Scopes Access| Resource
-        MI -.->|Principal| Role
+    subgraph "Least-Privilege Resource Access"
+        Client -->|Bearer Token| Target[Target Resource\ne.g. Blob Container]
+        Assignment[Role Assignment\nStorage Blob Data Reader] -.->|Narrow Scope| Target
+        UAMI -.->|Identity Principal| Assignment
+        Developer -.->|User Principal| Assignment
     end
 ```
 
