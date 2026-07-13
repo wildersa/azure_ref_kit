@@ -75,9 +75,21 @@ export ALLOWED_TOOL_NAMES="get_system_status"
    PYTHONPATH=solutions/foundry-agent-with-mcp pytest solutions/foundry-agent-with-mcp/tests
    ```
 
+## Authorization and Identity
+This solution uses `DefaultAzureCredential` for all Azure service interactions.
+
+### Least-Privilege Guidance
+To follow Microsoft security best practices, grant the executing identity the **Foundry User** role (Role ID: `53ca6127-db72-4b80-b1b0-d745d6d5456d`) at the **Foundry Project** scope. This provides the necessary data plane permissions to interact with the agent and models without granting broad management access.
+
+**Forbidden Practices:**
+- Do not use broad Azure roles such as **Owner** or **Contributor** for the runtime identity.
+- Avoid assigning roles at the subscription or resource group level if a project-level scope is sufficient.
+- Never use wildcard permissions (`*`) or service-level contributor roles for application identities.
+
+For more information, see [Role-based access control for Microsoft Foundry](https://learn.microsoft.com/en-us/azure/foundry/concepts/rbac-foundry).
+
 ## Known Limits and Trade-offs
 - **Synchronous Timeout**: MCP tool calls are subject to a 100-second timeout in this implementation.
-- **Identity**: This runtime uses `DefaultAzureCredential`. Ensure the executing identity has `Contributor` or `Owner` role on the Foundry project.
 - **No-IaC**: This solution manages the agent via the SDK as part of application configuration and assumes an existing Foundry project and externally hosted MCP endpoint.
 
 ## Complexity / Minimalism Notes
