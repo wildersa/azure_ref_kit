@@ -3,10 +3,21 @@ type: building-block
 category: pipelines
 status: implemented
 purpose: Minimal Durable Functions orchestration pattern for customer-visible pipeline status tracking.
+version: 1.0.0
+
+runtime:
+  language: python
+  dependencies:
+    - azure-functions
+    - azure-functions-durable
+    - jsonschema
+
 inputs:
   - name: pipeline_start_request
     type: object
     description: Initial request to start the pipeline.
+    required: true
+
 outputs:
   - name: pipeline_run_status
     type: object
@@ -17,18 +28,26 @@ outputs:
   - name: api_endpoint
     type: string
     description: The endpoint of the deployed Function App.
+
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_service_plan
   - azurerm_storage_account
   - azurerm_application_insights
   - azurerm_log_analytics_workspace
+
+deployment_path: infra/terraform
+
 contracts:
   reads: []
   writes:
     - shared/contracts/pipeline-run.schema.json
     - shared/contracts/pipeline-step.schema.json
+    - building-blocks/pipelines/durable-basic-pipeline/schemas/pipeline_input.schema.json
+    - building-blocks/pipelines/durable-basic-pipeline/schemas/pipeline_success.schema.json
+    - building-blocks/pipelines/durable-basic-pipeline/schemas/friendly_failure.schema.json
   emits: []
+
 security_boundary:
   policy: "Enforces Durable Functions orchestration boundary through identity-first storage and filtered status schemas."
   forbid_wildcards: true
@@ -42,6 +61,7 @@ security_boundary:
       description: "Allows the function host to process queue messages."
     - role: "Storage Table Data Contributor"
       description: "Allows orchestrator to manage history and tracking tables."
+
 customer_safe_boundary:
   forbid:
     - "Raw Azure Function logs or Durable Functions orchestration history"

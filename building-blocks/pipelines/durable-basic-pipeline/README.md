@@ -68,8 +68,17 @@ This module enforces an **identity-first security boundary**. Shared access keys
 
 ## Failure behavior
 
-- **Failures**: If a step fails, the orchestrator updates the `PipelineRun` status to `failed` with a customer-safe `friendly_error`.
-- **Retry follow-up**: Add explicit Durable Functions retry options when the reference needs to demonstrate retry policy behavior instead of only orchestration shape.
+- **Bounded Retries**: Potentially transient steps (OCR, Publication) use a `RetryOptions` policy with a 5-second initial interval and a maximum of 3 attempts.
+- **Non-Retryable Failures**: Validation failures are treated as deterministic and non-retryable; the pipeline fails immediately to avoid redundant processing.
+- **Customer-Safe Redaction**: All failures (including retry exhaustion and unhandled exceptions) are caught by the orchestrator and reported as a generic friendly error to the customer status store, preventing leakage of technical details or secrets.
+
+## Microsoft Learn References
+
+- [Durable Functions Overview](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview)
+- [Durable Functions Python Programming Model](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=python-v2)
+- [Orchestrator Code Constraints](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-code-constraints)
+- [Error Handling in Durable Functions](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-error-handling)
+- [Azure Functions Python Developer Guide](https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference-python)
 
 ## Known limits
 

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PipelineSuccess",
+  "type": "object",
+  "required": ["status", "artifacts"],
+  "properties": {
+    "status": { "type": "string", "const": "completed" },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "business_summary": { "type": ["string", "null"] }
+  }
+}

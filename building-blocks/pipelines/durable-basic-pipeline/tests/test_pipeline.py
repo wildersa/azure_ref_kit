@@ -68,32 +68,33 @@ def test_orchestrator_happy_path(mock_context, valid_input):
     )
     assert mock_context.call_activity.call_args_list[0][0][1]["status"] == "running"
 
-    # 2. OCR Step
+    # 2. OCR Step (with retry)
     gen.send(None)
     assert (
-        mock_context.call_activity.call_args_list[1][0][0]
+        mock_context.call_activity_with_retry.call_args_list[0][0][0]
         == "ocr_document_intelligence"
     )
 
-    # 3. Validation Step
+    # 3. Validation Step (direct call)
     gen.send(ocr_success)
     assert (
-        mock_context.call_activity.call_args_list[2][0][0] == "field_validation_worker"
+        mock_context.call_activity.call_args_list[1][0][0] == "field_validation_worker"
     )
 
-    # 4. Publication Step
+    # 4. Publication Step (with retry)
     gen.send(validation_success)
     assert (
-        mock_context.call_activity.call_args_list[3][0][0] == "final_result_publisher"
+        mock_context.call_activity_with_retry.call_args_list[1][0][0]
+        == "final_result_publisher"
     )
 
     # 5. Finalize status to 'completed'
     gen.send(publish_success)
     assert (
-        mock_context.call_activity.call_args_list[4][0][0]
+        mock_context.call_activity.call_args_list[2][0][0]
         == "update_pipeline_run_status"
     )
-    assert mock_context.call_activity.call_args_list[4][0][1]["status"] == "completed"
+    assert mock_context.call_activity.call_args_list[2][0][1]["status"] == "completed"
 
     # End of orchestrator
     with pytest.raises(StopIteration) as exc:
@@ -114,19 +115,19 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
     # 1. Start
     next(gen)
 
-    # 2. OCR Step
+    # 2. OCR Step (with retry)
     gen.send(None)
 
     # 3. Handle OCR failure and update status to 'failed'
     gen.send(ocr_failure)
     assert (
-        mock_context.call_activity.call_args_list[2][0][0]
+        mock_context.call_activity.call_args_list[1][0][0]
         == "update_pipeline_run_status"
     )
-    assert mock_context.call_activity.call_args_list[2][0][1]["status"] == "failed"
+    assert mock_context.call_activity.call_args_list[1][0][1]["status"] == "failed"
     assert (
         "blurry"
-        not in mock_context.call_activity.call_args_list[2][0][1]["friendly_error"]
+        not in mock_context.call_activity.call_args_list[1][0][1]["friendly_error"]
     )
     # Actually, in my implementation I used a generic error message for the catch-all,
     # but for specific step failures I should check what I did.
@@ -135,7 +136,7 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
 
     assert (
         "An error occurred"
-        in mock_context.call_activity.call_args_list[2][0][1]["friendly_error"]
+        in mock_context.call_activity.call_args_list[1][0][1]["friendly_error"]
     )
 
     with pytest.raises(StopIteration) as exc:
@@ -172,10 +173,13 @@ def test_orchestrator_safety_boundary(mock_context, valid_input, caplog):
 
     gen = pipeline_orchestrator(mock_context)
     next(gen)  # 'running'
-    gen.send(None)  # OCR call
+    gen.send(None)  # OCR call (with retry)
 
     # Send unsafe failure
-    gen.send(ocr_unsafe_failure)
+    try:
+        gen.send(ocr_unsafe_failure)
+    except StopIteration:
+        pass
 
     # 1. Check customer-facing status (must be redacted)
     last_call_args = mock_context.call_activity.call_args_list[-1][0][1]
@@ -225,7 +229,10 @@ def test_http_start_logging_safety(caplog):
         # the real function might be in the closure.
         if func_to_call.__closure__:
             for cell in func_to_call.__closure__:
-                if callable(cell.cell_contents) and cell.cell_contents.__name__ == "http_start":
+                if (
+                    callable(cell.cell_contents)
+                    and cell.cell_contents.__name__ == "http_start"
+                ):
                     func_to_call = cell.cell_contents
                     break
         asyncio.run(func_to_call(req, client))
@@ -291,3 +298,88 @@ def test_activities_basic():
     pub = final_result_publisher({"run_id": "1"})
     assert pub["status"] == "completed"
     assert pub["publication_status"] == "published"
+
+
+def test_orchestrator_retry_exhaustion(mock_context, valid_input):
+    """
+    Verify orchestrator behavior when a retryable activity fails repeatedly.
+    In Durable Functions, if call_activity_with_retry exhausts retries, it raises an exception.
+    """
+    mock_context.get_input.return_value = valid_input
+
+    gen = pipeline_orchestrator(mock_context)
+
+    # 1. Start
+    next(gen)
+
+    # 2. OCR Step (with retry)
+    gen.send(None)
+
+    # Simulate exception from call_activity_with_retry after retries exhausted
+    try:
+        gen.throw(Exception("Retry attempts exhausted."))
+    except StopIteration:
+        pass
+
+    # 3. Handle failure and update status to 'failed'
+    assert (
+        mock_context.call_activity.call_args_list[1][0][0]
+        == "update_pipeline_run_status"
+    )
+    assert mock_context.call_activity.call_args_list[1][0][1]["status"] == "failed"
+    assert (
+        "An error occurred"
+        in mock_context.call_activity.call_args_list[1][0][1]["friendly_error"]
+    )
+
+
+def test_orchestrator_validation_failure_no_retry(mock_context, valid_input):
+    """
+    Verify that validation failure (non-retryable) immediately fails the pipeline.
+    """
+    mock_context.get_input.return_value = valid_input
+
+    ocr_success = {"status": "completed", "artifacts": ["ocr-1"]}
+    validation_failure = {
+        "status": "failed",
+        "friendly_error": "Missing mandatory field.",
+    }
+
+    gen = pipeline_orchestrator(mock_context)
+
+    # 1. Start
+    next(gen)
+
+    # 2. OCR Step
+    gen.send(None)
+
+    # 3. Validation Step
+    gen.send(ocr_success)
+
+    # 4. Handle validation failure
+    gen.send(validation_failure)
+
+    assert (
+        mock_context.call_activity.call_args_list[2][0][0]
+        == "update_pipeline_run_status"
+    )
+    assert mock_context.call_activity.call_args_list[2][0][1]["status"] == "failed"
+
+
+def test_orchestrator_determinism_no_file_io(mock_context, valid_input):
+    """
+    Verify that the orchestrator does not perform any filesystem I/O during execution.
+    This is a strict Durable Functions constraint for determinism and replay safety.
+    """
+    mock_context.get_input.return_value = valid_input
+
+    from unittest.mock import patch
+
+    # Mock 'open' to raise an error if called during orchestration
+    with patch("builtins.open", side_effect=IOError("Filesystem access forbidden during orchestration")):
+        gen = pipeline_orchestrator(mock_context)
+        # Run through the orchestration (triggering the first yield)
+        next(gen)
+
+    # If we reached here without an IOError, the orchestrator did not call open()
+    assert mock_context.call_activity.call_args_list[0][0][0] == "update_pipeline_run_status"

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FriendlyFailure",
+  "type": "object",
+  "required": ["error", "status"],
+  "properties": {
+    "error": { "type": "string" },
+    "status": { "type": "string", "const": "failed" },
+    "friendly_message": { "type": "string" }
+  }
+}
