@@ -4,7 +4,7 @@
 Practical network boundary notes for customer-facing APIs, agents, tools, and Azure services. This module provides guidance on implementing network isolation in Azure solutions while maintaining architectural minimalism and security-first principles.
 
 ## Service-Level Mermaid Diagram
-This diagram shows the logical separation between the public edge, the API boundary, and internal Azure services, including DevOps integration paths.
+This diagram shows the logical separation between the public edge, the API boundary, internal private services, and external SaaS dependencies.
 
 ```mermaid
 flowchart TD
@@ -17,11 +17,16 @@ flowchart TD
         API[Portal API / Functions]
     end
 
+    subgraph SaaSZone [External SaaS Zone - Untrusted]
+        DevOps[Azure DevOps / GitHub]
+    end
+
     subgraph InternalZone [Internal / Private Zone - Trusted]
         subgraph VNet [Virtual Network]
             direction TB
             PE[Private Endpoints]
             Subnet[Integration Subnet]
+            Egress[NAT Gateway / Firewall]
         end
 
         Orchestrator[Durable Functions Orchestrator]
@@ -31,14 +36,12 @@ flowchart TD
         KV[Key Vault]
         AI[AI Foundry Services]
         Logs[App Insights / Logs]
-
-        subgraph ExternalIntegration [External / DevOps Integration]
-            DevOps[Azure DevOps / GitHub]
-        end
     end
 
     User -->|HTTPS / WAF| SWA
     SWA -->|Linked Backend| API
+
+    %% Private Link Traffic (Internal)
     API -->|VNet Integration| Subnet
     Subnet -->|Private Link| PE
     PE --- Orchestrator
@@ -49,7 +52,11 @@ flowchart TD
     PE --- AI
     PE --- Logs
 
-    Orchestrator -->|Managed Identity| DevOps
+    %% Controlled Outbound Egress (External)
+    Orchestrator -->|Outbound| Subnet
+    Subnet --> Egress
+    Egress -->|Public Egress / Managed Identity| DevOps
+
     Agent -->|Managed Identity| AI
 ```
 
@@ -75,7 +82,24 @@ The customer-facing portal (e.g., Static Web App) must be strictly separated fro
 | **Azure Storage** | Disabled | N/A | Supported | Firewalled to trusted IPs/Subnets | Private Endpoint + Public Access Disabled |
 | **Key Vault** | Disabled | N/A | Supported | Firewalled to trusted services | Private Endpoint + Public Access Disabled |
 | **AI Foundry** | Disabled | N/A | Supported | Firewalled to compute subnets | Private Endpoint + Public Access Disabled |
-| **Azure DevOps** | N/A | N/A | N/A | Managed Identity + RBAC | Service Tags + Managed Identity |
+| **Azure DevOps** | N/A | Supported (Service Tags) | N/A | Managed Identity + RBAC | Service Tags + Managed Identity + NAT Gateway |
+
+## Outbound Access Boundary
+When an internal service (e.g., a Durable Functions Orchestrator) needs to reach external SaaS dependencies like Azure DevOps or GitHub, it must cross the outbound boundary. Unlike internal PaaS, these services do not support Private Link for standard consumption.
+
+### Egress Control Options
+| Method | Use Case | Implementation Note |
+| :--- | :--- | :--- |
+| **Service Tags** | Narrowing Azure egress | Use the `AzureDevOps` service tag in Network Security Groups (NSGs) to allow outbound traffic only to DevOps. |
+| **NAT Gateway** | Static Egress IPs | Provides a fixed public IP for your VNet, allowing the external SaaS to allowlist your specific origin. |
+| **Azure Firewall** | FQDN Filtering | Restrict egress to specific URLs (e.g., `dev.azure.com`) rather than broad IP ranges. |
+| **Web Proxy** | Application-level audit | Route all outbound traffic through a proxy for deep packet inspection and logging. |
+
+### Least-Privilege Identity Pattern
+Security at the network boundary must be reinforced by identity-based security:
+- **Managed Identity**: Use System-Assigned or User-Assigned Managed Identities for all Azure-to-DevOps communication.
+- **Service Principal Integration**: The managed identity must be **explicitly added** as a user or service principal within the Azure DevOps Organization. Access is not granted automatically by Azure; you must assign specific permissions (e.g., `Build Read`) to the identity in the DevOps portal or via API.
+- **Token Handling**: Avoid long-lived PATs or secrets; prefer Entra ID-based authentication for Azure DevOps where supported by the client library.
 
 ## Restricted Ingress Guidance
 Public-facing services (like Azure Functions or App Service) must be protected against direct unauthorized access. Supported restriction methods include:
