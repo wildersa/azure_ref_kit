@@ -8,17 +8,18 @@ This building block defines the safe, **read-only DevOps status** [Model Context
 ```mermaid
 sequenceDiagram
     participant A as Foundry/Agent Consumer
-    participant MCP as MCP Tool Boundary
-    participant C as Safe DevOps Status Contract
+    participant MCP as MCP Tool Boundary (Contract)
+    participant C as Controlled DevOps Adapter
     participant D as Azure DevOps API
 
     A->>MCP: Request Status (pipeline_id, run_id)
-    MCP->>C: Validate Input (Safe Identifiers Only)
-    C->>D: Sanitized Request (GET /_apis/...)
+    MCP->>C: Route Validated Input
+    C->>C: Authorize & Authenticate (PAT/Identity)
+    C->>D: REST API Request (GET /_apis/...)
     D-->>C: Raw Response (Logs, Secrets, Internals)
     C->>C: Sanitize & Filter to Contract
     C-->>MCP: Sanitized Response (Safe Fields Only)
-    MCP-->>A: Business Status Outcome
+    MCP-->>A: Bounded Business Status
 ```
 
 ## Security Boundary
@@ -106,11 +107,12 @@ Returns a list of recent runs for a specific pipeline.
 - **No Global Search**: It requires specific pipeline identifiers and does not support searching across multiple organizations or projects.
 
 ## Authentication and Implementation
-This module defines the **contract only**. It is the responsibility of the adapter/implementation to:
+This module defines the **declarative contract only**. It is the responsibility of a **Controlled DevOps Adapter** (the implementation) to:
 - Securely handle authentication (PATs, OAuth, Managed Identity).
 - Enforce authorization and project scoping.
 - Perform the actual Azure DevOps REST API calls.
-- Sanitize the raw response to match this contract.
+- Handle raw provider payloads and sensitive technical data.
+- Sanitize the response to match the fields defined in this contract *before* returning data to the agent.
 No credentials, tokens, or live cloud integration should be included in this module.
 
 ## Deployment / IaC Decision
