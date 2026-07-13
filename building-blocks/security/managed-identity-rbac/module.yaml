@@ -6,17 +6,35 @@ purpose: Reference pattern for least-privilege identity and RBAC in Azure.
 description: >
   This building block defines the standard for secure service-to-service authentication using
   Managed Identities and Azure RBAC. It enforces a strict "no-secrets" policy by leveraging
-  Microsoft Entra ID. Wildcard permissions (*) and broad roles like 'Owner' or 'Contributor'
+  Microsoft Entra ID. Wildcard permissions (*), Owner, and Contributor roles
   are strictly forbidden in favor of specific Data Plane roles.
-inputs: []
-outputs: []
+inputs:
+  - name: workload_name
+    type: string
+    description: Name of the workload for identity naming.
+  - name: target_resource_id
+    type: string
+    description: The fully qualified Azure Resource ID of the target resource for RBAC assignment.
+  - name: role_definition_name
+    type: string
+    description: The name of the built-in Azure RBAC role to assign (e.g., 'Storage Blob Data Reader').
+outputs:
+  - name: principal_id
+    type: string
+    description: The Principal ID of the created Managed Identity.
+  - name: client_id
+    type: string
+    description: The Client ID of the created User-Assigned Managed Identity.
+  - name: role_assignment_id
+    type: string
+    description: The ID of the created Role Assignment.
 dependencies:
   - name: azure-identity
     type: sdk
     version: "^1.12.0"
 azure_resources:
-  - Microsoft Entra Managed Identity
-  - Azure RBAC
+  - Microsoft Entra Managed Identity (User-Assigned)
+  - Azure RBAC Role Assignment
 security_boundary:
   policy: "Least-privilege Managed Identity access only"
   forbid_wildcards: true
