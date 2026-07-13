@@ -6,6 +6,14 @@ purpose: Practical network boundary notes for customer-facing APIs, agents, tool
 inputs: []
 outputs: []
 azure_resources: []
+deployment_path: null
+security_assumptions:
+  - This module is documentation-only and provides architectural guidance.
+  - Implementation of these boundaries requires concrete infrastructure components (VNets, Private Endpoints, etc.).
+  - Security depends on correct configuration of the chosen Azure services and their networking features.
+dependencies:
+  python: []
+  infra: []
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
@@ -16,6 +24,10 @@ customer_safe_boundary:
     - "Subscription IDs"
     - "Raw Access Tokens"
     - "Private IP Addresses"
+    - "Raw Provider Payloads"
+    - "Internal Resource IDs"
+    - "Secrets and Tokens"
+    - "Raw Logs and Stack Traces"
 contracts:
   reads: []
   writes: []
