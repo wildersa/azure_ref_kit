@@ -1,14 +1,12 @@
 name: static-status-portal
 type: portal
-category: documentation
+category: building-block
 status: active
-purpose: Defines the contract and architecture for a customer-safe static status portal that displays pipeline outcomes without exposing technical internals.
+purpose: Minimal read-only status portal shell for displaying customer-safe pipeline outcomes.
 contracts:
   consumes:
     - building-blocks/security/customer-safe-status-boundary/src/schemas/customer_safe_status.schema.json
-  reads:
-    - shared/contracts/pipeline-run.schema.json
-    - shared/contracts/artifact.schema.json
+    - building-blocks/security/customer-safe-status-boundary/src/schemas/friendly_failure.schema.json
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
@@ -19,5 +17,7 @@ customer_safe_boundary:
     - "SAS tokens and connection strings"
     - "System prompts"
     - "Internal Azure Resource IDs"
-azure_resources: []
-deployment_path: null
+    - "IaC state files"
+azure_resources:
+  - "Microsoft.Web/staticSites"
+deployment_path: building-blocks/portals/static-status-portal/infra/terraform/
