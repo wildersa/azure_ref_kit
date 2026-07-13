@@ -68,44 +68,15 @@ class GetPipelineRunStatusResponse(BaseModel):
     )
 
 
-class GetLatestBuildSummaryRequest(BaseModel):
-    """Request to get the summary of the latest build."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    pipeline_id: SafeId = Field(..., description="The ID or name of the pipeline.")
-    branch: Optional[SafeId] = Field(
-        None, description="Filter by branch name (defaults to default branch)."
-    )
-
-
-class GetLatestBuildSummaryResponse(BaseModel):
-    """Response containing the summary of the most recent build."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    pipeline_name: str = Field(..., description="The name of the pipeline.")
-    build_number: str = Field(..., description="The build number (e.g., 20240102.1).")
-    status: PipelineStatus = Field(..., description="The current state of the build.")
-    result: PipelineResult = Field(..., description="The outcome of a completed build.")
-    branch: str = Field(..., description="The source branch for the build.")
-    finish_time: datetime = Field(
-        ..., description="When the build finished (ISO 8601)."
-    )
-    summary: Optional[str] = Field(
-        None, description="A friendly business-level summary of the build status."
-    )
-    portal_url: HttpUrl = Field(
-        ..., description="A sanitized link to the build in the Azure DevOps portal."
-    )
-
-
 class ListRecentPipelineRunsRequest(BaseModel):
     """Request to list recent runs of a specific pipeline."""
 
     model_config = ConfigDict(extra="forbid")
 
     pipeline_id: SafeId = Field(..., description="The ID or name of the pipeline.")
+    branch: Optional[SafeId] = Field(
+        None, description="Filter by branch name (defaults to all branches)."
+    )
     top: Annotated[int, Field(ge=1, le=20)] = Field(
         5, description="Number of recent runs to return (default: 5, max: 20)."
     )
