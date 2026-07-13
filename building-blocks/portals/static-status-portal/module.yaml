@@ -4,9 +4,41 @@ category: building-block
 status: active
 purpose: Minimal read-only status portal shell for displaying customer-safe pipeline outcomes.
 contracts:
-  consumes:
+  reads:
     - building-blocks/security/customer-safe-status-boundary/src/schemas/customer_safe_status.schema.json
     - building-blocks/security/customer-safe-status-boundary/src/schemas/friendly_failure.schema.json
+inputs:
+  - name: name_prefix
+    type: string
+    description: "A prefix for the name of the Static Web App."
+  - name: resource_group_name
+    type: string
+    description: "The name of the resource group in which to create the Static Web App."
+  - name: location
+    type: string
+    description: "The Azure region where the Static Web App should be created."
+  - name: sku_tier
+    type: string
+    description: "The SKU tier of the Static Web App (Free or Standard)."
+  - name: sku_size
+    type: string
+    description: "The SKU size of the Static Web App (Free or Standard)."
+  - name: tags
+    type: map
+    description: "A mapping of tags to assign to the resource."
+outputs:
+  - name: static_web_app_id
+    type: string
+    description: "The ID of the Static Web App."
+  - name: static_web_app_name
+    type: string
+    description: "The name of the Static Web App."
+  - name: static_web_app_default_host_name
+    type: string
+    description: "The default host name of the Static Web App."
+  - name: resource_group_name
+    type: string
+    description: "The name of the resource group."
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true

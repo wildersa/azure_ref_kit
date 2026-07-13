@@ -8,15 +8,14 @@ The Static Status Portal provides a read-only, business-level view of pipeline r
 
 This shell is designed to be hosted as an Azure Static Web App, consuming a controlled API that returns only allowlisted fields.
 
-## Features
+## Portal Responsibilities
 
-- **P0 Views:** Run list, progress tracking, friendly failures, and safe artifact metadata.
-- **Security First:** Explicit client-side sanitization in the adapter acts as **Defense in Depth**; the primary security boundary is enforced at the API level.
-- **Fixture Support:** Built-in mock data for local development without Azure dependencies.
-- **SWA Ready:** Includes `staticwebapp.config.json` with authenticated routes and security headers.
-- **Infrastructure:** Minimal Terraform for `azurerm_static_web_app`.
+- **Authentication & Authorization:** Leverages Azure Static Web Apps built-in auth to ensure users only see their own data.
+- **Presentation:** Provides a clean, React-based interface for tracking pipeline progress.
+- **Sanitization:** Implements client-side defense-in-depth to prevent any technical leakage.
+- **Mocking:** Supports a local fixture mode for rapid development and testing.
 
-## Architecture
+## Architecture Boundary
 
 ```mermaid
 flowchart LR
@@ -25,29 +24,67 @@ flowchart LR
     Func -->|REST API| SWA[Static Web Apps Shell]
     SWA -->|HTTPS| Customer[Customer Browser]
 
-    subgraph SWA [Static Web Apps Shell]
+    subgraph "Static Web Apps Portal"
         UI[React UI]
         Adapter[API Adapter + Defense-in-Depth Sanitizer]
         UI <--> Adapter
     end
 ```
 
-## Security Policy
+## UI Surface Contract
 
-The primary security boundary is the **Controlled Functions API**, which must only return allowlisted `CustomerSafeStatus` and `FriendlyFailure` fields.
+The portal shell must provide the following functional components:
 
-The frontend API adapter provides **Defense in Depth** by explicitly sanitizing all incoming JSON to ensure technical internals never reach the React UI state, even if the backend returns unexpected fields.
+### 1. Run List
+Displays a list of recent pipeline runs associated with the customer.
+- **Fields:** Opaque ID, Status, Created Date, Summary.
+- **Constraint:** Must never display internal database keys or subscription identifiers.
 
-This portal **never** renders:
-- Raw Logs or stack traces.
-- AI system prompts.
-- Internal Azure Resource IDs or Subscription IDs.
-- Secrets, tokens, or IaC data.
+### 2. Run Detail & Timeline
+A detailed view of a single pipeline run showing its execution path.
+- **Behavior:** Renders high-level stages and their completion status.
+- **Constraint:** Forbidden to show raw logs, internal step IDs, or technical stack traces.
+
+### 3. Artifacts List
+Lists safe, customer-facing artifacts produced by the pipeline.
+- **Fields:** Friendly Name, Type, Size.
+- **Constraint:** Must never expose SAS tokens, storage account keys, or internal storage paths (storage_ref).
+
+### 4. Cost Summary
+Optional high-level cost or resource consumption summary.
+- **Behavior:** Shows business-level units (e.g., "Credits used").
+- **Constraint:** Must never show raw Azure billing details or currency unless explicitly safe.
+
+### 5. Friendly Error Panel
+A dedicated UI component for rendering non-technical failures.
+- **Behavior:** Translates technical error codes into human-readable guidance.
+- **Constraint:** Must never render provider payloads, internal exceptions, or stack traces.
+
+### 6. Start Run Placeholder
+A UI shell for future pipeline triggers.
+- **Behavior:** Currently read-only in this reference.
+
+## API Contract Usage
+
+The portal consumes the `CustomerSafeStatus` schema. All interactions with the backend are brokered through the API adapter which enforces the safety boundary.
+
+## Customer-Safe Status Boundary
+
+This module strictly adheres to the repository security standards.
+
+### Forbidden Data (Internal-Only)
+The following information is strictly forbidden from being displayed in the UI or contained in the API responses reaching the portal:
+- **Raw Logs** and technical debug output.
+- **Prompts** used for AI grounding or system instructions.
+- **Provider Payloads** from internal services (Azure DevOps, GitHub).
+- **Azure Resource IDs**, Tenant IDs, and Subscription IDs.
+- **Secrets**, tokens, SAS tokens, storage keys, and connection strings.
+- **Internal Exceptions** and technical stack traces.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20+
 - npm
 
 ### Installation
@@ -79,8 +116,9 @@ The infrastructure is located in `infra/terraform/`. It provisions a basic Azure
 ### Deployment Proof
 ```bash
 cd infra/terraform
-terraform init
-terraform validate
+# Use Terraform/OpenTofu to provision:
+# terraform init
+# terraform validate
 ```
 
 ## References
