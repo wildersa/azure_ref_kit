@@ -82,7 +82,7 @@ The customer-facing portal (e.g., Static Web App) must be strictly separated fro
 | **Azure Storage** | Disabled | N/A | Supported | Firewalled to trusted IPs/Subnets | Private Endpoint + Public Access Disabled |
 | **Key Vault** | Disabled | N/A | Supported | Firewalled to trusted services | Private Endpoint + Public Access Disabled |
 | **AI Foundry** | Disabled | N/A | Supported | Firewalled to compute subnets | Private Endpoint + Public Access Disabled |
-| **Azure DevOps** | N/A | Supported (Service Tags) | N/A | Managed Identity + RBAC | Service Tags + Managed Identity + NAT Gateway |
+| **Azure DevOps** | N/A | Supported (FQDN/IP) | N/A | Managed Identity + RBAC | FQDN Filtering + Managed Identity + NAT Gateway |
 
 ## Outbound Access Boundary
 When an internal service (e.g., a Durable Functions Orchestrator) needs to reach external SaaS dependencies like Azure DevOps or GitHub, it must cross the outbound boundary. Unlike internal PaaS, these services do not support Private Link for standard consumption.
@@ -90,9 +90,9 @@ When an internal service (e.g., a Durable Functions Orchestrator) needs to reach
 ### Egress Control Options
 | Method | Use Case | Implementation Note |
 | :--- | :--- | :--- |
-| **Service Tags** | Narrowing Azure egress | Use the `AzureDevOps` service tag in Network Security Groups (NSGs) to allow outbound traffic only to DevOps. |
+| **FQDN Filtering** | URL-level restriction | Use Azure Firewall (Premium/Standard) to allow egress only to `dev.azure.com` and related endpoints. |
+| **IP Allowlisting** | Narrowing Azure egress | Filter outbound traffic to the published Azure DevOps IP ranges (see Microsoft docs for current XML/JSON). |
 | **NAT Gateway** | Static Egress IPs | Provides a fixed public IP for your VNet, allowing the external SaaS to allowlist your specific origin. |
-| **Azure Firewall** | FQDN Filtering | Restrict egress to specific URLs (e.g., `dev.azure.com`) rather than broad IP ranges. |
 | **Web Proxy** | Application-level audit | Route all outbound traffic through a proxy for deep packet inspection and logging. |
 
 ### Least-Privilege Identity Pattern
