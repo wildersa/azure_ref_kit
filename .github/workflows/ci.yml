@@ -94,7 +94,7 @@ jobs:
       func_http: ${{ steps.filter.outputs.func_http }}
       func_queue: ${{ steps.filter.outputs.func_queue }}
       pipeline_durable: ${{ steps.filter.outputs.pipeline_durable }}
-      webapp_agent_api: ${{ steps.filter.outputs.webapp_agent_api }}
+      web_app_agent_api: ${{ steps.filter.outputs.web_app_agent_api }}
       workflow: ${{ steps.filter.outputs.workflow }}
     steps:
       - name: Checkout
@@ -112,8 +112,8 @@ jobs:
               - 'building-blocks/functions/agent-tool-queue-function/**'
             pipeline_durable:
               - 'building-blocks/pipelines/durable-basic-pipeline/**'
-            webapp_agent_api:
-              - 'building-blocks/hosting/webapp-agent-api/**'
+            web_app_agent_api:
+              - 'building-blocks/hosting/web-app-agent-api/**'
             workflow:
               - '.github/workflows/**'
 
@@ -151,14 +151,14 @@ jobs:
         run: PYTHONPATH=. python -m pytest tests/
 
   # Job to test Web App agent API module
-  test-webapp-agent-api:
+  test-web-app-agent-api:
     name: Test Web App Agent API
     needs: [choose-runner, changes]
-    if: needs.changes.outputs.webapp_agent_api == 'true' || needs.changes.outputs.workflow == 'true'
+    if: needs.changes.outputs.web_app_agent_api == 'true' || needs.changes.outputs.workflow == 'true'
     runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
     defaults:
       run:
-        working-directory: building-blocks/hosting/webapp-agent-api
+        working-directory: building-blocks/hosting/web-app-agent-api
     steps:
       - name: Checkout
         uses: actions/checkout@v4
