@@ -2,8 +2,8 @@ import json
 import unittest
 from unittest.mock import patch, MagicMock
 
-from building_blocks.mcp.devops_status_adapter.src.adapter import DevOpsStatusAdapter
 from pydantic import ValidationError
+from building_blocks.mcp.devops_status_adapter.src.adapter import DevOpsStatusAdapter
 from building_blocks.mcp.devops_mcp_tool_contract.src.models import (
     GetPipelineRunStatusResponse,
     ListRecentPipelineRunsResponse,
@@ -20,9 +20,52 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
             token="test-token",
         )
 
-    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.urlopen")
-    def test_get_pipeline_run_status_success(self, mock_urlopen):
-        # Mock ADO response
+    def test_transport_injection(self):
+        mock_transport = MagicMock()
+        mock_transport.return_value = (b'{"id": 1}', 200)
+
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
+
+        adapter._make_request(
+            "https://dev.azure.com/test-org/test-project/_apis/build/builds/1"
+        )
+        mock_transport.assert_called_once()
+
+    def test_rejected_non_azure_devops_hosts(self):
+        with self.assertRaisesRegex(ValueError, "only dev.azure.com is allowed"):
+            DevOpsStatusAdapter(
+                organization_url="https://evil.com/org",
+                project="test-project",
+                token="test-token",
+            )
+
+    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.logger")
+    def test_sanitized_failure_logging(self, mock_logger):
+        mock_transport = MagicMock()
+        mock_transport.side_effect = Exception("Sensitive technical error info")
+
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
+
+        with self.assertRaises(RuntimeError):
+            adapter._make_request(
+                "https://dev.azure.com/test-org/test-project/_apis/build/builds/1"
+            )
+
+        # Verify that the sensitive error info is NOT logged
+        for call in mock_logger.error.call_args_list:
+            self.assertNotIn("Sensitive technical error info", call[0][0])
+
+    def test_get_pipeline_run_status_success(self):
         mock_response_data = {
             "id": 12345,
             "status": "completed",
@@ -40,15 +83,20 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
             },
         }
 
-        mock_cm = MagicMock()
-        mock_cm.read.return_value = json.dumps(mock_response_data).encode("utf-8")
-        mock_cm.status = 200
-        mock_cm.__enter__.return_value = mock_cm
-        mock_urlopen.return_value = mock_cm
-
-        response = self.adapter.get_pipeline_run_status(
-            pipeline_id="123", run_id="12345"
+        mock_transport = MagicMock()
+        mock_transport.return_value = (
+            json.dumps(mock_response_data).encode("utf-8"),
+            200,
         )
+
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
+
+        response = adapter.get_pipeline_run_status(pipeline_id="123", run_id="12345")
 
         self.assertIsInstance(response, GetPipelineRunStatusResponse)
         self.assertEqual(response.pipeline_name, "Test Pipeline")
@@ -63,8 +111,7 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
             "https://dev.azure.com/test-org/test-project/_build/results?buildId=12345",
         )
 
-    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.urlopen")
-    def test_list_recent_pipeline_runs_success(self, mock_urlopen):
+    def test_list_recent_pipeline_runs_success(self):
         mock_response_data = {
             "count": 2,
             "value": [
@@ -87,13 +134,20 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
             ],
         }
 
-        mock_cm = MagicMock()
-        mock_cm.read.return_value = json.dumps(mock_response_data).encode("utf-8")
-        mock_cm.status = 200
-        mock_cm.__enter__.return_value = mock_cm
-        mock_urlopen.return_value = mock_cm
+        mock_transport = MagicMock()
+        mock_transport.return_value = (
+            json.dumps(mock_response_data).encode("utf-8"),
+            200,
+        )
 
-        response = self.adapter.list_recent_pipeline_runs(pipeline_id="123", top=2)
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
+
+        response = adapter.list_recent_pipeline_runs(pipeline_id="123", top=2)
 
         self.assertIsInstance(response, ListRecentPipelineRunsResponse)
         self.assertEqual(response.pipeline_name, "Test Pipeline")
@@ -101,33 +155,40 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
         self.assertEqual(response.runs[0].run_id, "12346")
         self.assertEqual(response.runs[1].result, PipelineResult.FAILED)
 
-    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.urlopen")
-    def test_malformed_provider_payload_fails_closed(self, mock_urlopen):
-        # Missing required 'status' field
+    def test_malformed_provider_payload_fails_closed(self):
         mock_response_data = {"id": 12345, "definition": {"name": "Test Pipeline"}}
 
-        mock_cm = MagicMock()
-        mock_cm.read.return_value = json.dumps(mock_response_data).encode("utf-8")
-        mock_cm.status = 200
-        mock_cm.__enter__.return_value = mock_cm
-        mock_urlopen.return_value = mock_cm
+        mock_transport = MagicMock()
+        mock_transport.return_value = (
+            json.dumps(mock_response_data).encode("utf-8"),
+            200,
+        )
+
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
 
         with self.assertRaisesRegex(RuntimeError, "Malformed provider response."):
-            self.adapter.get_pipeline_run_status(pipeline_id="123", run_id="12345")
+            adapter.get_pipeline_run_status(pipeline_id="123", run_id="12345")
 
-    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.urlopen")
-    def test_api_error_fails_closed(self, mock_urlopen):
-        mock_cm = MagicMock()
-        mock_cm.status = 404
-        mock_cm.__enter__.return_value = mock_cm
-        mock_urlopen.return_value = mock_cm
+    def test_api_error_fails_closed(self):
+        mock_transport = MagicMock()
+        mock_transport.return_value = (b"", 404)
+
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
 
         with self.assertRaisesRegex(
             RuntimeError, "Internal error fetching DevOps status."
         ):
-            self.adapter.get_pipeline_run_status(
-                pipeline_id="123", run_id="nonexistent"
-            )
+            adapter.get_pipeline_run_status(pipeline_id="123", run_id="nonexistent")
 
     def test_credential_safety_in_headers(self):
         headers = self.adapter._get_headers()
@@ -136,30 +197,30 @@ class TestDevOpsStatusAdapter(unittest.TestCase):
         # Ensure token is not present in plain text
         self.assertNotIn("test-token", headers["Authorization"])
 
-    @patch("building_blocks.mcp.devops_status_adapter.src.adapter.urlopen")
-    def test_list_recent_pipeline_runs_pagination_and_branch(self, mock_urlopen):
-        # Verify top and branch parameters are passed correctly in URL
-        mock_cm = MagicMock()
-        mock_cm.read.return_value = json.dumps({"count": 0, "value": []}).encode(
-            "utf-8"
+    def test_list_recent_pipeline_runs_pagination_and_branch(self):
+        mock_transport = MagicMock()
+        mock_transport.return_value = (
+            json.dumps({"count": 0, "value": []}).encode("utf-8"),
+            200,
         )
-        mock_cm.status = 200
-        mock_cm.__enter__.return_value = mock_cm
-        mock_urlopen.return_value = mock_cm
 
-        self.adapter.list_recent_pipeline_runs(
+        adapter = DevOpsStatusAdapter(
+            organization_url="https://dev.azure.com/test-org",
+            project="test-project",
+            token="test-token",
+            transport=mock_transport,
+        )
+
+        adapter.list_recent_pipeline_runs(
             pipeline_id="123", branch="refs/heads/feat", top=10
         )
 
-        args, kwargs = mock_urlopen.call_args
+        args, kwargs = mock_transport.call_args
         request = args[0]
         self.assertIn("%24top=10", request.full_url)
         self.assertIn("branchName=refs%2Fheads%2Ffeat", request.full_url)
 
     def test_rejected_unsafe_identifiers_via_contract(self):
-        # The adapter uses contract models for validation on output.
-        # While input validation usually happens at the tool entry point,
-        # we can verify that the contract's SafeId pattern works as expected.
         from pydantic import TypeAdapter
         from building_blocks.mcp.devops_mcp_tool_contract.src.models import SafeId
 

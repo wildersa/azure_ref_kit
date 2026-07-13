@@ -1,9 +1,9 @@
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable
 from urllib.request import Request, urlopen
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlparse
 
 from pydantic import ValidationError
 
@@ -35,8 +35,16 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+def default_transport(request: Request) -> Any:
+    """Default HTTP transport using urllib.request.urlopen."""
+    with urlopen(request) as response:
+        return response.read(), response.status
+
+
 class DevOpsStatusAdapter:
     """Controlled read-only adapter for Azure DevOps status queries."""
+
+    ALLOWED_HOSTS = ["dev.azure.com"]
 
     def __init__(
         self,
@@ -44,6 +52,7 @@ class DevOpsStatusAdapter:
         project: str,
         token: str,
         api_version: str = "7.1",
+        transport: Optional[Callable[[Request], Any]] = None,
     ):
         """
         Initialize the adapter.
@@ -53,11 +62,21 @@ class DevOpsStatusAdapter:
             project: The project name or ID.
             token: The Personal Access Token (PAT).
             api_version: The Azure DevOps REST API version.
+            transport: Optional injectable HTTP transport for testing and isolation.
         """
+        self._validate_url(organization_url)
         self.organization_url = organization_url.rstrip("/")
         self.project = quote(project)
         self.token = token
         self.api_version = api_version
+        self.transport = transport or default_transport
+
+    def _validate_url(self, url: str) -> None:
+        """Ensure the URL targets a trusted Azure DevOps host."""
+        parsed = urlparse(url)
+        if parsed.netloc not in self.ALLOWED_HOSTS:
+            logger.error("Attempted access to unauthorized host.")
+            raise ValueError("Invalid organization_url: only dev.azure.com is allowed.")
 
     def _get_headers(self) -> Dict[str, str]:
         """Construct headers for the REST API request."""
@@ -71,16 +90,17 @@ class DevOpsStatusAdapter:
         }
 
     def _make_request(self, url: str) -> Dict[str, Any]:
-        """Perform a GET request to the Azure DevOps API."""
+        """Perform a GET request using the injected transport."""
         request = Request(url, headers=self._get_headers(), method="GET")
         try:
-            with urlopen(request) as response:
-                if response.status != 200:
-                    logger.error(f"Azure DevOps API returned status {response.status}")
-                    raise RuntimeError(f"Azure DevOps API error: {response.status}")
-                return json.loads(response.read().decode("utf-8"))
-        except Exception as e:
-            logger.error(f"Failed to fetch from Azure DevOps: {str(e)}")
+            body, status = self.transport(request)
+            if status != 200:
+                logger.error(f"Provider returned error status: {status}")
+                raise RuntimeError("Provider error.")
+            return json.loads(body.decode("utf-8"))
+        except Exception:
+            # Sanitize logging: do not log the raw exception string/technical details
+            logger.error("Failed to fetch from provider due to technical error.")
             # Fail closed: do not expose internal error details to the response
             raise RuntimeError("Internal error fetching DevOps status.")
 
@@ -92,23 +112,13 @@ class DevOpsStatusAdapter:
 
         Maps to: GET https://dev.azure.com/{organization}/{project}/_apis/build/builds/{buildId}
         """
-        # Validate inputs using contract's SafeId constraint implicitly or explicitly
-        # Here we just use them in the URL construction safely
         safe_run_id = quote(run_id)
         url = f"{self.organization_url}/{self.project}/_apis/build/builds/{safe_run_id}"
 
         raw_data = self._make_request(url)
 
-        # Map raw data to contract model
         try:
-            # Azure DevOps Build properties:
-            # status: 'all', 'cancelling', 'completed', 'inProgress', 'none', 'notStarted', 'postponed'
-            # result: 'canceled', 'failed', 'none', 'partiallySucceeded', 'succeeded'
-
-            # Note: pipeline_id in request might be different from what's in the response definition id
-            # We use the response data for mapping.
-
-            # Start and finish times are ISO 8601 strings in ADO
+            # Map raw data to contract model
             start_time = datetime.fromisoformat(
                 raw_data["startTime"].replace("Z", "+00:00")
             )
@@ -137,8 +147,8 @@ class DevOpsStatusAdapter:
                 summary=f"Build {raw_data['buildNumber']} {raw_data.get('result', raw_data['status'])}.",
                 portal_url=raw_data["_links"]["web"]["href"],
             )
-        except (KeyError, ValueError, ValidationError) as e:
-            logger.error(f"Failed to map Azure DevOps response: {str(e)}")
+        except (KeyError, ValueError, ValidationError):
+            logger.error("Failed to map provider response due to schema mismatch.")
             raise RuntimeError("Malformed provider response.")
 
     def list_recent_pipeline_runs(
@@ -184,6 +194,6 @@ class DevOpsStatusAdapter:
             return ListRecentPipelineRunsResponse(
                 pipeline_name=pipeline_name, runs=runs
             )
-        except (KeyError, ValueError, ValidationError) as e:
-            logger.error(f"Failed to map Azure DevOps response: {str(e)}")
+        except (KeyError, ValueError, ValidationError):
+            logger.error("Failed to map provider list response due to schema mismatch.")
             raise RuntimeError("Malformed provider response.")
