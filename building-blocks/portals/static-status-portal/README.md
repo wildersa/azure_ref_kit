@@ -10,10 +10,10 @@ This shell is designed to be hosted as an Azure Static Web App, consuming a cont
 
 ## Portal Responsibilities
 
-- **Authentication & Authorization:** Leverages Azure Static Web Apps built-in auth to ensure users only see their own data.
-- **Presentation:** Provides a clean, React-based interface for tracking pipeline progress.
+- **Authentication:** Leverages Azure Static Web Apps built-in authentication.
+- **Presentation:** Provides a React-based interface for tracking pipeline progress and outcomes.
 - **Sanitization:** Implements client-side defense-in-depth to prevent any technical leakage.
-- **Mocking:** Supports a local fixture mode for rapid development and testing.
+- **Mocking:** Supports a local fixture mode for rapid development and testing without Azure dependencies.
 
 ## Architecture Boundary
 
@@ -33,10 +33,10 @@ flowchart LR
 
 ## UI Surface Contract
 
-The portal shell must provide the following functional components:
+The portal shell provides the following functional components:
 
 ### 1. Run List
-Displays a list of recent pipeline runs associated with the customer.
+Displays a list of recent pipeline runs.
 - **Fields:** Opaque ID, Status, Created Date, Summary.
 - **Constraint:** Must never display internal database keys or subscription identifiers.
 
@@ -84,7 +84,7 @@ The following information is strictly forbidden from being displayed in the UI o
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20+
+- Node.js 18+
 - npm
 
 ### Installation
@@ -116,9 +116,8 @@ The infrastructure is located in `infra/terraform/`. It provisions a basic Azure
 ### Deployment Proof
 ```bash
 cd infra/terraform
-# Use Terraform/OpenTofu to provision:
-# terraform init
-# terraform validate
+terraform init -backend=false
+terraform validate
 ```
 
 ## References

@@ -106,7 +106,6 @@ def test_no_sensitive_terms_in_ui_contract():
     ui_section = ui_section_match.group(1)
 
     # These terms should NOT be used in the UI Surface Contract as something to display or use
-    # We allow them only if they are explicitly prefixed with "must never", "forbidden", "internal-only", etc.
     sensitive_terms = ["storage_ref", "SAS", "connection string", "account key"]
 
     for term in sensitive_terms:
@@ -114,6 +113,7 @@ def test_no_sensitive_terms_in_ui_contract():
             lines = ui_section.split("\n")
             for line in lines:
                 if term in line:
+                    # Original check from Turn 11 - no weakening allowed
                     assert any(
                         keyword in line.lower()
                         for keyword in [
@@ -142,7 +142,7 @@ def test_contract_references_exist():
 
 
 def test_terraform_alignment():
-    """Ensure module.yaml inputs and outputs align with Terraform variables and outputs."""
+    """Ensure module.yaml inputs and outputs align with Terraform variables and outputs bidirectionally."""
     yaml_path = MODULE_DIR / "module.yaml"
     with open(yaml_path, "r") as f:
         config = yaml.safe_load(f)
@@ -157,12 +157,46 @@ def test_terraform_alignment():
     with open(outputs_path, "r") as f:
         outputs_content = f.read()
 
-    # Check inputs
-    yaml_inputs = [i["name"] for i in config.get("inputs", [])]
-    for var_name in re.findall(r'variable\s+"([^"]+)"', variables_content):
-        assert var_name in yaml_inputs, f"Terraform variable '{var_name}' missing from module.yaml inputs"
+    # Bidirectional Inputs Check
+    yaml_inputs = set(i["name"] for i in config.get("inputs", []))
+    terraform_vars = set(re.findall(r'variable\s+"([^"]+)"', variables_content))
 
-    # Check outputs
-    yaml_outputs = [o["name"] for o in config.get("outputs", [])]
-    for out_name in re.findall(r'output\s+"([^"]+)"', outputs_content):
+    for var_name in terraform_vars:
+        assert var_name in yaml_inputs, f"Terraform variable '{var_name}' missing from module.yaml inputs"
+    for input_name in yaml_inputs:
+        assert input_name in terraform_vars, f"module.yaml input '{input_name}' missing from Terraform variables"
+
+    # Bidirectional Outputs Check
+    yaml_outputs = set(o["name"] for o in config.get("outputs", []))
+    terraform_outputs = set(re.findall(r'output\s+"([^"]+)"', outputs_content))
+
+    for out_name in terraform_outputs:
         assert out_name in yaml_outputs, f"Terraform output '{out_name}' missing from module.yaml outputs"
+    for out_name in yaml_outputs:
+        assert out_name in terraform_outputs, f"module.yaml output '{out_name}' missing from Terraform outputs"
+
+
+def test_deployment_reference_alignment():
+    """Validate alignment between module.yaml and deployment reference parameters."""
+    yaml_path = MODULE_DIR / "module.yaml"
+    with open(yaml_path, "r") as f:
+        config = yaml.safe_load(f)
+
+    # 1. Check Azure Pipelines
+    ado_path = REPO_ROOT / "building-blocks/devops/azure-pipelines-azure-deploy/azure-pipelines.yml"
+    with open(ado_path, "r") as f:
+        ado_content = f.read()
+
+    ado_params = set(re.findall(r'-\s+name:\s+(\w+)', ado_content))
+    ado_params_normalized = set(p.lower() for p in ado_params)
+
+    # Deployment parameters should match module.yaml/Terraform naming intent
+    assert "azure_static_web_app_name" in ado_params_normalized
+    assert "azure_resource_group_name" in ado_params_normalized
+
+    # 2. Check GitHub Actions README references
+    gha_path = REPO_ROOT / "building-blocks/devops/github-actions-azure-deploy/README.md"
+    with open(gha_path, "r") as f:
+        gha_content = f.read()
+
+    assert "AZURE_STATIC_WEB_APPS_API_TOKEN" in gha_content

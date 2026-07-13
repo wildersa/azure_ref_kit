@@ -1,3 +1,4 @@
+# Terraform for Static Status Portal
 terraform {
   required_providers {
     azurerm = {
