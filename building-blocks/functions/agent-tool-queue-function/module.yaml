@@ -2,26 +2,42 @@ name: agent-tool-queue-function
 type: building-block
 category: functions
 status: stable
-purpose: Async queue-based Azure Function reference for longer-running agent tool execution.
-inputs: []
+purpose: Async queue-backed Azure Function reference with explicit submit/status contracts for longer-running agent tool execution.
+inputs:
+  - name: operation_type
+    type: string
+    description: The type of operation to perform (e.g., 'ping', 'analyze_text').
+  - name: parameters
+    type: object
+    description: Operation-specific parameters.
 outputs:
-  - name: queue_tool_result
-    type: queue-function-tool
-    description: Result of the asynchronous tool execution returned via an output queue.
+  - name: correlation_id
+    type: string
+    description: Opaque identifier for tracking job progress.
+  - name: status
+    type: string
+    description: Current business-level status (pending, running, completed, failed).
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_storage_account
   - azurerm_storage_queue
+  - azurerm_storage_table
 deployment_path: infra/terraform
 contracts:
   reads:
+    - type: http-request
+      description: Submit job request (POST /api/submit) or Status request (GET /api/status/{id}).
     - type: storage-queue-message
-      description: Input message containing operation_type, parameters, and correlation_id.
+      description: Internal input message containing operation details and correlation_id.
   writes:
+    - type: http-response
+      description: Submit response with correlation_id or Status response with result/error.
     - type: storage-queue-message
-      description: Output message containing the execution result and the matching correlation_id.
+      description: Output message containing the execution result for agent consumption.
+    - type: storage-table-entity
+      description: Job status and result persistence for the status contract.
 security_boundary:
-  policy: "Enforces async boundary through controlled storage queues and filtered response schemas."
+  policy: "Enforces async boundary through controlled storage queues, tables, and filtered response schemas."
   forbid_wildcards: true
   forbid_secrets: true
   required_roles:
@@ -29,6 +45,8 @@ security_boundary:
       description: "Allows reading from input queue and writing to output queue."
     - role: "Storage Queue Data Message Processor"
       description: "Allows the Function App to process messages from queue triggers."
+    - role: "Storage Table Data Contributor"
+      description: "Allows persisting job status and results to Table Storage."
 customer_safe_boundary:
   forbid:
     - "Raw Azure Function logs or internal execution traces"

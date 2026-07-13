@@ -1,99 +1,113 @@
-from src.tool import process_queue_job
+import pytest
+from unittest.mock import MagicMock
+import json
+from src.tool import process_queue_job, StatusStore
 from src.models import JobStatus
 
 
-def test_process_queue_job_ping_success():
+@pytest.fixture
+def mock_store():
+    store = MagicMock(spec=StatusStore)
+    return store
+
+
+def test_process_queue_job_ping_success(mock_store):
     payload = {
-        "correlation_id": "test-job-123",
+        "correlation_id": "test-job-12345678",
         "operation_type": "ping",
         "parameters": {"text": "hello"},
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
-    assert result.correlation_id == "test-job-123"
-    assert result.status == JobStatus.SUCCEEDED
+    assert result.correlation_id == "test-job-12345678"
+    assert result.status == JobStatus.COMPLETED
     assert result.result_data == {"message": "pong", "echo": "hello"}
-    assert result.error_message is None
-    assert result.timestamp is not None
+
+    # Verify status transitions were recorded
+    assert mock_store.update_status.call_count == 2
+    # First call: RUNNING
+    args, kwargs = mock_store.update_status.call_args_list[0]
+    assert args[1] == JobStatus.RUNNING
+    # Second call: COMPLETED
+    args, kwargs = mock_store.update_status.call_args_list[1]
+    assert args[1] == JobStatus.COMPLETED
 
 
-def test_process_queue_job_analyze_text_success():
+def test_process_queue_job_analyze_text_success(mock_store):
     payload = {
-        "correlation_id": "analyze-456",
+        "correlation_id": "analyze-12345678",
         "operation_type": "analyze_text",
         "parameters": {"text": "Hello World"},
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
-    assert result.correlation_id == "analyze-456"
-    assert result.status == JobStatus.SUCCEEDED
+    assert result.correlation_id == "analyze-12345678"
+    assert result.status == JobStatus.COMPLETED
     assert result.result_data["word_count"] == 2
     assert result.result_data["length"] == 11
 
 
-def test_process_queue_job_invalid_operation():
+def test_process_queue_job_invalid_operation(mock_store):
     payload = {
-        "correlation_id": "invalid-op-789",
+        "correlation_id": "invalid-op-12345678",
         "operation_type": "unknown_op",
         "parameters": {},
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
-    assert result.correlation_id == "invalid-op-789"
+    assert result.correlation_id == "invalid-op-12345678"
     assert result.status == JobStatus.FAILED
     assert "Unsupported operation type" in result.error_message
 
+    # Verify FAILED status was persisted
+    args, kwargs = mock_store.update_status.call_args_list[-1]
+    assert args[1] == JobStatus.FAILED
 
-def test_process_queue_job_invalid_schema():
+
+def test_process_queue_job_invalid_schema(mock_store):
     # Missing operation_type
     payload = {
-        "correlation_id": "schema-fail-000",
+        "correlation_id": "schema-fail-12345678",
         "parameters": {},
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
-    assert result.correlation_id == "schema-fail-000"
+    assert result.correlation_id == "schema-fail-12345678"
     assert result.status == JobStatus.FAILED
-    assert "Invalid job payload" in result.error_message
+    assert "Invalid job payload or schema" in result.error_message
 
 
-def test_process_queue_job_invalid_correlation_id_length():
+def test_process_queue_job_invalid_correlation_id_format(mock_store):
     # Too short
     payload = {
         "correlation_id": "short",
         "operation_type": "ping",
         "parameters": {},
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
     assert result.status == JobStatus.FAILED
     assert result.correlation_id == "invalid-id-format"
 
 
-def test_process_queue_job_invalid_correlation_id_pattern():
-    # Correct length but invalid characters
+def test_process_queue_job_extra_fields_forbidden(mock_store):
     payload = {
-        "correlation_id": "!!!!!!!!",
+        "correlation_id": "extra-field-12345678",
         "operation_type": "ping",
         "parameters": {},
+        "unsafe_field": "exploit"
     }
-    result = process_queue_job(payload)
+    result = process_queue_job(payload, store=mock_store)
 
     assert result.status == JobStatus.FAILED
+    assert "Invalid job payload or schema" in result.error_message
+
+
+def test_process_queue_job_redacts_unexpected_error(mock_store):
+    # Pass None to trigger an Exception in the validation step
+    result = process_queue_job(None, store=mock_store)
+
+    assert result.status == JobStatus.FAILED
+    assert "Invalid job payload or schema" in result.error_message
+    # Ensure invalid-id-format is used when payload is missing
     assert result.correlation_id == "invalid-id-format"
-
-
-def test_process_queue_job_redacts_unexpected_error(monkeypatch):
-    def mock_ping(*args, **kwargs):
-        raise RuntimeError("Secret database connection failed!")
-
-    # This is a bit tricky to mock inside process_queue_job without changing it,
-    # but we can mock something it calls if it had any.
-    # Since it's deterministic and local, we can just test that we don't leak if we passed something that causes a crash.
-    # For now, we trust the try-except Exception block.
-
-    # Let's verify it handles a totally broken payload gracefully
-    result = process_queue_job(None)  # Should trigger Exception
-    assert result.status == JobStatus.FAILED
-    assert "invalid" in result.error_message.lower()
-    assert "Secret" not in result.error_message

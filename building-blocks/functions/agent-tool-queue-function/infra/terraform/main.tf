@@ -30,6 +30,11 @@ resource "azurerm_storage_queue" "output" {
   storage_account_name = azurerm_storage_account.main.name
 }
 
+resource "azurerm_storage_table" "job_status" {
+  name                 = "jobstatus"
+  storage_account_name = azurerm_storage_account.main.name
+}
+
 resource "azurerm_service_plan" "main" {
   name                = "${var.name_prefix}-plan"
   resource_group_name = azurerm_resource_group.main.name
@@ -66,7 +71,7 @@ resource "azurerm_function_app_flex_consumption" "main" {
   }
 }
 
-# RBAC for the Function App to access queues and storage
+# RBAC for the Function App to access queues, tables, and storage
 resource "azurerm_role_assignment" "queue_processor" {
   scope                = azurerm_storage_account.main.id
   role_definition_name = "Storage Queue Data Message Processor"
@@ -76,6 +81,12 @@ resource "azurerm_role_assignment" "queue_processor" {
 resource "azurerm_role_assignment" "queue_contributor" {
   scope                = azurerm_storage_account.main.id
   role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "table_contributor" {
+  scope                = azurerm_storage_account.main.id
+  role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.main.identity[0].principal_id
 }
 
