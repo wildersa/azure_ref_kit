@@ -2,16 +2,16 @@
 # This reference uses Workload Identity Federation (OIDC) for secure deployment.
 
 parameters:
-  - name: azureServiceConnection
+  - name: AZURE_SERVICE_CONNECTION_NAME
     type: string
     displayName: 'Azure Service Connection Name'
-  - name: staticWebAppName
+  - name: AZURE_STATIC_WEB_APP_NAME
     type: string
     displayName: 'Static Web App Name'
-  - name: resourceGroupName
+  - name: AZURE_RESOURCE_GROUP_NAME
     type: string
     displayName: 'Resource Group Name'
-  - name: environmentName
+  - name: DEPLOYMENT_ENVIRONMENT
     type: string
     default: 'production'
     displayName: 'Deployment Environment'
@@ -64,7 +64,7 @@ stages:
     jobs:
       - deployment: DeployPortal
         displayName: 'Deploy Portal'
-        environment: ${{ parameters.environmentName }}
+        environment: ${{ parameters.DEPLOYMENT_ENVIRONMENT }}
         strategy:
           runOnce:
             deploy:
@@ -83,14 +83,14 @@ stages:
                 # This avoids storing long-lived secrets in Azure DevOps.
                 - task: AzureCLI@2
                   inputs:
-                    azureSubscription: ${{ parameters.azureServiceConnection }}
+                    azureSubscription: ${{ parameters.AZURE_SERVICE_CONNECTION_NAME }}
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
-                      echo "Fetching deployment token for SWA: ${{ parameters.staticWebAppName }}"
+                      echo "Fetching deployment token for SWA: ${{ parameters.AZURE_STATIC_WEB_APP_NAME }}"
                       TOKEN=$(az staticwebapp secrets list \
-                        --name ${{ parameters.staticWebAppName }} \
-                        --resource-group ${{ parameters.resourceGroupName }} \
+                        --name ${{ parameters.AZURE_STATIC_WEB_APP_NAME }} \
+                        --resource-group ${{ parameters.AZURE_RESOURCE_GROUP_NAME }} \
                         --query "properties.apiKey" -o tsv)
 
                       if [ -z "$TOKEN" ]; then

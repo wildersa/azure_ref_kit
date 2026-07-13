@@ -48,6 +48,27 @@ def test_azure_pipelines_yaml_syntax():
     assert "BuildAndTest" in stage_names
     assert "Deploy" in stage_names
 
+def test_contract_alignment():
+    module_yaml_path = pathlib.Path(__file__).parent.parent / "module.yaml"
+    pipeline_yaml_path = pathlib.Path(__file__).parent.parent / "azure-pipelines.yml"
+
+    with open(module_yaml_path, "r") as f:
+        module_data = yaml.safe_load(f)
+
+    with open(pipeline_yaml_path, "r") as f:
+        pipeline_data = yaml.safe_load(f)
+
+    module_inputs = {i["name"] for i in module_data.get("inputs", [])}
+    pipeline_params = {p["name"] for p in pipeline_data.get("parameters", [])}
+
+    # Verify all module inputs are defined as pipeline parameters
+    for input_name in module_inputs:
+        assert input_name in pipeline_params, f"Input '{input_name}' defined in module.yaml is missing from azure-pipelines.yml parameters"
+
+    # Verify no unexpected parameters in pipeline (optional, but good for cleanliness)
+    # for param_name in pipeline_params:
+    #     assert param_name in module_inputs, f"Parameter '{param_name}' in azure-pipelines.yml is not defined in module.yaml inputs"
+
 def test_readme_mentions_wif():
     readme_path = pathlib.Path(__file__).parent.parent / "README.md"
     with open(readme_path, "r") as f:
