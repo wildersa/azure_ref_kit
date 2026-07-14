@@ -102,21 +102,3 @@ resource "azurerm_role_assignment" "storage_blob_owner" {
   role_definition_name = "Storage Blob Data Owner"
   principal_id         = azurerm_user_assigned_identity.example.principal_id
 }
-
-resource "azurerm_role_assignment" "storage_queue_contributor" {
-  scope                = azurerm_storage_account.example.id
-  role_definition_name = "Storage Queue Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.example.principal_id
-}
-
-resource "azurerm_role_assignment" "storage_queue_message_processor" {
-  scope                = azurerm_storage_account.example.id
-  role_definition_name = "Storage Queue Data Message Processor"
-  principal_id         = azurerm_user_assigned_identity.example.principal_id
-}
-
-resource "azurerm_role_assignment" "storage_table_contributor" {
-  scope                = azurerm_storage_account.example.id
-  role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_user_assigned_identity.example.principal_id
-}

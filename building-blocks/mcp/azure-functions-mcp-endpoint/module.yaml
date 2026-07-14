@@ -17,13 +17,13 @@ inputs:
     type: string
     description: "Optional: Existing resource group name."
 outputs:
-  - name: get_synthetic_resource_response
-    type: object
-    description: "Response from the get_synthetic_resource tool. Example: {'id': 'comp-001', 'type': 'Standard_DS1_v2', 'status': 'running', 'region': 'local-synth-1'}"
-    contract: "read-only"
+  - name: mcp_endpoint_url
+    type: string
+    description: "The full URL for the MCP Streamable HTTP endpoint."
 dependencies:
   - python >= 3.10
   - azure-functions >= 1.24.0
+  - pydantic >= 2.0.0
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_storage_account

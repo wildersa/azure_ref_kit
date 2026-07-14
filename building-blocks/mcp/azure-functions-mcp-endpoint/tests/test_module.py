@@ -19,11 +19,8 @@ def test_tool_definition_static():
         content = f.read()
 
     assert "@app.mcp_tool_trigger" in content
-    assert 'tool_name="get_service_info"' in content
-    assert 'tool_name="get_resource_health"' in content
-    assert 'tool_name="get_server_time"' in content
-    assert "def get_service_info(context: str) -> str:" in content
-    assert "def get_resource_health(context: str) -> str:" in content
+    assert 'tool_name="get_synthetic_resource"' in content
+    assert "def get_synthetic_resource(context: str) -> str:" in content
 
 
 def test_host_json_valid():
@@ -54,3 +51,4 @@ def test_requirements_file():
         content = f.read()
 
     assert "azure-functions>=1.24.0" in content
+    assert "pydantic>=2.0.0" in content

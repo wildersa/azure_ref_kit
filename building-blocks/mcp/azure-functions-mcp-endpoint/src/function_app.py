@@ -1,6 +1,7 @@
 import azure.functions as func
 import logging
 import json
+from pydantic import BaseModel, Field
 
 app = func.FunctionApp()
 
@@ -19,6 +20,16 @@ SYNTHETIC_DATA = {
         "region": "local-synth-1",
     },
 }
+
+
+class SyntheticResource(BaseModel):
+    """Synthetic metadata for a resource."""
+
+    id: str = Field(description="Unique identifier for the synthetic resource")
+    type: str = Field(description="Resource type specification")
+    status: str = Field(description="Current operational status")
+    region: str = Field(description="Deployment region for the resource")
+
 
 get_synthetic_resource_properties = json.dumps(
     {
@@ -66,8 +77,9 @@ def get_synthetic_resource(context: str) -> str:
         if resource_type not in SYNTHETIC_DATA:
             return json.dumps({"error": f"Unsupported resource type: {resource_type}"})
 
-        # Return safe, synthetic data
-        return json.dumps(SYNTHETIC_DATA[resource_type])
+        # Return safe, synthetic data using the Pydantic model
+        resource = SyntheticResource(**SYNTHETIC_DATA[resource_type])
+        return resource.model_dump_json()
 
     except json.JSONDecodeError:
         logging.error("Failed to parse MCP tool invocation context.")
