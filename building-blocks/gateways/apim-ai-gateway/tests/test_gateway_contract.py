@@ -56,11 +56,12 @@ def test_policy_xml_parsing():
     set_header_api_key = root.find(".//inbound/set-header[@name='api-key'][@exists-action='delete']")
     assert set_header_api_key is not None, "Policy must redact 'api-key' in inbound"
 
-    # Check for request size protection
-    choose_size = root.find(".//inbound/choose/when[@condition]")
-    assert choose_size is not None
-    assert "MAX_REQUEST_SIZE_BYTES" in choose_size.get('condition')
-    assert root.find(".//inbound/choose/when/return-response/set-status[@code='413']") is not None
+    # Check for request size protection (validate-content)
+    validate_content = root.find(".//inbound/validate-content")
+    assert validate_content is not None
+    assert validate_content.get('max-size') == "{{MAX_REQUEST_SIZE_BYTES}}"
+    assert validate_content.get('size-exceeded-action') == "prevent"
+    assert validate_content.get('unspecified-content-type-action') == "prevent"
 
     # Check for safe trace telemetry
     trace = root.find(".//outbound/trace[@source='AI-Gateway-Safe-Trace']")
