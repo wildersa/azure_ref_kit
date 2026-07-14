@@ -1,0 +1,68 @@
+name: apim-ai-gateway
+type: gateway
+category: security
+status: active
+purpose: Minimal APIM-based AI Gateway for controlled model access.
+description: >
+  This building block implements a minimal AI Gateway using Azure API Management.
+  It governs access to one existing Azure OpenAI or Microsoft Foundry model backend.
+  It enforces token governance (TPM), performs managed-identity backend authentication,
+  redacts technical identifiers, and emits token metrics to Application Insights.
+inputs:
+  - name: apim_name
+    type: string
+    description: Name of the APIM instance.
+  - name: location
+    type: string
+    description: Azure region for deployment.
+  - name: model_endpoint
+    type: string
+    description: Existing model endpoint URL (e.g., https://resourcename.openai.azure.com/).
+  - name: model_resource_id
+    type: string
+    description: Azure Resource ID of the model for RBAC assignment.
+  - name: model_id
+    type: string
+    description: Friendly identifier for the model (e.g., 'gpt-4o').
+  - name: token_limit_per_minute
+    type: number
+    description: TPM limit to enforce.
+  - name: tenant_id
+    type: string
+    description: Azure AD Tenant ID for JWT validation.
+  - name: audience
+    type: string
+    description: Expected audience for the Entra ID token.
+outputs:
+  - name: gateway_url
+    type: string
+    description: The base URL of the AI Gateway.
+  - name: identity_principal_id
+    type: string
+    description: The Principal ID of the APIM identity.
+azure_resources:
+  - Azure API Management
+  - User-Assigned Managed Identity
+  - Role Assignment (Cognitive Services User)
+security_boundary:
+  policy: "Authenticated AI Gateway with Managed Identity backend access"
+  forbid_wildcards: true
+  forbid_secrets: true
+  forbid_anonymous_model_access: true
+customer_safe_boundary:
+  forbid:
+    - "Internal Managed Identity Object IDs"
+    - "Tenant IDs"
+    - "Subscription IDs"
+    - "Raw Access Tokens"
+    - "Backend API Keys"
+    - "Technical Provider Headers (x-ms-region, x-ratelimit-*)"
+contracts:
+  reads:
+    - schema: "llm-request-schema.json"
+  writes: []
+  emits:
+    - schema: "llm-token-metric.json"
+limitations:
+  - "Governs one existing model backend per instance in first version."
+  - "Requires APIM SKU with GenAI policy support (Standard v2 recommended)."

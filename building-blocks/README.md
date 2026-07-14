@@ -9,6 +9,7 @@ A building block is a small, bounded reference component that can be copied, dep
 ```text
 agents/          Azure AI Foundry agents and assistant patterns
 functions/       Azure Functions APIs, triggers, integrations, and workers
+gateways/        AI gateways for model access, token governance, and security
 observability/   Application Insights, Azure Monitor, dashboards, workbooks
 pipelines/       Durable Functions and orchestration references
 portals/         Static Web Apps and customer-facing UI references

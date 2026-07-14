@@ -1,0 +1,70 @@
+<!--
+  AI Gateway Policy: Model Access Governance
+  - Authenticates callers using Entra ID JWT validation
+  - Uses Managed Identity for backend authentication
+  - Enforces Token-per-Minute (TPM) limits
+  - Emits token usage metrics to Application Insights
+  - Redacts sensitive headers and provides safe error responses
+-->
+<policies>
+    <inbound>
+        <base />
+        <!-- 1. Explicit Entra JWT validation for authenticated caller boundary -->
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. AI Gateway requires a valid Entra ID token.">
+            <openid-config url="https://login.microsoftonline.com/{{TENANT_ID}}/v2.0/.well-known/openid-configuration" />
+            <audiences>
+                <audience>{{AUDIENCE}}</audience>
+            </audiences>
+            <issuers>
+                <issuer>https://sts.windows.net/{{TENANT_ID}}/</issuer>
+                <issuer>https://login.microsoftonline.com/{{TENANT_ID}}/v2.0</issuer>
+            </issuers>
+        </validate-jwt>
+
+        <!-- 2. Wire to registered backend -->
+        <set-backend-service backend-id="model-backend" />
+
+        <!-- 3. Token-per-Minute Governance -->
+        <llm-token-limit counter-key="@(context.Subscription.Id)"
+                         tokens-per-minute="{{TOKEN_LIMIT_PER_MINUTE}}"
+                         estimate-prompt-tokens="true"
+                         remaining-tokens-variable-name="remainingTokens" />
+
+        <!-- 4. Emit token metrics -->
+        <llm-emit-token-metric namespace="AI-Gateway">
+            <dimension name="Subscription ID" />
+            <dimension name="Model ID" value="{{MODEL_ID}}" />
+        </llm-emit-token-metric>
+
+        <!-- 5. Managed Identity authentication to backend (using User-Assigned identity explicitly) -->
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" client-id="{{CLIENT_ID}}" />
+
+        <!-- 6. Remove backend-leaking headers -->
+        <set-header name="api-key" exists-action="delete" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <!-- 7. Redact sensitive technical headers from provider -->
+        <set-header name="x-ms-region" exists-action="delete" />
+        <set-header name="x-ratelimit-remaining-tokens" exists-action="delete" />
+        <set-header name="x-ratelimit-remaining-requests" exists-action="delete" />
+    </outbound>
+    <on-error>
+        <base />
+        <!-- 8. Safe error responses -->
+        <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+        </set-header>
+        <set-body>@{
+            return new JObject(
+                new JProperty("error", new JObject(
+                    new JProperty("code", "GatewayError"),
+                    new JProperty("message", "An error occurred in the AI Gateway. Technical details are redacted for security.")
+                ))
+            ).ToString();
+        }</set-body>
+    </on-error>
+</policies>

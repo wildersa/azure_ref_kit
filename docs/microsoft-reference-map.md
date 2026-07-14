@@ -148,6 +148,45 @@ Repository implication:
 - Keep CI/CD examples minimal and tied to a concrete module.
 - Avoid pipeline templates without a working module that uses them.
 
+## AI Gateway references
+
+### AI Gateway in Azure API Management
+
+URL: https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities
+
+Use for:
+
+- AI gateway concepts;
+- importing language model APIs (OpenAI, Foundry);
+- traffic mediation, token rate limiting, security, and observability;
+- SKU and capability availability.
+
+Repository implication:
+
+- Use APIM as the primary AI Gateway reference.
+- Prefer Managed Identity for backend authentication.
+- Implement token-per-minute governance (TPM) using `llm-token-limit`.
+- Use `llm-emit-token-metric` for token-based observability.
+
+### LLM Token Limit Policy
+
+URL: https://learn.microsoft.com/azure/api-management/llm-token-limit-policy
+
+Use for:
+
+- configuring token rate limits and quotas;
+- understanding `counter-key` behavior (per-app/per-user);
+- prompt estimation vs. actual usage.
+
+### LLM Emit Token Metric Policy
+
+URL: https://learn.microsoft.com/azure/api-management/llm-emit-token-metric-policy
+
+Use for:
+
+- sending token consumption metrics to Application Insights;
+- configuring custom dimensions for usage analysis.
+
 ### Azure Developer CLI overview
 
 URL: https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview
