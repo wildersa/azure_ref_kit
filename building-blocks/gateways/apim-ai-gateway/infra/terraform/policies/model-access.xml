@@ -1,0 +1,58 @@
+<!--
+  AI Gateway Policy: Model Access Governance
+  - Authenticates callers using subscription key or documented pattern
+  - Uses Managed Identity for backend authentication
+  - Enforces Token-per-Minute (TPM) limits
+  - Emits token usage metrics to Application Insights
+  - Redacts sensitive headers and provides safe error responses
+-->
+<policies>
+    <inbound>
+        <base />
+        <!-- 1. Authenticated caller boundary (enforced by APIM product/API by default, but explicit here for clarity) -->
+        <check-header name="Authorization" failed-check-httpcode="401" failed-check-error-message="Unauthorized. AI Gateway requires authentication." ignore-case="false" />
+
+        <!-- 2. Token-per-Minute Governance -->
+        <llm-token-limit counter-key="@(context.Subscription.Id)"
+                         tokens-per-minute="{{TOKEN_LIMIT_PER_MINUTE}}"
+                         estimate-prompt-tokens="true"
+                         remaining-tokens-variable-name="remainingTokens" />
+
+        <!-- 3. Emit token metrics -->
+        <llm-emit-token-metric namespace="AI-Gateway">
+            <dimension name="Subscription ID" />
+            <dimension name="Model ID" value="{{MODEL_ID}}" />
+        </llm-emit-token-metric>
+
+        <!-- 4. Managed Identity authentication to backend -->
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+
+        <!-- 5. Remove backend-leaking headers -->
+        <set-header name="api-key" exists-action="delete" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <!-- 6. Redact sensitive technical headers from provider -->
+        <set-header name="x-ms-region" exists-action="delete" />
+        <set-header name="x-ratelimit-remaining-tokens" exists-action="delete" />
+        <set-header name="x-ratelimit-remaining-requests" exists-action="delete" />
+    </outbound>
+    <on-error>
+        <base />
+        <!-- 7. Safe error responses -->
+        <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+        </set-header>
+        <set-body>@{
+            return new JObject(
+                new JProperty("error", new JObject(
+                    new JProperty("code", "GatewayError"),
+                    new JProperty("message", "An error occurred in the AI Gateway. Technical details are redacted for security.")
+                ))
+            ).ToString();
+        }</set-body>
+    </on-error>
+</policies>

@@ -58,6 +58,8 @@ flowchart TD
   Hosting --> Solutions
   Security --> Solutions
   DevOps --> Solutions
+  Gateway[AI Gateway track]
+  Gateway --> Solutions
 ```
 
 ## Track 0 — Repository foundation
@@ -627,6 +629,65 @@ P0:
 
 - prefer Terraform/OpenTofu for reusable patterns;
 - use azd/Bicep when adapting official Microsoft samples or when a solution benefits from azd up.
+
+## Track 7 — AI Gateway
+
+Purpose: implement a minimal APIM-based AI Gateway for controlled model access.
+
+Primary folder:
+
+```text
+building-blocks/gateways/
+```
+
+Microsoft docs to re-check before implementation:
+
+```text
+https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities
+https://learn.microsoft.com/azure/api-management/llm-token-limit-policy
+```
+
+### 7.1 APIM AI Gateway model-access building block
+
+Folder:
+
+```text
+building-blocks/gateways/apim-ai-gateway/
+```
+
+Goal:
+
+```text
+Minimal APIM gateway that protects one existing model endpoint with explicit caller authentication, managed-identity backend access, and token governance.
+```
+
+P0:
+
+- authenticated caller boundary;
+- managed-identity auth to backend;
+- token-per-minute governance;
+- safe telemetry without technical leakage;
+- README with Mermaid and local validation.
+
+### 7.2 Foundry agent using APIM AI Gateway for model access
+
+Folder:
+
+```text
+solutions/foundry-agent-with-gateway/
+```
+
+Goal:
+
+```text
+Agent reference that uses the AI Gateway instead of direct model access.
+```
+
+P0:
+
+- agent configuration uses gateway endpoint;
+- demonstrates token limit enforcement;
+- demonstrates observability via gateway metrics.
 
 ## First wave of Jules issues
 
