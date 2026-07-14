@@ -2,7 +2,7 @@ name: github-actions-azure-deploy
 type: devops
 category: devops
 status: reference
-purpose: Secure GitHub Actions deployment reference pattern for Azure Static Web Apps using OIDC and federated identity.
+purpose: Secure GitHub Actions deployment reference patterns for Azure services (SWA, APIM AI Gateway) using OIDC and federated identity.
 inputs:
   - name: AZURE_CLIENT_ID
     description: "Client ID of the Microsoft Entra application or User-Assigned Managed Identity for OIDC authentication."
@@ -37,9 +37,23 @@ inputs:
     description: "The state file key for the Terraform remote backend."
     type: secret
     required: false
+  - name: RESOURCE_GROUP_NAME
+    description: "The name of the target Azure resource group."
+    type: string
+    required: false
+  - name: LOCATION
+    description: "Azure region for deployment."
+    type: string
+    required: false
+  - name: APIM_NAME
+    description: "Name of the APIM instance."
+    type: string
+    required: false
 outputs:
   - name: static_web_app_url
     description: "The URL of the deployed Static Web App."
+  - name: gateway_url
+    description: "The base URL of the deployed AI Gateway."
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true

@@ -17,6 +17,38 @@ def test_module_yaml_structure():
     assert data["security_boundary"]["forbid_secrets"] is True
     assert data["security_boundary"]["forbid_wildcards"] is True
 
+    # Check for APIM specific inputs/outputs
+    input_names = [i["name"] for i in data["inputs"]]
+    assert "APIM_NAME" in input_names
+    assert "RESOURCE_GROUP_NAME" in input_names
+
+    output_names = [o["name"] for o in data["outputs"]]
+    assert "gateway_url" in output_names
+
+def test_apim_gateway_workflow_exists():
+    workflow_path = pathlib.Path(__file__).parent.parent / "apim-ai-gateway-deploy.yml"
+    assert workflow_path.exists(), "apim-ai-gateway-deploy.yml is missing"
+
+def test_apim_gateway_workflow_security():
+    workflow_path = pathlib.Path(__file__).parent.parent / "apim-ai-gateway-deploy.yml"
+    with open(workflow_path, "r") as f:
+        content = f.read()
+        data = yaml.safe_load(content)
+
+    # OIDC Check
+    assert data["permissions"]["id-token"] == "write"
+    assert "azure/login" in content
+    assert "client-id: ${{ secrets.AZURE_CLIENT_ID }}" in content
+
+    # No secrets check
+    assert "password" not in content.lower()
+    assert "client-secret" not in content.lower()
+
+    # Gated apply check
+    deploy_job = data["jobs"]["deploy"]
+    assert "environment" in deploy_job
+    assert deploy_job["environment"] == "apim-gateway-deploy"
+
 def test_readme_contains_required_sections():
     readme_path = pathlib.Path(__file__).parent.parent / "README.md"
     with open(readme_path, "r") as f:
