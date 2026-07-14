@@ -15,17 +15,45 @@ def is_valid_correlation_id(v: Any) -> bool:
 
 
 class JobStatus(str, Enum):
-    """Explicit job status transitions."""
+    """
+    Explicit business-level job status transitions.
+    Aligned with CustomerSafeStatus schema.
+    """
 
-    QUEUED = "queued"
+    PENDING = "pending"
     RUNNING = "running"
-    SUCCEEDED = "succeeded"
+    COMPLETED = "completed"
     FAILED = "failed"
+
+
+class SubmitRequest(BaseModel):
+    """Request model for submitting a new job."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    operation_type: str = Field(
+        ...,
+        description="The type of operation to perform.",
+        min_length=1,
+        max_length=64,
+    )
+    parameters: dict[str, Any] = Field(
+        default_factory=dict, description="Operation-specific parameters."
+    )
+
+
+class SubmitResponse(BaseModel):
+    """Response model after successfully enqueuing a job."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    correlation_id: str = Field(..., description="The opaque correlation ID for the job.")
+    status: JobStatus = Field(JobStatus.PENDING, description="Initial job status.")
 
 
 class JobInput(BaseModel):
     """
-    Validated input for the queue job.
+    Validated input for the queue job (internal message schema).
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -40,7 +68,7 @@ class JobInput(BaseModel):
         ...,
         description="The type of operation to perform.",
         min_length=1,
-        max_length=32,
+        max_length=64,
     )
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Operation-specific parameters."
@@ -58,7 +86,7 @@ class JobInput(BaseModel):
 
 class JobResult(BaseModel):
     """
-    Customer-safe job result record.
+    Customer-safe job result record (internal storage and result queue schema).
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -79,3 +107,21 @@ class JobResult(BaseModel):
         if not CORRELATION_ID_PATTERN.match(v):
             raise ValueError("Invalid Correlation ID format.")
         return v
+
+
+class JobStatusResponse(BaseModel):
+    """
+    Customer-safe status response (API surface).
+    Aligned with building-blocks/security/customer-safe-status-boundary.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(..., description="The opaque correlation ID.")
+    status: JobStatus = Field(..., description="The current status.")
+    business_summary: Optional[str] = Field(None, description="Safe summary of progress.")
+    created_at: str = Field(..., description="ISO 8601 creation timestamp.")
+    started_at: Optional[str] = Field(None, description="ISO 8601 start timestamp.")
+    finished_at: Optional[str] = Field(None, description="ISO 8601 finish timestamp.")
+    result_data: Optional[dict[str, Any]] = Field(None, description="Operation results.")
+    error_message: Optional[str] = Field(None, description="Safe error message.")
