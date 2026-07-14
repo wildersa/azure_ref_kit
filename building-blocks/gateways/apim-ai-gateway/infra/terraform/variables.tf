@@ -45,6 +45,12 @@ variable "token_limit_per_minute" {
   default     = 5000
 }
 
+variable "max_request_size_bytes" {
+  description = "The maximum allowed request body size in bytes."
+  type        = number
+  default     = 102400 # 100KB default
+}
+
 variable "model_resource_id" {
   description = "The fully qualified Azure Resource ID of the model (OpenAI/Foundry) for RBAC assignment."
   type        = string

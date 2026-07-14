@@ -92,6 +92,58 @@ terraform apply tfplan
 - No semantic caching, multi-backend routing, or circuit breakers in this version.
 - Requires an APIM SKU that supports GenAI policies (Standard v2 or equivalent).
 
+## Usage
+
+### Caller Authentication
+
+The AI Gateway requires **Microsoft Entra ID (Azure AD)** authentication for all callers.
+
+1.  Obtain an Entra ID token for the audience defined in your deployment (default: `https://cognitiveservices.azure.com`).
+2.  Include the token in the `Authorization` header: `Bearer <token>`.
+
+### APIM Subscription
+
+By default, this gateway requires a valid **APIM Subscription Key**.
+
+-   The subscription key must be passed in the `Ocp-Apim-Subscription-Key` header.
+-   Token governance (`llm-token-limit`) is enforced per subscription ID.
+
+### Example Usage (Placeholder)
+
+```bash
+# Example call to the gateway (Chat Completions)
+# Replace <gateway-url> with your deployed APIM gateway URL
+# Replace <subscription-key> with a valid APIM subscription key
+# Replace <entra-token> with a valid Entra ID access token
+
+curl -X POST "https://<gateway-url>/v1/chat/completions" \
+     -H "Content-Type: application/json" \
+     -H "Ocp-Apim-Subscription-Key: <subscription-key>" \
+     -H "Authorization: Bearer <entra-token>" \
+     -d '{
+       "messages": [
+         {"role": "user", "content": "Hello, AI Gateway!"}
+       ]
+     }'
+```
+
+## Security & State
+
+### Terraform State Security
+
+**Warning**: Terraform state files and plans for this module contain sensitive infrastructure identifiers.
+
+-   **Do not commit** `terraform.tfstate`, `terraform.tfstate.backup`, or `.tfplan` files to version control.
+-   **Do not commit** generated credentials, keys, or tokens.
+-   Use a secure remote backend (e.g., Azure Blob Storage with encryption) for production state management.
+
+### Safe Telemetry
+
+The gateway emits safe telemetry only:
+-   **Trace**: Logs `RequestId` and `DurationMs`.
+-   **Metrics**: Emits token usage counts (TPM) per Subscription ID and Model ID.
+-   **Forbidden**: The gateway **never** logs prompts, completions, request/response bodies, authorization headers, subscription keys, or internal resource IDs.
+
 ## Cleanup
 
 ```bash
