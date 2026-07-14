@@ -27,6 +27,9 @@ inputs:
   - name: token_limit_per_minute
     type: number
     description: TPM limit to enforce.
+  - name: max_request_size_bytes
+    type: number
+    description: Maximum allowed request body size in bytes.
   - name: tenant_id
     type: string
     description: Azure AD Tenant ID for JWT validation.

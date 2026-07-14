@@ -39,7 +39,12 @@
         <!-- 5. Managed Identity authentication to backend (using User-Assigned identity explicitly) -->
         <authentication-managed-identity resource="https://cognitiveservices.azure.com" client-id="{{CLIENT_ID}}" />
 
-        <!-- 6. Remove backend-leaking headers -->
+        <!-- 6. Bounded request body protection (fail-closed via validate-content) -->
+        <validate-content unspecified-content-type-action="prevent" max-size="{{MAX_REQUEST_SIZE_BYTES}}" size-exceeded-action="prevent" errors-variable-name="requestValidationErrors">
+            <content type="application/json" validate-as="json" action="ignore" />
+        </validate-content>
+
+        <!-- 7. Remove backend-leaking headers -->
         <set-header name="api-key" exists-action="delete" />
     </inbound>
     <backend>
@@ -47,14 +52,21 @@
     </backend>
     <outbound>
         <base />
-        <!-- 7. Redact sensitive technical headers from provider -->
+        <!-- 8. Safe correlation and latency telemetry (no prompts or bodies) -->
+        <trace source="AI-Gateway-Safe-Trace">
+            <message>@(String.Format("RequestId: {0}, Duration: {1}ms", context.RequestId, context.Elapsed.TotalMilliseconds))</message>
+            <metadata name="RequestId" value="@(context.RequestId.ToString())" />
+            <metadata name="DurationMs" value="@(context.Elapsed.TotalMilliseconds.ToString())" />
+        </trace>
+
+        <!-- 9. Redact sensitive technical headers from provider -->
         <set-header name="x-ms-region" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-tokens" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-requests" exists-action="delete" />
     </outbound>
     <on-error>
         <base />
-        <!-- 8. Safe error responses -->
+        <!-- 10. Safe error responses -->
         <set-header name="Content-Type" exists-action="override">
             <value>application/json</value>
         </set-header>
