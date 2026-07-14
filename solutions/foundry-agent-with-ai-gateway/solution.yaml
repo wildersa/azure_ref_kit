@@ -1,0 +1,14 @@
+name: foundry-agent-with-ai-gateway
+status: active
+purpose: Foundry Prompt Agent using APIM AI Gateway for governed model access.
+description: >
+  This solution demonstrates how to route a Microsoft Foundry agent's model access
+  through the APIM AI Gateway building block. It provides a centralized governance
+  and security layer for model interactions while keeping the agent service itself
+  directly accessible to the client.
+composition:
+  - building-blocks/gateways/apim-ai-gateway/
+  - solutions/foundry-agent-basic/ (pattern)
+dependencies:
+  - azure-ai-projects>=2.3.0
+  - azure-identity
