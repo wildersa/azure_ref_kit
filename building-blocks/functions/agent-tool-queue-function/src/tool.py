@@ -150,7 +150,7 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
             error_res = JobResult(
                 correlation_id=job_input.correlation_id,
                 status=JobStatus.FAILED,
-                error_message=f"Unsupported operation type: {operation}",
+                error_message="Unsupported operation type requested.",
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
             if store:
@@ -179,11 +179,12 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
             )
         return success_res
 
-    except ValueError as e:
+    except ValueError:
+        # P0: Do not echo str(e) back to caller as it may contain rejected input values.
         error_res = JobResult(
             correlation_id=cid,
             status=JobStatus.FAILED,
-            error_message=str(e),
+            error_message="Invalid job payload or schema.",
             timestamp=datetime.now(timezone.utc).isoformat(),
         )
         if store:
