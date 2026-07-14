@@ -36,8 +36,8 @@
             <dimension name="Model ID" value="{{MODEL_ID}}" />
         </llm-emit-token-metric>
 
-        <!-- 5. Managed Identity authentication to backend -->
-        <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
+        <!-- 5. Managed Identity authentication to backend (using User-Assigned identity explicitly) -->
+        <authentication-managed-identity resource="https://cognitiveservices.azure.com" client-id="{{CLIENT_ID}}" />
 
         <!-- 6. Remove backend-leaking headers -->
         <set-header name="api-key" exists-action="delete" />

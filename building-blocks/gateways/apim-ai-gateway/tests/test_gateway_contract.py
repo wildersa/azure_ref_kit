@@ -50,6 +50,7 @@ def test_policy_xml_parsing():
     auth_identity = root.find(".//authentication-managed-identity")
     assert auth_identity is not None, "Policy must contain <authentication-managed-identity>"
     assert auth_identity.get('resource') == "https://cognitiveservices.azure.com"
+    assert auth_identity.get('client-id') == "{{CLIENT_ID}}", "Policy must explicitly set client-id for user-assigned identity"
 
     # Check for header redaction (api-key should be deleted)
     set_header_api_key = root.find(".//inbound/set-header[@name='api-key'][@exists-action='delete']")
@@ -70,6 +71,8 @@ def test_terraform_security_invariants():
     assert "azurerm_role_assignment" in content
     assert "role_definition_name = \"Cognitive Services User\"" in content
 
-    # Verify policy uses tenant_id and audience
+    # Verify policy uses tenant_id, audience, and client_id
     assert "TENANT_ID" in content
     assert "AUDIENCE" in content
+    assert "CLIENT_ID" in content
+    assert "azurerm_user_assigned_identity.apim_identity.client_id" in content

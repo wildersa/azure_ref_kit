@@ -80,14 +80,17 @@ resource "azurerm_api_management_api_policy" "model_policy" {
     replace(
       replace(
         replace(
-          file("${path.module}/policies/model-access.xml"),
-          "{{TOKEN_LIMIT_PER_MINUTE}}", var.token_limit_per_minute
+          replace(
+            file("${path.module}/policies/model-access.xml"),
+            "{{TOKEN_LIMIT_PER_MINUTE}}", var.token_limit_per_minute
+          ),
+          "{{MODEL_ID}}", var.model_id
         ),
-        "{{MODEL_ID}}", var.model_id
+        "{{TENANT_ID}}", var.tenant_id
       ),
-      "{{TENANT_ID}}", var.tenant_id
+      "{{AUDIENCE}}", var.audience
     ),
-    "{{AUDIENCE}}", var.audience
+    "{{CLIENT_ID}}", azurerm_user_assigned_identity.apim_identity.client_id
   )
 }
 
