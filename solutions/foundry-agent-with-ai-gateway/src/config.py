@@ -12,6 +12,7 @@ class Settings:
     project_endpoint: str
     agent_name: str
     model_name: str
+    gateway_connection_name: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -19,6 +20,7 @@ class Settings:
         project_endpoint = os.getenv("AZURE_AI_PROJECT_ENDPOINT")
         agent_name = os.getenv("AZURE_AI_AGENT_NAME")
         model_name = os.getenv("AZURE_AI_MODEL_NAME")
+        gateway_connection_name = os.getenv("AZURE_AI_GATEWAY_CONNECTION_NAME")
 
         missing = []
         if not project_endpoint:
@@ -27,13 +29,15 @@ class Settings:
             missing.append("AZURE_AI_AGENT_NAME")
         if not model_name:
             missing.append("AZURE_AI_MODEL_NAME")
+        if not gateway_connection_name:
+            missing.append("AZURE_AI_GATEWAY_CONNECTION_NAME")
 
         if missing:
             raise ValueError(
                 f"Missing required configuration environment variables: {', '.join(missing)}"
             )
 
-        # Strict validation for agent and model names
+        # Strict validation for agent, model, and connection names
         # Constraints: 1-64 chars, alphanumeric, hyphens, or underscores
         name_regex = r"^[a-zA-Z0-9_\-]{1,64}$"
         if not re.match(name_regex, agent_name):
@@ -45,6 +49,11 @@ class Settings:
             raise ValueError(
                 "Invalid AZURE_AI_MODEL_NAME. Must be 1-64 characters and contain only "
                 "alphanumeric, hyphens, or underscores."
+            )
+        if not re.match(name_regex, gateway_connection_name):
+            raise ValueError(
+                "Invalid AZURE_AI_GATEWAY_CONNECTION_NAME. Must be 1-64 characters and "
+                "contain only alphanumeric, hyphens, or underscores."
             )
 
         # Deterministic validation for project endpoint
@@ -69,6 +78,7 @@ class Settings:
             project_endpoint=project_endpoint,
             agent_name=agent_name,
             model_name=model_name,
+            gateway_connection_name=gateway_connection_name,
         )
 
 

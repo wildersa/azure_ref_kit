@@ -68,6 +68,7 @@ The runtime requires the following environment variables.
 | `AZURE_AI_PROJECT_ENDPOINT` | The Foundry project discovery URL. | `https://<res-name>.ai.azure.com/api/projects/<proj-id>` |
 | `AZURE_AI_AGENT_NAME` | The name of the agent to create or resolve. | `gw-prompt-agent` |
 | `AZURE_AI_MODEL_NAME` | The deployment name of the model to use. | `gpt-4o-mini` |
+| `AZURE_AI_GATEWAY_CONNECTION_NAME` | The name of the Foundry connection targeting APIM. | `ai-gateway-connection` |
 
 ## Infrastructure (Terraform)
 
@@ -88,6 +89,7 @@ See [infra/terraform/README.md](./infra/terraform/README.md) for details.
     export AZURE_AI_PROJECT_ENDPOINT="https://<res-name>.ai.azure.com/api/projects/<proj-id>"
     export AZURE_AI_AGENT_NAME="gw-prompt-agent"
     export AZURE_AI_MODEL_NAME="gpt-4o-mini"
+    export AZURE_AI_GATEWAY_CONNECTION_NAME="ai-gateway-connection"
 
     PYTHONPATH=. python -m src.main "How can a gateway help me?"
     ```

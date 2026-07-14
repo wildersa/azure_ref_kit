@@ -49,6 +49,7 @@ def test_config_validation():
     )
     os.environ["AZURE_AI_AGENT_NAME"] = "invalid name!"
     os.environ["AZURE_AI_MODEL_NAME"] = "gpt-4o"
+    os.environ["AZURE_AI_GATEWAY_CONNECTION_NAME"] = "ai-gateway"
 
     with pytest.raises(ValueError, match="Invalid AZURE_AI_AGENT_NAME"):
         Settings.from_env()
@@ -58,6 +59,7 @@ def test_config_validation():
     settings = Settings.from_env()
     assert settings.agent_name == "valid-agent"
     assert settings.model_name == "gpt-4o"
+    assert settings.gateway_connection_name == "ai-gateway"
 
 
 def test_mermaid_diagram_exists():

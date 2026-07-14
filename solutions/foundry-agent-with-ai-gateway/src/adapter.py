@@ -37,13 +37,17 @@ class FoundryAgentAdapter:
             self.initialize_client()
 
         try:
+            # We build the qualified model string to route through the APIM gateway connection
+            # Format: <connection-name>/<deployment-name>
+            qualified_model = (
+                f"{self.settings.gateway_connection_name}/{self.settings.model_name}"
+            )
+
             # We assume self._project_client is initialized here
-            # In the Gateway scenario, the project connection is already configured in Azure
-            # to point to the APIM URL. The SDK will use that connection transparently.
             return self._project_client.agents.create_version(  # type: ignore
                 agent_name=self.settings.agent_name,
                 definition=PromptAgentDefinition(
-                    model=self.settings.model_name,
+                    model=qualified_model,
                     instructions="You are a helpful assistant.",
                 ),
             )
@@ -64,9 +68,8 @@ class FoundryAgentAdapter:
             response = openai_client.responses.create(
                 input=user_input,
                 extra_body={
-                    "agent_reference": {
+                    "agent": {
                         "name": agent.name,
-                        "type": "agent_reference",
                     }
                 },
             )
