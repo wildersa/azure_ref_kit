@@ -17,6 +17,20 @@ def update_pipeline_run_status(status_data: dict):
     return True
 
 
+def update_pipeline_step_status(step_data: dict):
+    """
+    Activity to update the status of an individual pipeline step.
+    In a real implementation, this would write to a database (e.g., Cosmos DB).
+    Follows shared/contracts/pipeline-step.schema.json
+    """
+    logging.info("Activity: Updating pipeline step status.")
+
+    # In a real implementation, we would validate step_data against the schema
+    # and perform the database update here.
+
+    return True
+
+
 def ocr_document_intelligence(input_data: dict):
     """
     Mock OCR activity.

@@ -13,10 +13,14 @@ runtime:
     - jsonschema
 
 inputs:
-  - name: pipeline_start_request
+  - name: pipeline_run
     type: object
-    description: Initial request to start the pipeline.
+    description: Metadata about the pipeline run (id, customer_id, pipeline_type).
     required: true
+  - name: source_blob
+    type: string
+    description: Path or reference to the source document in blob storage.
+    required: false
 
 outputs:
   - name: pipeline_run_status
