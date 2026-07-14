@@ -506,18 +506,20 @@ def test_orchestrator_determinism_no_file_io(mock_context, valid_input):
     )
 
 
-def test_blob_start_logic():
+def test_blob_start_logic(caplog):
     """
-    Verify the logic of blob_start.
+    Verify the logic of blob_start and ensure sensitive data is not logged.
     """
     import asyncio
+    caplog.set_level(logging.INFO)
 
     myblob = MagicMock(spec=func.InputStream)
-    myblob.name = "uploads/invoice1.pdf"
+    blob_path = "uploads/sensitive-invoice-id.pdf"
+    myblob.name = blob_path
 
     async def mock_start_new(function_name, client_input=None):
         assert function_name == "pipeline_orchestrator"
-        assert client_input["source_blob"] == "uploads/invoice1.pdf"
+        assert client_input["source_blob"] == blob_path
         assert client_input["pipeline_run"]["customer_id"] == "auto-triggered"
         return "test-id"
 
@@ -537,3 +539,9 @@ def test_blob_start_logic():
             break
 
     asyncio.run(func_to_call(myblob, client))
+
+    # Regression check: blob name must not be in logs
+    assert blob_path not in caplog.text
+    assert "sensitive-invoice-id" not in caplog.text
+    assert "Blob trigger started" in caplog.text
+    assert "Orchestration started via blob trigger" in caplog.text

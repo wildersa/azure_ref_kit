@@ -54,7 +54,7 @@ async def blob_start(myblob: func.InputStream, client: df.DurableOrchestrationCl
     Matches the pattern in README.md.
     """
     name = myblob.name
-    logging.info(f"Blob trigger started for {name}")
+    logging.info("Blob trigger started.")
 
     # In a real scenario, we would parse customer_id from path or metadata
     pipeline_run = {
@@ -68,7 +68,7 @@ async def blob_start(myblob: func.InputStream, client: df.DurableOrchestrationCl
     input_data = {"pipeline_run": pipeline_run, "source_blob": name}
 
     instance_id = await client.start_new("pipeline_orchestrator", client_input=input_data)
-    logging.info(f"Orchestration started via blob trigger for {name}")
+    logging.info("Orchestration started via blob trigger.")
 
 
 # Register Orchestrator
