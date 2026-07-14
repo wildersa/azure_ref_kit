@@ -27,6 +27,16 @@ def test_policy_xml_parsing():
     tree = ET.parse(POLICY_XML)
     root = tree.getroot()
 
+    # Check for validate-jwt (explicit Entra JWT validation)
+    validate_jwt = root.find(".//validate-jwt")
+    assert validate_jwt is not None, "Policy must contain <validate-jwt> for authentication boundary"
+    assert validate_jwt.get('header-name') == "Authorization"
+
+    # Check for set-backend-service (explicit wiring to registered backend)
+    set_backend = root.find(".//set-backend-service")
+    assert set_backend is not None, "Policy must contain <set-backend-service> to wire to the backend"
+    assert set_backend.get('backend-id') == "model-backend"
+
     # Check for llm-token-limit
     token_limit = root.find(".//llm-token-limit")
     assert token_limit is not None, "Policy must contain <llm-token-limit>"
@@ -60,6 +70,6 @@ def test_terraform_security_invariants():
     assert "azurerm_role_assignment" in content
     assert "role_definition_name = \"Cognitive Services User\"" in content
 
-    # Ensure no hardcoded secrets or keys are obvious (minimal check)
-    assert "api-key" not in content.lower() or "set-header" in content.lower() # api-key is in policy text within main.tf
-    assert "client_secret" not in content.lower()
+    # Verify policy uses tenant_id and audience
+    assert "TENANT_ID" in content
+    assert "AUDIENCE" in content

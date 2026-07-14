@@ -50,6 +50,17 @@ variable "model_resource_id" {
   type        = string
 }
 
+variable "tenant_id" {
+  description = "The Azure AD Tenant ID for JWT validation."
+  type        = string
+}
+
+variable "audience" {
+  description = "The expected audience for the Entra ID token."
+  type        = string
+  default     = "https://cognitiveservices.azure.com"
+}
+
 variable "app_insights_instrumentation_key" {
   description = "Application Insights instrumentation key for metrics (optional)."
   type        = string

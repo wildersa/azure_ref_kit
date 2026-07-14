@@ -27,6 +27,12 @@ inputs:
   - name: token_limit_per_minute
     type: number
     description: TPM limit to enforce.
+  - name: tenant_id
+    type: string
+    description: Azure AD Tenant ID for JWT validation.
+  - name: audience
+    type: string
+    description: Expected audience for the Entra ID token.
 outputs:
   - name: gateway_url
     type: string

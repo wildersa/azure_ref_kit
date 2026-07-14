@@ -78,10 +78,16 @@ resource "azurerm_api_management_api_policy" "model_policy" {
 
   xml_content = replace(
     replace(
-      file("${path.module}/policies/model-access.xml"),
-      "{{TOKEN_LIMIT_PER_MINUTE}}", var.token_limit_per_minute
+      replace(
+        replace(
+          file("${path.module}/policies/model-access.xml"),
+          "{{TOKEN_LIMIT_PER_MINUTE}}", var.token_limit_per_minute
+        ),
+        "{{MODEL_ID}}", var.model_id
+      ),
+      "{{TENANT_ID}}", var.tenant_id
     ),
-    "{{MODEL_ID}}", var.model_id
+    "{{AUDIENCE}}", var.audience
   )
 }
 

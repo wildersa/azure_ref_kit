@@ -1,6 +1,6 @@
 <!--
   AI Gateway Policy: Model Access Governance
-  - Authenticates callers using subscription key or documented pattern
+  - Authenticates callers using Entra ID JWT validation
   - Uses Managed Identity for backend authentication
   - Enforces Token-per-Minute (TPM) limits
   - Emits token usage metrics to Application Insights
@@ -9,25 +9,37 @@
 <policies>
     <inbound>
         <base />
-        <!-- 1. Authenticated caller boundary (enforced by APIM product/API by default, but explicit here for clarity) -->
-        <check-header name="Authorization" failed-check-httpcode="401" failed-check-error-message="Unauthorized. AI Gateway requires authentication." ignore-case="false" />
+        <!-- 1. Explicit Entra JWT validation for authenticated caller boundary -->
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized. AI Gateway requires a valid Entra ID token.">
+            <openid-config url="https://login.microsoftonline.com/{{TENANT_ID}}/v2.0/.well-known/openid-configuration" />
+            <audiences>
+                <audience>{{AUDIENCE}}</audience>
+            </audiences>
+            <issuers>
+                <issuer>https://sts.windows.net/{{TENANT_ID}}/</issuer>
+                <issuer>https://login.microsoftonline.com/{{TENANT_ID}}/v2.0</issuer>
+            </issuers>
+        </validate-jwt>
 
-        <!-- 2. Token-per-Minute Governance -->
+        <!-- 2. Wire to registered backend -->
+        <set-backend-service backend-id="model-backend" />
+
+        <!-- 3. Token-per-Minute Governance -->
         <llm-token-limit counter-key="@(context.Subscription.Id)"
                          tokens-per-minute="{{TOKEN_LIMIT_PER_MINUTE}}"
                          estimate-prompt-tokens="true"
                          remaining-tokens-variable-name="remainingTokens" />
 
-        <!-- 3. Emit token metrics -->
+        <!-- 4. Emit token metrics -->
         <llm-emit-token-metric namespace="AI-Gateway">
             <dimension name="Subscription ID" />
             <dimension name="Model ID" value="{{MODEL_ID}}" />
         </llm-emit-token-metric>
 
-        <!-- 4. Managed Identity authentication to backend -->
+        <!-- 5. Managed Identity authentication to backend -->
         <authentication-managed-identity resource="https://cognitiveservices.azure.com" />
 
-        <!-- 5. Remove backend-leaking headers -->
+        <!-- 6. Remove backend-leaking headers -->
         <set-header name="api-key" exists-action="delete" />
     </inbound>
     <backend>
@@ -35,14 +47,14 @@
     </backend>
     <outbound>
         <base />
-        <!-- 6. Redact sensitive technical headers from provider -->
+        <!-- 7. Redact sensitive technical headers from provider -->
         <set-header name="x-ms-region" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-tokens" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-requests" exists-action="delete" />
     </outbound>
     <on-error>
         <base />
-        <!-- 7. Safe error responses -->
+        <!-- 8. Safe error responses -->
         <set-header name="Content-Type" exists-action="override">
             <value>application/json</value>
         </set-header>
