@@ -9,16 +9,27 @@ This building block demonstrates a minimal Durable Functions orchestration patte
 ```mermaid
 flowchart TD
     Trigger[Blob Trigger] --> Orchestrator[Pipeline Orchestrator]
-    Orchestrator --> Init[Activity: Update Status 'running']
-    Init --> OCR[Activity: OCR Document Intelligence]
-    OCR --> Val[Activity: Field Validation Worker]
-    Val --> Pub[Activity: Final Result Publisher]
-    Pub --> Final[Activity: Update Status 'completed']
+    Orchestrator --> Init[Activity: Update Run Status 'running']
+
+    Init --> Step1Start[Activity: Update Step Status 'ocr/running']
+    Step1Start --> OCR[Activity: OCR Document Intelligence]
+    OCR --> Step1End[Activity: Update Step Status 'ocr/completed']
+
+    Step1End --> Step2Start[Activity: Update Step Status 'val/running']
+    Step2Start --> Val[Activity: Field Validation Worker]
+    Val --> Step2End[Activity: Update Step Status 'val/completed']
+
+    Step2End --> Step3Start[Activity: Update Step Status 'pub/running']
+    Step3Start --> Pub[Activity: Final Result Publisher]
+    Pub --> Step3End[Activity: Update Step Status 'pub/completed']
+
+    Step3End --> Final[Activity: Update Run Status 'completed']
 
     subgraph Error Handling
-        OCR -.->|Failure| Fail[Activity: Update Status 'failed']
-        Val -.->|Failure| Fail
-        Pub -.->|Failure| Fail
+        OCR -.->|Failure| StepFail[Activity: Update Step Status 'failed']
+        Val -.->|Failure| StepFail
+        Pub -.->|Failure| StepFail
+        StepFail --> Fail[Activity: Update Run Status 'failed']
     end
 ```
 
@@ -54,6 +65,10 @@ To maintain security and clarity, the following rules apply to status updates:
 - **Storage**: Azure Storage Account (required for Durable Functions state).
 - **Observability**: Application Insights.
 
+### IaC Decision
+
+This building block is primarily a **runtime reference implementation**. While a minimal Terraform example is provided for completeness, the focus is on the orchestration logic and status contracts. Per repository standards, this module does not mandate a specific IaC provider for adoption, but the provided reference follows the [docs/terraform-deployment-requirement.md](../../docs/terraform-deployment-requirement.md) for validation.
+
 ### Terraform Deployment
 
 A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Application Insights, and the Flex Consumption Function App.
@@ -66,11 +81,12 @@ This module enforces an **identity-first security boundary**. Shared access keys
 - `AzureWebJobsStorage__credential`: Set to `managedidentity`.
 - `APPLICATIONINSIGHTS_CONNECTION_STRING`: The connection string for Application Insights.
 
-## Failure behavior
+## Failure and Retry Behavior
 
-- **Bounded Retries**: Potentially transient steps (OCR, Publication) use a `RetryOptions` policy with a 5-second initial interval and a maximum of 3 attempts.
-- **Non-Retryable Failures**: Validation failures are treated as deterministic and non-retryable; the pipeline fails immediately to avoid redundant processing.
-- **Customer-Safe Redaction**: All failures (including retry exhaustion and unhandled exceptions) are caught by the orchestrator and reported as a generic friendly error to the customer status store, preventing leakage of technical details or secrets.
+- **Bounded Retries**: Potentially transient steps (OCR, Publication) use a `RetryOptions` policy with a 5-second initial interval and a maximum of 3 attempts. This handles temporary Azure service unavailability or network blips.
+- **Retryable Exception Pattern**: Only specific categories of failures (e.g., HTTP 429/5xx) should be retried. In this reference, `call_activity_with_retry` is used for steps interfacing with external services.
+- **Non-Retryable Failures**: Validation failures (e.g., missing mandatory fields) are treated as deterministic and non-retryable; the pipeline fails immediately to avoid redundant processing and cost.
+- **Customer-Safe Redaction**: All failures (including retry exhaustion and unhandled exceptions) are caught by the orchestrator. It then updates the `PipelineRun` and `PipelineStep` status with a generic friendly error, preventing leakage of internal technical details, stack traces, or secrets to the customer-facing interface.
 
 ## Microsoft Learn References
 

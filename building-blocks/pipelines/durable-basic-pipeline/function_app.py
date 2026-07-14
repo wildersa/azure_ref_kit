@@ -1,11 +1,14 @@
 import azure.functions as func
 import azure.durable_functions as df
 import logging
+import uuid
+from datetime import datetime, timezone
 
 try:
     from .src.orchestrator import pipeline_orchestrator
     from .src.activities import (
         update_pipeline_run_status,
+        update_pipeline_step_status,
         ocr_document_intelligence,
         field_validation_worker,
         final_result_publisher,
@@ -14,6 +17,7 @@ except ImportError:
     from src.orchestrator import pipeline_orchestrator
     from src.activities import (
         update_pipeline_run_status,
+        update_pipeline_step_status,
         ocr_document_intelligence,
         field_validation_worker,
         final_result_publisher,
@@ -40,11 +44,39 @@ async def http_start(req: func.HttpRequest, client: df.DurableOrchestrationClien
     return client.create_check_status_response(req, instance_id)
 
 
+@app.blob_trigger(
+    arg_name="myblob", path="uploads/{name}", connection="AzureWebJobsStorage"
+)
+@app.durable_client_input(client_name="client")
+async def blob_start(myblob: func.InputStream, client: df.DurableOrchestrationClient):
+    """
+    Blob trigger to start an orchestration.
+    Matches the pattern in README.md.
+    """
+    name = myblob.name
+    logging.info("Blob trigger started.")
+
+    # In a real scenario, we would parse customer_id from path or metadata
+    pipeline_run = {
+        "id": str(uuid.uuid4()),
+        "customer_id": "auto-triggered",
+        "pipeline_type": "document-processing",
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    input_data = {"pipeline_run": pipeline_run, "source_blob": name}
+
+    instance_id = await client.start_new("pipeline_orchestrator", client_input=input_data)
+    logging.info("Orchestration started via blob trigger.")
+
+
 # Register Orchestrator
 app.orchestration_trigger(context_name="context")(pipeline_orchestrator)
 
 # Register Activities
 app.activity_trigger(input_name="status_data")(update_pipeline_run_status)
+app.activity_trigger(input_name="step_data")(update_pipeline_step_status)
 app.activity_trigger(input_name="input_data")(ocr_document_intelligence)
 app.activity_trigger(input_name="input_data")(field_validation_worker)
 app.activity_trigger(input_name="input_data")(final_result_publisher)
