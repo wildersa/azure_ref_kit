@@ -58,6 +58,7 @@ def test_readme_contains_required_sections():
     assert "## Deployment Architecture" in content
     assert "```mermaid" in content
     assert "## Configuration and Secrets" in content
+    assert "## Cost Impact & Operations" in content
     assert "## Security & Customer-Safe Boundary" in content
     assert "## Deployment/IaC Decision" in content
     assert "## References" in content

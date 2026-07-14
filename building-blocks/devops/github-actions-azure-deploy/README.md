@@ -250,6 +250,17 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
 ```
 
+## Cost Impact & Operations
+
+### Cost Impact
+- **Billable Resources**: Applying these workflows will provision billable Azure resources, including **Azure API Management (APIM)** and **Azure OpenAI/Foundry** model consumption.
+- **SKU Caution**: Ensure the configured `apim_sku` (default: `StandardV2_1`) and model usage align with your budget and quota.
+
+### Rollback and Destroy
+- **Rollback**: Terraform does not support automatic "undo" to a previous state. To roll back, you must revert the code changes in the repository and trigger a new deployment workflow to apply the previous configuration.
+- **Destroy**: Deleting resources is an explicit operator action. Use `terraform destroy` locally or via a manual workflow to remove resources.
+- **State Risks**: Manual deletion of resources in the Azure Portal can cause state divergence, leading to deployment failures in the workflow.
+
 ## Security & Customer-Safe Boundary
 
 This pattern enforces strict boundaries to prevent leakage of technical internals:
