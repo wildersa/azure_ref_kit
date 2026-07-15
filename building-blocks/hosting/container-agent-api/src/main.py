@@ -1,14 +1,19 @@
 import logging
+import os
+from datetime import datetime, UTC
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, ConfigDict
-from datetime import datetime, UTC
 
-# Configure logging to be safe
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Container-hosted Agent API")
+app = FastAPI(
+    title="Container-hosted Agent API",
+    description="Minimal read-only agent API reference for Azure Container Apps.",
+    version="1.0.0",
+)
 
 
 class AgentQueryRequest(BaseModel):
@@ -76,10 +81,8 @@ async def global_exception_handler(request: Request, exc: Exception):
     Global exception handler to prevent technical leakage.
     """
     # Customer-Safe Logging Boundary:
-    # Do NOT log the raw exception string or stack trace in a way that might be returned to the user.
-    logger.error(
-        "An unexpected error occurred in the agent API. Technical details redacted."
-    )
+    # We log the event internally but redact sensitive details from the user response.
+    logger.error("Internal server error: Redacted details for customer safety.")
 
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -108,16 +111,17 @@ async def agent_query(request: AgentQueryRequest):
     """
     Bounded read-only example endpoint.
     """
-    # This is a stub implementation for the reference hosting block.
-    # In a real scenario, this would call downstream services safely.
-    # We avoid reflecting the resource_id to maintain a strict safe boundary.
+    # This is a deterministic stub for the reference hosting block.
+    # It demonstrates the safe boundary without requiring external dependencies.
+    # We never reflect the resource_id directly in the summary.
     return AgentQueryResponse(
         status="active",
-        summary="The requested resource is currently active and healthy. Technical details are redacted.",
+        summary="The requested resource is currently active and healthy. Business-level summary provided, technical details redacted.",
     )
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    port = int(os.getenv("PORT", "8080"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

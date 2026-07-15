@@ -25,10 +25,13 @@ def test_readme_has_required_sections():
 
     required_sections = [
         "## Purpose",
+        "## Scenario",
         "## Architecture",
         "## When to Use Containers",
         "## When NOT to Use Containers",
         "## Security and Safety",
+        "## API Contract",
+        "## Configuration",
         "## Local Development",
         "## Azure Hosting Notes",
         "## Validation Commands",

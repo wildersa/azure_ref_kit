@@ -13,3 +13,6 @@ tests/
 module.yaml
 README.md
 .dockerignore
+Dockerfile
+requirements-test.txt
+schemas/
