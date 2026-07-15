@@ -9,17 +9,18 @@ The agent helps developers and managers get quick status updates without needing
 ## Composed blocks
 
 - [Foundry Agent with Tools](../foundry-agent-with-tools/README.md): Foundry agent runtime pattern for customer questions.
-- [DevOps Status Tool](../../building-blocks/functions/devops-status-tool/README.md): Safe read-only DevOps status tool for Azure DevOps Builds API.
+- [DevOps Status Adapter](../../building-blocks/mcp/devops-status-adapter/README.md): Controlled read-only Azure DevOps adapter.
+- [DevOps MCP Tool Contract](../../building-blocks/mcp/devops-mcp-tool-contract/README.md): Shared contract for DevOps status tools.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
     User[User] -->|Asks safe question| Agent[Foundry Agent]
-    Agent -->|Calls| Tool[DevOps Status Tool]
-    Tool -->|Queries| DevOps[Azure DevOps API]
-    DevOps -->|Raw Response| Tool
-    Tool -->|Sanitized Response| Agent
+    Agent -->|Calls get_pipeline_run_status| Adapter[DevOps Status Adapter]
+    Adapter -->|Queries| DevOps[Azure DevOps API]
+    DevOps -->|Raw Response| Adapter
+    Adapter -->|Sanitized Contract Response| Agent
     Agent -->|Friendly Answer| User
 ```
 
@@ -29,16 +30,16 @@ flowchart TD
 sequenceDiagram
     participant U as User / App
     participant A as Foundry Agent
-    participant T as DevOps Status Tool
+    participant T as DevOps Status Adapter
     participant D as Azure DevOps API
 
-    U->>A: "What's the status of my build?"
-    A->>T: call get_build_status(organization_url="...", project="...", build_id=123)
-    T->>D: GET /_apis/build/builds/123
+    U->>A: "What's the status of my pipeline?"
+    A->>T: call get_pipeline_run_status(pipeline_id="...", run_id="...")
+    T->>D: GET /_apis/build/builds/{run_id}
     D-->>T: Raw JSON (secrets, logs, technical IDs)
     Note over T: Sanitize & Filter to Safe Contract
-    T-->>A: { "status": "completed", "result": "succeeded", "summary": "Build passed." }
-    A-->>U: "Your build succeeded."
+    T-->>A: { "status": "completed", "result": "succeeded", "summary": "Build 1.2.3 succeeded." }
+    A-->>U: "Your pipeline run succeeded."
 ```
 
 ## Entrypoints
@@ -56,13 +57,14 @@ sequenceDiagram
 | `AZURE_DEVOPS_PAT` | Personal Access Token | `your-pat` |
 | `AZURE_DEVOPS_ORG_URL` | Organization URL | `https://dev.azure.com/my-org` |
 | `AZURE_DEVOPS_PROJECT` | Project name or ID | `my-project` |
-| `AZURE_DEVOPS_BUILD_ID` | Default build ID for test | `12345` |
+| `AZURE_DEVOPS_PIPELINE_ID` | Default pipeline ID for scope | `my-pipeline` |
+| `AZURE_DEVOPS_RUN_ID` | Default run ID for scope | `12345` |
 
 ## Deployment / IaC Decision
 
-**No-IaC Decision**: This reference solution does not include Terraform/OpenTofu.
-- The Foundry Agent is a configuration-first resource (Prompt Agent) typically managed via SDK or CLI.
-- This solution composes existing runtimes and consumes pre-existing Foundry/Azure DevOps resources; it does not introduce new Azure resources.
+**IaC Decision**: This solution includes Terraform for the Azure-side AI Foundry resources.
+- See [infra/terraform/README.md](infra/terraform/README.md) for details.
+- Azure DevOps resources and tokens are treated as external inputs.
 
 ## Local Validation
 
@@ -74,9 +76,21 @@ python --version
 ruff check src/
 ruff format --check src/
 
-# Run tests (requires pytest-mock)
+# Run tests
 pytest tests/
+
+# Validate Terraform
+cd infra/terraform
+terraform init -backend=false
+terraform validate
 ```
+
+## Security and Privacy
+
+- **Read-Only**: The agent only uses read-only tools and cannot trigger or modify pipelines.
+- **Scope Restriction**: The adapter is hard-coded to a specific scope (organization, project, pipeline, run) to prevent unauthorized discovery.
+- **Sanitization**: All raw DevOps responses are mapped to a strict, customer-safe Pydantic model (defined in the MCP contract) before reaching the agent.
+- **No Secrets**: Secrets and tokens are never logged, stored in code, or returned to the agent.
 
 ## References
 

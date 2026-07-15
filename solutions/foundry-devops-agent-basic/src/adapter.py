@@ -15,15 +15,20 @@ from openai.types.responses.response_input_param import (
 from .config import Settings
 from .agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 
-# Add the building block to the path to allow importing the tool implementation
-# This allows us to reuse the tool without duplicating the code.
+# Add required paths to sys.path to allow importing building blocks
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
-DEVOPS_TOOL_SRC = REPO_ROOT / "building-blocks" / "functions" / "devops-status-tool" / "src"
-if str(DEVOPS_TOOL_SRC) not in sys.path:
-    sys.path.append(str(DEVOPS_TOOL_SRC))
+ADAPTER_SRC = REPO_ROOT / "building-blocks" / "mcp" / "devops-status-adapter" / "src"
+CONTRACT_SRC = (
+    REPO_ROOT / "building-blocks" / "mcp" / "devops-mcp-tool-contract" / "src"
+)
 
-# Now we can import the tool safely from the flat 'src' directory
-import tool  # noqa: E402
+if str(ADAPTER_SRC) not in sys.path:
+    sys.path.append(str(ADAPTER_SRC))
+if str(CONTRACT_SRC) not in sys.path:
+    sys.path.append(str(CONTRACT_SRC))
+
+# Now we can import the adapter
+import adapter as devops_adapter  # noqa: E402
 
 # Redact technical details in logs
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -36,6 +41,12 @@ class FoundryDevOpsAgentAdapter:
     def __init__(self, settings: Settings):
         self.settings = settings
         self._project_client: Optional[AIProjectClient] = None
+        # Initialize the controlled DevOps adapter
+        self._devops_adapter = devops_adapter.DevOpsStatusAdapter(
+            organization_url=settings.organization_url,
+            project=settings.project,
+            token=settings.devops_pat,
+        )
 
     def initialize_client(self) -> None:
         """Initializes the AIProjectClient using DefaultAzureCredential."""
@@ -99,23 +110,25 @@ class FoundryDevOpsAgentAdapter:
 
                     input_list: ResponseInputParam = []
                     for call in tool_calls:
-                        if call.name == "get_build_status":
+                        if call.name == "get_pipeline_run_status":
                             try:
                                 # 1. Parse arguments from the agent
                                 args = (
                                     json.loads(call.arguments) if call.arguments else {}
                                 )
 
+                                pipeline_id = args.get("pipeline_id")
+                                run_id = args.get("run_id")
+
                                 # 2. SAFETY: Enforce the configured scope from Settings.
-                                # This solution is bounded to exactly one organization, project, and build.
-                                # If the agent attempts to query a different scope, we reject it.
+                                # This solution is bounded to exactly one pipeline and run.
                                 if (
-                                    args.get("organization_url")
-                                    != self.settings.organization_url
-                                    or args.get("project") != self.settings.project
-                                    or args.get("build_id") != self.settings.build_id
+                                    pipeline_id != self.settings.pipeline_id
+                                    or run_id != self.settings.run_id
                                 ):
-                                    logger.warning("Agent attempted to query out-of-scope build.")
+                                    logger.warning(
+                                        "Agent attempted to query out-of-scope run."
+                                    )
                                     input_list.append(
                                         FunctionCallOutput(
                                             type="function_call_output",
@@ -129,9 +142,14 @@ class FoundryDevOpsAgentAdapter:
                                     )
                                     continue
 
-                                # 3. Execute the existing DevOps status tool
-                                # It handles its own environment variables for PAT
-                                result = tool.get_build_status_safe(args)
+                                # 3. Execute the controlled DevOps adapter
+                                # The adapter handles its own validation and sanitization.
+                                result_obj = (
+                                    self._devops_adapter.get_pipeline_run_status(
+                                        pipeline_id=pipeline_id, run_id=run_id
+                                    )
+                                )
+                                result = result_obj.model_dump(mode="json")
 
                                 input_list.append(
                                     FunctionCallOutput(
@@ -141,7 +159,7 @@ class FoundryDevOpsAgentAdapter:
                                     )
                                 )
                             except Exception:
-                                logger.error("DevOps tool execution failed.")
+                                logger.error("DevOps adapter execution failed.")
                                 input_list.append(
                                     FunctionCallOutput(
                                         type="function_call_output",
@@ -154,7 +172,7 @@ class FoundryDevOpsAgentAdapter:
                                     )
                                 )
                         else:
-                            logger.warning("Agent requested unknown tool.")
+                            logger.warning(f"Agent requested unknown tool: {call.name}")
                             input_list.append(
                                 FunctionCallOutput(
                                     type="function_call_output",
