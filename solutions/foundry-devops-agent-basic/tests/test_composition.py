@@ -49,9 +49,10 @@ def test_adapter_chat_response_with_tool_call(
     mock_call = MagicMock()
     mock_call.type = "function_call"
     mock_call.name = "get_pipeline_run_status"
-    mock_call.arguments = json.dumps(
-        {"pipeline_id": "test-pipeline", "run_id": "run-456"}
-    )
+    mock_call.arguments = json.dumps({
+        "pipeline_id": "test-pipeline",
+        "run_id": "run-456"
+    })
     mock_call.call_id = "call-789"
 
     mock_response_1 = MagicMock()
@@ -75,7 +76,7 @@ def test_adapter_chat_response_with_tool_call(
         "branch": "main",
         "start_time": "2024-01-01T10:00:00Z",
         "summary": "Build succeeded.",
-        "portal_url": "https://dev.azure.com/test-org/test-project/_build/results?buildId=456",
+        "portal_url": "https://dev.azure.com/test-org/test-project/_build/results?buildId=456"
     }
     mock_devops_adapter.get_pipeline_run_status.return_value = mock_result_obj
 
@@ -108,9 +109,10 @@ def test_adapter_handles_tool_failure_sanitized(
     mock_call = MagicMock()
     mock_call.type = "function_call"
     mock_call.name = "get_pipeline_run_status"
-    mock_call.arguments = json.dumps(
-        {"pipeline_id": "test-pipeline", "run_id": "run-456"}
-    )
+    mock_call.arguments = json.dumps({
+        "pipeline_id": "test-pipeline",
+        "run_id": "run-456"
+    })
 
     mock_response_1 = MagicMock()
     mock_response_1.output = [mock_call]
@@ -123,9 +125,7 @@ def test_adapter_handles_tool_failure_sanitized(
 
     # Tool raises an exception (e.g. connection error)
     mock_devops_adapter = mock_devops_adapter_class.return_value
-    mock_devops_adapter.get_pipeline_run_status.side_effect = Exception(
-        "Internal technical error"
-    )
+    mock_devops_adapter.get_pipeline_run_status.side_effect = Exception("Internal technical error")
 
     adapter = FoundryDevOpsAgentAdapter(mock_settings)
     adapter.get_chat_response("status?")
@@ -158,9 +158,10 @@ def test_adapter_rejects_out_of_scope_build(
     mock_call = MagicMock()
     mock_call.type = "function_call"
     mock_call.name = "get_pipeline_run_status"
-    mock_call.arguments = json.dumps(
-        {"pipeline_id": "DIFFERENT-PIPELINE", "run_id": "run-456"}
-    )
+    mock_call.arguments = json.dumps({
+        "pipeline_id": "DIFFERENT-PIPELINE",
+        "run_id": "run-456"
+    })
     mock_call.call_id = "call-wrong"
 
     mock_response_1 = MagicMock()
@@ -182,10 +183,7 @@ def test_adapter_rejects_out_of_scope_build(
     # Verify the error returned to the agent is sanitized and explains the scope limit
     second_call_input = mock_openai.responses.create.call_args_list[1][1]["input"]
     output_json = json.loads(second_call_input[0]["output"])
-    assert (
-        output_json["error"]
-        == "The tool requested is unavailable for the specified scope."
-    )
+    assert output_json["error"] == "The tool requested is unavailable for the specified scope."
 
 
 @patch("src.adapter.AIProjectClient")
@@ -225,3 +223,42 @@ def test_adapter_rejects_unknown_tool(
     second_call_input = mock_openai.responses.create.call_args_list[1][1]["input"]
     output_json = json.loads(second_call_input[0]["output"])
     assert output_json["error"] == "The tool requested is unavailable."
+
+
+@patch("src.adapter.AIProjectClient")
+@patch("src.adapter.DefaultAzureCredential")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
+def test_adapter_uses_managed_identity_if_pat_missing(
+    mock_devops_adapter_class, mock_credential_class, mock_client_class
+):
+    """
+    Verifies that the adapter attempts to fetch an Entra ID token using Managed Identity
+    if the PAT is not provided in settings.
+    """
+    settings = Settings(
+        project_endpoint="https://test.ai.azure.com/api/projects/123",
+        agent_name="test-agent",
+        model_name="gpt-4o",
+        devops_pat=None,  # Missing PAT
+        organization_url="https://dev.azure.com/test-org",
+        project="test-project",
+        pipeline_id="test-pipeline",
+        run_id="run-456",
+    )
+
+    mock_credential = mock_credential_class.return_value
+    mock_token = MagicMock()
+    mock_token.token = "mock-entra-token"
+    mock_credential.get_token.return_value = mock_token
+
+    adapter = FoundryDevOpsAgentAdapter(settings)
+    adapter._ensure_devops_adapter()
+
+    # Assert Entra ID token was requested with correct scope
+    mock_credential.get_token.assert_called_with("499b84ac-1321-427f-aa17-267ca6975798/.default")
+    # Assert DevOpsStatusAdapter was initialized with the Entra token
+    mock_devops_adapter_class.assert_called_with(
+        organization_url="https://dev.azure.com/test-org",
+        project="test-project",
+        token="mock-entra-token"
+    )

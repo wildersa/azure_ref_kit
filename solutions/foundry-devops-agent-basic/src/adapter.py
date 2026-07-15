@@ -18,9 +18,7 @@ from .agent_definition import SYSTEM_INSTRUCTIONS, get_tool_definitions
 # Add required paths to sys.path to allow importing building blocks
 REPO_ROOT = Path(__file__).parent.parent.parent.parent
 ADAPTER_SRC = REPO_ROOT / "building-blocks" / "mcp" / "devops-status-adapter" / "src"
-CONTRACT_SRC = (
-    REPO_ROOT / "building-blocks" / "mcp" / "devops-mcp-tool-contract" / "src"
-)
+CONTRACT_SRC = REPO_ROOT / "building-blocks" / "mcp" / "devops-mcp-tool-contract" / "src"
 
 if str(ADAPTER_SRC) not in sys.path:
     sys.path.append(str(ADAPTER_SRC))
@@ -41,12 +39,34 @@ class FoundryDevOpsAgentAdapter:
     def __init__(self, settings: Settings):
         self.settings = settings
         self._project_client: Optional[AIProjectClient] = None
-        # Initialize the controlled DevOps adapter
+        self._devops_token: Optional[str] = settings.devops_pat
+        self._devops_adapter: Optional[devops_adapter.DevOpsStatusAdapter] = None
+
+    def _ensure_devops_adapter(self) -> devops_adapter.DevOpsStatusAdapter:
+        """Ensures the DevOps adapter is initialized, fetching an Entra ID token if needed."""
+        if self._devops_adapter:
+            return self._devops_adapter
+
+        token = self._devops_token
+        if not token:
+            # P0: Support Microsoft Entra/Managed Identity for Azure DevOps
+            # Scope for Azure DevOps is 499b84ac-1321-427f-aa17-267ca6975798/.default
+            try:
+                credential = DefaultAzureCredential()
+                access_token = credential.get_token(
+                    "499b84ac-1321-427f-aa17-267ca6975798/.default"
+                )
+                token = access_token.token
+            except Exception:
+                logger.error("Failed to fetch Entra ID token for Azure DevOps.")
+                raise RuntimeError("Authentication to Azure DevOps failed.")
+
         self._devops_adapter = devops_adapter.DevOpsStatusAdapter(
-            organization_url=settings.organization_url,
-            project=settings.project,
-            token=settings.devops_pat,
+            organization_url=self.settings.organization_url,
+            project=self.settings.project,
+            token=token,
         )
+        return self._devops_adapter
 
     def initialize_client(self) -> None:
         """Initializes the AIProjectClient using DefaultAzureCredential."""
@@ -84,6 +104,7 @@ class FoundryDevOpsAgentAdapter:
 
         try:
             agent = self.create_or_resolve_agent()
+            devops = self._ensure_devops_adapter()
 
             with self._project_client.get_openai_client() as openai_client:  # type: ignore
                 conversation = openai_client.conversations.create()
@@ -126,9 +147,7 @@ class FoundryDevOpsAgentAdapter:
                                     pipeline_id != self.settings.pipeline_id
                                     or run_id != self.settings.run_id
                                 ):
-                                    logger.warning(
-                                        "Agent attempted to query out-of-scope run."
-                                    )
+                                    logger.warning("Agent attempted to query out-of-scope run.")
                                     input_list.append(
                                         FunctionCallOutput(
                                             type="function_call_output",
@@ -144,10 +163,8 @@ class FoundryDevOpsAgentAdapter:
 
                                 # 3. Execute the controlled DevOps adapter
                                 # The adapter handles its own validation and sanitization.
-                                result_obj = (
-                                    self._devops_adapter.get_pipeline_run_status(
-                                        pipeline_id=pipeline_id, run_id=run_id
-                                    )
+                                result_obj = devops.get_pipeline_run_status(
+                                    pipeline_id=pipeline_id, run_id=run_id
                                 )
                                 result = result_obj.model_dump(mode="json")
 
@@ -172,7 +189,8 @@ class FoundryDevOpsAgentAdapter:
                                     )
                                 )
                         else:
-                            logger.warning(f"Agent requested unknown tool: {call.name}")
+                            # P0 Safety: Avoid reflecting unknown tool names into logs.
+                            logger.warning("Agent requested unknown tool.")
                             input_list.append(
                                 FunctionCallOutput(
                                     type="function_call_output",

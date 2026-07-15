@@ -15,7 +15,7 @@ class Settings:
     model_name: str
 
     # Azure DevOps configuration
-    devops_pat: str
+    devops_pat: Optional[str]  # Optional to support Entra ID
     organization_url: str
     project: str
     pipeline_id: str
@@ -43,8 +43,7 @@ class Settings:
             missing.append("AZURE_AI_AGENT_NAME")
         if not model_name:
             missing.append("AZURE_AI_MODEL_NAME")
-        if not devops_pat:
-            missing.append("AZURE_DEVOPS_PAT")
+        # devops_pat is optional to support Managed Identity
         if not organization_url:
             missing.append("AZURE_DEVOPS_ORG_URL")
         if not project:
