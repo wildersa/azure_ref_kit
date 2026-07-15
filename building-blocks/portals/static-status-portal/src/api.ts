@@ -1,4 +1,4 @@
-import { CustomerSafeStatus, FriendlyFailure, PipelineStatus } from './types';
+import { CustomerSafeStatus, FriendlyFailure, PipelineStatus, PipelineStep, StepStatus } from './types';
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -35,6 +35,35 @@ const FIXTURE_RUNS: CustomerSafeStatus[] = [
     safe_artifacts: [
       { name: 'summary.pdf', size_bytes: 125000, content_type: 'application/pdf' },
       { name: 'results.json', size_bytes: 4500, content_type: 'application/json' }
+    ],
+    steps: [
+      {
+        run_id: 'run-001',
+        name: 'Document Upload',
+        status: 'completed',
+        input_summary: 'invoice_123.pdf',
+        output_summary: 'Upload successful',
+        started_at: '2024-05-01T10:00:05Z',
+        finished_at: '2024-05-01T10:00:10Z'
+      },
+      {
+        run_id: 'run-001',
+        name: 'AI Text Extraction',
+        status: 'completed',
+        input_summary: 'Processing PDF content...',
+        output_summary: 'Successfully extracted 1,500 tokens',
+        started_at: '2024-05-01T10:00:12Z',
+        finished_at: '2024-05-01T10:01:45Z'
+      },
+      {
+        run_id: 'run-001',
+        name: 'Validation & Publishing',
+        status: 'completed',
+        input_summary: 'Checking extracted fields...',
+        output_summary: 'All fields valid. Published to database.',
+        started_at: '2024-05-01T10:01:48Z',
+        finished_at: '2024-05-01T10:02:30Z'
+      }
     ]
   },
   {
@@ -46,7 +75,28 @@ const FIXTURE_RUNS: CustomerSafeStatus[] = [
     created_at: '2024-05-02T11:00:00Z',
     started_at: '2024-05-02T11:00:10Z',
     finished_at: '2024-05-02T11:01:45Z',
-    safe_artifacts: []
+    safe_artifacts: [],
+    steps: [
+      {
+        run_id: 'run-002',
+        name: 'Document Upload',
+        status: 'completed',
+        input_summary: 'corrupted_file.dat',
+        output_summary: 'Upload successful',
+        started_at: '2024-05-02T11:00:10Z',
+        finished_at: '2024-05-02T11:00:15Z'
+      },
+      {
+        run_id: 'run-002',
+        name: 'Format Validation',
+        status: 'failed',
+        input_summary: 'Validating file extension...',
+        output_summary: 'Unsupported format detected',
+        friendly_error: 'The uploaded file is not in a supported format. Please provide a PDF.',
+        started_at: '2024-05-02T11:00:18Z',
+        finished_at: '2024-05-02T11:01:45Z'
+      }
+    ]
   },
   {
     id: 'run-003',
@@ -54,7 +104,30 @@ const FIXTURE_RUNS: CustomerSafeStatus[] = [
     business_summary: 'Extracting entities from provided text...',
     progress_percent: 65,
     created_at: '2024-05-03T09:30:00Z',
-    started_at: '2024-05-03T09:30:15Z'
+    started_at: '2024-05-03T09:30:15Z',
+    steps: [
+      {
+        run_id: 'run-003',
+        name: 'Text Submission',
+        status: 'completed',
+        input_summary: 'Text provided via API',
+        output_summary: 'Input received',
+        started_at: '2024-05-03T09:30:15Z',
+        finished_at: '2024-05-03T09:30:18Z'
+      },
+      {
+        run_id: 'run-003',
+        name: 'AI Extraction',
+        status: 'running',
+        input_summary: 'Running LLM analysis...',
+        started_at: '2024-05-03T09:30:20Z'
+      },
+      {
+        run_id: 'run-003',
+        name: 'Result Generation',
+        status: 'pending'
+      }
+    ]
   }
 ];
 
@@ -66,7 +139,64 @@ const FIXTURE_FAILURES: Record<string, FriendlyFailure> = {
   }
 };
 
-const VALID_STATUSES: PipelineStatus[] = ['pending', 'running', 'completed', 'failed', 'cancelled'];
+const VALID_STATUSES: PipelineStatus[] = ['pending', 'running', 'waiting_input', 'failed', 'completed', 'cancelled'];
+const VALID_STEP_STATUSES: StepStatus[] = ['pending', 'running', 'waiting_input', 'failed', 'completed', 'skipped', 'cancelled'];
+
+/**
+ * Validates and sanitizes a single pipeline step.
+ */
+function validateAndSanitizeStep(data: any): PipelineStep {
+  if (!data || typeof data !== 'object') throw new ValidationError('Invalid step object');
+
+  if (typeof data.run_id !== 'string' || !data.run_id) throw new ValidationError('Step missing run_id');
+  if (typeof data.name !== 'string' || !data.name) throw new ValidationError('Step missing name');
+  if (!VALID_STEP_STATUSES.includes(data.status)) throw new ValidationError(`Invalid step status: ${data.status}`);
+
+  const sanitized: PipelineStep = {
+    run_id: data.run_id,
+    name: data.name,
+    status: data.status
+  };
+
+  if (data.input_summary !== undefined && data.input_summary !== null) {
+    if (typeof data.input_summary !== 'string') throw new ValidationError('Invalid step input_summary');
+    sanitized.input_summary = data.input_summary;
+  }
+
+  if (data.output_summary !== undefined && data.output_summary !== null) {
+    if (typeof data.output_summary !== 'string') throw new ValidationError('Invalid step output_summary');
+    sanitized.output_summary = data.output_summary;
+  }
+
+  if (data.friendly_error !== undefined && data.friendly_error !== null) {
+    if (typeof data.friendly_error !== 'string') throw new ValidationError('Invalid step friendly_error');
+    sanitized.friendly_error = data.friendly_error;
+  }
+
+  if (data.started_at) {
+    if (typeof data.started_at !== 'string' || isNaN(Date.parse(data.started_at))) throw new ValidationError('Invalid step started_at');
+    sanitized.started_at = data.started_at;
+  }
+
+  if (data.finished_at) {
+    if (typeof data.finished_at !== 'string' || isNaN(Date.parse(data.finished_at))) throw new ValidationError('Invalid step finished_at');
+    sanitized.finished_at = data.finished_at;
+  }
+
+  if (Array.isArray(data.artifacts)) {
+    sanitized.artifacts = data.artifacts.map((a: any, idx: number) => {
+        if (typeof a !== 'string') throw new ValidationError(`Step artifact at index ${idx} is not a string`);
+        return a;
+    });
+  }
+
+  if (data.retry_count !== undefined && data.retry_count !== null) {
+    if (typeof data.retry_count !== 'number' || data.retry_count < 0) throw new ValidationError('Invalid step retry_count');
+    sanitized.retry_count = data.retry_count;
+  }
+
+  return sanitized;
+}
 
 /**
  * Validates and sanitizes raw status data against the CustomerSafeStatus schema.
@@ -125,6 +255,10 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
         content_type: typeof a.content_type === 'string' ? a.content_type : undefined
       };
     });
+  }
+
+  if (Array.isArray(data.steps)) {
+    sanitized.steps = data.steps.map(validateAndSanitizeStep);
   }
 
   return sanitized;

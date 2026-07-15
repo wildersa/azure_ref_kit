@@ -66,6 +66,49 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack, getD
         </div>
       )}
 
+      {/* Pipeline Steps Timeline */}
+      <div style={{ border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden', marginBottom: '30px' }}>
+        <div style={{ backgroundColor: '#f8fafc', padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Pipeline Execution Timeline</h3>
+        </div>
+        <div style={{ padding: '20px' }}>
+          {!run.steps || run.steps.length === 0 ? (
+            <p style={{ color: '#6b7280', margin: 0, fontStyle: 'italic' }}>No detailed step information available.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {run.steps.map((step, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      backgroundColor: step.status === 'completed' ? '#22c55e' : step.status === 'running' ? '#3b82f6' : step.status === 'failed' ? '#ef4444' : '#d1d5db',
+                      marginTop: '4px',
+                      zIndex: 1
+                    }} />
+                    {idx < run.steps!.length - 1 && (
+                      <div style={{ width: '2px', flexGrow: 1, backgroundColor: '#e5e7eb', margin: '4px 0' }} />
+                    )}
+                  </div>
+                  <div style={{ paddingBottom: idx < run.steps!.length - 1 ? '24px' : '0', flexGrow: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{step.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        {step.status.toUpperCase()}
+                      </div>
+                    </div>
+                    {step.input_summary && <div style={{ fontSize: '0.8125rem', color: '#4b5563', marginBottom: '4px' }}>{step.input_summary}</div>}
+                    {step.output_summary && <div style={{ fontSize: '0.8125rem', color: '#059669', fontStyle: 'italic' }}>{step.output_summary}</div>}
+                    {step.friendly_error && <div style={{ fontSize: '0.8125rem', color: '#dc2626', marginTop: '4px' }}>{step.friendly_error}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div style={{ border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
         <div style={{ backgroundColor: '#f8fafc', padding: '16px 20px', borderBottom: '1px solid #e5e7eb' }}>
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Output Artifacts</h3>
