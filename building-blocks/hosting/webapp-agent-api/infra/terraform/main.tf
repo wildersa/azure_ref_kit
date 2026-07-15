@@ -52,7 +52,7 @@ resource "azurerm_linux_web_app" "agent_api" {
 
     active_directory_v2 {
       client_id            = var.client_id
-      tenant_auth_endpoint = "https://sts.windows.net/${var.tenant_id}/v2.0"
+      tenant_auth_endpoint = "https://login.microsoftonline.com/${var.tenant_id}/v2.0"
     }
   }
 

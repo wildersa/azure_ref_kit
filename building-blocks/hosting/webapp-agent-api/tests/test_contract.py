@@ -90,3 +90,4 @@ def test_terraform_security_defaults():
     assert "auth_enabled           = true" in content
     assert "https_only = true" in content
     assert "unauthenticated_action = \"Return401\"" in content
+    assert "tenant_auth_endpoint = \"https://login.microsoftonline.com/${var.tenant_id}/v2.0\"" in content
