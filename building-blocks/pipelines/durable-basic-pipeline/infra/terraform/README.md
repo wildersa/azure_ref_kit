@@ -42,3 +42,4 @@ This directory contains the Terraform configuration to deploy the Durable Basic 
 - Orchestrator functions must be **deterministic**. Do not use random numbers, GUIDs, or current date/time directly in the orchestrator logic (use `context.current_utc_datetime` instead).
 - Avoid long-running tasks in orchestrators; use Activity functions for such tasks.
 - For more details, see [Durable Functions limits and constraints](https://learn.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-orchestrations?tabs=python#reliability).
+# Force inclusion in PR
