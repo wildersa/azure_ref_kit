@@ -1,0 +1,19 @@
+name: foundry-agent-with-queue-tool
+status: executable
+purpose: Demonstrate a Foundry agent that submits long-running work through a controlled async queue-function boundary.
+building_blocks:
+  - id: agent-tool-queue-function
+    path: building-blocks/functions/agent-tool-queue-function
+    role: worker
+    status: implemented
+    deploy_target: pipeline_function_app
+  - id: customer-safe-status-boundary
+    path: building-blocks/security/customer-safe-status-boundary
+    role: security
+    status: implemented
+    deploy_target: none
+  - id: managed-identity-rbac
+    path: building-blocks/security/managed-identity-rbac
+    role: security
+    status: implemented
+    deploy_target: none
