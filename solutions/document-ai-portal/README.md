@@ -29,13 +29,13 @@ This solution is composed of multiple building blocks that are packaged into spe
 
 ### Composed Building Blocks
 
-- [Static Status Portal](../../building-blocks/portals/static-status-portal/): The React-based frontend (Status: Scaffold).
+- [Static Status Portal](../../building-blocks/portals/static-status-portal/): The React-based frontend (Status: Implemented).
 - [Portal API Functions](../../building-blocks/functions/portal-api-functions/): Backend API for the portal (Status: Implemented).
 - [Blob Trigger](../../building-blocks/functions/blob-trigger-start-pipeline/): Entrypoint for new documents (Status: Implemented).
-- [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results (Status: Scaffold).
+- [Blob Artifact Store](../../building-blocks/storage/blob-artifact-store/): Secure storage for documents and results (Status: Implemented).
 - [Durable Basic Pipeline](../../building-blocks/pipelines/durable-basic-pipeline/): Workflow orchestration (Status: Implemented).
-- [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker (Status: Implemented).
-- [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker (Status: Implemented).
+- [OCR Document Intelligence](../../building-blocks/functions/ocr-document-intelligence/): Document analysis worker (Status: Active).
+- [Field Validation Worker](../../building-blocks/functions/field-validation-worker/): Extracted field validation worker (Status: Active).
 - [Final Result Publisher](../../building-blocks/functions/final-result-publisher/): Finalizes and publishes safe results (Status: Implemented).
 - [Pipeline Assistant Foundry](../../building-blocks/agents/pipeline-assistant-foundry/): AI agent for customer interaction (Status: Implemented).
 - [AppInsights Observability](../../building-blocks/observability/appinsights-observability/): Technical monitoring and tracing (Status: Scaffold).
