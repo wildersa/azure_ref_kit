@@ -11,6 +11,18 @@ SafeId = Annotated[
     str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=128)
 ]
 
+# Pattern for friendly summaries: permits standard characters and common punctuation.
+SUMMARY_PATTERN = r"^[a-zA-Z0-9_\-\. \(\)\',;!]+$"
+SafeSummary = Annotated[
+    str, StringConstraints(pattern=SUMMARY_PATTERN, min_length=1, max_length=512)
+]
+
+# Short SHA pattern: exactly 7 or 8 hex characters.
+SHA_PATTERN = r"^[a-fA-F0-9]{7,8}$"
+SafeSha = Annotated[
+    str, StringConstraints(pattern=SHA_PATTERN, min_length=7, max_length=8)
+]
+
 
 class PipelineStatus(str, Enum):
     IN_PROGRESS = "inProgress"
@@ -43,23 +55,23 @@ class GetPipelineRunStatusResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    pipeline_name: str = Field(
+    pipeline_name: SafeId = Field(
         ..., description="The name of the Azure DevOps pipeline."
     )
-    run_id: str = Field(..., description="The unique identifier for the specific run.")
+    run_id: SafeId = Field(..., description="The unique identifier for the specific run.")
     status: PipelineStatus = Field(..., description="The current state of the run.")
     result: PipelineResult = Field(..., description="The outcome of a completed run.")
-    branch: str = Field(..., description="The source branch for the run.")
-    commit_sha: Optional[str] = Field(
+    branch: SafeId = Field(..., description="The source branch for the run.")
+    commit_sha: Optional[SafeSha] = Field(
         None, description="The short commit SHA associated with the run."
     )
     start_time: datetime = Field(..., description="When the run started (ISO 8601).")
     end_time: Optional[datetime] = Field(
         None, description="When the run finished (ISO 8601)."
     )
-    duration_seconds: Optional[int] = Field(
-        None, description="The total duration of the run in seconds."
+    duration_seconds: Optional[Annotated[int, Field(ge=0, le=864000)]] = Field(
+        None, description="The total duration of the run in seconds (up to 10 days)."
     )
-    summary: Optional[str] = Field(
+    summary: Optional[SafeSummary] = Field(
         None, description="A friendly business-level summary of the run status."
     )
