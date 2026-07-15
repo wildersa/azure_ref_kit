@@ -6,7 +6,7 @@ This reference solution demonstrates how to connect an Azure AI Foundry agent to
 
 A company wants to build a "System Status Assistant" that can be used across multiple different AI platforms (Azure AI Foundry, local developer CLI, etc.). They choose **MCP** as the tool integration layer to ensure that the tool logic is written once and can be consumed by any MCP-compatible agent.
 
-This example composes a Foundry Prompt Agent with an MCP server based on the `fastmcp-basic-server` building block.
+This example composes a Foundry Prompt Agent with an MCP server based on the `azure-functions-mcp-endpoint` building block.
 
 ## Architecture
 
@@ -22,14 +22,14 @@ flowchart LR
     end
 
     subgraph "MCP Boundary (Remote)"
-        MCP_Server[MCP Server / FastMCP]
-        Tool[get_system_status]
+        MCP_Endpoint[Azure Functions MCP Endpoint]
+        Tool[get_synthetic_resource]
     end
 
     User --> Runtime
     Runtime <--> Agent
-    Agent <-->|Streamable HTTP| MCP_Server
-    MCP_Server --> Tool
+    Agent <-->|Streamable HTTP| MCP_Endpoint
+    MCP_Endpoint --> Tool
 ```
 
 ## Security and Customer Safety Boundary
@@ -44,7 +44,7 @@ flowchart LR
 ### Prerequisites
 - Python 3.10+
 - Azure AI Foundry project with a model deployment (e.g., `gpt-4o`).
-- A running MCP server (see `building-blocks/mcp/fastmcp-basic-server/`).
+- A running MCP server (see `building-blocks/mcp/azure-functions-mcp-endpoint/`).
 
 ### Configuration
 Set the following environment variables:
@@ -53,9 +53,9 @@ Set the following environment variables:
 export AZURE_AI_PROJECT_ENDPOINT="https://<resource>.ai.azure.com/api/projects/<project-id>"
 export AZURE_AI_AGENT_NAME="mcp-status-assistant"
 export AZURE_AI_MODEL_NAME="gpt-4o"
-export MCP_SERVER_URL="https://your-mcp-server.com/mcp"
-export MCP_SERVER_LABEL="system-status-server"
-export ALLOWED_TOOL_NAMES="get_system_status"
+export MCP_SERVER_URL="https://your-functions-app.azurewebsites.net/runtime/webhooks/mcp"
+export MCP_SERVER_LABEL="azure-functions-mcp"
+export ALLOWED_TOOL_NAMES="get_synthetic_resource"
 ```
 
 ### Run Commands
@@ -67,7 +67,7 @@ export ALLOWED_TOOL_NAMES="get_system_status"
 
 2. **Run CLI**:
    ```bash
-   PYTHONPATH=. python3 -m solutions.foundry-agent-with-mcp.src.main "Is the system healthy?"
+   PYTHONPATH=. python3 -m solutions.foundry-agent-with-mcp.src.main "What is the status of the compute resource?"
    ```
 
 3. **Run Tests**:
@@ -99,6 +99,9 @@ For more information, see [Role-based access control for Microsoft Foundry](http
 - **Follow-up needed**: No.
 
 ## Deployment / IaC Decision
-**Status: No-IaC (Reference Pattern)**
+**Status: No-IaC (Composition Reference)**
 
-This solution focuses on the runtime integration between a Foundry Agent and an MCP server. The infrastructure for hosting MCP servers is covered in separate building blocks. The agent itself is resolved or created dynamically via the SDK.
+This solution performs application-level composition between a Foundry Agent and a remote MCP endpoint. It does not introduce new infrastructure.
+- The **Foundry Agent** is managed as application configuration via the Azure AI Projects SDK.
+- The **MCP Endpoint** is provided by the `azure-functions-mcp-endpoint` building block, which owns its own Terraform definitions.
+- Connectivity is handled via environment variables (`MCP_SERVER_URL`).

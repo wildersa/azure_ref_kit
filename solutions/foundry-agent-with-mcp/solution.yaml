@@ -5,6 +5,6 @@ entrypoints:
   sdk_invocation: AIProjectClient
   cli: solutions.foundry-agent-with-mcp.src.main
 building_blocks:
-  - building-blocks/mcp/fastmcp-basic-server
+  - building-blocks/mcp/azure-functions-mcp-endpoint
 contracts: []
 azure_resources: []
