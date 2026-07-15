@@ -33,12 +33,15 @@ def test_get_synthetic_resource_storage_valid():
 
 def test_get_synthetic_resource_invalid_type():
     """Test request with unsupported resource type."""
-    context = json.dumps({"arguments": {"resource_type": "database"}})
+    rejected_input = "database-secret-leak-attempt"
+    context = json.dumps({"arguments": {"resource_type": rejected_input}})
     response_str = get_synthetic_resource(context)
     response = json.loads(response_str)
 
     assert "error" in response
     assert "Unsupported resource type" in response["error"]
+    # Regression test: Ensure the rejected input is NOT reflected in the error response
+    assert rejected_input not in response_str
 
 
 def test_get_synthetic_resource_missing_arg():

@@ -75,7 +75,7 @@ def get_synthetic_resource(context: str) -> str:
             return json.dumps({"error": "Missing required argument: resource_type"})
 
         if resource_type not in SYNTHETIC_DATA:
-            return json.dumps({"error": f"Unsupported resource type: {resource_type}"})
+            return json.dumps({"error": "Unsupported resource type."})
 
         # Return safe, synthetic data using the Pydantic model
         resource = SyntheticResource(**SYNTHETIC_DATA[resource_type])
