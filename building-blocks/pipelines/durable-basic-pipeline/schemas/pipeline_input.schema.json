@@ -8,15 +8,15 @@
       "type": "object",
       "required": ["id", "customer_id", "pipeline_type", "status", "created_at"],
       "properties": {
-        "id": { "type": "string" },
-        "customer_id": { "type": "string" },
-        "pipeline_type": { "type": "string" },
-        "status": { "type": "string", "const": "pending" },
+        "id": { "type": "string", "maxLength": 64 },
+        "customer_id": { "type": "string", "maxLength": 64 },
+        "pipeline_type": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "const": "pending", "maxLength": 64 },
         "created_at": { "type": "string", "format": "date-time" }
       },
       "additionalProperties": false
     },
-    "source_blob": { "type": ["string", "null"] }
+    "source_blob": { "type": ["string", "null"], "maxLength": 2048 }
   },
   "additionalProperties": false
 }

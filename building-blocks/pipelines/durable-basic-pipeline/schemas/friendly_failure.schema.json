@@ -4,9 +4,9 @@
   "type": "object",
   "required": ["error", "status"],
   "properties": {
-    "error": { "type": "string" },
-    "status": { "type": "string", "const": "failed" },
-    "friendly_message": { "type": "string" }
+    "error": { "type": "string", "maxLength": 128 },
+    "status": { "type": "string", "const": "failed", "maxLength": 64 },
+    "friendly_message": { "type": "string", "maxLength": 2048 }
   },
   "additionalProperties": false
 }

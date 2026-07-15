@@ -4,12 +4,13 @@
   "type": "object",
   "required": ["status", "artifacts"],
   "properties": {
-    "status": { "type": "string", "const": "completed" },
+    "status": { "type": "string", "const": "completed", "maxLength": 64 },
     "artifacts": {
       "type": "array",
-      "items": { "type": "string" }
+      "maxItems": 100,
+      "items": { "type": "string", "maxLength": 128 }
     },
-    "business_summary": { "type": ["string", "null"] }
+    "business_summary": { "type": ["string", "null"], "maxLength": 2048 }
   },
   "additionalProperties": false
 }
