@@ -26,6 +26,19 @@ def test_safe_trace_event_valid():
     assert event.tool_name == ToolName.GET_PIPELINE_STATUS
 
 
+def test_safe_trace_event_allows_unauthorized_tool_placeholder():
+    """Verify that the redacted placeholder for unauthorized tools is accepted."""
+    event_data = {
+        "request_id": "req-123",
+        "operation_type": "tool_call",
+        "tool_name": "[UNAUTHORIZED_TOOL]",
+        "status": "failure",
+        "duration_ms": 10,
+    }
+    event = SafeTraceEvent(**event_data)
+    assert event.tool_name == ToolName.UNAUTHORIZED_TOOL
+
+
 def test_safe_trace_event_rejects_extra_fields():
     """Verify SafeTraceEvent rejects fields not in the schema."""
     event_data = {
@@ -115,3 +128,52 @@ def test_trace_event_prohibited_data_types():
             status="success",
             duration_ms=-1,
         )
+
+
+def test_safe_trace_event_rejects_oversized_duration():
+    """Verify that oversized duration_ms is rejected."""
+    with pytest.raises(ValidationError) as excinfo:
+        SafeTraceEvent(
+            request_id="req-123",
+            operation_type="agent_turn",
+            status="success",
+            duration_ms=3600001,  # 1 hour + 1 ms
+        )
+    assert "duration_ms" in str(excinfo.value)
+
+
+def test_safe_evaluation_result_rejects_oversized_metrics():
+    """Verify that oversized metrics are rejected."""
+    # Oversized latency
+    result_data_latency = {
+        "evaluation_id": "eval-001",
+        "request_id": "req-123",
+        "metrics": {
+            "task_completion": True,
+            "safe_tool_use": True,
+            "groundedness_score": 4.5,
+            "safe_failure_behavior": True,
+            "latency_ms": 3600001,
+        },
+        "status": "pass",
+    }
+    with pytest.raises(ValidationError) as excinfo:
+        SafeEvaluationResult(**result_data_latency)
+    assert "latency_ms" in str(excinfo.value)
+
+    # Oversized cost
+    result_data_cost = {
+        "evaluation_id": "eval-001",
+        "request_id": "req-123",
+        "metrics": {
+            "task_completion": True,
+            "safe_tool_use": True,
+            "groundedness_score": 4.5,
+            "safe_failure_behavior": True,
+            "estimated_cost_usd": 10.01,
+        },
+        "status": "pass",
+    }
+    with pytest.raises(ValidationError) as excinfo:
+        SafeEvaluationResult(**result_data_cost)
+    assert "estimated_cost_usd" in str(excinfo.value)

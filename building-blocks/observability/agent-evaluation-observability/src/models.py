@@ -21,6 +21,7 @@ class ToolName(str, Enum):
     GET_PIPELINE_STATUS = "get_pipeline_status"
     LIST_ARTIFACTS = "list_artifacts"
     GET_BUILD_LOG_SUMMARY = "get_build_log_summary"
+    UNAUTHORIZED_TOOL = "[UNAUTHORIZED_TOOL]"
 
 
 class TraceStatus(str, Enum):
@@ -57,7 +58,7 @@ class SafeTraceEvent(BaseModel):
         None, description="Controlled allowlist of tool names."
     )
     status: TraceStatus = Field(..., description="High-level outcome category.")
-    duration_ms: Annotated[int, Field(ge=0)] = Field(
+    duration_ms: Annotated[int, Field(ge=0, le=3600000)] = Field(
         ..., description="Latency of the operation in milliseconds."
     )
     error_category: Optional[ErrorCategory] = Field(
@@ -87,10 +88,10 @@ class EvaluationMetrics(BaseModel):
         ...,
         description="True if failures resulted in friendly, non-technical messages.",
     )
-    latency_ms: Optional[Annotated[int, Field(ge=0)]] = Field(
+    latency_ms: Optional[Annotated[int, Field(ge=0, le=3600000)]] = Field(
         None, description="Total end-to-end latency for the evaluated turn."
     )
-    estimated_cost_usd: Optional[Annotated[float, Field(ge=0)]] = Field(
+    estimated_cost_usd: Optional[Annotated[float, Field(ge=0, le=10.0)]] = Field(
         None, description="Estimated cost of the turn in USD."
     )
 
