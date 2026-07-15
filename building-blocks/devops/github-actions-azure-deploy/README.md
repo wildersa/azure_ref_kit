@@ -1,6 +1,6 @@
 # GitHub Actions Azure Deployment Reference
 
-Secure GitHub Actions deployment pattern for publishing the [Static Status Portal](../../portals/static-status-portal/) to Azure Static Web Apps.
+Secure GitHub Actions deployment patterns for publishing the [Static Status Portal](../../portals/static-status-portal/) and the [APIM AI Gateway](../../gateways/apim-ai-gateway/) to Azure.
 
 ## Purpose
 
@@ -14,8 +14,7 @@ This building block defines secure reference patterns for deploying to Azure usi
 
 ## Deployment Architecture
 
-The following diagram illustrates the secure deployment boundary:
-
+### Static Web App Deployment
 ```mermaid
 graph TD
     Developer[Developer] -->|Push Code| GitHub[GitHub Repository]
@@ -32,9 +31,28 @@ graph TD
     end
 ```
 
+### APIM AI Gateway Deployment
+```mermaid
+flowchart TD
+    Developer[Developer] -->|Push Code| GitHub[GitHub Repository]
+    GitHub -->|Trigger| GHA[GitHub Actions Workflow]
+
+    subgraph "Azure Auth & Deploy Boundary"
+        GHA -- "OIDC Auth" --> Entra[Microsoft Entra ID]
+        Entra -- "Short-lived Token" --> Azure[Azure Subscription]
+        GHA -- "Run Terraform" --> TF[Module-local Terraform]
+    end
+
+    subgraph "Outcome"
+        TF -- "Deploy" --> APIM[APIM AI Gateway]
+    end
+```
+
 ## Configuration and Secrets
 
-To implement this pattern securely, configure the following GitHub Repository Secrets. **Never commit these values to the repository.**
+To implement these patterns securely, configure the following GitHub Repository Secrets and Variables. **Never commit these values to the repository.**
+
+### Secrets
 
 | Name | Type | Description |
 |------|------|-------------|
@@ -47,16 +65,24 @@ To implement this pattern securely, configure the following GitHub Repository Se
 | `BACKEND_CONTAINER_NAME` | Secret | The container name for the Terraform remote backend. |
 | `BACKEND_KEY` | Secret | The state file key for the Terraform remote backend. |
 
-### Configuration Variables
+### Variables
 
 | Name | Type | Description |
 |------|------|-------------|
-| `ENVIRONMENT_NAME` | Variable | The name of the GitHub Environment used for deployment gating (e.g., `durable-pipeline-deploy`). |
+| `ENVIRONMENT_NAME` | Variable | The name of the GitHub Environment used for deployment gating (e.g., `durable-pipeline-deploy`, `apim-gateway-deploy`). |
+| `RESOURCE_GROUP_NAME` | Variable | The name of the target Azure resource group (APIM). |
+| `LOCATION` | Variable | Azure region for deployment. |
+| `APIM_NAME` | Variable | Name of the APIM instance. |
+| `PUBLISHER_EMAIL` | Variable | Email address for APIM notifications. |
+| `PUBLISHER_NAME` | Variable | Organization name for APIM. |
+| `MODEL_ENDPOINT` | Variable | The target model endpoint URL. |
+| `MODEL_ID` | Variable | Friendly identifier for the model (e.g., 'gpt-4o'). |
+| `MODEL_RESOURCE_ID` | Variable | The Azure Resource ID of the model for RBAC assignment. |
 
 ### OIDC Configuration Prerequisites
 1. Create a Microsoft Entra application or User-Assigned Managed Identity.
 2. Configure **Federated Identity Credentials** in Azure to trust your GitHub repository, branch, or environment.
-3. Assign the `Contributor` role (or a custom role with SWA deployment permissions) to the identity at the target resource or resource group scope.
+3. Assign the `Contributor` role (or a custom role with deployment permissions) to the identity at the target resource or resource group scope.
 
 ## Reference Workflow: Deploy Static Status Portal
 
@@ -116,34 +142,44 @@ jobs:
           output_location: "dist" # Folder where the build output is generated
 ```
 
-## Reference Workflow: Deploy Durable Basic Pipeline Infrastructure
+## Reference Workflow: Deploy APIM AI Gateway
 
-The following YAML demonstrates a secure Terraform deployment for the [Durable Basic Pipeline](../../pipelines/durable-basic-pipeline/infra/terraform/). It includes static validation, planning, and deployment stages with environment-based gating.
+The following YAML demonstrates a secure Terraform deployment for the [APIM AI Gateway](../../gateways/apim-ai-gateway/). It includes static validation, planning, and deployment stages with environment-based gating.
 
 ```yaml
-name: Deploy Durable Basic Pipeline
+name: Deploy APIM AI Gateway
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+      - 'building-blocks/gateways/apim-ai-gateway/infra/terraform/**'
   pull_request:
     branches: [ main ]
     paths:
-      - 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform/**'
+      - 'building-blocks/gateways/apim-ai-gateway/infra/terraform/**'
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  TF_WORKING_DIR: 'building-blocks/pipelines/durable-basic-pipeline/infra/terraform'
+  TF_WORKING_DIR: 'building-blocks/gateways/apim-ai-gateway/infra/terraform'
   # Terraform OIDC environment variables
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_USE_OIDC: true
+  # Terraform variables mapped from secrets/variables
+  TF_VAR_resource_group_name: ${{ vars.RESOURCE_GROUP_NAME }}
+  TF_VAR_location: ${{ vars.LOCATION }}
+  TF_VAR_apim_name: ${{ vars.APIM_NAME }}
+  TF_VAR_publisher_email: ${{ vars.PUBLISHER_EMAIL }}
+  TF_VAR_publisher_name: ${{ vars.PUBLISHER_NAME }}
+  TF_VAR_model_endpoint: ${{ vars.MODEL_ENDPOINT }}
+  TF_VAR_model_id: ${{ vars.MODEL_ID }}
+  TF_VAR_model_resource_id: ${{ vars.MODEL_RESOURCE_ID }}
+  TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
 jobs:
   static_validation:
@@ -166,7 +202,7 @@ jobs:
     name: 'Infrastructure Plan'
     needs: static_validation
     runs-on: ubuntu-latest
-    environment: durable-pipeline-deploy
+    environment: apim-gateway-deploy
     steps:
       - uses: actions/checkout@v4
       - name: 'Az CLI Login'
@@ -191,7 +227,7 @@ jobs:
     name: 'Infrastructure Deploy'
     needs: plan
     runs-on: ubuntu-latest
-    environment: durable-pipeline-deploy
+    environment: apim-gateway-deploy
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
@@ -214,21 +250,32 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
 ```
 
+## Cost Impact & Operations
+
+### Cost Impact
+- **Billable Resources**: Applying these workflows will provision billable Azure resources, including **Azure API Management (APIM)** and **Azure OpenAI/Foundry** model consumption.
+- **SKU Caution**: Ensure the configured `apim_sku` (default: `StandardV2_1`) and model usage align with your budget and quota.
+
+### Rollback and Destroy
+- **Rollback**: Terraform does not support automatic "undo" to a previous state. To roll back, you must revert the code changes in the repository and trigger a new deployment workflow to apply the previous configuration.
+- **Destroy**: Deleting resources is an explicit operator action. Use `terraform destroy` locally or via a manual workflow to remove resources.
+- **State Risks**: Manual deletion of resources in the Azure Portal can cause state divergence, leading to deployment failures in the workflow.
+
 ## Security & Customer-Safe Boundary
 
 This pattern enforces strict boundaries to prevent leakage of technical internals:
 
 - **Forbidden in Repository**: Never commit `.env`, `.publishsettings`, `.json` credentials, or hardcoded IDs.
 - **Identity First**: Prefer OIDC over long-lived secrets.
-- **Least Privilege**: The deployment identity should only have permissions to deploy to the specific SWA resource.
+- **Least Privilege**: The deployment identity should only have permissions to deploy to the specific Azure resources.
 - **Log Masking**: GitHub Actions automatically masks secrets, but avoid printing technical identifiers (Tenant ID, Subscription ID) in non-secret variables if they might appear in customer-facing logs.
 
 ## Deployment/IaC Decision
 
 - **Pattern-Only**: This building block defines the *workflow* contract. It does not include Terraform/OpenTofu files because it focuses on the GitHub Actions orchestration.
-- **Prerequisites**: It assumes the Azure Static Web App resource has been provisioned (e.g., via a separate infra module or manually for initial setup).
+- **Prerequisites**: It assumes the target Azure resources (e.g., Resource Group) have been provisioned or will be managed via the provided Terraform modules.
 
 ## References
 - [GitHub Actions for Azure Overview](https://learn.microsoft.com/en-us/azure/developer/github/github-actions)
-- [Deploy to Azure Static Web Apps with GitHub Actions](https://learn.microsoft.com/en-us/azure/static-web-apps/build-configuration)
-- [Azure Login action / OpenID Connect guidance](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
+- [Connect GitHub to Azure with OpenID Connect](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
+- [Terraform on Azure overview](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
