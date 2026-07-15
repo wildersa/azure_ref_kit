@@ -14,20 +14,21 @@ def mock_settings():
         devops_pat="test-pat",
         organization_url="https://dev.azure.com/test-org",
         project="test-project",
-        build_id=456,
+        pipeline_id="test-pipeline",
+        run_id="run-456",
     )
 
 
 @patch("src.adapter.AIProjectClient")
 @patch("src.adapter.DefaultAzureCredential")
-@patch("src.adapter.tool.get_build_status_safe")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
 def test_adapter_chat_response_with_tool_call(
-    mock_get_status, mock_credential, mock_client_class, mock_settings
+    mock_devops_adapter_class, mock_credential, mock_client_class, mock_settings
 ):
     """
     Proves successful tool composition:
-    1. Agent requests get_build_status.
-    2. Adapter routes to tool.get_build_status_safe.
+    1. Agent requests get_pipeline_run_status.
+    2. Adapter routes to DevOpsStatusAdapter.get_pipeline_run_status.
     3. Result is returned to the agent.
     """
     # Mock AIProjectClient and its sub-objects
@@ -47,11 +48,10 @@ def test_adapter_chat_response_with_tool_call(
     # First response contains a function call
     mock_call = MagicMock()
     mock_call.type = "function_call"
-    mock_call.name = "get_build_status"
+    mock_call.name = "get_pipeline_run_status"
     mock_call.arguments = json.dumps({
-        "organization_url": "https://dev.azure.com/test-org",
-        "project": "test-project",
-        "build_id": 456
+        "pipeline_id": "test-pipeline",
+        "run_id": "run-456"
     })
     mock_call.call_id = "call-789"
 
@@ -65,13 +65,20 @@ def test_adapter_chat_response_with_tool_call(
 
     mock_openai.responses.create.side_effect = [mock_response_1, mock_response_2]
 
-    # Mock the tool implementation result
-    mock_get_status.return_value = {
+    # Mock the DevOpsStatusAdapter result
+    mock_devops_adapter = mock_devops_adapter_class.return_value
+    mock_result_obj = MagicMock()
+    mock_result_obj.model_dump.return_value = {
+        "pipeline_name": "Test Pipeline",
+        "run_id": "run-456",
         "status": "completed",
         "result": "succeeded",
+        "branch": "main",
+        "start_time": "2024-01-01T10:00:00Z",
         "summary": "Build succeeded.",
         "portal_url": "https://dev.azure.com/test-org/test-project/_build/results?buildId=456"
     }
+    mock_devops_adapter.get_pipeline_run_status.return_value = mock_result_obj
 
     # Execute
     adapter = FoundryDevOpsAgentAdapter(mock_settings)
@@ -79,18 +86,15 @@ def test_adapter_chat_response_with_tool_call(
 
     # Assertions
     assert response == "The build succeeded."
-    mock_get_status.assert_called_once()
-
-    # Verify the tool was called with the correct arguments from the agent
-    args = mock_get_status.call_args[0][0]
-    assert args["build_id"] == 456
-    assert args["project"] == "test-project"
+    mock_devops_adapter.get_pipeline_run_status.assert_called_once_with(
+        pipeline_id="test-pipeline", run_id="run-456"
+    )
 
 
 @patch("src.adapter.AIProjectClient")
-@patch("src.adapter.tool.get_build_status_safe")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
 def test_adapter_handles_tool_failure_sanitized(
-    mock_get_status, mock_client_class, mock_settings
+    mock_devops_adapter_class, mock_client_class, mock_settings
 ):
     """
     Verifies that tool failures are caught and a sanitized error is returned to the agent.
@@ -104,11 +108,10 @@ def test_adapter_handles_tool_failure_sanitized(
     # Agent calls the tool
     mock_call = MagicMock()
     mock_call.type = "function_call"
-    mock_call.name = "get_build_status"
+    mock_call.name = "get_pipeline_run_status"
     mock_call.arguments = json.dumps({
-        "organization_url": "https://dev.azure.com/test-org",
-        "project": "test-project",
-        "build_id": 456
+        "pipeline_id": "test-pipeline",
+        "run_id": "run-456"
     })
 
     mock_response_1 = MagicMock()
@@ -121,7 +124,8 @@ def test_adapter_handles_tool_failure_sanitized(
     mock_openai.responses.create.side_effect = [mock_response_1, mock_response_2]
 
     # Tool raises an exception (e.g. connection error)
-    mock_get_status.side_effect = Exception("Internal technical error")
+    mock_devops_adapter = mock_devops_adapter_class.return_value
+    mock_devops_adapter.get_pipeline_run_status.side_effect = Exception("Internal technical error")
 
     adapter = FoundryDevOpsAgentAdapter(mock_settings)
     adapter.get_chat_response("status?")
@@ -136,12 +140,12 @@ def test_adapter_handles_tool_failure_sanitized(
 
 
 @patch("src.adapter.AIProjectClient")
-@patch("src.adapter.tool.get_build_status_safe")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
 def test_adapter_rejects_out_of_scope_build(
-    mock_get_status, mock_client_class, mock_settings
+    mock_devops_adapter_class, mock_client_class, mock_settings
 ):
     """
-    Verifies that the adapter rejects tool calls for organizations, projects, or builds
+    Verifies that the adapter rejects tool calls for pipelines or runs
     not explicitly defined in the solution settings.
     """
     mock_client = mock_client_class.return_value
@@ -150,14 +154,13 @@ def test_adapter_rejects_out_of_scope_build(
     mock_openai.conversations.create.return_value.id = "conv-123"
     mock_client.agents.create_version.return_value.name = "agent-123"
 
-    # Agent attempts to query a DIFFERENT organization or build
+    # Agent attempts to query a DIFFERENT pipeline or run
     mock_call = MagicMock()
     mock_call.type = "function_call"
-    mock_call.name = "get_build_status"
+    mock_call.name = "get_pipeline_run_status"
     mock_call.arguments = json.dumps({
-        "organization_url": "https://dev.azure.com/DIFFERENT-ORG",
-        "project": "test-project",
-        "build_id": 456
+        "pipeline_id": "DIFFERENT-PIPELINE",
+        "run_id": "run-456"
     })
     mock_call.call_id = "call-wrong"
 
@@ -171,12 +174,91 @@ def test_adapter_rejects_out_of_scope_build(
     mock_openai.responses.create.side_effect = [mock_response_1, mock_response_2]
 
     adapter = FoundryDevOpsAgentAdapter(mock_settings)
-    adapter.get_chat_response("status of DIFFERENT-ORG?")
+    adapter.get_chat_response("status of DIFFERENT-PIPELINE?")
 
     # Verify the tool implementation was NEVER called
-    mock_get_status.assert_not_called()
+    mock_devops_adapter = mock_devops_adapter_class.return_value
+    mock_devops_adapter.get_pipeline_run_status.assert_not_called()
 
     # Verify the error returned to the agent is sanitized and explains the scope limit
     second_call_input = mock_openai.responses.create.call_args_list[1][1]["input"]
     output_json = json.loads(second_call_input[0]["output"])
     assert output_json["error"] == "The tool requested is unavailable for the specified scope."
+
+
+@patch("src.adapter.AIProjectClient")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
+def test_adapter_rejects_unknown_tool(
+    mock_devops_adapter_class, mock_client_class, mock_settings
+):
+    """
+    Verifies that the adapter rejects calls to unknown tools.
+    """
+    mock_client = mock_client_class.return_value
+    mock_openai = MagicMock()
+    mock_client.get_openai_client.return_value.__enter__.return_value = mock_openai
+    mock_openai.conversations.create.return_value.id = "conv-123"
+    mock_client.agents.create_version.return_value.name = "agent-123"
+
+    # Agent attempts to query an unknown tool
+    mock_call = MagicMock()
+    mock_call.type = "function_call"
+    mock_call.name = "delete_pipeline"
+    mock_call.arguments = json.dumps({"pipeline_id": "test-pipeline"})
+    mock_call.call_id = "call-evil"
+
+    mock_response_1 = MagicMock()
+    mock_response_1.output = [mock_call]
+
+    mock_response_2 = MagicMock()
+    mock_response_2.output = []
+    mock_response_2.output_text = "I cannot do that."
+
+    mock_openai.responses.create.side_effect = [mock_response_1, mock_response_2]
+
+    adapter = FoundryDevOpsAgentAdapter(mock_settings)
+    adapter.get_chat_response("delete pipeline!")
+
+    # Verify the error returned to the agent is sanitized
+    second_call_input = mock_openai.responses.create.call_args_list[1][1]["input"]
+    output_json = json.loads(second_call_input[0]["output"])
+    assert output_json["error"] == "The tool requested is unavailable."
+
+
+@patch("src.adapter.AIProjectClient")
+@patch("src.adapter.DefaultAzureCredential")
+@patch("src.adapter.devops_adapter.DevOpsStatusAdapter")
+def test_adapter_uses_managed_identity_if_pat_missing(
+    mock_devops_adapter_class, mock_credential_class, mock_client_class
+):
+    """
+    Verifies that the adapter attempts to fetch an Entra ID token using Managed Identity
+    if the PAT is not provided in settings.
+    """
+    settings = Settings(
+        project_endpoint="https://test.ai.azure.com/api/projects/123",
+        agent_name="test-agent",
+        model_name="gpt-4o",
+        devops_pat=None,  # Missing PAT
+        organization_url="https://dev.azure.com/test-org",
+        project="test-project",
+        pipeline_id="test-pipeline",
+        run_id="run-456",
+    )
+
+    mock_credential = mock_credential_class.return_value
+    mock_token = MagicMock()
+    mock_token.token = "mock-entra-token"
+    mock_credential.get_token.return_value = mock_token
+
+    adapter = FoundryDevOpsAgentAdapter(settings)
+    adapter._ensure_devops_adapter()
+
+    # Assert Entra ID token was requested with correct scope
+    mock_credential.get_token.assert_called_with("499b84ac-1321-427f-aa17-267ca6975798/.default")
+    # Assert DevOpsStatusAdapter was initialized with the Entra token
+    mock_devops_adapter_class.assert_called_with(
+        organization_url="https://dev.azure.com/test-org",
+        project="test-project",
+        token="mock-entra-token"
+    )

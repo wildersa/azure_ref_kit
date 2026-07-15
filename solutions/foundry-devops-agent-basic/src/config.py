@@ -15,10 +15,11 @@ class Settings:
     model_name: str
 
     # Azure DevOps configuration
-    devops_pat: str
+    devops_pat: Optional[str]  # Optional to support Entra ID
     organization_url: str
     project: str
-    build_id: int
+    pipeline_id: str
+    run_id: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -32,7 +33,8 @@ class Settings:
         devops_pat = os.getenv("AZURE_DEVOPS_PAT")
         organization_url = os.getenv("AZURE_DEVOPS_ORG_URL")
         project = os.getenv("AZURE_DEVOPS_PROJECT")
-        build_id_str = os.getenv("AZURE_DEVOPS_BUILD_ID")
+        pipeline_id = os.getenv("AZURE_DEVOPS_PIPELINE_ID")
+        run_id = os.getenv("AZURE_DEVOPS_RUN_ID")
 
         missing = []
         if not project_endpoint:
@@ -41,14 +43,15 @@ class Settings:
             missing.append("AZURE_AI_AGENT_NAME")
         if not model_name:
             missing.append("AZURE_AI_MODEL_NAME")
-        if not devops_pat:
-            missing.append("AZURE_DEVOPS_PAT")
+        # devops_pat is optional to support Managed Identity
         if not organization_url:
             missing.append("AZURE_DEVOPS_ORG_URL")
         if not project:
             missing.append("AZURE_DEVOPS_PROJECT")
-        if not build_id_str:
-            missing.append("AZURE_DEVOPS_BUILD_ID")
+        if not pipeline_id:
+            missing.append("AZURE_DEVOPS_PIPELINE_ID")
+        if not run_id:
+            missing.append("AZURE_DEVOPS_RUN_ID")
 
         if missing:
             raise ValueError(
@@ -88,13 +91,14 @@ class Settings:
         ):
             raise ValueError("AZURE_DEVOPS_ORG_URL must be a valid Azure DevOps URL.")
 
-        # Validation for build ID
-        try:
-            build_id = int(build_id_str)
-            if build_id <= 0:
-                raise ValueError()
-        except ValueError:
-            raise ValueError("AZURE_DEVOPS_BUILD_ID must be a positive integer.")
+        # Validation for identifiers (SafeId pattern)
+        safe_id_regex = r"^[a-zA-Z0-9_\-\. ]+$"
+        if not re.match(safe_id_regex, project):
+            raise ValueError("Invalid AZURE_DEVOPS_PROJECT identifier.")
+        if not re.match(safe_id_regex, pipeline_id):
+            raise ValueError("Invalid AZURE_DEVOPS_PIPELINE_ID identifier.")
+        if not re.match(safe_id_regex, run_id):
+            raise ValueError("Invalid AZURE_DEVOPS_RUN_ID identifier.")
 
         return cls(
             project_endpoint=project_endpoint,
@@ -103,7 +107,8 @@ class Settings:
             devops_pat=devops_pat,
             organization_url=organization_url,
             project=project,
-            build_id=build_id,
+            pipeline_id=pipeline_id,
+            run_id=run_id,
         )
 
 

@@ -1,13 +1,19 @@
 name: foundry-devops-agent-basic
 status: active
-purpose: Minimal reference solution for an Azure AI Foundry agent answering safe pipeline/build status questions through a controlled tool boundary.
+purpose: Minimal reference solution for an Azure AI Foundry agent answering safe pipeline/build status questions through a controlled MCP tool boundary.
 entrypoints:
   cli: solutions/foundry-devops-agent-basic/src/main.py
   sdk_invocation: solutions/foundry-devops-agent-basic/src/adapter.py
 building_blocks:
   - building-blocks/agents/pipeline-assistant-foundry/
-  - building-blocks/functions/devops-status-tool/
+  - building-blocks/mcp/devops-mcp-tool-contract/
+  - building-blocks/mcp/devops-status-adapter/
 contracts:
   - shared/contracts/devops-status.schema.json
-azure_resources: []
-deployment_iac: "No-IaC: Prompt agent configuration via SDK/CLI. Composes existing building blocks."
+  - building-blocks/mcp/devops-mcp-tool-contract/schemas/get_pipeline_run_status_request.schema.json
+  - building-blocks/mcp/devops-mcp-tool-contract/schemas/get_pipeline_run_status_response.schema.json
+azure_resources:
+  - Azure AI Foundry Hub
+  - Azure AI Foundry Project
+  - Azure OpenAI (GPT-4o)
+deployment_iac: "solutions/foundry-devops-agent-basic/infra/terraform/"

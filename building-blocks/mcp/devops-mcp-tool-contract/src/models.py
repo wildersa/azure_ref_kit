@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field, ConfigDict, StringConstraints
 from typing_extensions import Annotated
 
@@ -75,3 +75,29 @@ class GetPipelineRunStatusResponse(BaseModel):
     summary: Optional[SafeSummary] = Field(
         None, description="A friendly business-level summary of the run status."
     )
+    portal_url: Optional[str] = Field(
+        None, description="Sanitized link to the run in the Azure DevOps portal."
+    )
+
+
+class PipelineRunSummary(BaseModel):
+    """Summary of a pipeline run."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    run_id: SafeId = Field(..., description="The unique identifier for the specific run.")
+    status: PipelineStatus = Field(..., description="The current state of the run.")
+    result: PipelineResult = Field(..., description="The outcome of a completed run.")
+    branch: SafeId = Field(..., description="The source branch for the run.")
+    start_time: datetime = Field(..., description="When the run started (ISO 8601).")
+
+
+class ListRecentPipelineRunsResponse(BaseModel):
+    """Response containing a list of recent pipeline runs."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    pipeline_name: SafeId = Field(
+        ..., description="The name of the Azure DevOps pipeline."
+    )
+    runs: List[PipelineRunSummary] = Field(..., description="List of recent runs.")

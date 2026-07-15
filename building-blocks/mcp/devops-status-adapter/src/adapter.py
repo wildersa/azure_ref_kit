@@ -63,7 +63,7 @@ class DevOpsStatusAdapter:
         Args:
             organization_url: The Azure DevOps organization URL (e.g., https://dev.azure.com/org).
             project: The project name or ID.
-            token: The Personal Access Token (PAT).
+            token: The Personal Access Token (PAT) or Entra ID Bearer token.
             api_version: The Azure DevOps REST API version.
             transport: Optional injectable HTTP transport for testing and isolation.
         """
@@ -86,11 +86,19 @@ class DevOpsStatusAdapter:
 
     def _get_headers(self) -> Dict[str, str]:
         """Construct headers for the REST API request."""
-        import base64
+        # Detect if the token is likely an Entra ID Bearer token or a PAT
+        # PATs are usually shorter and don't look like JWTs.
+        # Entra tokens for Azure DevOps are Bearer tokens.
+        if self.token.startswith("ey") and len(self.token) > 100:
+            auth_header = f"Bearer {self.token}"
+        else:
+            import base64
 
-        auth = base64.b64encode(f":{self.token}".encode("ascii")).decode("ascii")
+            auth = base64.b64encode(f":{self.token}".encode("ascii")).decode("ascii")
+            auth_header = f"Basic {auth}"
+
         return {
-            "Authorization": f"Basic {auth}",
+            "Authorization": auth_header,
             "Content-Type": "application/json",
             "Accept": f"application/json;api-version={self.api_version}",
         }
