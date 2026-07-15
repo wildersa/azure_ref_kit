@@ -1,10 +1,13 @@
 import re
-from typing import Any, Dict, List, Set
+from typing import Any, Dict
 
 # Standard redaction patterns
 REDACTION_PATTERNS = [
     (re.compile(r"AccountKey=[^;]+", re.IGNORECASE), "AccountKey=[REDACTED]"),
-    (re.compile(r"Bearer\s+[a-zA-Z0-9\-\._~+/]+=*", re.IGNORECASE), "Bearer [REDACTED]"),
+    (
+        re.compile(r"Bearer\s+[a-zA-Z0-9\-\._~+/]+=*", re.IGNORECASE),
+        "Bearer [REDACTED]",
+    ),
     (re.compile(r"sig=[a-zA-Z0-9%]+", re.IGNORECASE), "sig=[REDACTED]"),
     (re.compile(r"client_secret=[^&]+", re.IGNORECASE), "client_secret=[REDACTED]"),
 ]
@@ -60,6 +63,7 @@ ALLOWED_TOOL_NAMES = {
     "list_artifacts",
     "get_build_log_summary",
 }
+
 
 class TelemetryRedactor:
     """Utility to filter and redact agent telemetry to maintain customer-safe boundaries."""

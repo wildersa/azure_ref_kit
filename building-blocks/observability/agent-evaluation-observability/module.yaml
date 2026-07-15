@@ -46,3 +46,4 @@ contracts:
     - trace-event.schema.json
     - evaluation-result.schema.json
     - src/redactor.py
+    - src/models.py
