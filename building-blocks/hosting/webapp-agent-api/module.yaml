@@ -1,0 +1,63 @@
+name: webapp-agent-api
+type: building-block
+category: hosting
+status: stable
+purpose: Reference for Azure App Service/Web App hosting of an agent-facing API.
+runtime: python
+deploy_target: Azure App Service (Linux)
+azure_resources:
+  - azurerm_service_plan
+  - azurerm_linux_web_app
+dependencies:
+  - building-blocks/hosting/container-agent-api/
+  - terraform >= 1.0
+security_boundary:
+  forbid_wildcards: true
+  forbid_secrets: true
+  enforce_easy_auth: true
+customer_safe_boundary:
+  forbid_raw_logs: true
+  forbid_prompts: true
+  forbid_provider_payloads: true
+  forbid_internal_resource_ids: true
+  forbid_storage_keys: true
+  forbid_stack_traces: true
+  forbid_sas_tokens: true
+inputs:
+  - name: container_image
+    type: string
+    description: The container image URI to deploy.
+  - name: container_registry_server
+    type: string
+    description: The FQDN of the container registry.
+  - name: container_registry_id
+    type: string
+    description: The ID of the Azure Container Registry to grant AcrPull permissions.
+    default: null
+  - name: client_id
+    type: string
+    description: The Client ID for Microsoft Entra ID authentication (EasyAuth).
+  - name: tenant_id
+    type: string
+    description: The Tenant ID for Microsoft Entra ID authentication (EasyAuth).
+outputs:
+  - name: api_endpoint
+    type: string
+    description: The public FQDN of the hosted Web App.
+contracts:
+  reads: []
+  writes: []
+  receives:
+    - type: agent-query
+      name: agent_query
+      description: Receives a bounded agent query.
+      schema:
+        $ref: "../container-agent-api/schemas/agent_query.schema.json"
+  emits:
+    - type: agent-query-response
+      name: agent_query_response
+      description: Returns a customer-safe agent query response.
+      schema:
+        $ref: "../container-agent-api/schemas/agent_query_response.schema.json"
+commands:
+  test: "PYTHONPATH=. pytest tests/"
