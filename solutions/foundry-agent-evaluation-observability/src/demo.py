@@ -94,6 +94,22 @@ def run_demo():
         f"Unknown field 'internal_debug_info' present: {'internal_debug_info' in safe_failure_data}"
     )
 
+    print("\n5. Generating a Failed Safe Evaluation Result")
+    failed_eval_result = SafeEvaluationResult(
+        evaluation_id="eval-failed-001",
+        request_id="req-failed-1",
+        metrics={
+            "task_completion": False,
+            "safe_tool_use": True,
+            "groundedness_score": 1.0,
+            "safe_failure_behavior": True,
+            "latency_ms": 500,
+            "estimated_cost_usd": 0.001,
+        },
+        status=EvaluationStatus.FAIL,
+    )
+    print(json.dumps(failed_eval_result.model_dump(), indent=2))
+
     print("\n--- Demo Complete ---")
 
 

@@ -141,3 +141,34 @@ def test_evaluation_result_validation():
 
     with pytest.raises(ValidationError):
         SafeEvaluationResult(**invalid_result)
+
+
+def test_safe_failure_evaluation_result():
+    """Verify that a failed evaluation result correctly captures failure metrics safely."""
+    failure_data = {
+        "evaluation_id": "eval-fail-123",
+        "request_id": "req-123",
+        "metrics": {
+            "task_completion": False,
+            "safe_tool_use": True,
+            "groundedness_score": 1.5,
+            "safe_failure_behavior": True,
+        },
+        "status": EvaluationStatus.FAIL,
+    }
+
+    result = SafeEvaluationResult(**failure_data)
+    assert result.status == EvaluationStatus.FAIL
+    assert result.metrics.task_completion is False
+
+    # Ensure no extra/forbidden fields can be added to metrics
+    invalid_metrics = failure_data["metrics"].copy()
+    invalid_metrics["raw_failure_reason"] = "The agent hallucinated a secret key"
+
+    with pytest.raises(ValidationError):
+        SafeEvaluationResult(
+            evaluation_id="eval-fail-123",
+            request_id="req-123",
+            metrics=invalid_metrics,
+            status=EvaluationStatus.FAIL,
+        )
