@@ -8,7 +8,7 @@
     "mcp": {
       "serverName": "ReferenceMcpServer",
       "serverVersion": "1.0.0",
-      "instructions": "This server provides reference MCP tools for Azure Functions. It includes tools for service information and resource health."
+      "instructions": "This server provides a reference MCP tool 'get_synthetic_resource' for retrieving synthetic resource metadata. It is a safe, read-only endpoint."
     }
   },
   "logging": {

@@ -20,15 +20,15 @@ By hosting MCP tools on Azure Functions, agents can access enterprise systems an
 
 ```mermaid
 flowchart LR
-    subgraph "Agent Client"
+    subgraph AgentClient ["Agent Client"]
         Agent[Foundry Agent / Client]
     end
 
-    subgraph "Azure AI Foundry"
+    subgraph AzureAIFoundry ["Azure AI Foundry"]
         Foundry[Agent Service / Connection]
     end
 
-    subgraph "Azure Functions (MCP Server)"
+    subgraph AzureFunctions ["Azure Functions (MCP Server)"]
         Endpoint["/runtime/webhooks/mcp (SSE/HTTP)"]
         Extension[MCP Binding Extension]
         Tool1[get_synthetic_resource]
@@ -89,9 +89,12 @@ PYTHONPATH=src pytest tests/test_endpoint.py
 ```
 
 ## Security and Customer Safety
-- **Read-Only**: This reference contains only read-only tool triggers.
-- **Data Redaction**: The implementation avoids logging raw tool arguments or internal stack traces.
-- **System Keys**: When deployed to Azure, the endpoint is protected by the `mcp_extension` system key.
+- **Read-Only**: This reference contains exactly one read-only tool trigger; no mutation operations or arbitrary command/query passthrough.
+- **Fail-Closed**: Tool input is validated against a small allowlist. Invalid inputs return generic error messages.
+- **Data Redaction**: The implementation avoids logging raw tool arguments or internal stack traces. No raw exception/provider/runtime payloads are returned.
+- **Authentication Boundary**:
+    - **Production**: When deployed to Azure, the endpoint is protected by the `mcp_extension` system key (Function Key) and optionally Entra ID (App Service Auth).
+    - **Local**: During local development, the boundary is the local process/network.
 - **Identity-First**: The recommended pattern uses Managed Identity for all backend resource access.
 
 ## Deployment / IaC Reference

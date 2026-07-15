@@ -1,5 +1,12 @@
 import json
-from src.function_app import get_synthetic_resource
+import sys
+import os
+import re
+
+# Ensure the 'src' directory is in the python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
+from function_app import get_synthetic_resource
 
 
 def test_get_synthetic_resource_compute_valid():
@@ -26,12 +33,15 @@ def test_get_synthetic_resource_storage_valid():
 
 def test_get_synthetic_resource_invalid_type():
     """Test request with unsupported resource type."""
-    context = json.dumps({"arguments": {"resource_type": "database"}})
+    rejected_input = "database-secret-leak-attempt"
+    context = json.dumps({"arguments": {"resource_type": rejected_input}})
     response_str = get_synthetic_resource(context)
     response = json.loads(response_str)
 
     assert "error" in response
     assert "Unsupported resource type" in response["error"]
+    # Regression test: Ensure the rejected input is NOT reflected in the error response
+    assert rejected_input not in response_str
 
 
 def test_get_synthetic_resource_missing_arg():
@@ -68,3 +78,34 @@ def test_get_synthetic_resource_no_internal_leakage():
     assert "connection_string" not in response
     assert "secret" not in response
     assert "key" not in response
+
+
+def test_no_mutation_operations_exposed():
+    """Verify that only the read-only tool is present in function_app.py and no mutation triggers exist."""
+    src_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../src/function_app.py")
+    )
+    with open(src_path, "r") as f:
+        content = f.read()
+
+    # We only expect exactly one mcp_tool_trigger decorator
+    triggers = re.findall(r"@app\.mcp_tool_trigger", content)
+    assert len(triggers) == 1, (
+        f"Expected exactly 1 MCP tool trigger, found {len(triggers)}"
+    )
+
+    # Ensure the single tool name is the read-only one
+    assert 'tool_name="get_synthetic_resource"' in content
+
+    # Check for keywords that might indicate hidden mutation triggers
+    # We look for other trigger types that might be misused or added by mistake
+    mutation_triggers = [
+        "@app.route",
+        "@app.blob_trigger",
+        "@app.queue_trigger",
+        "@app.timer_trigger",
+    ]
+    for trigger in mutation_triggers:
+        assert trigger not in content, (
+            f"Prohibited trigger {trigger} found in read-only reference."
+        )
