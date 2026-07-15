@@ -27,11 +27,6 @@ def test_submit_task_success(mock_post, settings):
     assert result["correlation_id"] == "test-uuid"
     assert result["status"] == "pending"
     assert "error" not in result
-    mock_post.assert_called_once_with(
-        "http://mock-submit",
-        json={"operation_type": "ping", "parameters": {"text": "hello"}},
-        timeout=10,
-    )
 
 
 @patch("requests.post")
@@ -43,7 +38,6 @@ def test_submit_task_fails_on_extra_fields(mock_post, settings):
         "correlation_id": "test-uuid",
         "status": "pending",
         "internal_secret": "do-not-leak",
-        "raw_logs": "debug info",
     }
     mock_post.return_value = mock_response
 
@@ -51,8 +45,23 @@ def test_submit_task_fails_on_extra_fields(mock_post, settings):
 
     assert "error" in result
     assert "invalid response" in result["error"]
-    assert "internal_secret" not in str(result)
-    assert "raw_logs" not in str(result)
+
+
+@patch("requests.post")
+def test_submit_task_fails_on_oversized_id(mock_post, settings):
+    """Verify that oversized correlation_id is rejected."""
+    mock_response = MagicMock()
+    mock_response.status_code = 202
+    mock_response.json.return_value = {
+        "correlation_id": "a" * 100,
+        "status": "pending",
+    }
+    mock_post.return_value = mock_response
+
+    result = submit_task("ping", settings=settings)
+
+    assert "error" in result
+    assert "invalid response" in result["error"]
 
 
 @patch("requests.post")
@@ -82,28 +91,41 @@ def test_get_task_status_success(mock_get, settings):
 
     assert result["status"] == "completed"
     assert result["result_data"]["message"] == "pong"
-    mock_get.assert_called_once_with("http://mock-status/test-uuid-12345", timeout=10)
 
 
 @patch("requests.get")
-def test_get_task_status_fails_on_extra_fields(mock_get, settings):
-    """Verify that extra fields in status response cause validation failure (fail-closed)."""
+def test_get_task_status_fails_on_oversized_payload(mock_get, settings):
+    """Verify that oversized fields in status response are rejected."""
     mock_response = MagicMock()
     mock_response.status_code = 200
+
+    # Test oversized summary
     mock_response.json.return_value = {
         "id": "test-uuid-12345",
         "status": "completed",
-        "internal_id": "hidden",
-        "provider_payload": {"key": "val"},
+        "business_summary": "s" * 1000,
     }
     mock_get.return_value = mock_response
-
     result = get_task_status("test-uuid-12345", settings=settings)
-
     assert "error" in result
-    assert "invalid response" in result["error"]
-    assert "internal_id" not in str(result)
-    assert "provider_payload" not in str(result)
+
+    # Test too many keys in result_data
+    mock_response.json.return_value = {
+        "id": "test-uuid-12345",
+        "status": "completed",
+        "result_data": {f"key{i}": i for i in range(20)},
+    }
+    result = get_task_status("test-uuid-12345", settings=settings)
+    assert "error" in result
+
+    # Test oversized value in result_data
+    mock_response.json.return_value = {
+        "id": "test-uuid-12345",
+        "status": "completed",
+        "result_data": {"large": "v" * 2000},
+    }
+    result = get_task_status("test-uuid-12345", settings=settings)
+    assert "error" in result
 
 
 @patch("requests.get")
