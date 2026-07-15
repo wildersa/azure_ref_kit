@@ -2,6 +2,7 @@ import logging
 import requests
 from typing import Any, Dict, Optional
 from .config import Settings
+from .models import SubmitResponse, TaskStatusResponse
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +14,7 @@ def submit_task(
 ) -> Dict[str, Any]:
     """
     Submits a task to the asynchronous queue function.
+    Validates the response against a strict schema to prevent provider leakage.
     """
     if settings is None:
         settings = Settings()
@@ -21,16 +23,23 @@ def submit_task(
 
     try:
         # In a real environment, we would use managed identity to get a token if the function is protected.
-        # For this reference, we assume standard HTTP call to the boundary.
         response = requests.post(settings.function_submit_url, json=payload, timeout=10)
 
         if response.status_code == 202:
-            return response.json()
+            try:
+                raw_data = response.json()
+                # P0: Explicitly construct the allowed response shape and reject extra fields
+                validated = SubmitResponse(**raw_data)
+                return validated.model_dump(mode="json")
+            except Exception:
+                logger.error("Failed to parse or validate submission response.")
+                return {"error": "The service returned an invalid response."}
 
-        logger.error(f"Failed to submit task. Status: {response.status_code}")
+        logger.error("Failed to submit task. Service returned non-success status.")
         return {"error": "The task submission service is currently unavailable."}
-    except Exception as e:
-        logger.error(f"Error calling submit function: {str(e)}")
+    except Exception:
+        # P0: Avoid logging exception text or internal details
+        logger.error("Error calling submit function.")
         return {"error": "An error occurred while submitting the task."}
 
 
@@ -39,6 +48,7 @@ def get_task_status(
 ) -> Dict[str, Any]:
     """
     Retrieves the status of a task from the status boundary.
+    Validates the response against a strict schema to prevent provider leakage.
     """
     if settings is None:
         settings = Settings()
@@ -48,6 +58,7 @@ def get_task_status(
         not correlation_id
         or not isinstance(correlation_id, str)
         or len(correlation_id) < 8
+        or len(correlation_id) > 64
     ):
         return {"error": "Invalid correlation ID provided."}
 
@@ -57,12 +68,20 @@ def get_task_status(
         response = requests.get(url, timeout=10)
 
         if response.status_code == 200:
-            return response.json()
+            try:
+                raw_data = response.json()
+                # P0: Explicitly construct the allowed response shape and reject extra fields
+                validated = TaskStatusResponse(**raw_data)
+                return validated.model_dump(mode="json")
+            except Exception:
+                logger.error("Failed to parse or validate status response.")
+                return {"error": "The service returned an invalid response."}
         elif response.status_code == 404:
             return {"error": "Task not found. Please verify the correlation ID."}
 
-        logger.error(f"Failed to get task status. Status: {response.status_code}")
+        logger.error("Failed to get task status. Service returned non-success status.")
         return {"error": "The status service is currently unavailable."}
-    except Exception as e:
-        logger.error(f"Error calling status function: {str(e)}")
+    except Exception:
+        # P0: Avoid logging exception text or internal details
+        logger.error("Error calling status function.")
         return {"error": "An error occurred while retrieving the task status."}
