@@ -14,9 +14,6 @@ contracts:
     - type: mcp-tool
       name: get_pipeline_run_status
       description: Returns the status and summary of a specific Azure DevOps pipeline run.
-    - type: mcp-tool
-      name: list_recent_pipeline_runs
-      description: Returns a list of recent runs for a specific pipeline.
 customer_safe_boundary:
   policy: "Strictly read-only access to DevOps business status. Forbids access to technical logs, secrets, mutation operations, and developer PII."
   enforcement: "Schema-level restriction of allowed fields and Pydantic-based input validation for safe identifiers."

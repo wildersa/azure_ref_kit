@@ -9,17 +9,22 @@
     "status",
     "result",
     "branch",
-    "start_time",
-    "portal_url"
+    "start_time"
   ],
   "properties": {
     "pipeline_name": {
       "type": "string",
-      "description": "The name of the Azure DevOps pipeline."
+      "description": "The name of the Azure DevOps pipeline.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
     "run_id": {
       "type": "string",
-      "description": "The unique identifier for the specific run or build."
+      "description": "The unique identifier for the specific run or build.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
     "status": {
       "type": "string",
@@ -46,11 +51,17 @@
     },
     "branch": {
       "type": "string",
-      "description": "The source branch for the run."
+      "description": "The source branch for the run.",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ ]+$"
     },
     "commit_sha": {
       "type": "string",
-      "description": "The short commit SHA associated with the run."
+      "description": "The short commit SHA associated with the run.",
+      "minLength": 7,
+      "maxLength": 8,
+      "pattern": "^[a-fA-F0-9]{7,8}$"
     },
     "start_time": {
       "type": "string",
@@ -70,16 +81,16 @@
         "integer",
         "null"
       ],
-      "description": "The total duration of the run in seconds."
+      "description": "The total duration of the run in seconds.",
+      "minimum": 0,
+      "maximum": 864000
     },
     "summary": {
       "type": "string",
-      "description": "A friendly business-level summary of the run status or failure."
-    },
-    "portal_url": {
-      "type": "string",
-      "format": "uri",
-      "description": "A sanitized link to the run in the Azure DevOps portal."
+      "description": "A friendly business-level summary of the run status or failure.",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[a-zA-Z0-9_\\-\\.\\ \\(\\)\\',;!]+$"
     }
   },
   "additionalProperties": false
