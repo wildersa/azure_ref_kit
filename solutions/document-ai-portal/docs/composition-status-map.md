@@ -6,10 +6,10 @@ This document provides a compact status map of the building blocks composed in t
 
 | Building Block | Category | Status | Interface/Contract | Description |
 |----------------|----------|--------|--------------------|-------------|
-| [Static Status Portal](../../../building-blocks/portals/static-status-portal/) | Portal | 🏗️ Scaffold | React / SWA | Frontend UI shell and contract. |
+| [Static Status Portal](../../../building-blocks/portals/static-status-portal/) | Portal | ✅ Implemented | React / SWA | Customer-safe UI shell and API adapter. |
 | [Portal API Functions](../../../building-blocks/functions/portal-api-functions/) | API | ✅ Implemented | HTTPS / JSON | Enforcement boundary and data provider. |
 | [Blob Trigger](../../../building-blocks/functions/blob-trigger-start-pipeline/) | Trigger | ✅ Implemented | Blob Event | Entrypoint for document processing. |
-| [Blob Artifact Store](../../../building-blocks/storage/blob-artifact-store/) | Storage | 🏗️ Scaffold | Blob Storage | Storage pattern for artifacts. |
+| [Blob Artifact Store](../../../building-blocks/storage/blob-artifact-store/) | Storage | ✅ Implemented | Blob Storage | Secure storage and SAS delivery for artifacts. |
 | [Durable Basic Pipeline](../../../building-blocks/pipelines/durable-basic-pipeline/) | Pipeline | ✅ Implemented | Durable Functions | Workflow orchestration logic. |
 | [OCR Worker](../../../building-blocks/functions/ocr-document-intelligence/) | Worker | ⚡ Active | Activity Interface | OCR extraction using Document Intelligence. |
 | [Field Validation Worker](../../../building-blocks/functions/field-validation-worker/) | Worker | ⚡ Active | Activity Interface | Business rule validation for OCR results. |
@@ -83,6 +83,22 @@ The solution uses a consolidated Terraform approach located in `solutions/docume
 - **Current State**: The Terraform foundation provisions the core infrastructure (Storage, Functions, App Insights, Static Web App) and sets up the required Managed Identity and RBAC.
 - **Reference**: Deployment follows the [Terraform Deployment Requirement](../../../docs/terraform-deployment-requirement.md).
 - **Manual Steps**: Azure AI Document Intelligence and Azure AI Foundry Project must be provisioned or configured as variables if they exist outside the local solution scope.
+
+## Validation Basis
+
+The statuses in this map are verified against the following repository evidence:
+
+- **Static Status Portal**: `module.yaml` (implemented), full React codebase in `src/`, and Passing ESLint/Vite configuration.
+- **Portal API Functions**: `module.yaml` (implemented), Python `function_app.py`, and defined HTTP entrypoints.
+- **Blob Trigger**: `module.yaml` (implemented) and Python `function_app.py` with Blob trigger.
+- **Blob Artifact Store**: `module.yaml` (implemented), `src/artifact_store.py` with hardened validation and SAS generation.
+- **Durable Basic Pipeline**: `module.yaml` (implemented), Orchestrator/Activity definitions in `function_app.py`.
+- **OCR Worker**: `module.yaml` (active), `src/worker.py` integrated with Azure AI Document Intelligence SDK.
+- **Field Validation Worker**: `module.yaml` (active), `src/worker.py` with business logic.
+- **Final Result Publisher**: `module.yaml` (implemented) and Python activity code.
+- **Pipeline Assistant**: `module.yaml` (implemented), `src/agent_definition.py` and tool definitions.
+- **Observability & Cost**: `module.yaml` (scaffold), structural placeholders without full implementation logic.
+- **Infrastructure**: `solutions/document-ai-portal/infra/terraform/` provisions the core storage, functions, and identity resources.
 
 ## How to Read this Solution
 
