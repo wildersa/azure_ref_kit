@@ -67,7 +67,7 @@ async def blob_start(myblob: func.InputStream, client: df.DurableOrchestrationCl
 
     input_data = {"pipeline_run": pipeline_run, "source_blob": name}
 
-    instance_id = await client.start_new("pipeline_orchestrator", client_input=input_data)
+    await client.start_new("pipeline_orchestrator", client_input=input_data)
     logging.info("Orchestration started via blob trigger.")
 
 

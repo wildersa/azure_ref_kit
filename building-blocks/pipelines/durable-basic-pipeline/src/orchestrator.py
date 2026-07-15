@@ -6,6 +6,8 @@ from datetime import timezone
 from pathlib import Path
 
 # Load schemas once
+# Path: building-blocks/pipelines/durable-basic-pipeline/src/orchestrator.py
+# 1: src, 2: durable-basic-pipeline, 3: pipelines, 4: building-blocks, 5: root
 BASE_DIR = Path(__file__).parent.parent.parent.parent.parent
 PIPELINE_RUN_SCHEMA_PATH = (
     BASE_DIR / "shared" / "contracts" / "pipeline-run.schema.json"
@@ -14,21 +16,33 @@ PIPELINE_STEP_SCHEMA_PATH = (
     BASE_DIR / "shared" / "contracts" / "pipeline-step.schema.json"
 )
 
+# Local schemas
+MODULE_DIR = Path(__file__).parent.parent
+PIPELINE_INPUT_SCHEMA_PATH = MODULE_DIR / "schemas" / "pipeline_input.schema.json"
+PIPELINE_SUCCESS_SCHEMA_PATH = MODULE_DIR / "schemas" / "pipeline_success.schema.json"
+FRIENDLY_FAILURE_SCHEMA_PATH = MODULE_DIR / "schemas" / "friendly_failure.schema.json"
+
 
 def _load_schema(path):
     with open(path, "r") as f:
         return json.load(f)
 
 
-# P0: Load schema outside the orchestrator execution path to maintain determinism.
+# P0: Load schemas outside the orchestrator execution path to maintain determinism.
 # Durable Functions orchestrators must be free of filesystem-dependent side effects.
 try:
     PIPELINE_RUN_SCHEMA = _load_schema(PIPELINE_RUN_SCHEMA_PATH)
     PIPELINE_STEP_SCHEMA = _load_schema(PIPELINE_STEP_SCHEMA_PATH)
+    PIPELINE_INPUT_SCHEMA = _load_schema(PIPELINE_INPUT_SCHEMA_PATH)
+    PIPELINE_SUCCESS_SCHEMA = _load_schema(PIPELINE_SUCCESS_SCHEMA_PATH)
+    FRIENDLY_FAILURE_SCHEMA = _load_schema(FRIENDLY_FAILURE_SCHEMA_PATH)
 except Exception as e:
     logging.error(f"Failed to load pipeline schemas: {e}")
     PIPELINE_RUN_SCHEMA = None
     PIPELINE_STEP_SCHEMA = None
+    PIPELINE_INPUT_SCHEMA = None
+    PIPELINE_SUCCESS_SCHEMA = None
+    FRIENDLY_FAILURE_SCHEMA = None
 
 
 def pipeline_orchestrator(context: df.DurableOrchestrationContext):
@@ -38,23 +52,35 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
     customer-safe status transitions.
     """
     input_data = context.get_input()
-    if not input_data or "pipeline_run" not in input_data:
-        logging.error("Orchestrator received invalid input. Missing 'pipeline_run'.")
-        return "invalid_input"
 
-    pipeline_run = input_data["pipeline_run"]
-
-    # Contract validation must fail closed if the schema could not be loaded.
-    if not PIPELINE_RUN_SCHEMA or not PIPELINE_STEP_SCHEMA:
-        logging.error("Pipeline schemas are unavailable; refusing unvalidated execution.")
-        return "invalid_contract"
+    # Contract validation must fail closed if the schemas could not be loaded.
+    if (
+        not PIPELINE_RUN_SCHEMA
+        or not PIPELINE_STEP_SCHEMA
+        or not PIPELINE_INPUT_SCHEMA
+        or not PIPELINE_SUCCESS_SCHEMA
+        or not FRIENDLY_FAILURE_SCHEMA
+    ):
+        logging.error(
+            "Pipeline schemas are unavailable; refusing unvalidated execution."
+        )
+        return {
+            "status": "failed",
+            "error": "Contract validation failed",
+            "friendly_message": "Internal configuration error. Schemas not loaded.",
+        }
 
     try:
-        jsonschema.validate(instance=pipeline_run, schema=PIPELINE_RUN_SCHEMA)
+        jsonschema.validate(instance=input_data, schema=PIPELINE_INPUT_SCHEMA)
     except Exception:
-        logging.error("PipelineRun payload failed contract validation.")
-        return "invalid_contract"
+        logging.error("Input payload failed contract validation.")
+        return {
+            "status": "failed",
+            "error": "Contract validation failed",
+            "friendly_message": "Invalid pipeline input request.",
+        }
 
+    pipeline_run = input_data["pipeline_run"]
     run_id = pipeline_run["id"]
     customer_id = pipeline_run["customer_id"]
     pipeline_type = pipeline_run["pipeline_type"]
@@ -84,18 +110,26 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
     )
 
     current_step_name = None
+    accumulated_artifacts = []
 
-    def _update_step(name, status, summary=None, artifacts=None, error=None, start=None, finish=None):
+    def _update_step(
+        name, status, summary=None, artifacts=None, error=None, start=None, finish=None
+    ):
         step_data = {
             "run_id": run_id,
             "name": name,
             "status": status,
         }
-        if summary: step_data["output_summary"] = summary
-        if artifacts: step_data["artifacts"] = artifacts
-        if error: step_data["friendly_error"] = error
-        if start: step_data["started_at"] = start
-        if finish: step_data["finished_at"] = finish
+        if summary:
+            step_data["output_summary"] = summary
+        if artifacts:
+            step_data["artifacts"] = artifacts
+        if error:
+            step_data["friendly_error"] = error
+        if start:
+            step_data["started_at"] = start
+        if finish:
+            step_data["finished_at"] = finish
 
         # Deterministic validation
         jsonschema.validate(instance=step_data, schema=PIPELINE_STEP_SCHEMA)
@@ -107,7 +141,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         yield _update_step(
             current_step_name,
             "running",
-            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat(),
         )
 
         ocr_result = yield context.call_activity_with_retry(
@@ -117,8 +151,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 "run_id": run_id,
                 "artifact_id": "source-document",
                 "document_type": pipeline_type,
-                "storage_ref": source_blob,
-                "source_blob": source_blob, # Explicitly pass source_blob
+                "source_blob": source_blob,
             },
         )
 
@@ -127,12 +160,17 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
             # because the same input will likely fail again.
             raise ValueError(ocr_result.get("friendly_error") or "OCR step failed.")
 
+        step_artifacts = ocr_result.get("artifacts", [])
+        accumulated_artifacts.extend(step_artifacts)
+
         yield _update_step(
             current_step_name,
             "completed",
             summary="OCR extraction completed.",
-            artifacts=ocr_result.get("artifacts", []),
-            finish=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            artifacts=step_artifacts,
+            finish=context.current_utc_datetime.replace(
+                tzinfo=timezone.utc
+            ).isoformat(),
         )
 
         # 3. Field Validation Step (Non-retryable)
@@ -141,7 +179,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         yield _update_step(
             current_step_name,
             "running",
-            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat(),
         )
 
         validation_result = yield context.call_activity(
@@ -158,12 +196,17 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 validation_result.get("friendly_error") or "Field validation failed."
             )
 
+        step_artifacts = validation_result.get("artifacts", [])
+        accumulated_artifacts.extend(step_artifacts)
+
         yield _update_step(
             current_step_name,
             "completed",
             summary="Field validation completed.",
-            artifacts=validation_result.get("artifacts", []),
-            finish=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            artifacts=step_artifacts,
+            finish=context.current_utc_datetime.replace(
+                tzinfo=timezone.utc
+            ).isoformat(),
         )
 
         # 4. Final Result Publishing (Retryable)
@@ -171,7 +214,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         yield _update_step(
             current_step_name,
             "running",
-            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            start=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat(),
         )
 
         publish_result = yield context.call_activity_with_retry(
@@ -182,8 +225,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 "validation_status": validation_result.get(
                     "validation_status", "valid"
                 ),
-                "artifact_ids": ocr_result.get("artifacts", [])
-                + validation_result.get("artifacts", []),
+                "artifact_ids": accumulated_artifacts,
             },
         )
 
@@ -196,13 +238,16 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
             current_step_name,
             "completed",
             summary="Final results published.",
-            finish=context.current_utc_datetime.replace(tzinfo=timezone.utc).isoformat()
+            finish=context.current_utc_datetime.replace(
+                tzinfo=timezone.utc
+            ).isoformat(),
         )
 
         # 5. Finalize Pipeline Run
         finish_time = context.current_utc_datetime.replace(
             tzinfo=timezone.utc
         ).isoformat()
+        business_summary = "Pipeline completed successfully. Results are now available."
         yield context.call_activity(
             "update_pipeline_run_status",
             {
@@ -213,11 +258,17 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 "created_at": pipeline_run["created_at"],
                 "started_at": start_time,
                 "finished_at": finish_time,
-                "business_summary": "Pipeline completed successfully. Results are now available.",
+                "business_summary": business_summary,
             },
         )
 
-        return "completed"
+        success_result = {
+            "status": "completed",
+            "artifacts": accumulated_artifacts,
+            "business_summary": business_summary,
+        }
+        jsonschema.validate(instance=success_result, schema=PIPELINE_SUCCESS_SCHEMA)
+        return success_result
 
     except Exception:
         # Safely capture failure without leaking internals in technical logs.
@@ -226,13 +277,17 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
         error_time = context.current_utc_datetime.replace(
             tzinfo=timezone.utc
         ).isoformat()
+        friendly_message = (
+            "An error occurred during document processing. "
+            "The error has been logged and the support team has been notified."
+        )
 
         if current_step_name:
             yield _update_step(
                 current_step_name,
                 "failed",
                 error="Step failed. Technical details redacted.",
-                finish=error_time
+                finish=error_time,
             )
 
         yield context.call_activity(
@@ -245,10 +300,14 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 "created_at": pipeline_run["created_at"],
                 "started_at": start_time,
                 "finished_at": error_time,
-                "friendly_error": "An error occurred during document processing. "
-                "The error has been logged and the support team has been notified.",
+                "friendly_error": friendly_message,
             },
         )
-        # We don't re-raise here to allow the orchestration to finish cleanly
-        # with the failed status in the status store.
-        return "failed"
+
+        failure_result = {
+            "status": "failed",
+            "error": "Pipeline execution failed",
+            "friendly_message": friendly_message,
+        }
+        jsonschema.validate(instance=failure_result, schema=FRIENDLY_FAILURE_SCHEMA)
+        return failure_result

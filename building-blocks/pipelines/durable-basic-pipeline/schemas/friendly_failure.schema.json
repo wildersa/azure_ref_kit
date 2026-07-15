@@ -7,5 +7,6 @@
     "error": { "type": "string" },
     "status": { "type": "string", "const": "failed" },
     "friendly_message": { "type": "string" }
-  }
+  },
+  "additionalProperties": false
 }

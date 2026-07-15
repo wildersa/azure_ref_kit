@@ -13,8 +13,10 @@
         "pipeline_type": { "type": "string" },
         "status": { "type": "string", "const": "pending" },
         "created_at": { "type": "string", "format": "date-time" }
-      }
+      },
+      "additionalProperties": false
     },
     "source_blob": { "type": ["string", "null"] }
-  }
+  },
+  "additionalProperties": false
 }

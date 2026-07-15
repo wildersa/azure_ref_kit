@@ -12,6 +12,18 @@ runtime:
     - azure-functions-durable
     - jsonschema
 
+trigger:
+  type: blob_trigger
+  path: "uploads/{name}"
+  connection: AzureWebJobsStorage
+
+activities:
+  - update_pipeline_run_status
+  - update_pipeline_step_status
+  - ocr_document_intelligence
+  - field_validation_worker
+  - final_result_publisher
+
 inputs:
   - name: pipeline_run
     type: object
@@ -32,6 +44,8 @@ outputs:
   - name: api_endpoint
     type: string
     description: The endpoint of the deployed Function App.
+
+deploy_target: azure-functions
 
 azure_resources:
   - azurerm_function_app_flex_consumption
