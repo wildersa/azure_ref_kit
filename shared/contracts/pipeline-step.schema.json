@@ -5,18 +5,20 @@
   "type": "object",
   "required": ["run_id", "name", "status"],
   "properties": {
-    "run_id": { "type": "string" },
-    "name": { "type": "string" },
+    "run_id": { "type": "string", "maxLength": 64 },
+    "name": { "type": "string", "maxLength": 64 },
     "status": {
       "type": "string",
-      "enum": ["pending", "running", "waiting_input", "failed", "completed", "skipped", "cancelled"]
+      "enum": ["pending", "running", "waiting_input", "failed", "completed", "skipped", "cancelled"],
+      "maxLength": 64
     },
-    "input_summary": { "type": ["string", "null"] },
-    "output_summary": { "type": ["string", "null"] },
-    "friendly_error": { "type": ["string", "null"] },
+    "input_summary": { "type": ["string", "null"], "maxLength": 2048 },
+    "output_summary": { "type": ["string", "null"], "maxLength": 2048 },
+    "friendly_error": { "type": ["string", "null"], "maxLength": 2048 },
     "artifacts": {
       "type": "array",
-      "items": { "type": "string" }
+      "maxItems": 100,
+      "items": { "type": "string", "maxLength": 128 }
     },
     "retry_count": { "type": "integer", "minimum": 0 },
     "started_at": { "type": ["string", "null"], "format": "date-time" },

@@ -74,7 +74,10 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity.call_args_list[1][0][0]
         == "update_pipeline_step_status"
     )
-    assert mock_context.call_activity.call_args_list[1][0][1]["name"] == "ocr-document-intelligence"
+    assert (
+        mock_context.call_activity.call_args_list[1][0][1]["name"]
+        == "ocr-document-intelligence"
+    )
     assert mock_context.call_activity.call_args_list[1][0][1]["status"] == "running"
 
     # 3. OCR Step (with retry)
@@ -83,7 +86,10 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity_with_retry.call_args_list[0][0][0]
         == "ocr_document_intelligence"
     )
-    assert mock_context.call_activity_with_retry.call_args_list[0][0][2]["source_blob"] == valid_input["source_blob"]
+    assert (
+        mock_context.call_activity_with_retry.call_args_list[0][0][2]["source_blob"]
+        == valid_input["source_blob"]
+    )
 
     # 4. Complete OCR step
     gen.send(ocr_success)
@@ -99,7 +105,10 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity.call_args_list[3][0][0]
         == "update_pipeline_step_status"
     )
-    assert mock_context.call_activity.call_args_list[3][0][1]["name"] == "field-validation-worker"
+    assert (
+        mock_context.call_activity.call_args_list[3][0][1]["name"]
+        == "field-validation-worker"
+    )
 
     # 6. Validation Step (direct call)
     gen.send(None)
@@ -121,7 +130,10 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity.call_args_list[6][0][0]
         == "update_pipeline_step_status"
     )
-    assert mock_context.call_activity.call_args_list[6][0][1]["name"] == "final-result-publisher"
+    assert (
+        mock_context.call_activity.call_args_list[6][0][1]["name"]
+        == "final-result-publisher"
+    )
 
     # 9. Publication Step (with retry)
     gen.send(None)
@@ -149,7 +161,9 @@ def test_orchestrator_happy_path(mock_context, valid_input):
     # End of orchestrator
     with pytest.raises(StopIteration) as exc:
         gen.send(None)
-    assert exc.value.value == "completed"
+    assert exc.value.value["status"] == "completed"
+    assert "ocr-1" in exc.value.value["artifacts"]
+    assert "val-1" in exc.value.value["artifacts"]
 
 
 def test_orchestrator_ocr_failure(mock_context, valid_input):
@@ -198,10 +212,6 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
         "blurry"
         not in mock_context.call_activity.call_args_list[3][0][1]["friendly_error"]
     )
-    # Actually, in my implementation I used a generic error message for the catch-all,
-    # but for specific step failures I should check what I did.
-    # In orchestrator.py: raise Exception(ocr_result.get("friendly_error") or "OCR step failed.")
-    # Then caught by except Exception as e: ... friendly_error: "An error occurred during document processing. ..."
 
     assert (
         "An error occurred"
@@ -210,7 +220,7 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
 
     with pytest.raises(StopIteration) as exc:
         gen.send(None)
-    assert exc.value.value == "failed"
+    assert exc.value.value["status"] == "failed"
 
 
 def test_orchestrator_invalid_contract(mock_context):
@@ -225,7 +235,8 @@ def test_orchestrator_invalid_contract(mock_context):
     gen = pipeline_orchestrator(mock_context)
     with pytest.raises(StopIteration) as exc:
         next(gen)
-    assert exc.value.value == "invalid_contract"
+    assert exc.value.value["status"] == "failed"
+    assert "Contract validation failed" in exc.value.value["error"]
 
 
 def test_orchestrator_safety_boundary(mock_context, valid_input, caplog):
@@ -307,36 +318,18 @@ def test_http_start_logging_safety(caplog):
     import asyncio
 
     # Access the original function behind the Azure Functions decorators
-    # http_start is decorated with @app.route and @app.durable_client_input
-    # Standard decorators use __wrapped__, but let's check if it exists.
-    # If not, we can call the function and mock the 'client' kwarg if the decorator allows.
-
-    # Access the original function behind the Azure Functions decorators
-    # In azure-functions v2, the FunctionBuilder object stores the original
-    # user function in _function._func, but it might still be wrapped by
-    # durable-functions decorators.
-    if hasattr(http_start, "_function") and hasattr(http_start._function, "_func"):
-        func_to_call = http_start._function._func
-        # If it's a closure (as seen in durable functions decorators),
-        # the real function might be in the closure.
-        if func_to_call.__closure__:
-            for cell in func_to_call.__closure__:
-                if (
-                    callable(cell.cell_contents)
-                    and cell.cell_contents.__name__ == "http_start"
-                ):
-                    func_to_call = cell.cell_contents
-                    break
-        asyncio.run(func_to_call(req, client))
-    elif hasattr(http_start, "__wrapped__"):
-        # Fallback for standard decorators
-        func_to_call = http_start.__wrapped__
-        while hasattr(func_to_call, "__wrapped__"):
+    func_to_call = http_start
+    while True:
+        if hasattr(func_to_call, "_function") and hasattr(
+            func_to_call._function, "_func"
+        ):
+            func_to_call = func_to_call._function._func
+        elif hasattr(func_to_call, "__wrapped__"):
             func_to_call = func_to_call.__wrapped__
-        asyncio.run(func_to_call(req, client))
-    else:
-        # Fallback to direct call
-        asyncio.run(http_start(req, client=client))
+        else:
+            break
+
+    asyncio.run(func_to_call(req, client))
 
     assert "test-instance-id" not in caplog.text
     assert "Orchestration started" in caplog.text
@@ -358,7 +351,9 @@ def test_activities_logging_safety(caplog):
 
     # 2. update_pipeline_step_status
     caplog.clear()
-    update_pipeline_step_status({"run_id": run_id, "status": "running", "name": "step1"})
+    update_pipeline_step_status(
+        {"run_id": run_id, "status": "running", "name": "step1"}
+    )
     assert run_id not in caplog.text
     assert "Activity: Updating pipeline step status" in caplog.text
 
@@ -494,7 +489,10 @@ def test_orchestrator_determinism_no_file_io(mock_context, valid_input):
     from unittest.mock import patch
 
     # Mock 'open' to raise an error if called during orchestration
-    with patch("builtins.open", side_effect=IOError("Filesystem access forbidden during orchestration")):
+    with patch(
+        "builtins.open",
+        side_effect=IOError("Filesystem access forbidden during orchestration"),
+    ):
         gen = pipeline_orchestrator(mock_context)
         # Run through the orchestration (triggering the first yield)
         next(gen)
@@ -511,6 +509,7 @@ def test_blob_start_logic(caplog):
     Verify the logic of blob_start and ensure sensitive data is not logged.
     """
     import asyncio
+
     caplog.set_level(logging.INFO)
 
     myblob = MagicMock(spec=func.InputStream)

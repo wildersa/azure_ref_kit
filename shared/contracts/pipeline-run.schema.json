@@ -5,18 +5,19 @@
   "type": "object",
   "required": ["id", "customer_id", "pipeline_type", "status", "created_at"],
   "properties": {
-    "id": { "type": "string" },
-    "customer_id": { "type": "string" },
-    "pipeline_type": { "type": "string" },
+    "id": { "type": "string", "maxLength": 64 },
+    "customer_id": { "type": "string", "maxLength": 64 },
+    "pipeline_type": { "type": "string", "maxLength": 64 },
     "status": {
       "type": "string",
-      "enum": ["pending", "running", "waiting_input", "failed", "completed", "cancelled"]
+      "enum": ["pending", "running", "waiting_input", "failed", "completed", "cancelled"],
+      "maxLength": 64
     },
-    "current_step": { "type": ["string", "null"] },
+    "current_step": { "type": ["string", "null"], "maxLength": 64 },
     "progress_percent": { "type": "integer", "minimum": 0, "maximum": 100 },
-    "business_summary": { "type": ["string", "null"] },
-    "friendly_error": { "type": ["string", "null"] },
-    "correlation_id": { "type": ["string", "null"] },
+    "business_summary": { "type": ["string", "null"], "maxLength": 2048 },
+    "friendly_error": { "type": ["string", "null"], "maxLength": 2048 },
+    "correlation_id": { "type": ["string", "null"], "maxLength": 64 },
     "estimated_cost": { "type": ["number", "null"] },
     "created_at": { "type": "string", "format": "date-time" },
     "started_at": { "type": ["string", "null"], "format": "date-time" },

@@ -13,3 +13,4 @@ output "storage_account_name" {
 output "api_endpoint" {
   value = "https://${azurerm_function_app_flex_consumption.function.default_hostname}"
 }
+# Force inclusion in PR
