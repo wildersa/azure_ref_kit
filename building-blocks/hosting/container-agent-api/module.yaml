@@ -3,11 +3,21 @@ type: building-block
 category: hosting
 status: stable
 purpose: Reference for packaging an agent-facing API as a container for Azure Container Apps or App Service.
-runtime: Docker / Container
+runtime: python
+deploy_target: Azure Container Apps
 azure_resources:
   - azurerm_container_app
   - azurerm_container_app_environment
   - azurerm_log_analytics_workspace
+dependencies:
+  - python >= 3.12
+  - fastapi
+  - uvicorn
+  - pydantic
+commands:
+  build: "docker build -t container-agent-api ."
+  test: "PYTHONPATH=. pytest tests/"
+  run: "python src/main.py"
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true

@@ -15,18 +15,17 @@ WORKDIR /app
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 # Install dependencies
-# We copy requirements.txt first to leverage Docker cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code and change ownership in one layer
+# Copy source code and change ownership
 COPY --chown=appuser:appuser src/ /app/src/
 
 # Switch to the non-root user
 USER appuser
 
-# Expose the port the API will run on
+# Expose the port
 EXPOSE 8080
 
-# Run the API using uvicorn
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the API using the python entrypoint to respect the PORT environment variable
+CMD ["python", "src/main.py"]

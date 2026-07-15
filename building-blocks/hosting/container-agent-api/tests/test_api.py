@@ -63,7 +63,7 @@ def test_error_boundary_redacts_technical_details(caplog):
         )
 
         # Verify the sensitive info is NOT in the logs (only our generic message)
-        assert "An unexpected error occurred in the agent API" in caplog.text
+        assert "Internal server error: Redacted details for customer safety." in caplog.text
         assert "Sensitive database error" not in caplog.text
 
 

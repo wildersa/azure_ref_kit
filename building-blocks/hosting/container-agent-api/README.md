@@ -6,6 +6,10 @@ Reference building block defining when and how to package a bounded agent-facing
 
 Provide a standard hosting reference for agentic workloads that require custom runtimes, long-running processes, or specific system dependencies that exceed the limits of serverless environments like Azure Functions.
 
+## Scenario
+
+A development team needs to expose a read-only agent interface that performs resource metadata lookups. They chose a container-based approach because their future roadmap includes integrating specialized C++ libraries for data processing that are not easily supported in standard Azure Functions runtimes.
+
 ## Architecture
 
 ```mermaid
@@ -38,8 +42,36 @@ flowchart LR
 
 - **Non-Root User:** The container runs as a non-privileged `appuser` to minimize the blast radius of any potential vulnerability.
 - **No Technical Leakage:** The API implements a global exception handler that redacts internal stack traces and technical details, returning only customer-safe error messages.
-- **Strict Validation:** Input models use Pydantic v2 with regex patterns and length limits to prevent injection and oversized payloads.
+- **Strict Validation:** Input and output models use Pydantic v2 with regex patterns and length limits to prevent injection, oversized payloads, and technical data leakage.
 - **Read-Only by Design:** This reference demonstrates a read-only query pattern, avoiding any mutation operations that could affect system state.
+
+## API Contract
+
+### Request: `GET /health`
+
+Returns the service health status.
+
+### Request: `POST /agent/query`
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| `query_type` | string | Type of query | `^[a-zA-Z0-9_-]+$`, max 32 chars |
+| `resource_id` | string | Resource identifier | `^[a-zA-Z0-9_-]+$`, max 64 chars |
+
+### Response: `200 OK`
+
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| `status` | string | Current status of the resource | `^[a-zA-Z0-9_-]+$`, max 32 chars |
+| `updated_at` | datetime | ISO timestamp | ISO 8601 |
+| `summary` | string | Friendly business-level summary | max 256 chars |
+
+## Configuration
+
+| Environment Variable | Description | Default |
+|----------------------|-------------|---------|
+| `PORT` | The port the service listens on | `8080` |
+| `LOG_LEVEL` | Logging level (INFO, DEBUG, ERROR) | `INFO` |
 
 ## Local Development
 
@@ -59,9 +91,6 @@ pip install -r requirements.txt
 
 # Start the API locally
 python src/main.py
-
-# Alternatively, using uvicorn directly:
-# uvicorn src.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
 ### Local Build and Run (Docker)
@@ -88,6 +117,14 @@ curl -X POST http://localhost:8080/agent/query \
 - **Managed Identity:** Use System-Assigned or User-Assigned Managed Identity for secure access to Azure resources (like ACR for image pull).
 - **Scale to Zero:** Configure KEDA scalers to scale the container app to zero when not in use to save costs.
 
+### Deployment Assumptions and Cost Drivers
+- **Provisioning:** Deployment assumes an existing Azure Container Registry (ACR) or public registry for the image.
+- **Costs:** Billing is based on vCPU and memory allocated per second. Scaling to zero significantly reduces costs during idle periods. Log Analytics ingestion and retention are additional cost drivers.
+
+### Authentication Limitations
+- **Identity:** This reference focuses on hosting and API boundaries and does not implement a specific authentication layer (e.g., Bearer tokens, API keys).
+- **Production Recommendation:** For production, use Azure Container Apps built-in authentication (EasyAuth), Microsoft Entra ID integration, or an API Gateway (like Azure API Management) to protect the endpoint.
+
 ## Validation Commands
 
 ```bash
@@ -109,7 +146,7 @@ PYTHONPATH=. pytest tests/
 ## Microsoft Documentation Consulted
 
 - [Azure Container Apps overview](https://learn.microsoft.com/en-us/azure/container-apps/overview)
-- [Containers in Azure App Service](https://learn.microsoft.com/en-us/azure/app-service/configure-custom-container)
-- [FastAPI in containers](https://fastapi.tiangolo.com/deployment/docker/)
-- [Terraform on Azure](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
-- [Managed identity for Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/managed-identity)
+- [Deploy a container to Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/quickstart-portal)
+- [Managed identities in Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/managed-identity)
+- [FastAPI on Azure guidance](https://learn.microsoft.com/en-us/azure/developer/python/tutorial-containerize-simple-web-app)
+- [Terraform on Azure overview](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
