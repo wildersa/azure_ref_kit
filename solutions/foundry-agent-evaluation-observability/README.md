@@ -1,143 +1,105 @@
 # Foundry Agent Evaluation and Observability
 
-This reference solution demonstrates how to apply the [agent-evaluation-observability](../../building-blocks/observability/agent-evaluation-observability/README.md) building block to a concrete Azure AI Foundry agent flow.
+This reference solution demonstrates how to apply the [agent-evaluation-observability](../../building-blocks/observability/agent-evaluation-observability/README.md) building block to a concrete Azure AI Foundry agent flow. It focuses on maintaining a strict boundary between technical diagnostics and customer-facing status.
 
 ## Purpose
 
-Align agent tracing and evaluation with customer-safe boundaries. This solution ensures that engineering teams have the technical diagnostics needed to maintain the agent without exposing sensitive internals or customer data to unauthorized surfaces.
+Align agent tracing and evaluation with customer-safe boundaries. This solution ensures that engineering teams have the technical diagnostics needed to maintain the agent without exposing sensitive internals, raw prompts, or customer data to unauthorized surfaces.
 
 ## Scenario
 
-A business has deployed an agent (e.g., `foundry-agent-with-tools`) and needs to:
+A business has deployed an agent (e.g., `foundry-devops-agent-basic`) and needs to:
 1. Capture end-to-end technical traces for debugging and performance tuning.
 2. Maintain a strict **customer-safe boundary** where internal reasoning, raw prompts, and secrets are never logged.
 3. Quantify agent quality and safety through recurring evaluation.
 
-## Composition
+## Composed Building Blocks
 
-This solution composes:
-- `solutions/foundry-agent-with-tools`: The base agent and tool execution pattern.
-- `building-blocks/observability/agent-evaluation-observability`: The tracing and evaluation standards.
-- `building-blocks/observability/appinsights-observability`: The technical telemetry host.
+- `solutions/foundry-devops-agent-basic`: The base agent reference for DevOps status queries.
+- `building-blocks/observability/agent-evaluation-observability`: The tracing and evaluation standards and redaction logic.
 
-## Telemetry and Security Boundary
+## Architecture
 
-Technical telemetry is strictly separated from customer-facing business status. Tracing focuses on the technical "how", while the Status Store focuses on the business "what".
+The following diagram illustrates the flow from agent execution to safe telemetry and evaluation, while keeping customer-facing status separate.
 
 ```mermaid
 flowchart TD
-    subgraph "Agent Execution (Private Boundary)"
+    subgraph AgentExecution ["Agent Execution (Private)"]
         A[Foundry Agent] -->|Tool Call| T[Agent Tools]
-        A -->|Step Outcome| R[Internal Results]
+        A -->|Internal Result| R[Raw Trace Event]
     end
 
-    subgraph "Trace/Evaluation Boundary (Technical)"
-        A -.->|OpenTelemetry| O[Azure Monitor / App Insights]
-        A -.->|Evaluation Signal| F[Foundry Observability]
+    subgraph SafeAdapter ["Safe Telemetry Adapter"]
+        R -->|Filter & Redact| SA[Redactor / Filter]
+        SA -->|SafeTraceEvent| ST[Safe Telemetry]
+        SA -->|SafeEvaluationResult| SE[Safe Evaluation]
     end
 
-    subgraph "Observability Views (Internal/Engineering)"
-        O -->|End-to-end Traces| D1[App Insights Dashboard]
-        F -->|Quality/Safety Scores| D2[Foundry Monitoring]
+    subgraph EngineeringObs ["Engineering Observability (Internal)"]
+        ST -->|OpenTelemetry| O[Azure Monitor / App Insights]
+        SE -->|Quality Signal| F[Foundry Observability]
     end
 
-    subgraph "Customer Boundary (Safe/Business)"
+    subgraph CustomerBoundary ["Customer Boundary (Safe)"]
         A -->|Safe Status| S[Status Store]
         S -->|Business Status| P[Customer Portal]
     end
+
+    O -->|Diagnostics| D[Engineering Dashboards]
+    F -->|Quality| Q[Quality Scores]
 ```
 
-## Trace and Evaluation Checklist
+## Data Boundary
 
-Technical telemetry in Application Insights should include these fields for diagnostics:
+| Data Category | Engineering Telemetry (Internal) | Customer Portal (Safe) |
+|---------------|----------------------------------|------------------------|
+| **Core Identifiers** | Request ID, Agent Version | Request ID, Business ID |
+| **Execution Path** | Redacted Tool Names, Step Durations | High-level Progress |
+| **Input/Output** | **REDACTED** (No prompts/results) | Safe Business Status Only |
+| **Error Details** | Friendly Error Categories | User-friendly Messages |
+| **Metrics** | Latency, Cost, Token Count | Completion Status |
 
-| Field | Description |
-|-------|-------------|
-| **Request ID** | Correlation ID used to link spans across services. |
-| **Agent ID/Name** | Identifier for the specific agent version (e.g., `assistant-v1`). |
-| **Agent Step Names** | Names of internal reasoning steps or state transitions. |
-| **Tool Call Names** | The specific name of the tool called (e.g., `get_system_status`). |
-| **Tool Outcome** | Technical success or failure of the tool call. |
-| **Latency** | Duration of agent turns and individual tool executions. |
-| **Safety Outcome** | High-level safety result from content filters. |
-| **Sanitized Summary** | High-level diagnostic summary (no secrets). |
+## Local Demo Flow
 
-## Customer-Safe Logging Rules
+The solution includes a deterministic local demo that demonstrates how raw agent outcomes are transformed into safe telemetry and evaluation results.
 
-### What MAY be traced
-- **Correlation IDs**: `request_id`, `session_id`.
-- **Business Status**: High-level states (e.g., `completed`, `failed`).
-- **Timing/Latency**: Performance metrics.
-- **Cost Estimate**: Aggregated token usage or cost figures.
-- **Friendly Error Category**: Categorized failures (e.g., `upstream_timeout`).
+### Prerequisites
+- Python 3.10+
+- Dependencies installed: `pip install -r requirements.txt` (including `pydantic`)
 
-### What MUST NOT be traced/logged
-These fields must **never** enter technical telemetry or logs:
-- **Secrets & Tokens**: API keys, SAS tokens, Bearer tokens.
-- **Connection Strings**: Full URIs containing credentials.
-- **Raw Prompts**: System instructions or model grounding text.
-- **Raw Customer Documents**: Full text or binary content from processed files.
-- **Raw Tool Payloads**: Unfiltered JSON request/response bodies.
-- **Stack Traces**: Technical error details revealing code paths.
-- **Platform Identifiers**: Real Tenant IDs, Subscription IDs, or Customer IDs.
-
-## Minimal Evaluation Checklist
-
-Every agent iteration must be evaluated against these pillars:
-
-| Pillar | Check | Description |
-|--------|-------|-------------|
-| **Quality** | Task Completion | Did the agent complete the goal accurately? |
-| **Tool-Boundary** | Tool-Call Correctness | Did it call the right tool with valid arguments? |
-| **Groundedness** | Groundedness & Relevance | Is the answer based on the provided context? |
-| **Safety** | Safety & Refusal Rate | Does it refuse harmful or out-of-scope prompts? |
-| **Status Boundary** | Safe Status Wording | Is the status language friendly and non-technical? |
-
-## Evaluation Implementation
-
-Using the Azure AI Evaluation SDK, this solution implements a recurring evaluation run:
-
-```python
-from azure.ai.evaluation import evaluate, GroundednessEvaluator, SafetyEvaluator
-
-# Define evaluators
-groundedness = GroundednessEvaluator(model_config=...)
-safety = SafetyEvaluator(model_config=...)
-
-# Run evaluation on test dataset
-result = evaluate(
-    data="eval_dataset.jsonl",
-    evaluators={
-        "groundedness": groundedness,
-        "safety": safety
-    },
-    output_path="./eval_results.json"
-)
-
-print(f"Evaluation Complete. Results: {result.metrics}")
+### Running the Demo
+```bash
+python3 src/demo.py
 ```
 
-## Redaction Policy Example
+The demo will:
+1. Simulate a raw agent turn with technical details and a "dirty" payload.
+2. Apply the `TelemetryRedactor` to produce a `SafeTraceEvent`.
+3. Generate a `SafeEvaluationResult` based on the outcome.
+4. Demonstrate a "safe failure" path where an error is categorized without leaking the stack trace.
 
-Before emitting traces, the application or tool boundary applies a redaction policy:
+## Operations and Responsibility
 
-| Pattern | Action | Result |
-|---------|--------|--------|
-| `AccountKey=[^;]+` | Redact | `AccountKey=REDACTED` |
-| `Bearer [^"]+` | Redact | `Bearer REDACTED` |
-| `SubscriptionId=[^;]+` | Redact | `SubscriptionId=REDACTED` |
-| Internal IP Addresses | Mask | `10.x.x.x` |
+### Sampling and Cost
+- **Tracing**: Use adaptive sampling (e.g., 5-10%) in production to balance observability with storage costs.
+- **Evaluation**: Run full evaluation on a representative subset of traffic or during CI/CD.
+
+### Retention and Privacy
+- **Retention**: Follow organizational policies (e.g., 30-90 days for technical traces).
+- **Privacy**: The `TelemetryRedactor` is a primary defense, but developers must ensure no PII/PHI is intentionally added to allowlisted fields.
+
+### Limitations and Scope
+- **Non-Production**: This is a reference implementation. Production environments should use robust OpenTelemetry exporters.
+- **Redaction**: Regex-based redaction is not exhaustive. Use it as one layer in a defense-in-depth strategy.
+- **Static Evaluation**: The local demo uses static fixtures; real-world evaluation requires the Azure AI Evaluation SDK and live model access.
 
 ## Deployment / IaC Decision
 
 **No-IaC: Guidance and SDK-based configuration.**
 
-This solution defines patterns for configuring tracing and evaluation on existing Azure resources (Foundry Project, Application Insights). Infrastructure for these resources is managed by the base hosting building blocks. No new Azure resources are introduced here.
+This solution defines patterns for configuring tracing and evaluation. Infrastructure for Application Insights or Foundry Projects is managed by their respective hosting building blocks. No new Azure resources are introduced in this reference.
 
 ## References
-
 - [Azure AI Foundry Agent Service Overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
-- [Observability in Generative AI](https://learn.microsoft.com/en-us/azure/foundry/concepts/observability)
-- [Application Insights OpenTelemetry Overview](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
-- [Foundry Trace Application Guidance](https://learn.microsoft.com/en-us/azure/foundry-classic/how-to/develop/trace-application)
-- [Customer-Safe Status Boundary](../../security/customer-safe-status-boundary/README.md)
+- [Trace applications with Foundry](https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/trace-application)
+- [Evaluate generative AI applications](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-approach-gen-ai)

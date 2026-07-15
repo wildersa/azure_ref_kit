@@ -1,20 +1,21 @@
 name: foundry-agent-evaluation-observability
-type: solution
 status: stable
 purpose: Reference solution for applying evaluation and observability standards to a Foundry agent while maintaining a customer-safe boundary.
-entrypoints:
-  python_sdk: Configuration and evaluation runs via Azure AI Evaluation SDK.
-  azure_cli: Telemetry and monitoring setup via CLI.
 building_blocks:
-  - solutions/foundry-agent-with-tools
-  - building-blocks/observability/agent-evaluation-observability
-  - building-blocks/observability/appinsights-observability
+  - id: foundry-devops-agent-basic
+    path: solutions/foundry-devops-agent-basic/
+    role: api
+    status: implemented
+  - id: agent-evaluation-observability
+    path: building-blocks/observability/agent-evaluation-observability/
+    role: observer
+    status: implemented
 contracts:
   reads:
     - OpenTelemetry technical spans
     - Agent execution traces
   writes:
-    - Redacted technical telemetry to Application Insights
-    - Quality and safety metrics to Azure AI Foundry
-    - Customer-safe status events to Status Store
-deployment_iac: "No-IaC: Guidance and SDK-based configuration."
+    - Redacted technical telemetry
+    - Quality and safety metrics
+    - Customer-safe status events
+deployment_iac: "No-IaC: This solution provides guidance and SDK-based configuration patterns."
