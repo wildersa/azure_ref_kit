@@ -44,10 +44,17 @@ class AgentQueryResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    status: str = Field(..., description="The current status of the resource")
+    status: str = Field(
+        ...,
+        description="The current status of the resource",
+        pattern=r"^[a-zA-Z0-9_-]+$",
+        max_length=32,
+    )
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     summary: str = Field(
-        ..., description="A friendly business-level summary of the resource status"
+        ...,
+        description="A friendly business-level summary of the resource status",
+        max_length=256,
     )
 
 
@@ -58,9 +65,14 @@ class ErrorResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    error_code: str = Field(..., description="A short, stable error code")
+    error_code: str = Field(
+        ...,
+        description="A short, stable error code",
+        pattern=r"^[A-Z0-9_]+$",
+        max_length=32,
+    )
     friendly_message: str = Field(
-        ..., description="A safe, human-readable error message"
+        ..., description="A safe, human-readable error message", max_length=256
     )
 
 
@@ -71,7 +83,12 @@ class HealthResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    status: str = Field(..., description="Service status")
+    status: str = Field(
+        ...,
+        description="Service status",
+        pattern=r"^[a-z]+$",
+        max_length=16,
+    )
     timestamp: datetime = Field(..., description="Current server time")
 
 

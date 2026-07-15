@@ -15,4 +15,3 @@ README.md
 .dockerignore
 Dockerfile
 requirements-test.txt
-schemas/

@@ -42,7 +42,7 @@ flowchart LR
 
 - **Non-Root User:** The container runs as a non-privileged `appuser` to minimize the blast radius of any potential vulnerability.
 - **No Technical Leakage:** The API implements a global exception handler that redacts internal stack traces and technical details, returning only customer-safe error messages.
-- **Strict Validation:** Input models use Pydantic v2 with regex patterns and length limits to prevent injection and oversized payloads.
+- **Strict Validation:** Input and output models use Pydantic v2 with regex patterns and length limits to prevent injection, oversized payloads, and technical data leakage.
 - **Read-Only by Design:** This reference demonstrates a read-only query pattern, avoiding any mutation operations that could affect system state.
 
 ## API Contract
@@ -60,11 +60,11 @@ Returns the service health status.
 
 ### Response: `200 OK`
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `status` | string | Current status of the resource |
-| `updated_at` | datetime | ISO timestamp |
-| `summary` | string | Friendly business-level summary |
+| Field | Type | Description | Validation |
+|-------|------|-------------|------------|
+| `status` | string | Current status of the resource | `^[a-zA-Z0-9_-]+$`, max 32 chars |
+| `updated_at` | datetime | ISO timestamp | ISO 8601 |
+| `summary` | string | Friendly business-level summary | max 256 chars |
 
 ## Configuration
 
