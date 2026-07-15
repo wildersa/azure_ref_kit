@@ -10,8 +10,8 @@ def mock_settings():
         project_endpoint="https://test.ai.azure.com/api/projects/123",
         agent_name="test-agent",
         model_name="gpt-4o",
-        mcp_server_url="https://mcp.com/api",
-        mcp_server_label="test-mcp",
+        mcp_server_url="https://your-functions-app.azurewebsites.net/runtime/webhooks/mcp",
+        mcp_server_label="azure-functions-mcp",
         allowed_tool_names=["get_synthetic_resource"],
     )
 
@@ -61,7 +61,7 @@ def test_get_chat_response_mcp_approval_loop(mock_client_class, mock_settings):
     # First response asks for MCP approval
     mock_req = MagicMock()
     mock_req.type = "mcp_approval_request"
-    mock_req.server_label = "test-mcp"
+    mock_req.server_label = "azure-functions-mcp"
     mock_req.name = "get_synthetic_resource"
     mock_req.id = "req_1"
 
@@ -156,7 +156,7 @@ def test_get_chat_response_loop_exhaustion_fail_closed(
     # Mock response that ALWAYS asks for approval
     mock_req = MagicMock()
     mock_req.type = "mcp_approval_request"
-    mock_req.server_label = "test-mcp"
+    mock_req.server_label = "azure-functions-mcp"
     mock_req.name = "get_synthetic_resource"
     mock_req.id = "req_1"
 
