@@ -142,14 +142,19 @@ const FIXTURE_FAILURES: Record<string, FriendlyFailure> = {
 const VALID_STATUSES: PipelineStatus[] = ['pending', 'running', 'waiting_input', 'failed', 'completed', 'cancelled'];
 const VALID_STEP_STATUSES: StepStatus[] = ['pending', 'running', 'waiting_input', 'failed', 'completed', 'skipped', 'cancelled'];
 
+// Constants for payload bounds (aligned with shared/contracts)
+const MAX_STR_LEN = 64;
+const MAX_LONG_STR_LEN = 2048;
+const MAX_ARTIFACTS = 100;
+
 /**
  * Validates and sanitizes a single pipeline step.
  */
 function validateAndSanitizeStep(data: any): PipelineStep {
   if (!data || typeof data !== 'object') throw new ValidationError('Invalid step object');
 
-  if (typeof data.run_id !== 'string' || !data.run_id) throw new ValidationError('Step missing run_id');
-  if (typeof data.name !== 'string' || !data.name) throw new ValidationError('Step missing name');
+  if (typeof data.run_id !== 'string' || !data.run_id || data.run_id.length > MAX_STR_LEN) throw new ValidationError('Step missing or invalid run_id');
+  if (typeof data.name !== 'string' || !data.name || data.name.length > MAX_STR_LEN) throw new ValidationError('Step missing or invalid name');
   if (!VALID_STEP_STATUSES.includes(data.status)) throw new ValidationError(`Invalid step status: ${data.status}`);
 
   const sanitized: PipelineStep = {
@@ -159,17 +164,17 @@ function validateAndSanitizeStep(data: any): PipelineStep {
   };
 
   if (data.input_summary !== undefined && data.input_summary !== null) {
-    if (typeof data.input_summary !== 'string') throw new ValidationError('Invalid step input_summary');
+    if (typeof data.input_summary !== 'string' || data.input_summary.length > MAX_LONG_STR_LEN) throw new ValidationError('Invalid step input_summary');
     sanitized.input_summary = data.input_summary;
   }
 
   if (data.output_summary !== undefined && data.output_summary !== null) {
-    if (typeof data.output_summary !== 'string') throw new ValidationError('Invalid step output_summary');
+    if (typeof data.output_summary !== 'string' || data.output_summary.length > MAX_LONG_STR_LEN) throw new ValidationError('Invalid step output_summary');
     sanitized.output_summary = data.output_summary;
   }
 
   if (data.friendly_error !== undefined && data.friendly_error !== null) {
-    if (typeof data.friendly_error !== 'string') throw new ValidationError('Invalid step friendly_error');
+    if (typeof data.friendly_error !== 'string' || data.friendly_error.length > MAX_LONG_STR_LEN) throw new ValidationError('Invalid step friendly_error');
     sanitized.friendly_error = data.friendly_error;
   }
 
@@ -184,8 +189,9 @@ function validateAndSanitizeStep(data: any): PipelineStep {
   }
 
   if (Array.isArray(data.artifacts)) {
+    if (data.artifacts.length > MAX_ARTIFACTS) throw new ValidationError('Too many step artifacts');
     sanitized.artifacts = data.artifacts.map((a: any, idx: number) => {
-        if (typeof a !== 'string') throw new ValidationError(`Step artifact at index ${idx} is not a string`);
+        if (typeof a !== 'string' || a.length > 128) throw new ValidationError(`Step artifact at index ${idx} is invalid`);
         return a;
     });
   }
@@ -206,7 +212,7 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
   if (!data || typeof data !== 'object') throw new ValidationError('Invalid status object');
 
   // Required fields
-  if (typeof data.id !== 'string' || !data.id) throw new ValidationError('Missing or invalid id');
+  if (typeof data.id !== 'string' || !data.id || data.id.length > MAX_STR_LEN) throw new ValidationError('Missing or invalid id');
   if (!VALID_STATUSES.includes(data.status)) throw new ValidationError(`Invalid status: ${data.status}`);
   if (typeof data.created_at !== 'string' || isNaN(Date.parse(data.created_at))) throw new ValidationError('Missing or invalid created_at');
 
@@ -218,7 +224,7 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
 
   // Optional fields with strict type checking
   if (data.business_summary !== undefined) {
-    if (typeof data.business_summary !== 'string') throw new ValidationError('Invalid business_summary');
+    if (typeof data.business_summary !== 'string' || data.business_summary.length > MAX_LONG_STR_LEN) throw new ValidationError('Invalid business_summary');
     sanitized.business_summary = data.business_summary;
   }
 
@@ -245,8 +251,9 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
   }
 
   if (Array.isArray(data.safe_artifacts)) {
+    if (data.safe_artifacts.length > MAX_ARTIFACTS) throw new ValidationError('Too many artifacts');
     sanitized.safe_artifacts = data.safe_artifacts.map((a: any, idx: number) => {
-      if (typeof a.name !== 'string' || !a.name) throw new ValidationError(`Artifact at index ${idx} missing name`);
+      if (typeof a.name !== 'string' || !a.name || a.name.length > 128) throw new ValidationError(`Artifact at index ${idx} invalid name`);
       if (typeof a.size_bytes !== 'number') throw new ValidationError(`Artifact at index ${idx} missing or invalid size_bytes`);
 
       return {
@@ -258,6 +265,7 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
   }
 
   if (Array.isArray(data.steps)) {
+    if (data.steps.length > 50) throw new ValidationError('Too many steps');
     sanitized.steps = data.steps.map(validateAndSanitizeStep);
   }
 
@@ -270,13 +278,13 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
 function validateAndSanitizeFailure(data: any): FriendlyFailure {
   if (!data || typeof data !== 'object') throw new ValidationError('Invalid failure object');
 
-  if (typeof data.error_code !== 'string' || !data.error_code) throw new ValidationError('Missing or invalid error_code');
-  if (typeof data.message !== 'string' || !data.message) throw new ValidationError('Missing or invalid message');
+  if (typeof data.error_code !== 'string' || !data.error_code || data.error_code.length > MAX_STR_LEN) throw new ValidationError('Missing or invalid error_code');
+  if (typeof data.message !== 'string' || !data.message || data.message.length > MAX_LONG_STR_LEN) throw new ValidationError('Missing or invalid message');
 
   return {
     error_code: data.error_code,
     message: data.message,
-    correlation_id: typeof data.correlation_id === 'string' ? data.correlation_id : undefined
+    correlation_id: (typeof data.correlation_id === 'string' && data.correlation_id.length <= MAX_STR_LEN) ? data.correlation_id : undefined
   };
 }
 

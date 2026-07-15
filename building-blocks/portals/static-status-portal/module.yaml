@@ -1,12 +1,31 @@
 name: static-status-portal
 type: portal
 category: building-block
-status: active
+status: implemented
 purpose: Minimal read-only status portal shell for displaying customer-safe pipeline outcomes.
+version: 1.0.0
+
+runtime:
+  language: typescript
+  environment: nodejs-18
+  dependencies:
+    - react
+    - vite
+    - typescript
+
+build_commands:
+  install: "npm install"
+  build: "npm run build"
+  test: "npm run test"
+  lint: "npm run lint"
+
 contracts:
   reads:
     - building-blocks/security/customer-safe-status-boundary/src/schemas/customer_safe_status.schema.json
     - building-blocks/security/customer-safe-status-boundary/src/schemas/friendly_failure.schema.json
+    - shared/contracts/pipeline-run.schema.json
+    - shared/contracts/pipeline-step.schema.json
+
 inputs:
   - name: name_prefix
     type: string
@@ -26,6 +45,7 @@ inputs:
   - name: tags
     type: map
     description: "A mapping of tags to assign to the resource."
+
 outputs:
   - name: static_web_app_id
     type: string
@@ -39,17 +59,23 @@ outputs:
   - name: resource_group_name
     type: string
     description: "The name of the resource group."
+
 security_boundary:
+  policy: "Enforces customer-safe status boundary via strict API adapter sanitization and defense-in-depth UI rendering."
   forbid_wildcards: true
   forbid_secrets: true
+
 customer_safe_boundary:
   forbid:
     - "Raw Azure Function logs"
     - "Internal exceptions and stack traces"
-    - "SAS tokens and connection strings"
-    - "System prompts"
-    - "Internal Azure Resource IDs"
-    - "IaC state files"
+    - "SAS tokens, connection strings, and storage keys"
+    - "System prompts and grounding instructions"
+    - "Internal Azure Resource IDs, Tenant IDs, and Subscription IDs"
+    - "IaC state files and plans"
+    - "storage_ref or internal storage paths"
+
 azure_resources:
   - "Microsoft.Web/staticSites"
+
 deployment_path: building-blocks/portals/static-status-portal/infra/terraform/

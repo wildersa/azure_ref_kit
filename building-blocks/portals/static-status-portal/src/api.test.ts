@@ -158,4 +158,60 @@ describe('API Adapter (Strict Validation & Defense in Depth)', () => {
     });
     expect(result).not.toHaveProperty('technical_detail');
   });
+
+  describe('Bounded Payload Handling (P0 Requirements)', () => {
+    it('rejects IDs that are too long', async () => {
+        const oversizedData = {
+            id: 'a'.repeat(65),
+            status: 'completed',
+            created_at: '2024-01-01T00:00:00Z'
+        };
+        vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => oversizedData } as Response);
+        await expect(api.getRunDetail('too-long')).rejects.toThrow(/invalid id/i);
+    });
+
+    it('rejects business_summary that is too long', async () => {
+        const oversizedData = {
+            id: 'run-1',
+            status: 'completed',
+            created_at: '2024-01-01T00:00:00Z',
+            business_summary: 'a'.repeat(2049)
+        };
+        vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => oversizedData } as Response);
+        await expect(api.getRunDetail('run-1')).rejects.toThrow(/invalid business_summary/i);
+    });
+
+    it('rejects too many artifacts', async () => {
+        const oversizedData = {
+            id: 'run-1',
+            status: 'completed',
+            created_at: '2024-01-01T00:00:00Z',
+            safe_artifacts: Array(101).fill({ name: 'a.txt', size_bytes: 10 })
+        };
+        vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => oversizedData } as Response);
+        await expect(api.getRunDetail('run-1')).rejects.toThrow(/too many artifacts/i);
+    });
+
+    it('rejects too many steps', async () => {
+        const oversizedData = {
+            id: 'run-1',
+            status: 'completed',
+            created_at: '2024-01-01T00:00:00Z',
+            steps: Array(51).fill({ run_id: 'run-1', name: 'step', status: 'completed' })
+        };
+        vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => oversizedData } as Response);
+        await expect(api.getRunDetail('run-1')).rejects.toThrow(/too many steps/i);
+    });
+
+    it('rejects step names that are too long', async () => {
+        const oversizedData = {
+            id: 'run-1',
+            status: 'completed',
+            created_at: '2024-01-01T00:00:00Z',
+            steps: [{ run_id: 'run-1', name: 'a'.repeat(65), status: 'completed' }]
+        };
+        vi.mocked(fetch).mockResolvedValue({ ok: true, json: async () => oversizedData } as Response);
+        await expect(api.getRunDetail('run-1')).rejects.toThrow(/invalid name/i);
+    });
+  });
 });
