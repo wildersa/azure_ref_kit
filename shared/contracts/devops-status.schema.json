@@ -9,8 +9,7 @@
     "status",
     "result",
     "branch",
-    "start_time",
-    "portal_url"
+    "start_time"
   ],
   "properties": {
     "pipeline_name": {
@@ -75,11 +74,6 @@
     "summary": {
       "type": "string",
       "description": "A friendly business-level summary of the run status or failure."
-    },
-    "portal_url": {
-      "type": "string",
-      "format": "uri",
-      "description": "A sanitized link to the run in the Azure DevOps portal."
     }
   },
   "additionalProperties": false

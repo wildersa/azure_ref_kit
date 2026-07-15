@@ -20,8 +20,6 @@ def load_schema(filename):
     [
         "get_pipeline_run_status_request.schema.json",
         "get_pipeline_run_status_response.schema.json",
-        "list_recent_pipeline_runs_request.schema.json",
-        "list_recent_pipeline_runs_response.schema.json",
     ],
 )
 def test_schema_syntax(schema_file):
@@ -36,13 +34,6 @@ def test_request_schema_validation():
     """Verify that the request schema correctly validates a sample payload."""
     schema = load_schema("get_pipeline_run_status_request.schema.json")
     payload = {"pipeline_id": "123", "run_id": "456"}
-    jsonschema.validate(instance=payload, schema=schema)
-
-
-def test_list_runs_request_schema_validation():
-    """Verify that the list runs request schema validates correctly."""
-    schema = load_schema("list_recent_pipeline_runs_request.schema.json")
-    payload = {"pipeline_id": "123", "branch": "main", "top": 10}
     jsonschema.validate(instance=payload, schema=schema)
 
 
@@ -76,7 +67,6 @@ def test_response_schema_validation_with_ref():
         "result": "succeeded",
         "branch": "main",
         "start_time": "2024-01-01T10:00:00Z",
-        "portal_url": "https://dev.azure.com/org/proj/_build/results?buildId=12345",
     }
     jsonschema.validate(instance=payload, schema=schema, resolver=resolver)
 
@@ -140,7 +130,6 @@ def load_fixture(filename):
     "fixture_file, schema_file",
     [
         ("pipeline_run_status.json", "get_pipeline_run_status_response.schema.json"),
-        ("recent_pipeline_runs.json", "list_recent_pipeline_runs_response.schema.json"),
     ],
 )
 def test_fixtures_against_schemas(fixture_file, schema_file):
