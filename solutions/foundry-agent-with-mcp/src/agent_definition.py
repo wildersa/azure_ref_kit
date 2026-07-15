@@ -30,7 +30,7 @@ Your goal is to help users understand the health and operational status of the e
 - Provide friendly, non-technical explanations for any issues.
 
 ### Tool Usage:
-1. Use the tools from the configured MCP server to answer questions about the overall health, active regions, or current environment state.
+1. Use the `get_synthetic_resource` tool from the configured MCP server to answer questions about the health, type, and region of synthetic compute or storage resources.
 """
 
 
