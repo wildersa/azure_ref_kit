@@ -19,10 +19,10 @@ This shell is designed to be hosted as an Azure Static Web App, consuming a cont
 
 ```mermaid
 flowchart LR
-    Source[Internal Status Source] -->|Safe Status| Boundary[Customer-Safe Status Boundary]
-    Boundary -->|Redact/Sanitize| Func[Controlled Functions API]
-    Func -->|REST API| SWA[Static Web Apps Shell]
-    SWA -->|HTTPS| Customer[Customer Browser]
+    Customer[Customer Browser] <-->|HTTPS| SWA[Static Web Apps Shell]
+    SWA <-->|REST API| Func[Controlled Functions API]
+    Func <-->|Safe Status| Boundary[Customer-Safe Status Boundary]
+    Boundary <--> Source[Internal Status Source]
 
     subgraph "Static Web Apps Portal"
         UI[React UI]
@@ -42,7 +42,7 @@ Displays a list of recent pipeline runs.
 
 ### 2. Run Detail & Timeline
 A detailed view of a single pipeline run showing its execution path.
-- **Behavior:** Renders high-level stages and their completion status.
+- **Behavior:** Renders high-level stages and their completion status as a timeline.
 - **Constraint:** Forbidden to show raw logs, internal step IDs, or technical stack traces.
 
 ### 3. Artifacts List
@@ -66,7 +66,7 @@ A UI shell for future pipeline triggers.
 
 ## API Contract Usage
 
-The portal consumes the `CustomerSafeStatus` schema. All interactions with the backend are brokered through the API adapter which enforces the safety boundary.
+The portal consumes the `CustomerSafeStatus` schema. All interactions with the backend are brokered through the API adapter which enforces the safety boundary by sanitizing inputs and failing closed on invalid data.
 
 ## Customer-Safe Status Boundary
 
@@ -80,6 +80,7 @@ The following information is strictly forbidden from being displayed in the UI o
 - **Azure Resource IDs**, Tenant IDs, and Subscription IDs.
 - **Secrets**, tokens, SAS tokens, storage keys, and connection strings.
 - **Internal Exceptions** and technical stack traces.
+- **storage_ref** or internal storage paths.
 
 ## Getting Started
 
@@ -104,6 +105,11 @@ npm run dev
 npm run test
 ```
 
+### Linting
+```bash
+npm run lint
+```
+
 ### Build
 ```bash
 npm run build
@@ -112,6 +118,11 @@ npm run build
 ## Infrastructure
 
 The infrastructure is located in `infra/terraform/`. It provisions a basic Azure Static Web App.
+
+### Deployment Assumptions & Cost Drivers
+- **Azure Static Web Apps:** Standard tier is used by default for production features.
+- **Bandwidth:** Standard data transfer rates apply.
+- **Authentication:** Uses built-in SWA authentication.
 
 ### Deployment Proof
 ```bash

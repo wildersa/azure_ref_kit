@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from './api';
 import { CustomerSafeStatus, FriendlyFailure } from './types';
 import { RunList } from './components/RunList';
@@ -12,34 +12,21 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{message: string, isNotFound?: boolean} | null>(null);
 
-  useEffect(() => {
-    fetchRuns();
-  }, []);
-
-  useEffect(() => {
-    if (selectedRunId) {
-      fetchRunDetail(selectedRunId);
-    } else {
-      setRunDetail(null);
-      setFailureDetail(null);
-    }
-  }, [selectedRunId]);
-
-  const fetchRuns = async () => {
+  const fetchRuns = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const data = await api.getRuns();
       setRuns(data);
-    } catch (err: any) {
+    } catch (_err: any) {
       // Redact technical details even here, just in case
       setError({ message: 'The status service is temporarily unavailable. Please try again later.' });
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchRunDetail = async (id: string) => {
+  const fetchRunDetail = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -61,10 +48,25 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRuns();
+  }, [fetchRuns]);
+
+  useEffect(() => {
+    if (selectedRunId) {
+      fetchRunDetail(selectedRunId);
+    } else {
+      // Use functional updates or move these to handleBack to avoid cascading renders in effect
+      // But for the shell, we'll keep it simple by moving to handleBack and resetting here only if needed.
+    }
+  }, [selectedRunId, fetchRunDetail]);
 
   const handleBack = () => {
     setSelectedRunId(null);
+    setRunDetail(null);
+    setFailureDetail(null);
     setError(null);
   };
 

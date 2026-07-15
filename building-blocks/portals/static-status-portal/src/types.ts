@@ -1,9 +1,25 @@
 /**
  * Customer-Safe Status Types
  * Strictly aligned with building-blocks/security/customer-safe-status-boundary/src/schemas/
+ * and shared/contracts/
  */
 
-export type PipelineStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+export type PipelineStatus = 'pending' | 'running' | 'waiting_input' | 'failed' | 'completed' | 'cancelled';
+
+export type StepStatus = 'pending' | 'running' | 'waiting_input' | 'failed' | 'completed' | 'skipped' | 'cancelled';
+
+export interface PipelineStep {
+  run_id: string;
+  name: string;
+  status: StepStatus;
+  input_summary?: string | null;
+  output_summary?: string | null;
+  friendly_error?: string | null;
+  artifacts?: string[];
+  retry_count?: number;
+  started_at?: string | null;
+  finished_at?: string | null;
+}
 
 export interface SafeArtifact {
   name: string;
@@ -21,6 +37,7 @@ export interface CustomerSafeStatus {
   started_at?: string | null;
   finished_at?: string | null;
   safe_artifacts?: SafeArtifact[];
+  steps?: PipelineStep[];
 }
 
 export interface FriendlyFailure {
