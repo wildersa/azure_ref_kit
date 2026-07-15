@@ -36,11 +36,13 @@
         "latency_ms": {
           "type": "integer",
           "minimum": 0,
+          "maximum": 3600000,
           "description": "Total end-to-end latency for the evaluated turn."
         },
         "estimated_cost_usd": {
           "type": "number",
           "minimum": 0,
+          "maximum": 10.0,
           "description": "Estimated cost of the turn in USD."
         }
       },

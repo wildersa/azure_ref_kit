@@ -10,6 +10,8 @@ This building block defines the standards for capturing technical diagnostics an
 
 Technical telemetry should be strictly separated from business status. Tracing focuses on the "how" (diagnostics), while the Portal API and Status Store focus on the "what" (outcomes).
 
+This building block uses `solutions/foundry-agent-with-tools` as its concrete reference for agent execution.
+
 ```mermaid
 flowchart TD
     subgraph "Agent Execution (Private)"
@@ -118,8 +120,9 @@ To validate the observability contract and redaction logic locally:
 
 - **Redaction**: Implement automated redaction for common secret patterns (e.g., `AccountKey=...`, `Bearer ...`) before emitting traces.
 - **Least-Privilege Access**: Access to Application Insights and Foundry evaluation results should be restricted to engineering/security roles only.
-- **Retention**: Telemetry and evaluation datasets should follow organizational data retention policies (typically 30-90 days).
-- **Monitoring Trade-offs**: While high-detail tracing aids debugging, it increases storage costs and privacy risks. Use sampled tracing in production.
+- **Retention & Privacy**: Telemetry and evaluation datasets should follow organizational data retention policies (typically 30-90 days). The data controller is responsible for ensuring that PII/PHI is scrubbed before reaching long-term storage.
+- **Sampling & Cost**: While high-detail tracing aids debugging, it increases storage costs and privacy risks. Use sampled tracing (e.g., 10%) in production to balance observability needs with cost and data exposure.
+- **Observability Boundary**: Technical telemetry (traces/metrics) is for engineering use. Business status (via Portal) is for customers. Never cross-link raw technical identifiers directly in the customer portal.
 
 ## Deployment / IaC Decision
 

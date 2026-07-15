@@ -30,6 +30,7 @@
     "duration_ms": {
       "type": "integer",
       "minimum": 0,
+      "maximum": 3600000,
       "description": "Latency of the operation in milliseconds."
     },
     "error_category": {

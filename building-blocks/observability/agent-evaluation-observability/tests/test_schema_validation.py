@@ -2,6 +2,7 @@ import json
 import os
 from jsonschema import validate
 
+
 def test_trace_event_fixture_validates_against_schema():
     """Verify that the safe trace event fixture complies with its schema."""
     base_path = os.path.join(os.path.dirname(__file__), "..")
@@ -14,6 +15,7 @@ def test_trace_event_fixture_validates_against_schema():
         fixture = json.load(f)
 
     validate(instance=fixture, schema=schema)
+
 
 def test_trace_event_rejects_forbidden_fields():
     """Verify that the trace event schema rejects forbidden additional properties."""
@@ -31,7 +33,7 @@ def test_trace_event_rejects_forbidden_fields():
         "operation_type": "agent_turn",
         "status": "success",
         "duration_ms": 100,
-        "prompt": "forbidden"
+        "prompt": "forbidden",
     }
     with pytest.raises(ValidationError):
         validate(instance=invalid_trace, schema=schema)
@@ -42,10 +44,11 @@ def test_trace_event_rejects_forbidden_fields():
         "operation_type": "agent_turn",
         "status": "error",
         "duration_ms": 100,
-        "error_category": "Internal Server Error: stack trace at..."
+        "error_category": "Internal Server Error: stack trace at...",
     }
     with pytest.raises(ValidationError):
         validate(instance=invalid_trace_error, schema=schema)
+
 
 def test_evaluation_result_rejects_forbidden_metrics():
     """Verify that the evaluation result schema rejects additional properties in metrics."""
@@ -67,11 +70,12 @@ def test_evaluation_result_rejects_forbidden_metrics():
             "safe_tool_use": True,
             "groundedness_score": 5,
             "safe_failure_behavior": True,
-            "raw_payload": "{}"
-        }
+            "raw_payload": "{}",
+        },
     }
     with pytest.raises(ValidationError):
         validate(instance=invalid_eval, schema=schema)
+
 
 def test_evaluation_result_fixture_validates_against_schema():
     """Verify that the safe evaluation result fixture complies with its schema."""
