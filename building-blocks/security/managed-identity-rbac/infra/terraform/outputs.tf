@@ -5,7 +5,7 @@ output "identity_principal_id" {
 
 output "identity_client_id" {
   value       = azurerm_user_assigned_identity.workload.client_id
-  description = "The Client ID of the created User-Assigned Managed Identity."
+  description = "The Client ID of the created User-Assigned Managed Identity. Provide this to get_default_credential() or set as AZURE_CLIENT_ID for app code."
 }
 
 output "role_assignment_id" {

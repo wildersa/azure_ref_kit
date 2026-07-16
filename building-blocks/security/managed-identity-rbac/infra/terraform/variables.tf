@@ -23,6 +23,7 @@ variable "role_definition_name" {
   description = "The name of the built-in Azure RBAC role to assign (e.g., 'Storage Blob Data Reader')."
   default     = "Storage Blob Data Reader"
 
+  # P0: Least-privilege enforcement. Only narrow Data Plane roles are permitted.
   validation {
     condition = contains([
       "Storage Blob Data Reader",

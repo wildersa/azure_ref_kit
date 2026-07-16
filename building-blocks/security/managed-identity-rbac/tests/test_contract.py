@@ -1,5 +1,24 @@
+import os
 import yaml
 import pathlib
+from azure.identity import DefaultAzureCredential
+
+
+def test_get_default_credential_helper():
+    """Verify that the get_default_credential helper behaves as expected."""
+    # We can't easily test the actual credential behavior without environment setup,
+    # but we can verify the import and basic function presence.
+    try:
+        from ..src.identity import get_default_credential
+        credential = get_default_credential()
+        assert isinstance(credential, DefaultAzureCredential)
+    except ImportError:
+        # Fallback for different test execution contexts
+        import sys
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        from src.identity import get_default_credential
+        credential = get_default_credential()
+        assert isinstance(credential, DefaultAzureCredential)
 
 
 def test_module_yaml_structure():

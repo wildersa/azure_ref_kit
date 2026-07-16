@@ -62,17 +62,21 @@ It is critical to separate the credentials used during local development from th
 - **Local Development Identity:** Developers use their own Entra ID identity (via Azure CLI, VS Code, or Azure PowerShell). This identity typically has broader "Contributor" or "Developer" access to the development environment.
 - **Azure Runtime Identity:** The deployed service uses a **Managed Identity** (System or User Assigned) with strictly limited **Data Plane** RBAC roles (e.g., `Storage Blob Data Reader`). The service should never use the developer's personal credentials or a broad-privilege service principal in production.
 
-For a seamless transition, use the `DefaultAzureCredential` class from the `azure-identity` SDK, which handles the fallback logic automatically by checking for the presence of a managed identity environment and falling back to local tools if not found.
+For a seamless transition, use the `DefaultAzureCredential` class from the `azure-identity` SDK, which handles the fallback logic automatically by checking for credentials in the following order:
+1.  **Environment Variables:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`.
+2.  **Workload Identity:** Federated identity for AKS/GitHub Actions.
+3.  **Managed Identity:** System or User Assigned identity in Azure runtime.
+4.  **Local Tools:** Azure CLI, Azure PowerShell, VS Code, or IntelliJ if found.
 
 ### Python Implementation
+The recommended way to initialize credentials is using the provided `get_default_credential` helper, which correctly handles the transition between local development and Azure runtime (including User-Assigned Identity support via `AZURE_CLIENT_ID`).
+
 ```python
-import os
-from azure.identity import DefaultAzureCredential
+from building_blocks.security.managed_identity_rbac.src import get_default_credential
 from azure.storage.blob import BlobServiceClient
 
-# Best practice: Check for an explicit Client ID if using User-Assigned Identity
-client_id = os.environ.get("AZURE_CLIENT_ID")
-credential = DefaultAzureCredential(managed_identity_client_id=client_id) if client_id else DefaultAzureCredential()
+# Initialize credential (handles local fallback and User-Assigned Identity)
+credential = get_default_credential()
 
 # Initialize client using identity, not a connection string
 blob_service_client = BlobServiceClient(
@@ -111,14 +115,11 @@ Subscription or Resource Group scopes are intentionally avoided. Broad scopes in
 **Python Code:**
 ```python
 import os
-from azure.identity import DefaultAzureCredential
+from building_blocks.security.managed_identity_rbac.src import get_default_credential
 from azure.storage.blob import BlobClient
 
-# 1. Initialize credential.
-# For User-Assigned Identity, we MUST provide the client_id.
-# DefaultAzureCredential will automatically fall back to developer tools locally.
-client_id = os.environ.get("AZURE_CLIENT_ID")
-credential = DefaultAzureCredential(managed_identity_client_id=client_id)
+# 1. Initialize credential using the helper.
+credential = get_default_credential()
 
 # 2. Initialize the client using identity
 blob_url = f"{os.environ['STORAGE_ACCOUNT_URL']}/{os.environ['BLOB_CONTAINER_NAME']}/data.json"
@@ -178,9 +179,11 @@ flowchart TD
 
 ## Deployment/IaC Decision
 
-This building block is a **Security Reference Pattern**.
+This building block provides a **Modular Reference Pattern** for Azure Managed Identity.
 
-- **Implementation:** Other modules and solutions (Functions, Web Apps) must implement these patterns when provisioning their own identities and RBAC assignments.
+- **Choice:** **User-Assigned Managed Identity (UAMI)**.
+- **Rationale:** UAMIs offer a decoupled lifecycle from the compute resource, allowing for cleaner infrastructure-as-code (IaC) and sharing identities across multiple services within a security boundary.
+- **Implementation:** Other modules and solutions (Functions, Web Apps, Agent Services) should implement these patterns when provisioning their own identities and RBAC assignments.
 - **Reference Code:** See [infra/terraform/](infra/terraform/) for illustrative Terraform patterns showing how to create identities, assign roles, and configure services for identity-based access.
 
 ## Azure Deployment Assumptions
@@ -195,11 +198,29 @@ This building block is a **Security Reference Pattern**.
 - **User-Assigned Limits:** There are limits on the number of user-assigned identities per resource (typically 20-50).
 - **Scope Limits:** Subscription-level role assignments are capped (typically 2000-4000 per subscription).
 
+## Validation
+
+### Contract and Implementation Tests
+Run the provided contract tests to verify that `module.yaml`, README, and Terraform variables adhere to the security pattern.
+
+```bash
+python3 -m pytest building-blocks/security/managed-identity-rbac/tests/test_contract.py
+```
+
+### Infrastructure Validation
+Validate the Terraform reference implementation.
+
+```bash
+terraform fmt -check -recursive building-blocks/security/managed-identity-rbac/infra/terraform
+terraform init -backend=false building-blocks/security/managed-identity-rbac/infra/terraform
+terraform validate building-blocks/security/managed-identity-rbac/infra/terraform
+```
+
 ## Validation Notes
 
 To verify this pattern in a new module:
 1. Ensure `module.yaml` defines the required RBAC roles in the `security_boundary`.
-2. Check that `DefaultAzureCredential` is used in the source code.
+2. Check that `DefaultAzureCredential` or the `get_default_credential` helper is used in the source code.
 3. Verify that no secrets or connection strings are present in App Settings or environment variables.
 
 ## References
