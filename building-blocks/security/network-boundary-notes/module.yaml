@@ -1,11 +1,17 @@
 name: network-boundary-notes
 type: documentation
 category: security
-status: active
+status: implemented
 purpose: Practical network boundary notes for customer-facing APIs, agents, tools, and Azure services.
 inputs: []
 outputs: []
-azure_resources: []
+azure_resources:
+  - "Azure Private Link / Private Endpoints"
+  - "Azure Virtual Network (VNet)"
+  - "Azure App Service Access Restrictions"
+  - "Azure Functions Networking"
+  - "Azure Private DNS Zones"
+  - "Azure NAT Gateway"
 deployment_path: null
 security_assumptions:
   - This module is documentation-only and provides architectural guidance.
