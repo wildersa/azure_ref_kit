@@ -1,4 +1,4 @@
-name: foundry-agent-with-ai-gateway
+name: foundry-agent-with-gateway
 status: active
 purpose: Foundry Prompt Agent using APIM AI Gateway for governed model access.
 description: >

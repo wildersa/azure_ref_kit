@@ -76,6 +76,8 @@ The solution includes Terraform code to:
 1.  Deploy the **APIM AI Gateway** building block.
 2.  Configure a **Foundry Connection** (`ApiManagement` category) targeting the Gateway.
 
+The Foundry connection is configured using the `azapi` provider to support the latest `ApiManagement` category, ensuring that all model traffic from the agent is routed through the APIM endpoint.
+
 See [infra/terraform/README.md](./infra/terraform/README.md) for details.
 
 ## Local Run
@@ -96,10 +98,15 @@ See [infra/terraform/README.md](./infra/terraform/README.md) for details.
 
 ## Security & Secrets
 
-- **No Backend Keys**: The solution never uses or stores the model backend API keys.
+- **No Backend Keys**: The solution never uses or stores the model backend API keys. Direct model-backend endpoint access is not the default path.
 - **Managed Identity**: APIM authenticates to the model backend using a User-Assigned Managed Identity.
 - **APIM Subscription Key**: The Foundry connection uses an APIM subscription key. This key is treated as a secret in Terraform and is never printed or committed.
-- **Redacted Responses**: APIM policies redact technical provider headers and provide safe error messages.
+- **Redacted Responses**: APIM policies redact technical provider headers (e.g., `x-ms-region`, `x-ratelimit-*`) and provide safe error messages.
+
+## Token Governance & Observability
+
+- **Token Limits**: The gateway enforces TPM limits per subscription. If a limit is reached, the gateway returns a `429 Too Many Requests` response, which the agent handles with a customer-safe message.
+- **Safe Observability**: The gateway emits status, latency, and throttling signals. It strictly excludes prompts, completions, token contents, credentials, and internal resource IDs from all telemetry.
 
 ## Known Limitations
 
@@ -111,4 +118,5 @@ See [infra/terraform/README.md](./infra/terraform/README.md) for details.
 
 - [Foundry Agent Service overview](https://learn.microsoft.com/en-us/azure/foundry/agents/overview)
 - [APIM Generative AI gateway capabilities](https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities)
-- [Azure AI Foundry Model Gateway Lab](https://github.com/Azure-Samples/AI-Gateway/tree/main/labs/ai-foundry-model-gateway)
+- [Bring your own model to Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/how-to/ai-gateway)
+- [Enforce token limits with AI Gateway](https://learn.microsoft.com/azure/ai-foundry/configuration/enable-ai-api-management-gateway-portal)
