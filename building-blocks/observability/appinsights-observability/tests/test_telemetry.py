@@ -67,3 +67,39 @@ def test_invalid_identifier_pattern():
             operation_status=OperationStatus.SUCCESS,
             duration_ms=100,
         )
+
+
+def test_oversized_custom_dimensions_count():
+    """Verify that custom_dimensions is limited to 20 entries."""
+    oversized_dims = {f"key_{i}": f"val_{i}" for i in range(21)}
+    with pytest.raises(ValidationError):
+        TechnicalTelemetry(
+            operation_name="test",
+            operation_status=OperationStatus.SUCCESS,
+            duration_ms=100,
+            custom_dimensions=oversized_dims,
+        )
+
+
+def test_oversized_custom_dimension_key():
+    """Verify that custom dimension keys are limited to 64 chars."""
+    oversized_key = "a" * 65
+    with pytest.raises(ValidationError):
+        TechnicalTelemetry(
+            operation_name="test",
+            operation_status=OperationStatus.SUCCESS,
+            duration_ms=100,
+            custom_dimensions={oversized_key: "val"},
+        )
+
+
+def test_oversized_custom_dimension_value():
+    """Verify that custom dimension values are limited to 512 chars."""
+    oversized_val = "a" * 513
+    with pytest.raises(ValidationError):
+        TechnicalTelemetry(
+            operation_name="test",
+            operation_status=OperationStatus.SUCCESS,
+            duration_ms=100,
+            custom_dimensions={"key": oversized_val},
+        )

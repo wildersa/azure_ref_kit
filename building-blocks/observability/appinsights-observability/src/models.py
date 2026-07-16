@@ -6,8 +6,16 @@ from typing_extensions import Annotated
 # Regex for safe identifiers: alphanumeric, hyphens, underscores, dots, and spaces.
 # Also allows brackets [] for redaction placeholders and = for key=value pairs.
 SAFE_ID_PATTERN = r"^[a-zA-Z0-9_\-\. \[\]\=]+$"
+
+# Strict length bounds for different telemetry fields
 SafeId = Annotated[
     str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=128)
+]
+SafeKey = Annotated[
+    str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=64)
+]
+SafeValue = Annotated[
+    str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=512)
 ]
 
 
@@ -44,7 +52,9 @@ class TechnicalTelemetry(BaseModel):
         None, description="Name of the target resource or dependency."
     )
 
-    # Custom dimensions must be explicitly allowlisted and validated
-    custom_dimensions: Optional[Dict[str, SafeId]] = Field(
+    # Custom dimensions are limited to 20 entries with strict key/value length bounds
+    custom_dimensions: Optional[
+        Annotated[Dict[SafeKey, SafeValue], Field(max_length=20)]
+    ] = Field(
         None, description="Controlled key-value pairs for additional safe metadata."
     )

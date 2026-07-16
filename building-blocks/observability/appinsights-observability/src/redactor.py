@@ -73,16 +73,30 @@ class TelemetryRedactor:
     ) -> TechnicalTelemetry:
         """
         Constructs a validated and redacted TechnicalTelemetry object.
+        Enforces stricter bounds on dimensions count and key/value length.
         """
 
         safe_custom_dims = {}
         if custom_dimensions:
+            # 1. Limit entry count to 20
+            count = 0
             for key, val in custom_dimensions.items():
+                if count >= 20:
+                    break
+
                 key_lower = key.lower()
+
+                # 2. Skip forbidden fields
                 if key_lower in FORBIDDEN_FIELDS:
                     continue
-                # Redact the value before adding it
-                safe_custom_dims[key] = str(TelemetryRedactor.redact_value(val))
+
+                # 3. Truncate keys to 64 chars and values to 512 chars
+                truncated_key = key[:64]
+                redacted_val = TelemetryRedactor.redact_value(str(val))
+                truncated_val = redacted_val[:512]
+
+                safe_custom_dims[truncated_key] = truncated_val
+                count += 1
 
         return TechnicalTelemetry(
             operation_name=TelemetryRedactor.redact_value(operation_name),
