@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LLM Token Metric Schema",
+  "description": "Schema for token metrics emitted by the AI Gateway to Application Insights.",
+  "type": "object",
+  "properties": {
+    "Namespace": {
+      "type": "string",
+      "const": "AI-Gateway"
+    },
+    "MetricName": {
+      "type": "string",
+      "const": "TokenUsage"
+    },
+    "Dimensions": {
+      "type": "object",
+      "properties": {
+        "Subscription ID": {
+          "type": "string"
+        },
+        "Model ID": {
+          "type": "string"
+        }
+      },
+      "required": ["Subscription ID", "Model ID"]
+    },
+    "Value": {
+      "type": "number",
+      "description": "The number of tokens consumed."
+    }
+  },
+  "required": ["Namespace", "MetricName", "Dimensions", "Value"]
+}

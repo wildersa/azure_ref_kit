@@ -16,7 +16,11 @@ The AI Gateway provides a governance and security layer between your callers (e.
 - One Gateway instance governs **one** existing Azure OpenAI or Microsoft Foundry model backend.
 - Managed Identity is used for backend authentication; static API keys are forbidden.
 
-## Mermaid Diagram
+## Architecture
+
+The AI Gateway acts as a secure proxy between clients and the model backend. It enforces authentication, applies governance policies, and ensures that telemetry remains customer-safe by redacting technical identifiers and provider-specific headers.
+
+### Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -75,10 +79,17 @@ terraform plan -out=tfplan
 terraform apply tfplan
 ```
 
-## Cost Drivers
+## Cost/Operations
 
-- **API Management (APIM)**: Costs depend on the selected SKU (e.g., Standard v2).
-- **Application Insights**: Storage costs for emitted metrics and logs.
+### Cost Drivers
+- **API Management (APIM)**: Costs depend on the selected SKU (e.g., Standard v2). For GenAI capabilities, v2 tiers are recommended.
+- **Application Insights**: Storage costs for emitted metrics and traces.
+- **Model Consumption**: The underlying model backend continues to charge based on its own pricing model.
+
+### Operations
+- **Monitoring**: Use the emitted `llm-token-metric` in Application Insights to build usage dashboards.
+- **Governance**: TPM limits are enforced at the gateway level. If a limit is reached, the gateway returns a `429 Too Many Requests` response.
+- **Security**: Regularly rotate calling application identities and audit RBAC assignments for the APIM Managed Identity.
 
 ## Security Assumptions
 

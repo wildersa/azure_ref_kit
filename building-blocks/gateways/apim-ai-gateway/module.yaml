@@ -30,19 +30,43 @@ inputs:
   - name: max_request_size_bytes
     type: number
     description: Maximum allowed request body size in bytes.
+  - name: resource_group_name
+    type: string
+    description: The name of the existing resource group.
+  - name: apim_sku
+    type: string
+    description: APIM SKU (Standard v2 recommended for GenAI capabilities).
+  - name: publisher_email
+    type: string
+    description: Email address for APIM notifications.
+  - name: publisher_name
+    type: string
+    description: Organization name for APIM.
   - name: tenant_id
     type: string
     description: Azure AD Tenant ID for JWT validation.
   - name: audience
     type: string
     description: Expected audience for the Entra ID token.
+  - name: app_insights_instrumentation_key
+    type: string
+    description: Application Insights instrumentation key for metrics (optional).
+  - name: app_insights_resource_id
+    type: string
+    description: Application Insights resource ID for logging (optional).
 outputs:
   - name: gateway_url
     type: string
     description: The base URL of the AI Gateway.
+  - name: api_path
+    type: string
+    description: The path for the model API.
   - name: identity_principal_id
     type: string
     description: The Principal ID of the APIM identity.
+  - name: identity_client_id
+    type: string
+    description: The Client ID of the APIM identity.
 azure_resources:
   - Azure API Management
   - User-Assigned Managed Identity

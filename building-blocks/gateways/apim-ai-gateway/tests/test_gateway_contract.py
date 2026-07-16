@@ -1,5 +1,6 @@
 import os
 import yaml
+import json
 import xml.etree.ElementTree as ET
 import pytest
 
@@ -8,6 +9,7 @@ MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 MODULE_YAML = os.path.join(MODULE_DIR, "module.yaml")
 POLICY_XML = os.path.join(MODULE_DIR, "infra", "terraform", "policies", "model-access.xml")
 TERRAFORM_MAIN = os.path.join(MODULE_DIR, "infra", "terraform", "main.tf")
+METRIC_SCHEMA = os.path.join(MODULE_DIR, "llm-token-metric.json")
 
 def test_module_yaml_structure():
     """Verify that module.yaml exists and has required fields."""
@@ -20,6 +22,20 @@ def test_module_yaml_structure():
     assert 'outputs' in data
     assert 'security_boundary' in data
     assert 'customer_safe_boundary' in data
+
+    # Check that contract schemas are listed and exist
+    emits = data.get('contracts', {}).get('emits', [])
+    assert len(emits) > 0
+    metric_schema_name = emits[0]['schema']
+    assert metric_schema_name == "llm-token-metric.json"
+    assert os.path.exists(os.path.join(MODULE_DIR, metric_schema_name))
+
+def test_metric_schema_validity():
+    """Verify that llm-token-metric.json is valid JSON."""
+    assert os.path.exists(METRIC_SCHEMA)
+    with open(METRIC_SCHEMA, 'r') as f:
+        data = json.load(f)
+    assert data['title'] == "LLM Token Metric Schema"
 
 def test_policy_xml_parsing():
     """Verify that the APIM policy XML is well-formed and contains required GenAI policies."""
@@ -120,3 +136,11 @@ def test_terraform_security_invariants():
     assert "AUDIENCE" in content
     assert "CLIENT_ID" in content
     assert "azurerm_user_assigned_identity.apim_identity.client_id" in content
+
+def test_forbidden_files_not_present():
+    """Verify that no forbidden files (tfstate, tfplan) are in the module directory."""
+    forbidden_extensions = [".tfstate", ".tfstate.backup", ".tfplan"]
+    for root, dirs, files in os.walk(MODULE_DIR):
+        for file in files:
+            for ext in forbidden_extensions:
+                assert not file.endswith(ext), f"Forbidden file found: {os.path.join(root, file)}"

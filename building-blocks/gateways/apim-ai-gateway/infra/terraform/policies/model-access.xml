@@ -63,6 +63,9 @@
         <set-header name="x-ms-region" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-tokens" exists-action="delete" />
         <set-header name="x-ratelimit-remaining-requests" exists-action="delete" />
+        <set-header name="x-ms-client-request-id" exists-action="delete" />
+        <set-header name="x-ms-useragent" exists-action="delete" />
+        <set-header name="x-accel-buffering" exists-action="delete" />
     </outbound>
     <on-error>
         <base />
