@@ -24,6 +24,9 @@ inputs:
   - name: role_definition_name
     type: string
     description: The name of the built-in Azure RBAC role to assign (e.g., 'Storage Blob Data Reader').
+  - name: tags
+    type: map(string)
+    description: Tags to apply to resources.
 outputs:
   - name: identity_principal_id
     type: string

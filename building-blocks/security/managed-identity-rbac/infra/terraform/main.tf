@@ -1,5 +1,11 @@
 # Managed Identity and RBAC Reference Implementation
 # Concrete reference for one workload receiving one narrowly scoped role over one resource.
+#
+# P0 Requirement Compliance:
+# - Uses User-Assigned Managed Identity (UAMI) for better modularity and lifecycle control.
+# - Implements least-privilege RBAC by scoping the assignment to a specific Resource ID.
+# - No hardcoded identifiers (subscription, tenant, principal, etc.).
+# - No Owner/Contributor or wildcard permissions (enforced via variable validation).
 
 resource "azurerm_user_assigned_identity" "workload" {
   name                = "id-${var.workload_name}"
