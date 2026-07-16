@@ -135,10 +135,52 @@ def test_process_queue_job_redacts_unexpected_error(mock_store):
 
 
 def test_process_queue_job_bounded_parameters_count(mock_store):
+    # Flat count exceeded (MAX_TOTAL_ITEMS is 50, but let's test a reasonable high value)
     payload = {
         "correlation_id": "bounded-count-12345678",
         "operation_type": "ping",
-        "parameters": {f"key_{i}": "value" for i in range(21)},
+        "parameters": {f"key_{i}": "value" for i in range(51)},
+    }
+    result = process_queue_job(payload, store=mock_store)
+    assert result.status == JobStatus.FAILED
+    assert "Invalid job payload or schema" in result.friendly_error
+
+
+def test_process_queue_job_bounded_parameters_recursive_depth(mock_store):
+    # MAX_RECURSIVE_DEPTH is 3
+    deep_params = {"a": {"b": {"c": {"d": "too_deep"}}}}
+    payload = {
+        "correlation_id": "bounded-depth-12345678",
+        "operation_type": "ping",
+        "parameters": deep_params,
+    }
+    result = process_queue_job(payload, store=mock_store)
+    assert result.status == JobStatus.FAILED
+    assert "Invalid job payload or schema" in result.friendly_error
+
+
+def test_process_queue_job_bounded_parameters_total_items_nested(mock_store):
+    # MAX_TOTAL_ITEMS is 50
+    nested_params = {
+        "list": [{"item": i} for i in range(30)]
+    }  # Each list item is a dict, total > 50 items
+    payload = {
+        "correlation_id": "bounded-nested-items-12345678",
+        "operation_type": "ping",
+        "parameters": nested_params,
+    }
+    result = process_queue_job(payload, store=mock_store)
+    assert result.status == JobStatus.FAILED
+    assert "Invalid job payload or schema" in result.friendly_error
+
+
+def test_process_queue_job_bounded_parameters_serialized_size(mock_store):
+    # MAX_PAYLOAD_SIZE_BYTES is 10KB
+    large_params = {"large": "a" * 11000}
+    payload = {
+        "correlation_id": "bounded-size-12345678",
+        "operation_type": "ping",
+        "parameters": large_params,
     }
     result = process_queue_job(payload, store=mock_store)
     assert result.status == JobStatus.FAILED
@@ -165,3 +207,20 @@ def test_process_queue_job_bounded_parameters_value_length(mock_store):
     result = process_queue_job(payload, store=mock_store)
     assert result.status == JobStatus.FAILED
     assert "Invalid job payload or schema" in result.friendly_error
+
+
+def test_process_queue_job_redacts_unbounded_result_data(mock_store):
+    # Mocking tool logic that produces oversized result_data
+
+    # We need to monkeypatch the operation logic in process_queue_job for this test
+    # or just test the model validation directly.
+    from src.models import JobResult, JobStatus
+    from datetime import datetime, timezone
+
+    with pytest.raises(ValueError, match="Result data exceeds maximum serialized size"):
+        JobResult(
+            correlation_id="bounded-result-12345678",
+            status=JobStatus.SUCCEEDED,
+            result_data={"large": "a" * 11000},
+            timestamp=datetime.now(timezone.utc).isoformat(),
+        )

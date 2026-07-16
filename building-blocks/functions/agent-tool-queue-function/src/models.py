@@ -2,9 +2,15 @@ from enum import Enum
 from typing import Any, Optional
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 import re
+import json
 
 # Correlation ID must be alphanumeric with hyphens, 8-64 chars.
 CORRELATION_ID_PATTERN = re.compile(r"^[a-zA-Z0-9-]{8,64}$")
+
+# Payload boundaries
+MAX_PAYLOAD_SIZE_BYTES = 10 * 1024  # 10KB
+MAX_RECURSIVE_DEPTH = 3
+MAX_TOTAL_ITEMS = 50
 
 
 def is_valid_correlation_id(v: Any) -> bool:
@@ -26,20 +32,80 @@ class JobStatus(str, Enum):
     FAILED = "failed"
 
 
-def validate_parameters(v: dict[str, Any]) -> dict[str, Any]:
-    """Ensures parameters are bounded in size and content."""
-    if len(v) > 20:
-        raise ValueError("Parameters dictionary exceeds maximum allowed items (20).")
+def validate_bounded_payload(
+    v: Any, depth: int = 0, item_count: int = 0, label: str = "payload"
+) -> int:
+    """
+    Recursively validates depth and item count of a JSON-serializable payload.
+    Returns the total item count.
+    """
+    if depth > MAX_RECURSIVE_DEPTH:
+        raise ValueError(
+            f"{label} exceeds maximum recursive depth ({MAX_RECURSIVE_DEPTH})."
+        )
 
-    for key, value in v.items():
-        if len(key) > 64:
-            raise ValueError(
-                f"Parameter key '{key[:10]}...' exceeds maximum length (64)."
+    current_count = item_count + 1
+    if current_count > MAX_TOTAL_ITEMS:
+        raise ValueError(f"{label} exceeds maximum total items ({MAX_TOTAL_ITEMS}).")
+
+    if isinstance(v, dict):
+        for key, value in v.items():
+            if len(str(key)) > 64:
+                raise ValueError(
+                    f"{label} key '{str(key)[:10]}...' exceeds maximum length (64)."
+                )
+            current_count = validate_bounded_payload(
+                value, depth + 1, current_count, label
             )
-        if isinstance(value, str) and len(value) > 1024:
-            raise ValueError(
-                f"Parameter value for '{key}' exceeds maximum length (1024)."
+    elif isinstance(v, list):
+        for item in v:
+            current_count = validate_bounded_payload(
+                item, depth + 1, current_count, label
             )
+    elif isinstance(v, str):
+        if len(v) > 1024:
+            raise ValueError(f"{label} string value exceeds maximum length (1024).")
+
+    return current_count
+
+
+def validate_parameters(v: dict[str, Any]) -> dict[str, Any]:
+    """Ensures parameters are bounded in size, depth, and content."""
+    # 1. Check total serialized size
+    try:
+        serialized = json.dumps(v)
+        if len(serialized) > MAX_PAYLOAD_SIZE_BYTES:
+            raise ValueError(
+                f"Parameters exceed maximum serialized size ({MAX_PAYLOAD_SIZE_BYTES} bytes)."
+            )
+    except (TypeError, ValueError) as e:
+        if isinstance(e, ValueError) and "maximum serialized size" in str(e):
+            raise
+        raise ValueError("Parameters must be JSON-serializable.")
+
+    # 2. Recursive depth and item count validation
+    validate_bounded_payload(v, label="Parameters")
+
+    return v
+
+
+def validate_result_data(v: Optional[dict[str, Any]]) -> Optional[dict[str, Any]]:
+    """Ensures result data is bounded before persistence or exposure."""
+    if v is None:
+        return v
+
+    try:
+        serialized = json.dumps(v)
+        if len(serialized) > MAX_PAYLOAD_SIZE_BYTES:
+            raise ValueError(
+                f"Result data exceeds maximum serialized size ({MAX_PAYLOAD_SIZE_BYTES} bytes)."
+            )
+    except (TypeError, ValueError) as e:
+        if isinstance(e, ValueError) and "maximum serialized size" in str(e):
+            raise
+        raise ValueError("Result data must be JSON-serializable.")
+
+    validate_bounded_payload(v, label="Result data")
     return v
 
 
@@ -139,6 +205,11 @@ class JobResult(BaseModel):
             raise ValueError("Invalid Correlation ID format.")
         return v
 
+    @field_validator("result_data")
+    @classmethod
+    def check_result_data(cls, v: Optional[dict[str, Any]]) -> Optional[dict[str, Any]]:
+        return validate_result_data(v)
+
 
 class JobStatusResponse(BaseModel):
     """
@@ -162,3 +233,8 @@ class JobStatusResponse(BaseModel):
     friendly_error: Optional[str] = Field(
         None, description="Safe error message.", max_length=1000
     )
+
+    @field_validator("result_data")
+    @classmethod
+    def check_result_data(cls, v: Optional[dict[str, Any]]) -> Optional[dict[str, Any]]:
+        return validate_result_data(v)
