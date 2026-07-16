@@ -83,4 +83,5 @@ def final_result_publisher(input_data: dict):
         "status": "completed",
         "publication_status": "published",
         "friendly_summary": "Results are now visible in the portal.",
+        "estimated_cost": 0.05,  # Sample cost from worker activity
     }

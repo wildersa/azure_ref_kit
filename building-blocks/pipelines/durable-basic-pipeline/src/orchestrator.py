@@ -230,6 +230,8 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
             },
         )
 
+        estimated_cost = publish_result.get("estimated_cost")
+
         if publish_result.get("status") == "failed":
             raise ValueError(
                 publish_result.get("friendly_error") or "Final publication failed."
@@ -257,7 +259,7 @@ def pipeline_orchestrator(context: df.DurableOrchestrationContext):
                 "pipeline_type": pipeline_type,
                 "status": "completed",
                 "correlation_id": context.instance_id,
-                "estimated_cost": 0.05,  # Sample cost for reference
+                "estimated_cost": estimated_cost,
                 "created_at": pipeline_run["created_at"],
                 "started_at": start_time,
                 "finished_at": finish_time,
