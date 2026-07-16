@@ -289,3 +289,60 @@ jobs:
 
       - name: Run pytest
         run: PYTHONPATH=. python -m pytest tests/
+
+  catalog-check-and-update:
+    name: Catalog Check and Auto-Commit
+    needs: choose-runner
+    runs-on: ${{ fromJSON(needs.choose-runner.outputs.runner) }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref || github.ref_name }}
+
+      - name: Configure local Python caches
+        if: needs.choose-runner.outputs.local == 'true'
+        run: |
+          mkdir -p "$HOME/.cache/pip"
+          echo "PIP_CACHE_DIR=$HOME/.cache/pip" >> "$GITHUB_ENV"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: ${{ needs.choose-runner.outputs.local != 'true' && 'pip' || '' }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyYAML pytest
+
+      - name: Generate catalog files
+        run: python scripts/generate_catalog.py
+
+      - name: Run script tests
+        run: PYTHONPATH=. python -m pytest scripts/tests/
+
+      - name: Auto-commit changed catalog files
+        run: |
+          if [ -n "$(git status --porcelain docs/)" ]; then
+            echo "Changes detected in catalog files."
+            IS_FORK="${{ github.event.pull_request.head.repo.fork }}"
+            if [ "$IS_FORK" = "true" ]; then
+              echo "Error: Catalog files are out of sync, but this is a fork PR. Pushing changes is not allowed."
+              echo "Please run 'python scripts/generate_catalog.py' locally and commit the changes to your branch."
+              git diff docs/
+              exit 1
+            else
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git add docs/catalog.md docs/catalog.json
+              git commit -m "chore: auto-update catalog files [skip ci]"
+              git push
+            fi
+          else
+            echo "Catalog files are up-to-date."
+          fi
