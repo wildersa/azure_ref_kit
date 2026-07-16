@@ -97,17 +97,29 @@ This pipeline implements a tiered failure handling strategy:
 
 This building block is primarily a **runtime reference implementation**. While a minimal Terraform example is provided for completeness, the focus is on the orchestration logic and status contracts. Per repository standards, this module does not mandate a specific IaC provider for adoption, but the provided reference follows the [docs/terraform-deployment-requirement.md](../../docs/terraform-deployment-requirement.md) for validation.
 
+### Identity-First Storage Configuration
+
+This module enforces an **identity-first security boundary** for Azure Storage, complying with modern Azure security best practices.
+
+1.  **Disable Storage Keys**: The storage account is configured with `shared_access_key_enabled = false`.
+2.  **Managed Identity**: The Function App uses a System-Assigned Managed Identity.
+3.  **App Settings**: The following settings are required for identity-based connections:
+    - `AzureWebJobsStorage__accountName`: The name of the storage account.
+    - `AzureWebJobsStorage__credential`: Must be set to `managedidentity`.
+    - `APPLICATIONINSIGHTS_CONNECTION_STRING`: Required for telemetry.
+
+### Customer-Safe Error Redaction
+
+To prevent the leakage of internal technical details (like SAS tokens, internal IDs, or stack traces) to the customer-facing status, this orchestrator implements a **fail-closed redaction policy**:
+
+- **Catch-All Error Handling**: All exceptions during orchestration are caught in a top-level `try...except` block.
+- **Internal Logging**: The technical error is logged to Application Insights for internal troubleshooting.
+- **Friendly Error Mapping**: The customer-facing `friendly_error` field is updated with a generic, safe message (e.g., "An error occurred during document processing").
+- **Contract Enforcement**: Status updates are validated against `shared/contracts/pipeline-run.schema.json` and `shared/contracts/pipeline-step.schema.json` before being persisted.
+
 ### Terraform Deployment
 
 A minimal Terraform deployment reference is provided in the [infra/terraform/](infra/terraform/) directory. It provisions the necessary Resource Group, Storage Account, Application Insights, and the Flex Consumption Function App.
-
-**Required Configuration (Identity-First):**
-
-This module enforces an **identity-first security boundary**. Shared access keys are disabled on the storage account (`shared_access_key_enabled = false`), and all communication is authorized via Microsoft Entra ID (Managed Identity).
-
-- `AzureWebJobsStorage__accountName`: The name of the storage account.
-- `AzureWebJobsStorage__credential`: Set to `managedidentity`.
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: The connection string for Application Insights.
 
 ## Microsoft Learn References
 

@@ -67,6 +67,10 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity.call_args_list[0][0][0]
         == "update_pipeline_run_status"
     )
+    assert (
+        mock_context.call_activity.call_args_list[0][0][1]["correlation_id"]
+        == "test-run-id"
+    )
 
     # 2. Start OCR step
     gen.send(None)
@@ -157,6 +161,11 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         == "update_pipeline_run_status"
     )
     assert mock_context.call_activity.call_args_list[8][0][1]["status"] == "completed"
+    assert (
+        mock_context.call_activity.call_args_list[8][0][1]["correlation_id"]
+        == "test-run-id"
+    )
+    assert mock_context.call_activity.call_args_list[8][0][1]["estimated_cost"] == 0.05
 
     # End of orchestrator
     with pytest.raises(StopIteration) as exc:
@@ -204,6 +213,10 @@ def test_orchestrator_ocr_failure(mock_context, valid_input):
         == "update_pipeline_run_status"
     )
     assert mock_context.call_activity.call_args_list[3][0][1]["status"] == "failed"
+    assert (
+        mock_context.call_activity.call_args_list[3][0][1]["correlation_id"]
+        == "test-run-id"
+    )
     assert (
         "blurry"
         not in mock_context.call_activity.call_args_list[2][0][1]["friendly_error"]

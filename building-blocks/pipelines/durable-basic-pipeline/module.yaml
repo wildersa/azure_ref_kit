@@ -1,9 +1,9 @@
 name: durable-basic-pipeline
 type: building-block
 category: pipelines
-status: implemented
-purpose: Minimal Durable Functions orchestration pattern for customer-visible pipeline status tracking.
-version: 1.0.0
+status: active
+purpose: Minimal Durable Functions orchestration pattern for tracking customer-visible pipeline status with an explicit security boundary.
+version: 1.1.0
 
 runtime:
   language: python
@@ -67,7 +67,7 @@ contracts:
   emits: []
 
 security_boundary:
-  policy: "Enforces Durable Functions orchestration boundary through identity-first storage and filtered status schemas."
+  policy: "Enforces a strict boundary between internal technical orchestration and customer-safe business status using identity-first storage and contract-validated schemas."
   forbid_wildcards: true
   forbid_secrets: true
   required_roles:

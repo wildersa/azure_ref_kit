@@ -115,5 +115,3 @@ resource "azurerm_role_assignment" "storage_table_data_contributor" {
   role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.function.identity[0].principal_id
 }
-# Force update
-# Force inclusion in PR

@@ -17,4 +17,3 @@ variable "tags" {
     module = "durable-basic-pipeline"
   }
 }
-# Force inclusion in PR
