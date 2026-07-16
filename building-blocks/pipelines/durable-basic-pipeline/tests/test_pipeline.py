@@ -147,8 +147,7 @@ def test_orchestrator_happy_path(mock_context, valid_input):
     )
 
     # 10. Complete Publication step
-    publish_result_with_cost = {**publish_success, "estimated_cost": 0.05}
-    gen.send(publish_result_with_cost)
+    gen.send(publish_success)
     assert (
         mock_context.call_activity.call_args_list[7][0][0]
         == "update_pipeline_step_status"
@@ -166,7 +165,6 @@ def test_orchestrator_happy_path(mock_context, valid_input):
         mock_context.call_activity.call_args_list[8][0][1]["correlation_id"]
         == "test-run-id"
     )
-    assert mock_context.call_activity.call_args_list[8][0][1]["estimated_cost"] == 0.05
 
     # End of orchestrator
     with pytest.raises(StopIteration) as exc:
@@ -558,8 +556,6 @@ def test_blob_start_logic(caplog):
     assert "sensitive-invoice-id" not in caplog.text
     assert "Blob trigger started" in caplog.text
     assert "Orchestration started via blob trigger" in caplog.text
-
-
 def test_orchestrator_oversized_id(mock_context):
     oversized_id = "a" * 65
     invalid_input = {

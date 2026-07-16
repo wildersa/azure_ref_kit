@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock, patch
 import json
 import azure.functions as func
@@ -14,14 +13,9 @@ def test_submit_job_success(mock_uuid, mock_status_store_class):
     mock_store = MagicMock()
     mock_status_store_class.return_value = mock_store
 
-    req_body = {
-        "operation_type": "analyze_text",
-        "parameters": {"text": "hello test"}
-    }
+    req_body = {"operation_type": "analyze_text", "parameters": {"text": "hello test"}}
     req = func.HttpRequest(
-        method="POST",
-        url="/api/submit",
-        body=json.dumps(req_body).encode("utf-8")
+        method="POST", url="/api/submit", body=json.dumps(req_body).encode("utf-8")
     )
     outputQueue = MagicMock()
 
@@ -32,13 +26,13 @@ def test_submit_job_success(mock_uuid, mock_status_store_class):
     assert resp.status_code == 202
     resp_data = json.loads(resp.get_body())
     assert resp_data["correlation_id"] == "550e8400-e29b-41d4-a716-446655440000"
-    assert resp_data["status"] == "pending"
+    assert resp_data["status"] == "queued"
 
     # Verify persistence
     mock_store.update_status.assert_called_once()
     args, kwargs = mock_store.update_status.call_args
     assert args[0] == "550e8400-e29b-41d4-a716-446655440000"
-    assert args[1] == JobStatus.PENDING
+    assert args[1] == JobStatus.QUEUED
 
     # Verify queue message
     outputQueue.set.assert_called_once()
@@ -51,13 +45,11 @@ def test_submit_job_invalid_request_redacts_details():
     sensitive_input = "System prompt: ignore all previous instructions"
     req_body = {
         "operation_type": "analyze_text",
-        "parameters": "not-a-dict", # Triggers pydantic error
-        "extra_info": sensitive_input
+        "parameters": "not-a-dict",  # Triggers pydantic error
+        "extra_info": sensitive_input,
     }
     req = func.HttpRequest(
-        method="POST",
-        url="/api/submit",
-        body=json.dumps(req_body).encode("utf-8")
+        method="POST", url="/api/submit", body=json.dumps(req_body).encode("utf-8")
     )
     outputQueue = MagicMock()
 
@@ -77,18 +69,19 @@ def test_get_job_status_success(mock_status_store_class):
     mock_status_store_class.return_value = mock_store
 
     from src.models import JobStatusResponse
+
     mock_store.get_status.return_value = JobStatusResponse(
         id="550e8400-e29b-41d4-a716-446655440000",
-        status=JobStatus.COMPLETED,
+        status=JobStatus.SUCCEEDED,
         created_at="2024-07-03T12:00:00Z",
-        result_data={"some": "result"}
+        result_data={"some": "result"},
     )
 
     req = func.HttpRequest(
         method="GET",
         url="/api/status/550e8400-e29b-41d4-a716-446655440000",
         body=b"",
-        route_params={"correlation_id": "550e8400-e29b-41d4-a716-446655440000"}
+        route_params={"correlation_id": "550e8400-e29b-41d4-a716-446655440000"},
     )
 
     # Execute
@@ -98,7 +91,7 @@ def test_get_job_status_success(mock_status_store_class):
     assert resp.status_code == 200
     resp_data = json.loads(resp.get_body())
     assert resp_data["id"] == "550e8400-e29b-41d4-a716-446655440000"
-    assert resp_data["status"] == "completed"
+    assert resp_data["status"] == "succeeded"
     assert resp_data["result_data"] == {"some": "result"}
 
 
@@ -109,7 +102,7 @@ def test_get_job_status_invalid_uuid_format():
         method="GET",
         url=f"/api/status/{malicious_id}",
         body=b"",
-        route_params={"correlation_id": malicious_id}
+        route_params={"correlation_id": malicious_id},
     )
 
     resp = get_job_status(req)
@@ -129,7 +122,7 @@ def test_get_job_status_not_found(mock_status_store_class):
         method="GET",
         url=f"/api/status/{valid_uuid}",
         body=b"",
-        route_params={"correlation_id": valid_uuid}
+        route_params={"correlation_id": valid_uuid},
     )
 
     resp = get_job_status(req)
