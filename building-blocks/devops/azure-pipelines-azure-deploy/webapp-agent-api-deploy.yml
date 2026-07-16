@@ -113,6 +113,7 @@ stages:
           # Export ARM environment variables for Terraform OIDC from the Service Connection
           export ARM_CLIENT_ID=$servicePrincipalId
           export ARM_TENANT_ID=$tenantId
+          export ARM_OIDC_TOKEN=$idToken
           export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
           terraform init \
@@ -124,6 +125,12 @@ stages:
           # Suppress raw plan output to avoid leaking technical internals or sensitive values
           terraform plan -input=false -out=tfplan > /dev/null
         workingDirectory: $(TF_WORKING_DIR)
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Terraform Plan'
+      inputs:
+        targetPath: '$(TF_WORKING_DIR)/tfplan'
+        artifact: 'terraform-plan'
+        publishLocation: 'pipeline'
 
 - stage: Deploy
   displayName: 'Infrastructure Deploy'
@@ -153,6 +160,12 @@ stages:
         deploy:
           steps:
           - checkout: self
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Terraform Plan'
+            inputs:
+              buildType: 'current'
+              artifactName: 'terraform-plan'
+              targetPath: '$(TF_WORKING_DIR)'
           - task: AzureCLI@2
             displayName: 'Terraform Apply'
             inputs:
@@ -165,6 +178,7 @@ stages:
                 # Export ARM environment variables for Terraform OIDC from the Service Connection
                 export ARM_CLIENT_ID=$servicePrincipalId
                 export ARM_TENANT_ID=$tenantId
+                export ARM_OIDC_TOKEN=$idToken
                 export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 
                 terraform init \
@@ -173,6 +187,6 @@ stages:
                   -backend-config="container_name=$(BACKEND_CONTAINER_NAME)" \
                   -backend-config="key=$(BACKEND_KEY)"
 
-                # Apply while suppressing detailed output.
-                terraform apply -auto-approve -input=false > /dev/null
+                # Apply the exact saved plan while suppressing detailed output.
+                terraform apply -auto-approve -input=false tfplan > /dev/null
               workingDirectory: $(TF_WORKING_DIR)

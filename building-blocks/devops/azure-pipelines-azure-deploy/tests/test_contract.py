@@ -162,6 +162,17 @@ def test_webapp_agent_api_pipeline_security():
     apply_step = next(s for s in steps if s.get("task") == "AzureCLI@2")
     assert "> /dev/null" in apply_step["inputs"]["inlineScript"], "Terraform apply output must be suppressed"
 
+    # WIF/OIDC Token Check
+    assert "export ARM_OIDC_TOKEN=$idToken" in apply_step["inputs"]["inlineScript"]
+    plan_stage = next(s for s in data["stages"] if s.get("stage") == "Plan")
+    plan_step = next(s for s in plan_stage["jobs"][0]["steps"] if s.get("task") == "AzureCLI@2")
+    assert "export ARM_OIDC_TOKEN=$idToken" in plan_step["inputs"]["inlineScript"]
+
+    # Artifact Check
+    assert any(s.get("task") == "PublishPipelineArtifact@1" for s in plan_stage["jobs"][0]["steps"]), "Plan must be published as artifact"
+    assert any(s.get("task") == "DownloadPipelineArtifact@2" for s in steps), "Plan must be downloaded before apply"
+    assert "terraform apply -auto-approve -input=false tfplan" in apply_step["inputs"]["inlineScript"], "Apply must use the saved plan file"
+
 def test_webapp_agent_api_pipeline_working_dir():
     pipeline_path = pathlib.Path(__file__).parent.parent / "webapp-agent-api-deploy.yml"
     with open(pipeline_path, "r") as f:
