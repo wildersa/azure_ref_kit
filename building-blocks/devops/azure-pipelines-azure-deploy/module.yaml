@@ -2,22 +2,69 @@ name: azure-pipelines-azure-deploy
 type: devops
 category: devops
 status: reference
-purpose: Secure Azure Pipelines deployment reference pattern for Azure Static Web Apps using Workload Identity Federation.
+purpose: Secure Azure Pipelines deployment reference patterns for Azure services (SWA, Durable Pipelines, Web App Agent API) using Workload Identity Federation.
 inputs:
   - name: AZURE_SERVICE_CONNECTION_NAME
     description: "Name of the Azure Resource Manager service connection configured with Workload Identity Federation."
     type: string
-  - name: AZURE_RESOURCE_GROUP_NAME
-    description: "Resource group name where the Static Web App is located."
-    type: string
-  - name: AZURE_STATIC_WEB_APP_NAME
-    description: "Name of the Azure Static Web App resource."
-    type: string
-  - name: DEPLOYMENT_ENVIRONMENT
+  - name: AZURE_TENANT_ID
+    description: "Tenant ID of the Azure tenant (used for Terraform)."
+    type: secret
+  - name: ENVIRONMENT_NAME
     description: "The name of the Azure Pipelines Environment for deployment gating and approvals."
     type: string
     required: false
-outputs: []
+  - name: BACKEND_RESOURCE_GROUP_NAME
+    description: "The resource group name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_STORAGE_ACCOUNT_NAME
+    description: "The storage account name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_CONTAINER_NAME
+    description: "The container name for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: BACKEND_KEY
+    description: "The state file key for the Terraform remote backend."
+    type: secret
+    required: false
+  - name: AZURE_RESOURCE_GROUP_NAME
+    description: "Resource group name (used for SWA)."
+    type: string
+    required: false
+  - name: AZURE_STATIC_WEB_APP_NAME
+    description: "Name of the Azure Static Web App resource."
+    type: string
+    required: false
+  - name: LOCATION
+    description: "Azure region for deployment."
+    type: string
+    required: false
+  - name: RESOURCE_PREFIX
+    description: "Prefix for resources (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_IMAGE
+    description: "The container image to deploy (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_REGISTRY_SERVER
+    description: "The FQDN of the container registry (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_REGISTRY_ID
+    description: "The ID of the Azure Container Registry (Web App Agent API)."
+    type: string
+    required: false
+  - name: AUTH_CLIENT_ID
+    description: "The Client ID for Entra ID authentication (Web App Agent API)."
+    type: string
+    required: false
+outputs:
+  - name: webapp_api_endpoint
+    description: "The default hostname of the deployed Web App Agent API."
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
