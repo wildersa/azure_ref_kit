@@ -11,8 +11,8 @@ def test_payload_bounds_defined_in_api():
         content = f.read()
 
     assert "MAX_STR_LEN = 64" in content
-    assert "MAX_LONG_STR_LEN = 2048" in content
-    assert "MAX_ARTIFACTS = 100" in content
+    assert "MAX_LONG_STR_LEN = 1000" in content
+    assert "MAX_ARTIFACTS = 50" in content
     assert "data.steps.length > 50" in content
 
 def test_schema_alignment_with_api():

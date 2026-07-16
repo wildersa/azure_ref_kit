@@ -6,10 +6,9 @@ interface RunDetailProps {
   run: CustomerSafeStatus;
   failure: FriendlyFailure | null;
   onBack: () => void;
-  getDownloadUrl: (runId: string, name: string) => string;
 }
 
-export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack, getDownloadUrl }) => {
+export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack }) => {
   return (
     <div style={{ padding: '20px' }}>
       <button
@@ -29,7 +28,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack, getD
             </span>
           </div>
         </div>
-        {run.estimated_cost !== undefined && (
+        {run.estimated_cost != null && (
           <div style={{ padding: '12px 16px', backgroundColor: '#f0f9ff', border: '1px solid #e0f2fe', borderRadius: '8px', textAlign: 'right' }}>
             <div style={{ fontSize: '0.75rem', color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.025em', fontWeight: 600 }}>Est. Cost</div>
             <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0c4a6e' }}>${run.estimated_cost.toFixed(2)}</div>
@@ -41,7 +40,7 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack, getD
         <h3 style={{ margin: '0 0 12px 0', fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', letterSpacing: '0.05em' }}>Progress Summary</h3>
         <p style={{ margin: '0 0 20px 0', fontSize: '1.125rem', fontWeight: 500 }}>{run.business_summary || 'No summary available.'}</p>
 
-        {run.status === 'running' && run.progress_percent !== undefined && (
+        {run.status === 'running' && run.progress_percent != null && (
           <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
             <div
               style={{
@@ -126,20 +125,6 @@ export const RunDetail: React.FC<RunDetailProps> = ({ run, failure, onBack, getD
                       {(artifact.size_bytes / 1024).toFixed(1)} KB • {artifact.content_type || 'Unknown'}
                     </div>
                   </div>
-                  <a
-                    href={getDownloadUrl(run.id, artifact.name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-block',
-                      fontSize: '0.875rem',
-                      color: '#2563eb',
-                      textDecoration: 'none',
-                      fontWeight: 500
-                    }}
-                  >
-                    Download &darr;
-                  </a>
                 </div>
               ))}
             </div>

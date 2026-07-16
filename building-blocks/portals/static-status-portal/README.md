@@ -10,7 +10,7 @@ This shell is designed to be hosted as an Azure Static Web App, consuming a cont
 
 ## Portal Responsibilities
 
-- **Authentication:** Leverages Azure Static Web Apps built-in authentication.
+- **Authentication:** Authentication is outside the scope of this bounded version. In a production deployment, this would leverage Azure Static Web Apps built-in authentication.
 - **Presentation:** Provides a React-based interface for tracking pipeline progress and outcomes.
 - **Sanitization:** Implements client-side defense-in-depth to prevent any technical leakage.
 - **Mocking:** Supports a local fixture mode for rapid development and testing without Azure dependencies.
@@ -31,6 +31,20 @@ flowchart LR
     end
 ```
 
+## Deployment / IaC Decision
+
+- **Platform:** Azure Static Web Apps (SWA).
+- **Reasoning:** SWA provides a simplified, scalable, and secure hosting model for static React applications. It integrates well with Azure Functions for a serverless backend and provides built-in support for custom domains and SSL.
+- **Infrastructure:** Managed via module-local Terraform in `infra/terraform/`.
+- **Authentication:** Intentionally omitted in this version to focus on the presentation and security boundary; will be added in a future track using SWA built-in auth.
+
+## Known Limits & Trade-offs
+
+- **Read-Only:** The portal is currently read-only; the "Start New Run" button is a placeholder.
+- **Static Fixtures:** Local development defaults to static fixtures instead of a real API.
+- **Download Forbidden:** Artifact download is explicitly forbidden to maintain the security boundary.
+- **Manual Authentication:** Authentication must be configured separately at the SWA service level if needed before Track 5.
+
 ## UI Surface Contract
 
 The portal shell provides the following functional components:
@@ -46,9 +60,9 @@ A detailed view of a single pipeline run showing its execution path.
 - **Constraint:** Forbidden to show raw logs, internal step IDs, or technical stack traces.
 
 ### 3. Artifacts List
-Lists safe, customer-facing artifacts produced by the pipeline.
+Lists safe, customer-facing artifact metadata produced by the pipeline.
 - **Fields:** Friendly Name, Type, Size.
-- **Constraint:** Must never expose SAS tokens, storage account keys, or internal storage paths (storage_ref).
+- **Constraint:** Must never provide download links, expose SAS tokens, storage account keys, or internal storage paths (storage_ref).
 
 ### 4. Cost Summary
 Optional high-level cost or resource consumption summary.
@@ -62,7 +76,7 @@ A dedicated UI component for rendering non-technical failures.
 
 ### 6. Start Run Placeholder
 A UI shell for future pipeline triggers.
-- **Behavior:** Currently read-only in this reference.
+- **Behavior:** Displays a disabled "+ Start New Run" button as a placeholder for future functionality.
 
 ## API Contract Usage
 

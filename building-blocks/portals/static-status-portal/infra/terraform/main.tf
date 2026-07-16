@@ -7,8 +7,8 @@ terraform {
   }
 }
 
-# Azure Static Web App for the Customer Status Portal
-# This resource hosts the React/TypeScript frontend.
+# Azure Static Web App for the Customer Status Portal.
+# This resource hosts the React/TypeScript frontend for the business status shell.
 resource "azurerm_static_web_app" "portal" {
   name                = "${var.name_prefix}-status-portal"
   resource_group_name = var.resource_group_name

@@ -121,7 +121,6 @@ function App() {
               run={runDetail}
               failure={failureDetail}
               onBack={handleBack}
-              getDownloadUrl={api.getDownloadUrl}
             />
           ) : (
             <RunList

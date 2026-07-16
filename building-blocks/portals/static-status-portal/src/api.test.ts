@@ -162,7 +162,7 @@ describe('API Adapter (Strict Validation & Defense in Depth)', () => {
   describe('Bounded Payload Handling (P0 Requirements)', () => {
     it('rejects IDs that are too long', async () => {
         const oversizedData = {
-            id: 'a'.repeat(65),
+            id: 'a'.repeat(129),
             status: 'completed',
             created_at: '2024-01-01T00:00:00Z'
         };

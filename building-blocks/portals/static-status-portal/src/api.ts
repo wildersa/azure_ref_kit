@@ -144,8 +144,9 @@ const VALID_STEP_STATUSES: StepStatus[] = ['pending', 'running', 'waiting_input'
 
 // Constants for payload bounds (aligned with shared/contracts)
 const MAX_STR_LEN = 64;
-const MAX_LONG_STR_LEN = 2048;
-const MAX_ARTIFACTS = 100;
+const MAX_ID_LEN = 128;
+const MAX_LONG_STR_LEN = 1000; // Aligned with CustomerSafeStatus business_summary and FriendlyFailure message
+const MAX_ARTIFACTS = 50; // Aligned with CustomerSafeStatus safe_artifacts
 
 /**
  * Validates and sanitizes a single pipeline step.
@@ -153,7 +154,7 @@ const MAX_ARTIFACTS = 100;
 function validateAndSanitizeStep(data: any): PipelineStep {
   if (!data || typeof data !== 'object') throw new ValidationError('Invalid step object');
 
-  if (typeof data.run_id !== 'string' || !data.run_id || data.run_id.length > MAX_STR_LEN) throw new ValidationError('Step missing or invalid run_id');
+  if (typeof data.run_id !== 'string' || !data.run_id || data.run_id.length > MAX_ID_LEN) throw new ValidationError('Step missing or invalid run_id');
   if (typeof data.name !== 'string' || !data.name || data.name.length > MAX_STR_LEN) throw new ValidationError('Step missing or invalid name');
   if (!VALID_STEP_STATUSES.includes(data.status)) throw new ValidationError(`Invalid step status: ${data.status}`);
 
@@ -212,7 +213,7 @@ function validateAndSanitizeStatus(data: any): CustomerSafeStatus {
   if (!data || typeof data !== 'object') throw new ValidationError('Invalid status object');
 
   // Required fields
-  if (typeof data.id !== 'string' || !data.id || data.id.length > MAX_STR_LEN) throw new ValidationError('Missing or invalid id');
+  if (typeof data.id !== 'string' || !data.id || data.id.length > MAX_ID_LEN) throw new ValidationError('Missing or invalid id');
   if (!VALID_STATUSES.includes(data.status)) throw new ValidationError(`Invalid status: ${data.status}`);
   if (typeof data.created_at !== 'string' || isNaN(Date.parse(data.created_at))) throw new ValidationError('Missing or invalid created_at');
 
@@ -331,9 +332,5 @@ export const api = {
     if (!response.ok) return null;
     const data = await response.json();
     return validateAndSanitizeFailure(data);
-  },
-
-  getDownloadUrl(runId: string, artifactName: string): string {
-    return `/api/runs/${runId}/artifacts/${encodeURIComponent(artifactName)}/download`;
   }
 };

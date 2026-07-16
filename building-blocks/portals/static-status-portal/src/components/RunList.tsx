@@ -12,6 +12,21 @@ export const RunList: React.FC<RunListProps> = ({ runs, onSelectRun }) => {
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2 style={{ margin: 0 }}>Recent Activity</h2>
+        <button
+          disabled
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#f3f4f6',
+            color: '#9ca3af',
+            border: '1px solid #e5e7eb',
+            borderRadius: '6px',
+            cursor: 'not-allowed',
+            fontSize: '0.875rem',
+            fontWeight: 500
+          }}
+        >
+          + Start New Run
+        </button>
       </div>
 
       {runs.length === 0 ? (

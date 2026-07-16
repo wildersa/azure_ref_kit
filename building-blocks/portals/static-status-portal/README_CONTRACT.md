@@ -83,12 +83,12 @@ The following technical and internal data **must never reach the browser or the 
 | **Empty** | Displays a "No runs found" message for the customer. |
 | **Not Found** | Displays a friendly 404 page for invalid or unauthorized IDs. |
 | **Failed** | Displays the `friendly_error` and a way to contact support or retry. |
-| **Completed** | Displays the final summary and links to safe artifacts. |
+| **Completed** | Displays the final summary and safe artifact metadata. |
 | **Unavailable** | Displays a maintenance or service disruption message. |
 
 ## Authentication and Security
 
-- **Authentication:** Required for all views. The portal must use Azure Static Web Apps built-in authentication (Microsoft Entra ID or GitHub).
+- **Authentication:** Authentication is outside the scope of this first version.
 - **Authorization:** Data must be scoped to the authenticated user's `customer_id`.
 - **Encryption:** All traffic must be over HTTPS.
 - **Write API:** This module does not define or allow an unauthenticated write API. All pipeline triggers must be handled through a separate, secure process.

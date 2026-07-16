@@ -1,7 +1,7 @@
 name: static-status-portal
 type: portal
 category: building-block
-status: implemented
+status: active
 purpose: Minimal read-only status portal shell for displaying customer-safe pipeline outcomes.
 version: 1.0.0
 

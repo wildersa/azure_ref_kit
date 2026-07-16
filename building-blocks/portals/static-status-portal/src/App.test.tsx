@@ -8,8 +8,7 @@ vi.mock('./api', () => ({
   api: {
     getRuns: vi.fn(),
     getRunDetail: vi.fn(),
-    getRunFailure: vi.fn(),
-    getDownloadUrl: vi.fn((runId, name) => `/api/runs/${runId}/artifacts/${name}/download`)
+    getRunFailure: vi.fn()
   }
 }));
 
