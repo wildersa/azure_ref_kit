@@ -16,7 +16,7 @@ outputs:
     description: Opaque identifier for tracking job progress.
   - name: status
     type: string
-    description: Current business-level status (pending, running, completed, failed).
+    description: Current business-level status (queued, running, succeeded, failed).
 azure_resources:
   - azurerm_function_app_flex_consumption
   - azurerm_storage_account

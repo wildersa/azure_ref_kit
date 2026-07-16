@@ -67,7 +67,10 @@ resource "azurerm_function_app_flex_consumption" "main" {
   site_config {}
 
   app_settings = {
-    "AzureWebJobsStorage__accountName" = azurerm_storage_account.main.name
+    "AzureWebJobsStorage__blobServiceUri"  = azurerm_storage_account.main.primary_blob_endpoint
+    "AzureWebJobsStorage__queueServiceUri" = azurerm_storage_account.main.primary_queue_endpoint
+    "AzureWebJobsStorage__tableServiceUri" = azurerm_storage_account.main.primary_table_endpoint
+    "AzureWebJobsStorage__accountName"     = azurerm_storage_account.main.name
   }
 }
 

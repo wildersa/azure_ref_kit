@@ -17,13 +17,30 @@ def is_valid_correlation_id(v: Any) -> bool:
 class JobStatus(str, Enum):
     """
     Explicit business-level job status transitions.
-    Aligned with CustomerSafeStatus schema.
+    Aligned with CustomerSafeStatus schema and prompt requirements.
     """
 
-    PENDING = "pending"
+    QUEUED = "queued"
     RUNNING = "running"
-    COMPLETED = "completed"
+    SUCCEEDED = "succeeded"
     FAILED = "failed"
+
+
+def validate_parameters(v: dict[str, Any]) -> dict[str, Any]:
+    """Ensures parameters are bounded in size and content."""
+    if len(v) > 20:
+        raise ValueError("Parameters dictionary exceeds maximum allowed items (20).")
+
+    for key, value in v.items():
+        if len(key) > 64:
+            raise ValueError(
+                f"Parameter key '{key[:10]}...' exceeds maximum length (64)."
+            )
+        if isinstance(value, str) and len(value) > 1024:
+            raise ValueError(
+                f"Parameter value for '{key}' exceeds maximum length (1024)."
+            )
+    return v
 
 
 class SubmitRequest(BaseModel):
@@ -36,10 +53,16 @@ class SubmitRequest(BaseModel):
         description="The type of operation to perform.",
         min_length=1,
         max_length=64,
+        pattern=r"^[a-z0-9_]+$",
     )
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Operation-specific parameters."
     )
+
+    @field_validator("parameters")
+    @classmethod
+    def check_parameters(cls, v: dict[str, Any]) -> dict[str, Any]:
+        return validate_parameters(v)
 
 
 class SubmitResponse(BaseModel):
@@ -47,8 +70,10 @@ class SubmitResponse(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    correlation_id: str = Field(..., description="The opaque correlation ID for the job.")
-    status: JobStatus = Field(JobStatus.PENDING, description="Initial job status.")
+    correlation_id: str = Field(
+        ..., description="The opaque correlation ID for the job."
+    )
+    status: JobStatus = Field(JobStatus.QUEUED, description="Initial job status.")
 
 
 class JobInput(BaseModel):
@@ -69,6 +94,7 @@ class JobInput(BaseModel):
         description="The type of operation to perform.",
         min_length=1,
         max_length=64,
+        pattern=r"^[a-z0-9_]+$",
     )
     parameters: dict[str, Any] = Field(
         default_factory=dict, description="Operation-specific parameters."
@@ -83,6 +109,11 @@ class JobInput(BaseModel):
             )
         return v
 
+    @field_validator("parameters")
+    @classmethod
+    def check_parameters(cls, v: dict[str, Any]) -> dict[str, Any]:
+        return validate_parameters(v)
+
 
 class JobResult(BaseModel):
     """
@@ -96,7 +127,7 @@ class JobResult(BaseModel):
     result_data: Optional[dict[str, Any]] = Field(
         None, description="Successful operation results."
     )
-    error_message: Optional[str] = Field(
+    friendly_error: Optional[str] = Field(
         None, description="Customer-safe error message if failed."
     )
     timestamp: str = Field(..., description="ISO 8601 timestamp of completion.")
@@ -112,16 +143,22 @@ class JobResult(BaseModel):
 class JobStatusResponse(BaseModel):
     """
     Customer-safe status response (API surface).
-    Aligned with building-blocks/security/customer-safe-status-boundary.
+    Aligned with building-blocks/security/customer-safe-status-boundary and shared contracts.
     """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(..., description="The opaque correlation ID.")
     status: JobStatus = Field(..., description="The current status.")
-    business_summary: Optional[str] = Field(None, description="Safe summary of progress.")
+    business_summary: Optional[str] = Field(
+        None, description="Safe summary of progress.", max_length=1000
+    )
     created_at: str = Field(..., description="ISO 8601 creation timestamp.")
     started_at: Optional[str] = Field(None, description="ISO 8601 start timestamp.")
     finished_at: Optional[str] = Field(None, description="ISO 8601 finish timestamp.")
-    result_data: Optional[dict[str, Any]] = Field(None, description="Operation results.")
-    error_message: Optional[str] = Field(None, description="Safe error message.")
+    result_data: Optional[dict[str, Any]] = Field(
+        None, description="Operation results."
+    )
+    friendly_error: Optional[str] = Field(
+        None, description="Safe error message.", max_length=1000
+    )
