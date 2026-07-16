@@ -76,6 +76,68 @@ The runtime requires the following environment variables.
    PYTHONPATH=. python -m src.main
    ```
 
+## Deployment with azd
+
+This solution is deployable using the [Azure Developer CLI (`azd`)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/overview). It reuses the existing Terraform Infrastructure as Code (IaC) located in `infra/terraform/`.
+
+### Prerequisites
+- [Azure Developer CLI (azd)](https://aka.ms/installazd)
+- [Terraform](https://www.terraform.io/downloads.html)
+- `azd` alpha Terraform support enabled:
+  ```bash
+  azd config set alpha.terraform on
+  ```
+
+### Deployment Flow
+
+```mermaid
+graph TD
+    User[Developer] --> AzdUp[azd up]
+    AzdUp --> Terraform[Terraform Provisioning]
+    Terraform --> Azure[Azure AI Foundry Resources]
+    Azure --> Outputs[Terraform Outputs]
+    Outputs --> Env[azd Environment]
+    Env --> Agent[Runnable Agent CLI]
+```
+
+### Commands
+
+1. **Provision and Setup**:
+   ```bash
+   azd up
+   ```
+   This command will provision the Azure resources using Terraform and automatically set the required environment variables in your `.azure/<env-name>/.env` file.
+
+2. **Run the Agent**:
+   After `azd up`, you can run the agent directly using the provisioned endpoint:
+   ```bash
+   # Load environment variables (optional, azd up handles mapping)
+   PYTHONPATH=. python -m src.main "Hello from azd!"
+   ```
+
+3. **Cleanup**:
+   ```bash
+   azd down
+   ```
+
+### Infrastructure Mapping
+
+`azd` maps Terraform outputs to environment variables. The following mapping is performed automatically:
+
+| Terraform Output | Environment Variable |
+|------------------|----------------------|
+| `AZURE_AI_PROJECT_ENDPOINT` | `AZURE_AI_PROJECT_ENDPOINT` |
+
+### Cost Drivers
+- **Azure AI Foundry Hub & Project**: Base cost for the Foundry workspace.
+- **Model Consumption**: Tokens used by the `gpt-4o-mini` deployment (S0 Global Standard).
+- **Resource Group**: Metadata storage and management.
+
+### Known Limitations
+- **Terraform Alpha**: Requires enabling the alpha feature in `azd`.
+- **Manual Cleanup**: Ensure `azd down` is used to avoid orphaned resources.
+- **Region Availability**: Azure AI Foundry Agent Service and `gpt-4o-mini` are available in specific regions (e.g., `eastus2`).
+
 ## Security Boundary
 
 - **Authentication**: Uses `DefaultAzureCredential`. No API keys or connection strings are stored or used.

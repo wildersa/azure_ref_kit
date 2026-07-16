@@ -1,0 +1,4 @@
+name: foundry-agent-basic
+infra:
+  provider: terraform
+  path: ./infra/terraform
