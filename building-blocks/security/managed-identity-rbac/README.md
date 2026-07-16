@@ -71,8 +71,10 @@ For a seamless transition, use the `DefaultAzureCredential` class from the `azur
 ### Python Implementation
 The recommended way to initialize credentials is using the provided `get_default_credential` helper, which correctly handles the transition between local development and Azure runtime (including User-Assigned Identity support via `AZURE_CLIENT_ID`).
 
+> **Note:** When using this module locally, ensure the `src` directory is in your `PYTHONPATH` or use relative imports within your project structure.
+
 ```python
-from building_blocks.security.managed_identity_rbac.src import get_default_credential
+from src.identity import get_default_credential
 from azure.storage.blob import BlobServiceClient
 
 # Initialize credential (handles local fallback and User-Assigned Identity)
@@ -115,7 +117,7 @@ Subscription or Resource Group scopes are intentionally avoided. Broad scopes in
 **Python Code:**
 ```python
 import os
-from building_blocks.security.managed_identity_rbac.src import get_default_credential
+from src.identity import get_default_credential
 from azure.storage.blob import BlobClient
 
 # 1. Initialize credential using the helper.
