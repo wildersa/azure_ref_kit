@@ -91,3 +91,14 @@ def test_capture_cost_entry_unknown_fields():
             estimated_amount=1.0,
             unknown_field="boom",
         )
+
+
+def test_capture_cost_entry_invalid_currency():
+    """Test that an invalid currency raises a ValueError."""
+    with pytest.raises(ValueError, match="is not supported"):
+        capture_cost_entry(
+            run_id="run-123",
+            category="ai_tokens",
+            estimated_amount=1.0,
+            currency="EUR",
+        )

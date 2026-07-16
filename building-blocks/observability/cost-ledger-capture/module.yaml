@@ -32,7 +32,7 @@ inputs:
     description: "Name of the unit (e.g., token)."
     type: string
   - name: currency
-    description: "Currency code (default: USD)."
+    description: "Currency code (Supported: USD)."
     type: string
   - name: created_at
     description: "Timestamp of the cost event (ISO-8601)."

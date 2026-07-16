@@ -26,6 +26,8 @@ FORBIDDEN_PATTERNS = [
     r"client_secret",
 ]
 
+ALLOWED_CURRENCIES = ["USD"]
+
 
 def _load_schema() -> Dict[str, Any]:
     """Loads the cost ledger schema from the shared contracts directory."""
@@ -50,7 +52,13 @@ def _validate_boundaries(data: Dict[str, Any]) -> None:
                         f"Field '{key}' contains forbidden technical or billing information."
                     )
 
-        # 3. Non-negative finite amounts
+        # 3. Currency restriction
+        if key == "currency" and value not in ALLOWED_CURRENCIES:
+            raise ValueError(
+                f"Field 'currency' value '{value}' is not supported. Supported currencies: {ALLOWED_CURRENCIES}"
+            )
+
+        # 4. Non-negative finite amounts
         if isinstance(value, (int, float)):
             if value < 0:
                 raise ValueError(f"Field '{key}' must be non-negative.")

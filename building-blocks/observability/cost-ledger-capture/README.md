@@ -25,7 +25,7 @@ This module expects data aligned with the `shared/contracts/cost-ledger.schema.j
 - **`input_units`**: Number of input units (e.g., tokens, pages).
 - **`output_units`**: Number of output units (e.g., tokens).
 - **`unit_name`**: Name of the unit (e.g., `token`, `page`, `second`).
-- **`currency`**: Currency code (default: `USD`).
+- **`currency`**: Currency code (Currently supported: `USD`).
 - **`created_at`**: Timestamp of the cost event (ISO-8601).
 
 ## Service-Level Diagram
