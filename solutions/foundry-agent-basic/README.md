@@ -83,9 +83,11 @@ This solution is deployable using the [Azure Developer CLI (`azd`)](https://lear
 ### Prerequisites
 - [Azure Developer CLI (azd)](https://aka.ms/installazd)
 - [Terraform](https://www.terraform.io/downloads.html)
-- `azd` alpha Terraform support enabled:
+- [Azure CLI (az)](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- `azd` configured to use Azure CLI for Terraform authentication:
   ```bash
-  azd config set alpha.terraform on
+  az login
+  azd config set auth.useAzCliAuth true
   ```
 
 ### Deployment Flow
@@ -134,7 +136,7 @@ graph TD
 - **Resource Group**: Metadata storage and management.
 
 ### Known Limitations
-- **Terraform Alpha**: Requires enabling the alpha feature in `azd`.
+- **Terraform Beta**: Terraform support in `azd` is currently in beta.
 - **Manual Cleanup**: Ensure `azd down` is used to avoid orphaned resources.
 - **Region Availability**: Azure AI Foundry Agent Service and `gpt-4o-mini` are available in specific regions (e.g., `eastus2`).
 

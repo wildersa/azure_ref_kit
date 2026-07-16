@@ -77,3 +77,17 @@ def test_terraform_outputs_mapping():
     assert 'output "AZURE_AI_PROJECT_ENDPOINT"' in content, (
         "Terraform must output AZURE_AI_PROJECT_ENDPOINT for azd mapping."
     )
+
+def test_readme_contains_azd_beta_and_auth_instructions():
+    """Verify that the README contains the correct azd beta and auth instructions."""
+    solution_root = Path(__file__).parent.parent
+    readme_path = solution_root / "README.md"
+
+    assert readme_path.exists(), "README.md must exist."
+
+    with open(readme_path, "r") as f:
+        content = f.read()
+
+    assert "Terraform Beta" in content, "README must refer to Terraform support as beta."
+    assert "azd config set auth.useAzCliAuth true" in content, "README must document useAzCliAuth instruction."
+    assert "azd config set alpha.terraform on" not in content, "README must not contain obsolete alpha instruction."
