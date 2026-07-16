@@ -1,6 +1,6 @@
 # GitHub Actions Azure Deployment Reference
 
-Secure GitHub Actions deployment patterns for publishing the [Static Status Portal](../../portals/static-status-portal/) and the [APIM AI Gateway](../../gateways/apim-ai-gateway/) to Azure.
+Secure GitHub Actions deployment patterns for publishing the [Static Status Portal](../../portals/static-status-portal/), the [APIM AI Gateway](../../gateways/apim-ai-gateway/), and the [Web App Agent API](../../hosting/webapp-agent-api/) to Azure.
 
 ## Purpose
 
@@ -8,7 +8,7 @@ This building block defines secure reference patterns for deploying to Azure usi
 
 ## When to Use These Patterns
 
-- **Use when**: Deploying frontend applications to Azure Static Web Apps or infrastructure via Terraform/OpenTofu from a GitHub repository.
+- **Use when**: Deploying frontend applications to Azure Static Web Apps, containerized APIs to Azure App Service, or infrastructure via Terraform/OpenTofu from a GitHub repository.
 - **Use when**: You want to eliminate long-lived Service Principal secrets in GitHub using OpenID Connect (OIDC).
 - **Do not use when**: Deploying to non-Azure targets or using legacy credential-based authentication as the primary method.
 
@@ -48,6 +48,23 @@ flowchart TD
     end
 ```
 
+### Web App Agent API Deployment
+```mermaid
+flowchart TD
+    Developer[Developer] -->|Push Code| GitHub[GitHub Repository]
+    GitHub -->|Trigger| GHA[GitHub Actions Workflow]
+
+    subgraph "Azure Auth & Deploy Boundary"
+        GHA -- "OIDC Auth" --> Entra[Microsoft Entra ID]
+        Entra -- "Short-lived Token" --> Azure[Azure Subscription]
+        GHA -- "Run Terraform" --> TF[Module-local Terraform]
+    end
+
+    subgraph "Outcome"
+        TF -- "Deploy" --> WebApp[Web App Agent API]
+    end
+```
+
 ## Configuration and Secrets
 
 To implement these patterns securely, configure the following GitHub Repository Secrets and Variables. **Never commit these values to the repository.**
@@ -78,6 +95,11 @@ To implement these patterns securely, configure the following GitHub Repository 
 | `MODEL_ENDPOINT` | Variable | The target model endpoint URL. |
 | `MODEL_ID` | Variable | Friendly identifier for the model (e.g., 'gpt-4o'). |
 | `MODEL_RESOURCE_ID` | Variable | The Azure Resource ID of the model for RBAC assignment. |
+| `RESOURCE_PREFIX` | Variable | Prefix for resources (Web App Agent API). |
+| `CONTAINER_IMAGE` | Variable | The container image to deploy (Web App Agent API). |
+| `CONTAINER_REGISTRY_SERVER` | Variable | The FQDN of the container registry (Web App Agent API). |
+| `CONTAINER_REGISTRY_ID` | Variable | The ID of the Azure Container Registry (Web App Agent API). |
+| `AUTH_CLIENT_ID` | Variable | The Client ID for Entra ID authentication (Web App Agent API). |
 
 ### OIDC Configuration Prerequisites
 1. Create a Microsoft Entra application or User-Assigned Managed Identity.
@@ -250,11 +272,117 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
 ```
 
+## Reference Workflow: Deploy Web App Agent API
+
+The following YAML demonstrates a secure Terraform deployment for the [Web App Agent API](../../hosting/webapp-agent-api/). It includes static validation, planning, and deployment stages with environment-based gating.
+
+```yaml
+name: Deploy Web App Agent API
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/hosting/webapp-agent-api/infra/terraform/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'building-blocks/hosting/webapp-agent-api/infra/terraform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_WORKING_DIR: 'building-blocks/hosting/webapp-agent-api/infra/terraform'
+  # Terraform OIDC environment variables
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: true
+  # Terraform variables mapped from secrets/variables
+  TF_VAR_prefix: ${{ vars.RESOURCE_PREFIX }}
+  TF_VAR_location: ${{ vars.LOCATION }}
+  TF_VAR_container_image: ${{ vars.CONTAINER_IMAGE }}
+  TF_VAR_container_registry_server: ${{ vars.CONTAINER_REGISTRY_SERVER }}
+  TF_VAR_container_registry_id: ${{ vars.CONTAINER_REGISTRY_ID }}
+  TF_VAR_client_id: ${{ vars.AUTH_CLIENT_ID }}
+  TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+
+jobs:
+  static_validation:
+    name: 'Static Validation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ env.TF_WORKING_DIR }}
+      - name: Terraform Init & Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  plan:
+    name: 'Infrastructure Plan'
+    needs: static_validation
+    runs-on: ubuntu-latest
+    environment: webapp-agent-api-deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Plan
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
+          terraform plan -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+  deploy:
+    name: 'Infrastructure Deploy'
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: webapp-agent-api-deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Az CLI Login'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Terraform Apply
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.BACKEND_RESOURCE_GROUP_NAME }}" \
+            -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
+            -backend-config="key=${{ secrets.BACKEND_KEY }}"
+          terraform apply -auto-approve -input=false
+        working-directory: ${{ env.TF_WORKING_DIR }}
+```
+
 ## Cost Impact & Operations
 
 ### Cost Impact
-- **Billable Resources**: Applying these workflows will provision billable Azure resources, including **Azure API Management (APIM)** and **Azure OpenAI/Foundry** model consumption.
-- **SKU Caution**: Ensure the configured `apim_sku` (default: `StandardV2_1`) and model usage align with your budget and quota.
+- **Billable Resources**: Applying these workflows will provision billable Azure resources, including **Azure API Management (APIM)**, **Azure App Service**, and **Azure OpenAI/Foundry** model consumption.
+- **SKU Caution**: Ensure the configured SKUs (e.g., APIM `StandardV2_1`, App Service `B1`) and model usage align with your budget and quota.
 
 ### Rollback and Destroy
 - **Rollback**: Terraform does not support automatic "undo" to a previous state. To roll back, you must revert the code changes in the repository and trigger a new deployment workflow to apply the previous configuration.
@@ -276,6 +404,7 @@ This pattern enforces strict boundaries to prevent leakage of technical internal
 - **Prerequisites**: It assumes the target Azure resources (e.g., Resource Group) have been provisioned or will be managed via the provided Terraform modules.
 
 ## References
+
 - [GitHub Actions for Azure Overview](https://learn.microsoft.com/en-us/azure/developer/github/github-actions)
 - [Connect GitHub to Azure with OpenID Connect](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect)
 - [Terraform on Azure overview](https://learn.microsoft.com/en-us/azure/developer/terraform/overview)
