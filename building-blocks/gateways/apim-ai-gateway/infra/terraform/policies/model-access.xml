@@ -30,12 +30,6 @@
                          estimate-prompt-tokens="true"
                          remaining-tokens-variable-name="remainingTokens" />
 
-        <!-- 4. Emit token metrics -->
-        <llm-emit-token-metric namespace="AI-Gateway">
-            <dimension name="Subscription ID" />
-            <dimension name="Model ID" value="{{MODEL_ID}}" />
-        </llm-emit-token-metric>
-
         <!-- 5. Managed Identity authentication to backend (using User-Assigned identity explicitly) -->
         <authentication-managed-identity resource="https://cognitiveservices.azure.com" client-id="{{CLIENT_ID}}" />
 

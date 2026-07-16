@@ -9,7 +9,7 @@ MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 MODULE_YAML = os.path.join(MODULE_DIR, "module.yaml")
 POLICY_XML = os.path.join(MODULE_DIR, "infra", "terraform", "policies", "model-access.xml")
 TERRAFORM_MAIN = os.path.join(MODULE_DIR, "infra", "terraform", "main.tf")
-METRIC_SCHEMA = os.path.join(MODULE_DIR, "llm-token-metric.json")
+TERRAFORM_VARS = os.path.join(MODULE_DIR, "infra", "terraform", "variables.tf")
 
 def test_module_yaml_structure():
     """Verify that module.yaml exists and has required fields."""
@@ -22,20 +22,6 @@ def test_module_yaml_structure():
     assert 'outputs' in data
     assert 'security_boundary' in data
     assert 'customer_safe_boundary' in data
-
-    # Check that contract schemas are listed and exist
-    emits = data.get('contracts', {}).get('emits', [])
-    assert len(emits) > 0
-    metric_schema_name = emits[0]['schema']
-    assert metric_schema_name == "llm-token-metric.json"
-    assert os.path.exists(os.path.join(MODULE_DIR, metric_schema_name))
-
-def test_metric_schema_validity():
-    """Verify that llm-token-metric.json is valid JSON."""
-    assert os.path.exists(METRIC_SCHEMA)
-    with open(METRIC_SCHEMA, 'r') as f:
-        data = json.load(f)
-    assert data['title'] == "LLM Token Metric Schema"
 
 def test_policy_xml_parsing():
     """Verify that the APIM policy XML is well-formed and contains required GenAI policies."""
@@ -57,10 +43,6 @@ def test_policy_xml_parsing():
     token_limit = root.find(".//llm-token-limit")
     assert token_limit is not None, "Policy must contain <llm-token-limit>"
     assert token_limit.get('tokens-per-minute') == "{{TOKEN_LIMIT_PER_MINUTE}}"
-
-    # Check for llm-emit-token-metric
-    emit_metric = root.find(".//llm-emit-token-metric")
-    assert emit_metric is not None, "Policy must contain <llm-emit-token-metric>"
 
     # Check for authentication-managed-identity
     auth_identity = root.find(".//authentication-managed-identity")
@@ -136,6 +118,24 @@ def test_terraform_security_invariants():
     assert "AUDIENCE" in content
     assert "CLIENT_ID" in content
     assert "azurerm_user_assigned_identity.apim_identity.client_id" in content
+
+def test_terraform_variable_validation():
+    """Verify that governance variables have HCL validation blocks with specific bounds."""
+    assert os.path.exists(TERRAFORM_VARS)
+    with open(TERRAFORM_VARS, 'r') as f:
+        content = f.read()
+
+    # Check for token_limit_per_minute validation
+    assert "variable \"token_limit_per_minute\"" in content
+    assert "validation {" in content
+    assert "var.token_limit_per_minute > 0" in content
+    assert "var.token_limit_per_minute <= 1000000" in content
+
+    # Check for max_request_size_bytes validation
+    assert "variable \"max_request_size_bytes\"" in content
+    assert content.count("validation {") >= 2
+    assert "var.max_request_size_bytes > 0" in content
+    assert "var.max_request_size_bytes <= 10485760" in content
 
 def test_forbidden_files_not_present():
     """Verify that no forbidden files (tfstate, tfplan) are in the module directory."""

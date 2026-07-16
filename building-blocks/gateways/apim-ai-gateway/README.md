@@ -87,7 +87,7 @@ terraform apply tfplan
 - **Model Consumption**: The underlying model backend continues to charge based on its own pricing model.
 
 ### Operations
-- **Monitoring**: Use the emitted `llm-token-metric` in Application Insights to build usage dashboards.
+- **Monitoring**: Use Azure Monitor metrics to track overall gateway health and latency.
 - **Governance**: TPM limits are enforced at the gateway level. If a limit is reached, the gateway returns a `429 Too Many Requests` response.
 - **Security**: Regularly rotate calling application identities and audit RBAC assignments for the APIM Managed Identity.
 
@@ -152,8 +152,7 @@ curl -X POST "https://<gateway-url>/v1/chat/completions" \
 
 The gateway emits safe telemetry only:
 -   **Trace**: Logs `RequestId` and `DurationMs`.
--   **Metrics**: Emits token usage counts (TPM) per Subscription ID and Model ID.
--   **Forbidden**: The gateway **never** logs prompts, completions, request/response bodies, authorization headers, subscription keys, or internal resource IDs.
+-   **Forbidden**: The gateway **never** logs prompts, completions, LLM tokens, request/response bodies, authorization headers, subscription keys, or internal resource IDs.
 
 ## Cleanup
 

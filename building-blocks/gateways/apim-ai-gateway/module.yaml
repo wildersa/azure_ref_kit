@@ -7,7 +7,7 @@ description: >
   This building block implements a minimal AI Gateway using Azure API Management.
   It governs access to one existing Azure OpenAI or Microsoft Foundry model backend.
   It enforces token governance (TPM), performs managed-identity backend authentication,
-  redacts technical identifiers, and emits token metrics to Application Insights.
+  and redacts technical identifiers.
 inputs:
   - name: apim_name
     type: string
@@ -88,8 +88,7 @@ contracts:
   reads:
     - schema: "llm-request-schema.json"
   writes: []
-  emits:
-    - schema: "llm-token-metric.json"
+  emits: []
 limitations:
   - "Governs one existing model backend per instance in first version."
   - "Requires APIM SKU with GenAI policy support (Standard v2 recommended)."
