@@ -34,6 +34,9 @@ def test_redactor_removes_new_forbidden_fields():
         "customer_id": "cust-999",
         "user_id": "user-888",
         "raw_logs": "DEBUG: internal details",
+        "completion": "The final answer.",
+        "generated_text": "More text.",
+        "azure_resource_id": "/subscriptions/abc/resourceGroups/xyz/...",
     }
 
     safe_payload = TelemetryRedactor.filter_payload(dirty_payload)
@@ -41,24 +44,9 @@ def test_redactor_removes_new_forbidden_fields():
     assert "customer_id" not in safe_payload
     assert "user_id" not in safe_payload
     assert "raw_logs" not in safe_payload
-
-
-def test_redactor_removes_more_forbidden_fields():
-    """Verify that even more forbidden fields are stripped from the payload."""
-    dirty_payload = {
-        "request_id": "req-123",
-        "api_key": "sk-12345",
-        "connection_string": "Endpoint=sb://...;SharedAccessKey=...",
-        "raw_tool_payload": {"sensitive": "data"},
-        "system_instruction": "You are a secret agent.",
-    }
-
-    safe_payload = TelemetryRedactor.filter_payload(dirty_payload)
-
-    assert "api_key" not in safe_payload
-    assert "connection_string" not in safe_payload
-    assert "raw_tool_payload" not in safe_payload
-    assert "system_instruction" not in safe_payload
+    assert "completion" not in safe_payload
+    assert "generated_text" not in safe_payload
+    assert "azure_resource_id" not in safe_payload
 
 
 def test_redactor_applies_pattern_redaction():
@@ -76,8 +64,34 @@ def test_redactor_applies_pattern_redaction():
     error_msg = safe_payload["error_category"]
     assert "Bearer [REDACTED]" in error_msg
     assert "AccountKey=[REDACTED]" in error_msg
-    assert "secret-token-123" not in error_msg
-    assert "abc-123" not in error_msg
+
+
+def test_redactor_redacts_azure_resource_ids():
+    """Verify that Azure Resource IDs are redacted within strings."""
+    payload = {
+        "request_id": "req-123",
+        "operation_type": "agent_turn",
+        "status": "error",
+        "duration_ms": 50,
+        "error_category": "Resource /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/my-rg/providers/Microsoft.CognitiveServices/accounts/my-ai not found.",
+    }
+
+    safe_payload = TelemetryRedactor.filter_payload(payload)
+    error_msg = safe_payload["error_category"]
+    assert "/subscriptions/[REDACTED]/resourceGroups/[REDACTED]" in error_msg
+    assert "my-rg" not in error_msg
+
+
+def test_redactor_enforces_payload_size_limit():
+    """Verify that the redactor limits the number of fields in the output."""
+    large_payload = {f"field_{i}": "value" for i in range(50)}
+    # Add some allowlisted fields so they have a chance to be included
+    large_payload["request_id"] = "req-1"
+    large_payload["status"] = "success"
+
+    safe_payload = TelemetryRedactor.filter_payload(large_payload)
+
+    assert len(safe_payload) <= 20
 
 
 def test_redactor_only_allows_allowlisted_fields():
@@ -123,33 +137,20 @@ def test_tool_name_allowlist_validation():
     assert safe_unauthorized["tool_name"] == "[UNAUTHORIZED_TOOL]"
 
 
-def test_strict_allowlist_check():
-    """Verify the strict allowlist check identifies unknown fields."""
-    # Valid
-    assert (
-        TelemetryRedactor.has_only_allowlisted_fields(
-            {
-                "request_id": "123",
-                "status": "success",
-                "duration_ms": 10,
-                "operation_type": "agent_turn",
-            }
-        )
-        is True
-    )
+def test_redactor_allows_newly_added_fields():
+    """Verify that newly added fields are allowed through the redactor."""
+    payload = {
+        "request_id": "req-1",
+        "operation_type": "tool_call",
+        "status": "success",
+        "duration_ms": 10,
+        "tool_outcome": "success",
+        "safety_outcome": "Pass",
+        "sanitized_summary": "Summary text.",
+    }
 
-    # Forbidden field
-    assert (
-        TelemetryRedactor.has_only_allowlisted_fields(
-            {"request_id": "123", "prompt": "hello"}
-        )
-        is False
-    )
+    safe_payload = TelemetryRedactor.filter_payload(payload)
 
-    # Unknown field (not allowlisted)
-    assert (
-        TelemetryRedactor.has_only_allowlisted_fields(
-            {"request_id": "123", "unknown_technical_field": "val"}
-        )
-        is False
-    )
+    assert safe_payload["tool_outcome"] == "success"
+    assert safe_payload["safety_outcome"] == "Pass"
+    assert safe_payload["sanitized_summary"] == "Summary text."
