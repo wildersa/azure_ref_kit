@@ -1,7 +1,7 @@
 name: cost-ledger-capture
 type: observability
 category: operations
-status: scaffold
+status: implemented
 purpose: Capture estimated internal cost entries for pipeline steps without exposing technical billing internals.
 inputs:
   - name: run_id
@@ -13,6 +13,30 @@ inputs:
   - name: estimated_amount
     description: "The estimated cost amount."
     type: number
+  - name: step_name
+    description: "Name of the pipeline step."
+    type: string
+  - name: provider
+    description: "Service provider (e.g., Azure)."
+    type: string
+  - name: model_or_service
+    description: "Specific model or service used."
+    type: string
+  - name: input_units
+    description: "Number of input units."
+    type: number
+  - name: output_units
+    description: "Number of output units."
+    type: number
+  - name: unit_name
+    description: "Name of the unit (e.g., token)."
+    type: string
+  - name: currency
+    description: "Currency code (default: USD)."
+    type: string
+  - name: created_at
+    description: "Timestamp of the cost event (ISO-8601)."
+    type: string
 outputs:
   - name: ledger_entry
     description: "The recorded cost ledger entry conforming to cost-ledger.schema.json."

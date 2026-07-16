@@ -9,7 +9,7 @@ Capture and store estimated costs associated with different steps of a Document 
 ## Contract vs Authoritative Billing
 
 - **Estimate Only**: This module captures **estimated** costs based on usage metrics (e.g., tokens, pages, execution time) and pre-defined rates.
-- **Not Authoritative**: This is NOT a replacement for official Azure billing, invoices, or Cost Management reconciliation.
+- **Not Authoritative**: This is NOT a replacement for official Azure billing, invoices, or Cost Management reconciliation. **Do not use this for customer invoicing without independent validation.**
 - **Internal Focus**: The primary goal is internal observability and optional high-level customer-facing cost summaries.
 
 ## Input Fields
@@ -17,7 +17,7 @@ Capture and store estimated costs associated with different steps of a Document 
 This module expects data aligned with the `shared/contracts/cost-ledger.schema.json` contract:
 
 - **`run_id`** (Required): Unique identifier for the pipeline run.
-- **`category`** (Required): Category of the cost (e.g., `ai_tokens`, `document_ai`, `storage`, `function_execution`, `integration`, `other`).
+- **`category`** (Required): Category of the cost (`ai_tokens`, `document_ai`, `storage`, `function_execution`, `integration`, `other`).
 - **`estimated_amount`** (Required): The calculated estimate for the step.
 - **`step_name`**: Name of the pipeline step that incurred the cost.
 - **`provider`**: Service provider (e.g., `Azure`, `OpenAI`).
@@ -69,19 +69,49 @@ Strict adherence to the [Customer-Safe Status Boundary](../../security/customer-
 - **Secrets & Tokens**: Any credentials used to access pricing or billing APIs.
 - **SKU Details**: Specific Azure SKU IDs or internal pricing tier names.
 
-## Deployment Assumptions
-
-- **Identity**: The calling service (Function) must use Managed Identity to write to the ledger store.
-- **Storage**: Ledger entries are typically stored in a secure table (e.g., Azure Table Storage or Cosmos DB) that is NOT directly accessible by the customer portal.
-
 ## Local / Demo Flow
 
-1. Use a local Function or script to generate a cost entry.
-2. Validate the entry against `shared/contracts/cost-ledger.schema.json`.
-3. Store the entry in a local emulator (e.g., Azurite Table Storage).
+You can create a validated cost ledger entry locally using the provided Python implementation.
+
+### Python Import
+
+```python
+from capture import capture_cost_entry
+
+entry = capture_cost_entry(
+    run_id="run-123",
+    category="ai_tokens",
+    estimated_amount=0.0045,
+    provider="Azure",
+    model_or_service="gpt-4o",
+    input_units=1000,
+    unit_name="token"
+)
+
+print(entry)
+```
+
+### Validation Failure (Security Boundary)
+
+```python
+# This will raise a ValueError due to the forbidden Subscription ID
+capture_cost_entry(
+    run_id="550e8400-e29b-41d4-a716-446655440000",
+    category="ai_tokens",
+    estimated_amount=1.0
+)
+```
+
+## Deployment / IaC decision
+
+This building block is currently a **logic-only reference** for validating and formatting cost entries. It does not introduce any new Azure resources at this stage.
+
+- **Infrastructure**: No new Terraform is added.
+- **Assumption**: The calling service (e.g., an Azure Function) will use this module to format data before writing it to a shared storage resource (e.g., Azure Table Storage) defined in the solution's central infrastructure.
 
 ## Known Limits
 
-- Does not include real-time pricing lookups from the Azure Retail Prices API in this reference.
+- Does not include real-time pricing lookups from the Azure Retail Prices API.
 - Does not handle currency conversion or complex tax calculations.
 - Aggregation logic for the customer-safe summary is implemented in the Portal API, not in the capture block.
+- String fields are limited to 128 characters to prevent excessive telemetry storage.
