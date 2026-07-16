@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-16T15:04:05.964690",
+  "last_updated": "2026-07-16T15:33:24.307432",
   "building_blocks": [
     {
       "name": "pipeline-assistant-foundry",
@@ -648,7 +648,7 @@
         {
           "name": "status",
           "type": "string",
-          "description": "Current business-level status (pending, running, completed, failed)."
+          "description": "Current business-level status (queued, running, succeeded, failed)."
         }
       ]
     },
