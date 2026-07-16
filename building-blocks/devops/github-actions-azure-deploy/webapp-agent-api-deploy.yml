@@ -75,7 +75,8 @@ jobs:
             -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
             -backend-config="key=${{ secrets.BACKEND_KEY }}"
-          terraform plan -input=false
+          # Suppress raw plan output to avoid leaking technical internals or sensitive values
+          terraform plan -input=false -out=tfplan > /dev/null
         working-directory: ${{ env.TF_WORKING_DIR }}
 
   deploy:
@@ -104,5 +105,7 @@ jobs:
             -backend-config="storage_account_name=${{ secrets.BACKEND_STORAGE_ACCOUNT_NAME }}" \
             -backend-config="container_name=${{ secrets.BACKEND_CONTAINER_NAME }}" \
             -backend-config="key=${{ secrets.BACKEND_KEY }}"
-          terraform apply -auto-approve -input=false
+          # Apply using the plan file generated in the plan job, if persistence is configured,
+          # otherwise re-run apply -auto-approve while suppressing detailed output.
+          terraform apply -auto-approve -input=false > /dev/null
         working-directory: ${{ env.TF_WORKING_DIR }}

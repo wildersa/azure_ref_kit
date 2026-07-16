@@ -52,6 +52,14 @@ def test_apim_gateway_workflow_security():
     assert "environment" in deploy_job
     assert deploy_job["environment"] == "apim-gateway-deploy"
 
+    # Plan suppression check
+    plan_step = next(s for s in data["jobs"]["plan"]["steps"] if s.get("name") == "Terraform Plan")
+    assert "> /dev/null" in plan_step["run"], "Terraform plan output must be suppressed"
+
+    # Apply suppression check
+    apply_step = next(s for s in data["jobs"]["deploy"]["steps"] if s.get("name") == "Terraform Apply")
+    assert "> /dev/null" in apply_step["run"], "Terraform apply output must be suppressed"
+
 def test_webapp_agent_api_workflow_exists():
     workflow_path = pathlib.Path(__file__).parent.parent / "webapp-agent-api-deploy.yml"
     assert workflow_path.exists(), "webapp-agent-api-deploy.yml is missing"
@@ -75,6 +83,14 @@ def test_webapp_agent_api_workflow_security():
     deploy_job = data["jobs"]["deploy"]
     assert "environment" in deploy_job
     assert deploy_job["environment"] == "webapp-agent-api-deploy"
+
+    # Plan suppression check
+    plan_step = next(s for s in data["jobs"]["plan"]["steps"] if s.get("name") == "Terraform Plan")
+    assert "> /dev/null" in plan_step["run"], "Terraform plan output must be suppressed"
+
+    # Apply suppression check
+    apply_step = next(s for s in data["jobs"]["deploy"]["steps"] if s.get("name") == "Terraform Apply")
+    assert "> /dev/null" in apply_step["run"], "Terraform apply output must be suppressed"
 
 def test_readme_contains_required_sections():
     readme_path = pathlib.Path(__file__).parent.parent / "README.md"
