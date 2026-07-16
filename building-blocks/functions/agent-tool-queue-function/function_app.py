@@ -24,7 +24,7 @@ def submit_job(req: func.HttpRequest, outputQueue: func.Out[str]) -> func.HttpRe
     """
     HTTP POST endpoint to submit a new asynchronous job.
     Validates the request, generates a correlation ID, enqueues the job,
-    and persists the initial PENDING status.
+    and persists the initial QUEUED status.
     """
     logging.info("Submit job request received.")
 
@@ -45,11 +45,11 @@ def submit_job(req: func.HttpRequest, outputQueue: func.Out[str]) -> func.HttpRe
         correlation_id = str(uuid.uuid4())
         created_at = datetime.now(timezone.utc).isoformat()
 
-        # 3. Persist PENDING status
+        # 3. Persist QUEUED status
         store = StatusStore()
         store.update_status(
             correlation_id,
-            JobStatus.PENDING,
+            JobStatus.QUEUED,
             business_summary="Job enqueued, awaiting processing.",
             created_at=created_at,
         )
@@ -63,7 +63,9 @@ def submit_job(req: func.HttpRequest, outputQueue: func.Out[str]) -> func.HttpRe
         outputQueue.set(job_input.model_dump_json())
 
         # 5. Return success response
-        response = SubmitResponse(correlation_id=correlation_id, status=JobStatus.PENDING)
+        response = SubmitResponse(
+            correlation_id=correlation_id, status=JobStatus.QUEUED
+        )
         return func.HttpResponse(
             response.model_dump_json(), status_code=202, mimetype="application/json"
         )
@@ -136,7 +138,9 @@ def get_job_status(req: func.HttpRequest) -> func.HttpResponse:
     queue_name="agent-tool-output",
     connection="AzureWebJobsStorage",
 )
-def agent_tool_queue_trigger(msg: func.QueueMessage, outputQueue: func.Out[str]) -> None:
+def agent_tool_queue_trigger(
+    msg: func.QueueMessage, outputQueue: func.Out[str]
+) -> None:
     """
     Azure Function triggered by a Storage Queue message.
     Executes tool logic, updates the status table, and emits result to output queue.

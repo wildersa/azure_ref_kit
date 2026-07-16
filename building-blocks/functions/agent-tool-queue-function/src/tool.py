@@ -46,7 +46,7 @@ class StatusStore:
         status: JobStatus,
         business_summary: Optional[str] = None,
         result_data: Optional[Dict[str, Any]] = None,
-        error_message: Optional[str] = None,
+        friendly_error: Optional[str] = None,
         created_at: Optional[str] = None,
         started_at: Optional[str] = None,
         finished_at: Optional[str] = None,
@@ -65,8 +65,8 @@ class StatusStore:
             entity["business_summary"] = business_summary
         if result_data:
             entity["result_data"] = json.dumps(result_data)
-        if error_message:
-            entity["error_message"] = error_message
+        if friendly_error:
+            entity["friendly_error"] = friendly_error
         if created_at:
             entity["created_at"] = created_at
         if started_at:
@@ -92,11 +92,13 @@ class StatusStore:
                 id=entity["RowKey"],
                 status=JobStatus(entity["status"]),
                 business_summary=entity.get("business_summary"),
-                created_at=entity.get("created_at", datetime.now(timezone.utc).isoformat()),
+                created_at=entity.get(
+                    "created_at", datetime.now(timezone.utc).isoformat()
+                ),
                 started_at=entity.get("started_at"),
                 finished_at=entity.get("finished_at"),
                 result_data=result_data,
-                error_message=entity.get("error_message"),
+                friendly_error=entity.get("friendly_error"),
             )
         except Exception:
             return None
@@ -117,7 +119,7 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
         # 1. Validate input schema
         try:
             if not isinstance(payload, dict):
-                 raise ValueError("Payload must be a dictionary.")
+                raise ValueError("Payload must be a dictionary.")
             job_input = JobInput(**payload)
         except Exception as e:
             logger.warning("Invalid job input received.")
@@ -129,7 +131,7 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
                 cid,
                 JobStatus.RUNNING,
                 business_summary="Processing job...",
-                started_at=start_time
+                started_at=start_time,
             )
 
         # 3. Deterministic operation (mock)
@@ -150,32 +152,32 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
             error_res = JobResult(
                 correlation_id=job_input.correlation_id,
                 status=JobStatus.FAILED,
-                error_message="Unsupported operation type requested.",
+                friendly_error="Unsupported operation type requested.",
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
             if store:
                 store.update_status(
                     cid,
                     JobStatus.FAILED,
-                    error_message=error_res.error_message,
-                    finished_at=error_res.timestamp
+                    friendly_error=error_res.friendly_error,
+                    finished_at=error_res.timestamp,
                 )
             return error_res
 
         # 4. Return successful result
         success_res = JobResult(
             correlation_id=job_input.correlation_id,
-            status=JobStatus.COMPLETED,
+            status=JobStatus.SUCCEEDED,
             result_data=result_data,
             timestamp=datetime.now(timezone.utc).isoformat(),
         )
         if store:
             store.update_status(
                 cid,
-                JobStatus.COMPLETED,
+                JobStatus.SUCCEEDED,
                 business_summary="Job completed successfully.",
                 result_data=result_data,
-                finished_at=success_res.timestamp
+                finished_at=success_res.timestamp,
             )
         return success_res
 
@@ -184,15 +186,15 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
         error_res = JobResult(
             correlation_id=cid,
             status=JobStatus.FAILED,
-            error_message="Invalid job payload or schema.",
+            friendly_error="Invalid job payload or schema.",
             timestamp=datetime.now(timezone.utc).isoformat(),
         )
         if store:
             store.update_status(
                 cid,
                 JobStatus.FAILED,
-                error_message=error_res.error_message,
-                finished_at=error_res.timestamp
+                friendly_error=error_res.friendly_error,
+                finished_at=error_res.timestamp,
             )
         return error_res
     except Exception:
@@ -200,20 +202,22 @@ def process_queue_job(payload: Any, store: Optional[StatusStore] = None) -> JobR
         error_res = JobResult(
             correlation_id=cid,
             status=JobStatus.FAILED,
-            error_message="An internal error occurred while processing the request.",
+            friendly_error="An internal error occurred while processing the request.",
             timestamp=datetime.now(timezone.utc).isoformat(),
         )
         if store:
             store.update_status(
                 cid,
                 JobStatus.FAILED,
-                error_message=error_res.error_message,
-                finished_at=error_res.timestamp
+                friendly_error=error_res.friendly_error,
+                finished_at=error_res.timestamp,
             )
         return error_res
 
 
-def process_queue_job_safe(payload: Dict[str, Any], store: Optional[StatusStore] = None) -> Dict[str, Any]:
+def process_queue_job_safe(
+    payload: Dict[str, Any], store: Optional[StatusStore] = None
+) -> Dict[str, Any]:
     """
     Safe entrypoint that returns a dictionary for queue output.
     """
