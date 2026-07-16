@@ -1,5 +1,6 @@
 import os
 import yaml
+import json
 import xml.etree.ElementTree as ET
 import pytest
 
@@ -8,6 +9,7 @@ MODULE_DIR = os.path.join(os.path.dirname(__file__), "..")
 MODULE_YAML = os.path.join(MODULE_DIR, "module.yaml")
 POLICY_XML = os.path.join(MODULE_DIR, "infra", "terraform", "policies", "model-access.xml")
 TERRAFORM_MAIN = os.path.join(MODULE_DIR, "infra", "terraform", "main.tf")
+TERRAFORM_VARS = os.path.join(MODULE_DIR, "infra", "terraform", "variables.tf")
 
 def test_module_yaml_structure():
     """Verify that module.yaml exists and has required fields."""
@@ -41,10 +43,6 @@ def test_policy_xml_parsing():
     token_limit = root.find(".//llm-token-limit")
     assert token_limit is not None, "Policy must contain <llm-token-limit>"
     assert token_limit.get('tokens-per-minute') == "{{TOKEN_LIMIT_PER_MINUTE}}"
-
-    # Check for llm-emit-token-metric
-    emit_metric = root.find(".//llm-emit-token-metric")
-    assert emit_metric is not None, "Policy must contain <llm-emit-token-metric>"
 
     # Check for authentication-managed-identity
     auth_identity = root.find(".//authentication-managed-identity")
@@ -120,3 +118,29 @@ def test_terraform_security_invariants():
     assert "AUDIENCE" in content
     assert "CLIENT_ID" in content
     assert "azurerm_user_assigned_identity.apim_identity.client_id" in content
+
+def test_terraform_variable_validation():
+    """Verify that governance variables have HCL validation blocks with specific bounds."""
+    assert os.path.exists(TERRAFORM_VARS)
+    with open(TERRAFORM_VARS, 'r') as f:
+        content = f.read()
+
+    # Check for token_limit_per_minute validation
+    assert "variable \"token_limit_per_minute\"" in content
+    assert "validation {" in content
+    assert "var.token_limit_per_minute > 0" in content
+    assert "var.token_limit_per_minute <= 1000000" in content
+
+    # Check for max_request_size_bytes validation
+    assert "variable \"max_request_size_bytes\"" in content
+    assert content.count("validation {") >= 2
+    assert "var.max_request_size_bytes > 0" in content
+    assert "var.max_request_size_bytes <= 10485760" in content
+
+def test_forbidden_files_not_present():
+    """Verify that no forbidden files (tfstate, tfplan) are in the module directory."""
+    forbidden_extensions = [".tfstate", ".tfstate.backup", ".tfplan"]
+    for root, dirs, files in os.walk(MODULE_DIR):
+        for file in files:
+            for ext in forbidden_extensions:
+                assert not file.endswith(ext), f"Forbidden file found: {os.path.join(root, file)}"

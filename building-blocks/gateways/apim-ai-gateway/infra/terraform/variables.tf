@@ -43,12 +43,22 @@ variable "token_limit_per_minute" {
   description = "The TPM limit to enforce at the gateway."
   type        = number
   default     = 5000
+
+  validation {
+    condition     = var.token_limit_per_minute > 0 && var.token_limit_per_minute <= 1000000
+    error_message = "The token_limit_per_minute must be between 1 and 1,000,000."
+  }
 }
 
 variable "max_request_size_bytes" {
   description = "The maximum allowed request body size in bytes."
   type        = number
   default     = 102400 # 100KB default
+
+  validation {
+    condition     = var.max_request_size_bytes > 0 && var.max_request_size_bytes <= 10485760
+    error_message = "The max_request_size_bytes must be between 1 and 10,485,760 (10MB)."
+  }
 }
 
 variable "model_resource_id" {
