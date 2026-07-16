@@ -1,5 +1,5 @@
 variable "resource_group_name" {
-  description = "Name of the existing resource group."
+  description = "Name of the resource group where the solution-local resources (Foundry Connection) will be deployed."
   type        = string
 }
 
@@ -20,41 +20,30 @@ variable "tags" {
   default     = {}
 }
 
-# APIM Gateway Inputs
+# Existing AI Gateway Inputs
 variable "apim_name" {
-  description = "Name of the APIM instance to create."
+  description = "Name of the existing APIM instance."
   type        = string
 }
 
-variable "publisher_email" {
-  description = "Email address for APIM notifications."
+variable "apim_resource_group_name" {
+  description = "The resource group of the existing APIM instance."
   type        = string
 }
 
-variable "publisher_name" {
-  description = "Organization name for APIM."
+variable "gateway_url" {
+  description = "The base URL of the existing AI Gateway."
   type        = string
 }
 
-variable "model_endpoint" {
-  description = "The target model endpoint URL (e.g., https://resourcename.openai.azure.com/)."
+variable "gateway_api_id" {
+  description = "The resource ID of the existing APIM API for the model gateway."
   type        = string
 }
 
 variable "model_id" {
-  description = "Identifier for the model (e.g., 'gpt-4o') for metrics dimensions."
+  description = "Identifier for the model (e.g., 'gpt-4o') configured in the gateway."
   type        = string
-}
-
-variable "model_resource_id" {
-  description = "The fully qualified Azure Resource ID of the model (OpenAI/Foundry) for RBAC assignment."
-  type        = string
-}
-
-variable "token_limit_per_minute" {
-  description = "The TPM limit to enforce at the gateway."
-  type        = number
-  default     = 5000
 }
 
 # Foundry Project Inputs
@@ -64,17 +53,6 @@ variable "foundry_hub_id" {
 }
 
 variable "foundry_project_id" {
-  description = "The Resource ID of the existing Azure AI Foundry Project (Cognitive Account Project)."
+  description = "The Resource ID of the existing Azure AI Foundry Project (Cognitive Account Project) where the connection will be scoped."
   type        = string
-}
-
-variable "tenant_id" {
-  description = "The Azure AD Tenant ID for JWT validation."
-  type        = string
-}
-
-variable "audience" {
-  description = "The expected audience for the Entra ID token."
-  type        = string
-  default     = "https://cognitiveservices.azure.com"
 }

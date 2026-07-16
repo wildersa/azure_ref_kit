@@ -72,11 +72,12 @@ The runtime requires the following environment variables.
 
 ## Infrastructure (Terraform)
 
-The solution includes Terraform code to:
-1.  Deploy the **APIM AI Gateway** building block.
-2.  Configure a **Foundry Connection** (`ApiManagement` category) targeting the Gateway.
+The solution includes Terraform code to configure a **Foundry Connection** (`ApiManagement` category) targeting an **existing APIM AI Gateway**.
 
-The Foundry connection is configured using the `azapi` provider to support the latest `ApiManagement` category, ensuring that all model traffic from the agent is routed through the APIM endpoint.
+**IaC Design Decisions:**
+- **Consumption Model**: This solution consumes an existing gateway contract instead of redeploying the gateway building block.
+- **Least Privilege**: The APIM subscription is scoped to the specific model gateway API, and the Foundry connection is scoped to the project level with `isSharedToAll = false`.
+- **Modern Provider**: The connection is configured using the `azapi` provider to support the `ApiManagement` category, ensuring all model traffic is routed through the APIM endpoint.
 
 See [infra/terraform/README.md](./infra/terraform/README.md) for details.
 

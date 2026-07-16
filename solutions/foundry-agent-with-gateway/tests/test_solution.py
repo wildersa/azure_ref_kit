@@ -152,6 +152,29 @@ def test_rate_limit_handling():
             adapter.get_chat_response("Hi")
 
 
+def test_terraform_constraints():
+    """Verify that the Terraform configuration adheres to the required constraints."""
+    infra_dir = Path(__file__).parent.parent / "infra" / "terraform"
+    main_tf = infra_dir / "main.tf"
+    assert main_tf.exists()
+
+    with open(main_tf, "r") as f:
+        content = f.read()
+
+    # Must NOT call the gateway module (should consume existing contract)
+    assert 'module "ai_gateway"' not in content
+    assert "apim-ai-gateway/infra/terraform" not in content
+
+    # Must NOT be shared globally (least privilege)
+    assert "isSharedToAll = false" in content
+
+    # Must scope the connection to a project parent
+    assert "parent_id = var.foundry_project_id" in content
+
+    # Verify least-privilege subscription scope
+    assert "api_id = var.gateway_api_id" in content
+
+
 def test_mermaid_diagram_exists():
     """Verify README.md contains the Mermaid diagram."""
     readme_file = Path(__file__).parent.parent / "README.md"
