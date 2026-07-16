@@ -68,8 +68,9 @@ class FoundryAgentAdapter:
             response = openai_client.responses.create(
                 input=user_input,
                 extra_body={
-                    "agent": {
+                    "agent_reference": {
                         "name": agent.name,
+                        "type": "agent_reference",
                     }
                 },
             )
@@ -83,7 +84,14 @@ class FoundryAgentAdapter:
         except RuntimeError:
             # Re-raise sanitized errors
             raise
-        except Exception:
+        except Exception as e:
+            # Check for 429 Too Many Requests (Rate Limit) from the gateway
+            if "429" in str(e) or "too many requests" in str(e).lower():
+                logger.warning("Agent request was rate limited by the AI Gateway.")
+                raise RuntimeError(
+                    "The agent is currently busy due to high demand. Please try again in a moment."
+                )
+
             logger.error("Error during response generation.")
             # Sanitize failures: do not return stack traces or raw provider payloads
             raise RuntimeError("The agent was unable to provide a response.")

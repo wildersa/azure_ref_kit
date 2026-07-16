@@ -13,7 +13,7 @@ def test_solution_yaml_structure():
     with open(solution_file, "r") as f:
         data = yaml.safe_load(f)
 
-    assert data["name"] == "foundry-agent-with-ai-gateway"
+    assert data["name"] == "foundry-agent-with-gateway"
     assert "composition" in data
     assert "building-blocks/gateways/apim-ai-gateway/" in data["composition"]
 
@@ -111,13 +111,68 @@ def test_runtime_gateway_contract():
         assert kwargs["definition"].model == expected_model
 
         # 5. Verify Responses API Payload Contract
-        # Must use "agent" key (not "agent_reference") in extra_body
+        # Must use "agent_reference" key in extra_body
         args, kwargs = mock_openai.responses.create.call_args
-        assert "agent" in kwargs["extra_body"]
-        assert kwargs["extra_body"]["agent"]["name"] == "resolved-agent-id"
-        assert "agent_reference" not in kwargs["extra_body"]
+        assert "agent_reference" in kwargs["extra_body"]
+        assert kwargs["extra_body"]["agent_reference"]["name"] == "resolved-agent-id"
+        assert kwargs["extra_body"]["agent_reference"]["type"] == "agent_reference"
 
         assert response == "Hello from AI"
+
+
+def test_rate_limit_handling():
+    """Verify that the adapter correctly handles 429 errors from the gateway."""
+    from src.config import Settings
+    from src.adapter import FoundryAgentAdapter
+
+    settings = Settings(
+        project_endpoint="https://test.ai.azure.com/api/projects/123",
+        agent_name="test-agent",
+        model_name="gpt-4o",
+        gateway_connection_name="ai-gateway-conn",
+    )
+    adapter = FoundryAgentAdapter(settings)
+
+    with patch("src.adapter.AIProjectClient") as mock_client_class:
+        mock_client = mock_client_class.return_value
+        mock_agent = MagicMock()
+        mock_client.agents.create_version.return_value = mock_agent
+
+        mock_openai = MagicMock()
+        mock_client.get_openai_client.return_value = mock_openai
+
+        # Simulate a 429 Too Many Requests error
+        mock_openai.responses.create.side_effect = Exception(
+            "Status 429: Too Many Requests"
+        )
+
+        with pytest.raises(
+            RuntimeError, match="The agent is currently busy due to high demand"
+        ):
+            adapter.get_chat_response("Hi")
+
+
+def test_terraform_constraints():
+    """Verify that the Terraform configuration adheres to the required constraints."""
+    infra_dir = Path(__file__).parent.parent / "infra" / "terraform"
+    main_tf = infra_dir / "main.tf"
+    assert main_tf.exists()
+
+    with open(main_tf, "r") as f:
+        content = f.read()
+
+    # Must NOT call the gateway module (should consume existing contract)
+    assert 'module "ai_gateway"' not in content
+    assert "apim-ai-gateway/infra/terraform" not in content
+
+    # Must NOT be shared globally (least privilege)
+    assert "isSharedToAll = false" in content
+
+    # Must scope the connection to a project parent
+    assert "parent_id = var.foundry_project_id" in content
+
+    # Verify least-privilege subscription scope
+    assert "api_id = var.gateway_api_id" in content
 
 
 def test_mermaid_diagram_exists():
