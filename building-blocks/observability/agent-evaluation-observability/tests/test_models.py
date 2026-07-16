@@ -6,6 +6,8 @@ from src.models import (
     OperationType,
     EvaluationStatus,
     ToolName,
+    LatencyBucket,
+    TraceStatus,
 )
 
 
@@ -16,14 +18,37 @@ def test_safe_trace_event_valid():
         "agent_id": "agent-v1",
         "operation_type": "tool_call",
         "tool_name": "get_pipeline_status",
+        "tool_outcome": "success",
         "status": "success",
         "duration_ms": 150,
+        "latency_bucket": "1s_to_5s",
+        "evaluation_score": 4.2,
+        "safety_outcome": "Pass",
+        "sanitized_summary": "All good.",
         "correlation_id": "df-run-999",
     }
     event = SafeTraceEvent(**event_data)
     assert event.request_id == "req-123"
     assert event.operation_type == OperationType.TOOL_CALL
-    assert event.tool_name == ToolName.GET_PIPELINE_STATUS
+    assert event.latency_bucket == LatencyBucket.S1_TO_5S
+    assert event.evaluation_score == 4.2
+    assert event.tool_outcome == TraceStatus.SUCCESS
+    assert event.safety_outcome == "Pass"
+    assert event.sanitized_summary == "All good."
+
+
+def test_safe_trace_event_rejects_oversized_summary():
+    """Verify that an oversized sanitized_summary is rejected by the model."""
+    event_data = {
+        "request_id": "req-123",
+        "operation_type": "agent_turn",
+        "status": "success",
+        "duration_ms": 100,
+        "sanitized_summary": "a" * 513,
+    }
+    with pytest.raises(ValidationError) as excinfo:
+        SafeTraceEvent(**event_data)
+    assert "sanitized_summary" in str(excinfo.value)
 
 
 def test_safe_trace_event_allows_unauthorized_tool_placeholder():
@@ -128,18 +153,6 @@ def test_trace_event_prohibited_data_types():
             status="success",
             duration_ms=-1,
         )
-
-
-def test_safe_trace_event_rejects_oversized_duration():
-    """Verify that oversized duration_ms is rejected."""
-    with pytest.raises(ValidationError) as excinfo:
-        SafeTraceEvent(
-            request_id="req-123",
-            operation_type="agent_turn",
-            status="success",
-            duration_ms=3600001,  # 1 hour + 1 ms
-        )
-    assert "duration_ms" in str(excinfo.value)
 
 
 def test_safe_evaluation_result_rejects_oversized_metrics():

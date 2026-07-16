@@ -10,12 +10,21 @@ REDACTION_PATTERNS = [
     ),
     (re.compile(r"sig=[a-zA-Z0-9%]+", re.IGNORECASE), "sig=[REDACTED]"),
     (re.compile(r"client_secret=[^&]+", re.IGNORECASE), "client_secret=[REDACTED]"),
+    (
+        re.compile(
+            r"/subscriptions/[0-9a-f\-]+/resourceGroups/[^/]+/providers/[^/]+/[^/]+",
+            re.IGNORECASE,
+        ),
+        "/subscriptions/[REDACTED]/resourceGroups/[REDACTED]/providers/[REDACTED]",
+    ),
 ]
 
 # Forbidden fields that must be stripped from any payload
 FORBIDDEN_FIELDS = {
     "prompt",
     "prompts",
+    "completion",
+    "completions",
     "user_input",
     "system_message",
     "tokens",
@@ -43,6 +52,10 @@ FORBIDDEN_FIELDS = {
     "raw_provider_payload",
     "connection_string",
     "system_instruction",
+    "azure_resource_id",
+    "resource_id",
+    "output_text",
+    "generated_text",
 }
 
 # Allowlisted technical fields for safe tracing
@@ -51,8 +64,13 @@ ALLOWLISTED_FIELDS = {
     "agent_id",
     "operation_type",
     "tool_name",
+    "tool_outcome",
     "status",
     "duration_ms",
+    "latency_bucket",
+    "evaluation_score",
+    "safety_outcome",
+    "sanitized_summary",
     "error_category",
     "correlation_id",
 }
@@ -86,11 +104,16 @@ class TelemetryRedactor:
         and strictly validates controlled values like tool_name.
         """
         safe_payload = {}
+        field_count = 0
 
         for key, value in payload.items():
+            # Cardinality/size bound: limit to 20 fields
+            if field_count >= 20:
+                break
+
             key_lower = key.lower()
 
-            # 1. Reject forbidden fields (redundant with allowlist but kept for clarity)
+            # 1. Reject forbidden fields
             if key_lower in FORBIDDEN_FIELDS:
                 continue
 
@@ -102,13 +125,18 @@ class TelemetryRedactor:
             if key_lower == "tool_name":
                 if value not in ALLOWED_TOOL_NAMES:
                     safe_payload[key_lower] = "[UNAUTHORIZED_TOOL]"
+                    field_count += 1
                     continue
 
-            # 4. Apply string redaction to allowlisted values
+            # 4. Apply string redaction and length bounding to allowlisted values
             if isinstance(value, str):
-                safe_payload[key_lower] = TelemetryRedactor.redact_string(value)
+                redacted_val = TelemetryRedactor.redact_string(value)
+                # Max length 512 for any textual field value
+                safe_payload[key_lower] = redacted_val[:512]
             else:
                 safe_payload[key_lower] = value
+
+            field_count += 1
 
         return safe_payload
 

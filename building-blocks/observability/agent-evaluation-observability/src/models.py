@@ -9,6 +9,9 @@ SafeId = Annotated[
     str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=128)
 ]
 
+# Bound summaries and other textual signals to 512 characters.
+SafeSummary = Annotated[str, StringConstraints(max_length=512)]
+
 
 class OperationType(str, Enum):
     AGENT_TURN = "agent_turn"
@@ -40,6 +43,13 @@ class ErrorCategory(str, Enum):
     VALIDATION_ERROR = "validation_error"
 
 
+class LatencyBucket(str, Enum):
+    UNDER_1S = "under_1s"
+    S1_TO_5S = "1s_to_5s"
+    S5_TO_15S = "5s_to_15s"
+    OVER_15S = "over_15s"
+
+
 class SafeTraceEvent(BaseModel):
     """Deterministic contract for customer-safe agent technical telemetry."""
 
@@ -57,9 +67,24 @@ class SafeTraceEvent(BaseModel):
     tool_name: Optional[ToolName] = Field(
         None, description="Controlled allowlist of tool names."
     )
+    tool_outcome: Optional[TraceStatus] = Field(
+        None, description="Technical success or failure of the tool call."
+    )
     status: TraceStatus = Field(..., description="High-level outcome category.")
     duration_ms: Annotated[int, Field(ge=0, le=3600000)] = Field(
         ..., description="Latency of the operation in milliseconds."
+    )
+    latency_bucket: Optional[LatencyBucket] = Field(
+        None, description="Latency bucket for coarse-grained performance analysis."
+    )
+    evaluation_score: Optional[Annotated[float, Field(ge=0, le=5)]] = Field(
+        None, description="Optional evaluation score associated with the turn."
+    )
+    safety_outcome: Optional[SafeId] = Field(
+        None, description="High-level safety result from content filters."
+    )
+    sanitized_summary: Optional[SafeSummary] = Field(
+        None, description="High-level diagnostic summary without technical details."
     )
     error_category: Optional[ErrorCategory] = Field(
         None, description="Controlled enum for friendly error categories."

@@ -22,6 +22,11 @@
       "enum": ["get_pipeline_status", "list_artifacts", "get_build_log_summary"],
       "description": "Controlled allowlist of tool names."
     },
+    "tool_outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "refusal", "error"],
+      "description": "Technical success or failure of the tool call."
+    },
     "status": {
       "type": "string",
       "enum": ["success", "failure", "refusal", "error"],
@@ -32,6 +37,27 @@
       "minimum": 0,
       "maximum": 3600000,
       "description": "Latency of the operation in milliseconds."
+    },
+    "latency_bucket": {
+      "type": "string",
+      "enum": ["under_1s", "1s_to_5s", "5s_to_15s", "over_15s"],
+      "description": "Latency bucket for coarse-grained performance analysis."
+    },
+    "evaluation_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Optional evaluation score associated with the turn."
+    },
+    "safety_outcome": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "High-level safety result from content filters."
+    },
+    "sanitized_summary": {
+      "type": "string",
+      "maxLength": 512,
+      "description": "High-level diagnostic summary without technical details."
     },
     "error_category": {
       "type": "string",
