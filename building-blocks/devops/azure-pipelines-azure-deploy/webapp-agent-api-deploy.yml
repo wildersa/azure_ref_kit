@@ -1,0 +1,192 @@
+# building-blocks/devops/azure-pipelines-azure-deploy/webapp-agent-api-deploy.yml
+# Secure Azure Pipelines reference for Web App Agent API infrastructure deployment.
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - building-blocks/hosting/webapp-agent-api/infra/terraform/**
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - building-blocks/hosting/webapp-agent-api/infra/terraform/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # REQUIRED: Name of the Azure Resource Manager service connection (Workload Identity Federation recommended)
+  - name: AZURE_SERVICE_CONNECTION_NAME
+    value: 'AZURE_RM_SVC_CONN'
+  # Path to the Terraform module
+  - name: TF_WORKING_DIR
+    value: 'building-blocks/hosting/webapp-agent-api/infra/terraform'
+  # Environment for deployment approval/gating (must be created in Azure DevOps)
+  - name: ENVIRONMENT_NAME
+    value: 'webapp-agent-api-deploy'
+  # Terraform OIDC enablement
+  - name: ARM_USE_OIDC
+    value: 'true'
+
+  # REQUIRED: These variables should be defined in the Pipeline UI or a Variable Group.
+  # Placeholder values are shown here for reference.
+  - name: AZURE_TENANT_ID
+    value: '00000000-0000-0000-0000-000000000000'
+  - name: RESOURCE_PREFIX
+    value: 'webapp-agent'
+  - name: LOCATION
+    value: 'East US'
+  - name: CONTAINER_IMAGE
+    value: 'mcr.microsoft.com/azuresapi/webapp-agent-api:latest'
+  - name: CONTAINER_REGISTRY_SERVER
+    value: 'myregistry.azurecr.io'
+  - name: CONTAINER_REGISTRY_ID
+    value: '/subscriptions/.../resourceGroups/.../providers/Microsoft.ContainerRegistry/registries/myregistry'
+  - name: AUTH_CLIENT_ID
+    value: '00000000-0000-0000-0000-000000000000'
+
+  # Terraform Backend Variables (mark as Secret in Azure DevOps)
+  - name: BACKEND_RESOURCE_GROUP_NAME
+    value: 'rg-terraform-state'
+  - name: BACKEND_STORAGE_ACCOUNT_NAME
+    value: 'stterraformstate'
+  - name: BACKEND_CONTAINER_NAME
+    value: 'tfstate'
+  - name: BACKEND_KEY
+    value: 'webapp-agent-api.tfstate'
+
+stages:
+- stage: Static_Validation
+  displayName: 'Static Validation'
+  jobs:
+  - job: Validate
+    steps:
+    - checkout: self
+    - script: |
+        terraform fmt -check -recursive
+      workingDirectory: $(TF_WORKING_DIR)
+      displayName: 'Terraform Format Check'
+    - script: |
+        terraform init -backend=false
+        terraform validate
+      workingDirectory: $(TF_WORKING_DIR)
+      displayName: 'Terraform Init & Validate'
+
+- stage: Plan
+  displayName: 'Infrastructure Plan'
+  dependsOn: Static_Validation
+  jobs:
+  - job: Plan
+    variables:
+      # Map pipeline variables to TF_VARs. These variables should be defined in the Pipeline or Variable Group.
+      - name: TF_VAR_prefix
+        value: $(RESOURCE_PREFIX)
+      - name: TF_VAR_location
+        value: $(LOCATION)
+      - name: TF_VAR_container_image
+        value: $(CONTAINER_IMAGE)
+      - name: TF_VAR_container_registry_server
+        value: $(CONTAINER_REGISTRY_SERVER)
+      - name: TF_VAR_container_registry_id
+        value: $(CONTAINER_REGISTRY_ID)
+      - name: TF_VAR_client_id
+        value: $(AUTH_CLIENT_ID)
+      - name: TF_VAR_tenant_id
+        value: $(AZURE_TENANT_ID)
+    steps:
+    - checkout: self
+    - task: AzureCLI@2
+      displayName: 'Terraform Plan'
+      inputs:
+        azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        inlineScript: |
+          set -e
+          # Export ARM environment variables for Terraform OIDC from the Service Connection
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_TENANT_ID=$tenantId
+          export ARM_OIDC_TOKEN=$idToken
+          export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
+          terraform init \
+            -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
+            -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \
+            -backend-config="container_name=$(BACKEND_CONTAINER_NAME)" \
+            -backend-config="key=$(BACKEND_KEY)"
+
+          # Suppress raw plan output to avoid leaking technical internals or sensitive values
+          terraform plan -input=false -out=tfplan > /dev/null
+        workingDirectory: $(TF_WORKING_DIR)
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Terraform Plan'
+      inputs:
+        targetPath: '$(TF_WORKING_DIR)/tfplan'
+        artifact: 'terraform-plan'
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: 'Infrastructure Deploy'
+  dependsOn: Plan
+  # Only deploy from main branch and NOT for pull requests
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - deployment: Apply
+    environment: '$(ENVIRONMENT_NAME)'
+    variables:
+      - name: TF_VAR_prefix
+        value: $(RESOURCE_PREFIX)
+      - name: TF_VAR_location
+        value: $(LOCATION)
+      - name: TF_VAR_container_image
+        value: $(CONTAINER_IMAGE)
+      - name: TF_VAR_container_registry_server
+        value: $(CONTAINER_REGISTRY_SERVER)
+      - name: TF_VAR_container_registry_id
+        value: $(CONTAINER_REGISTRY_ID)
+      - name: TF_VAR_client_id
+        value: $(AUTH_CLIENT_ID)
+      - name: TF_VAR_tenant_id
+        value: $(AZURE_TENANT_ID)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Terraform Plan'
+            inputs:
+              buildType: 'current'
+              artifactName: 'terraform-plan'
+              targetPath: '$(TF_WORKING_DIR)'
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            inputs:
+              azureSubscription: '$(AZURE_SERVICE_CONNECTION_NAME)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
+              inlineScript: |
+                set -e
+                # Export ARM environment variables for Terraform OIDC from the Service Connection
+                export ARM_CLIENT_ID=$servicePrincipalId
+                export ARM_TENANT_ID=$tenantId
+                export ARM_OIDC_TOKEN=$idToken
+                export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
+                terraform init \
+                  -backend-config="resource_group_name=$(BACKEND_RESOURCE_GROUP_NAME)" \
+                  -backend-config="storage_account_name=$(BACKEND_STORAGE_ACCOUNT_NAME)" \
+                  -backend-config="container_name=$(BACKEND_CONTAINER_NAME)" \
+                  -backend-config="key=$(BACKEND_KEY)"
+
+                # Apply the exact saved plan while suppressing detailed output.
+                terraform apply -auto-approve -input=false tfplan > /dev/null
+              workingDirectory: $(TF_WORKING_DIR)
