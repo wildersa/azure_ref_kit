@@ -2,7 +2,7 @@ name: github-actions-azure-deploy
 type: devops
 category: devops
 status: reference
-purpose: Secure GitHub Actions deployment reference patterns for Azure services (SWA, APIM AI Gateway) using OIDC and federated identity.
+purpose: Secure GitHub Actions deployment reference patterns for Azure services (SWA, APIM AI Gateway, Web App Agent API) using OIDC and federated identity.
 inputs:
   - name: AZURE_CLIENT_ID
     description: "Client ID of the Microsoft Entra application or User-Assigned Managed Identity for OIDC authentication."
@@ -38,7 +38,7 @@ inputs:
     type: secret
     required: false
   - name: RESOURCE_GROUP_NAME
-    description: "The name of the target Azure resource group."
+    description: "The name of the target Azure resource group (APIM)."
     type: string
     required: false
   - name: LOCATION
@@ -49,11 +49,33 @@ inputs:
     description: "Name of the APIM instance."
     type: string
     required: false
+  - name: RESOURCE_PREFIX
+    description: "Prefix for resources (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_IMAGE
+    description: "The container image to deploy (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_REGISTRY_SERVER
+    description: "The FQDN of the container registry (Web App Agent API)."
+    type: string
+    required: false
+  - name: CONTAINER_REGISTRY_ID
+    description: "The ID of the Azure Container Registry (Web App Agent API)."
+    type: string
+    required: false
+  - name: AUTH_CLIENT_ID
+    description: "The Client ID for Entra ID authentication (Web App Agent API)."
+    type: string
+    required: false
 outputs:
   - name: static_web_app_url
     description: "The URL of the deployed Static Web App."
   - name: gateway_url
     description: "The base URL of the deployed AI Gateway."
+  - name: webapp_api_endpoint
+    description: "The default hostname of the deployed Web App Agent API."
 security_boundary:
   forbid_wildcards: true
   forbid_secrets: true
