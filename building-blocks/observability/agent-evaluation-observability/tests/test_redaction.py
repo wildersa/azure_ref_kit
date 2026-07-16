@@ -94,6 +94,20 @@ def test_redactor_enforces_payload_size_limit():
     assert len(safe_payload) <= 20
 
 
+def test_redactor_truncates_allowlisted_strings():
+    """Verify that the redactor truncates string values for allowlisted fields."""
+    payload = {
+        "request_id": "req-1",
+        "operation_type": "agent_turn",
+        "status": "success",
+        "duration_ms": 10,
+        "sanitized_summary": "a" * 1000,
+    }
+
+    safe_payload = TelemetryRedactor.filter_payload(payload)
+    assert len(safe_payload["sanitized_summary"]) == 512
+
+
 def test_redactor_only_allows_allowlisted_fields():
     """Verify that unknown fields are removed even if not explicitly forbidden."""
     payload = {

@@ -9,6 +9,9 @@ SafeId = Annotated[
     str, StringConstraints(pattern=SAFE_ID_PATTERN, min_length=1, max_length=128)
 ]
 
+# Bound summaries and other textual signals to 512 characters.
+SafeSummary = Annotated[str, StringConstraints(max_length=512)]
+
 
 class OperationType(str, Enum):
     AGENT_TURN = "agent_turn"
@@ -80,7 +83,7 @@ class SafeTraceEvent(BaseModel):
     safety_outcome: Optional[SafeId] = Field(
         None, description="High-level safety result from content filters."
     )
-    sanitized_summary: Optional[str] = Field(
+    sanitized_summary: Optional[SafeSummary] = Field(
         None, description="High-level diagnostic summary without technical details."
     )
     error_category: Optional[ErrorCategory] = Field(

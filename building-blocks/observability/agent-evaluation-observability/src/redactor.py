@@ -128,9 +128,11 @@ class TelemetryRedactor:
                     field_count += 1
                     continue
 
-            # 4. Apply string redaction to allowlisted values
+            # 4. Apply string redaction and length bounding to allowlisted values
             if isinstance(value, str):
-                safe_payload[key_lower] = TelemetryRedactor.redact_string(value)
+                redacted_val = TelemetryRedactor.redact_string(value)
+                # Max length 512 for any textual field value
+                safe_payload[key_lower] = redacted_val[:512]
             else:
                 safe_payload[key_lower] = value
 

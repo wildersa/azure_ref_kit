@@ -51,10 +51,12 @@
     },
     "safety_outcome": {
       "type": "string",
+      "maxLength": 128,
       "description": "High-level safety result from content filters."
     },
     "sanitized_summary": {
       "type": "string",
+      "maxLength": 512,
       "description": "High-level diagnostic summary without technical details."
     },
     "error_category": {
