@@ -69,6 +69,8 @@ artifacts:
       - building-blocks/portals/static-status-portal
 ```
 
-## Validation
+## Validation & Cataloging
 
-The `scripts/check_solution_composition.py` script enforces this contract. It verifies that all declared paths exist and that mandatory files are present based on the solution's status.
+- **Enforcement (`scripts/check_solution_composition.py`)**: Enforces the composition contract. It verifies that all declared paths exist and that mandatory files are present based on the solution's status.
+- **Cataloging (`scripts/generate_catalog.py`)**: Automatically parses metadata from `module.yaml` and `solution.yaml` to generate the unified human-readable (`docs/catalog.md`) and LLM-ready (`docs/catalog.json`) catalog indexes. It also runs in validation mode (`--check`) during CI/CD to prevent out-of-sync pushes.
+

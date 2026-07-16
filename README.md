@@ -125,6 +125,29 @@ It is designed to run dynamically on either GitHub-hosted runners or on-premises
    * **Secret:** `RUNNER_CHECK_TOKEN` — A GitHub Personal Access Token (PAT) with `actions:read` access, allowing the runner selection script to query the runner API. If not present, the pipeline falls back to GitHub-hosted runners.
    * **Variable (Optional):** `vars.CI_ON_PREM_ONLY` — Set to `true` to force the workflow to run only on your self-hosted runner (disabling hosted fallback).
 
+## Automatic Catalog Generation
+
+The repository includes a metadata crawler at [scripts/generate_catalog.py](file:///f:/dev/azure_ref_kit/scripts/generate_catalog.py) that scans all `module.yaml` and `solution.yaml` configurations to maintain up-to-date catalog files:
+
+1. **[docs/catalog.md](file:///f:/dev/azure_ref_kit/docs/catalog.md) (Human-friendly):** A markdown index containing categorised tables with links to all modules, solutions, and their inputs/outputs.
+2. **[docs/catalog.json](file:///f:/dev/azure_ref_kit/docs/catalog.json) (LLM-friendly):** A structured database containing the full catalog metadata to allow quick indexing by LLM agents.
+
+### How to Run
+
+*   **Regenerate Catalogs:**
+    ```powershell
+    python scripts/generate_catalog.py
+    ```
+*   **Validate Sync Status:**
+    ```powershell
+    python scripts/generate_catalog.py --check
+    ```
+
+### CI/CD Integration
+The CI pipeline runs catalog validation and automated updates on every commit:
+*   On branches/PRs in the main repository, the CI automatically commits and pushes the updated catalog if changes are detected.
+*   On PRs from forks, the CI will fail the build if the catalog is out-of-sync, requiring the contributor to regenerate it locally and commit.
+
 ## Design principles
 
 - Keep modules small and composable.
