@@ -1,0 +1,106 @@
+schema_version: 1
+
+radar:
+  mode: round-robin
+  opportunities_per_run: 1
+  allow_no_new_fit: true
+  minimum_fit_to_publish: 55
+  minimum_sources: 1
+  prefer_multiple_source_types: true
+  implementation_issue_creation: disabled
+  return_to_first_segment_after_cycle: true
+
+research:
+  require_current_web_research: true
+  source_priority:
+    - regulators-public-institutions-and-official-statistics
+    - industry-associations-and-sector-research
+    - public-case-studies
+    - operational-guides-public-tenders-and-incident-reports
+    - academic-and-technical-research
+    - mature-open-source-projects-and-reference-architectures
+    - reputable-reporting
+  reject_marketing-only-evidence: true
+  record_queries: true
+  record_sources: true
+  distinguish_fact_from_inference: true
+
+publication:
+  require_specific_actor: true
+  require_specific_process: true
+  require_problem_evidence: true
+  require_macro_mermaid_architecture: true
+  require_possible_gains: true
+  require_measurable_metrics: true
+  require_risks_and_constraints: true
+  require_fit_breakdown: true
+  require_duplicate_keys: true
+  forbid_unsubstantiated_percentages: true
+
+fit_dimensions:
+  - id: problem-evidence
+    max_score: 20
+  - id: business-value
+    max_score: 20
+  - id: technical-feasibility
+    max_score: 20
+  - id: reuse-potential
+    max_score: 20
+  - id: strategic-differentiation
+    max_score: 20
+
+segments:
+  - id: cross-industry
+    name: Cross-industry and shared operations
+    enabled: true
+  - id: human-resources
+    name: Human resources and people operations
+    enabled: true
+  - id: financial-services
+    name: Banking, insurance, payments, and financial services
+    enabled: true
+  - id: healthcare
+    name: Healthcare, clinics, hospitals, and life sciences
+    enabled: true
+  - id: retail-ecommerce
+    name: Retail, commerce, and consumer services
+    enabled: true
+  - id: manufacturing
+    name: Manufacturing and industrial operations
+    enabled: true
+  - id: logistics-transport
+    name: Logistics, transport, warehousing, and mobility
+    enabled: true
+  - id: agriculture
+    name: Agriculture, livestock, and agribusiness
+    enabled: true
+  - id: construction-real-estate
+    name: Construction, engineering, and real estate
+    enabled: true
+  - id: energy-utilities
+    name: Energy, utilities, water, and environmental services
+    enabled: true
+  - id: telecommunications
+    name: Telecommunications and network operations
+    enabled: true
+  - id: education
+    name: Education, training, and workforce development
+    enabled: true
+  - id: public-sector
+    name: Public sector and citizen services
+    enabled: true
+  - id: professional-services
+    name: Legal, accounting, consulting, and professional services
+    enabled: true
+  - id: hospitality-tourism
+    name: Hospitality, tourism, food service, and events
+    enabled: true
+  - id: media-entertainment
+    name: Media, entertainment, sports, and creative industries
+    enabled: true
+  - id: technology-software
+    name: Technology, software, cloud, and digital platforms
+    enabled: true
+  - id: nonprofit
+    name: Nonprofit, associations, and social impact organizations
+    enabled: true
