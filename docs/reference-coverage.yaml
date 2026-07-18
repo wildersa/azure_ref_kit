@@ -1,0 +1,231 @@
+schema_version: 1
+last_reviewed: "2026-07-18"
+
+continuous_discovery:
+  purpose: >-
+    Keep Azure Reference Kit evolving as a broad Azure AI reference library, not only
+    as an agent implementation queue.
+  source_priority:
+    - Microsoft Learn and product documentation
+    - Azure Architecture Center
+    - Azure Samples and official Microsoft GitHub repositories
+    - Mature external repositories and public reference solutions
+  when_queue_empty:
+    - Read docs/catalog.json and this coverage map before proposing new work.
+    - Select a domain with coverage none or partial, prioritizing clear reusable gaps.
+    - Research current official sources first, then inspect mature external examples when useful.
+    - Record one to three bounded candidates with sources, rationale, priority, and status.
+    - Open only one immediately executable implementation issue unless independent capacity is explicit.
+    - Update the candidate status and issue number when work starts, then record the implemented path after merge.
+  selection_rules:
+    - Cover the full Azure AI ecosystem, not only agents.
+    - Prefer a reusable building block or a small composed solution with observable value.
+    - Adapt external ideas to repository contracts; do not copy implementations without reviewing license, security, and Azure fit.
+    - Do not repeat a rejected candidate unless its status is changed to revisit with a new reason.
+    - Prefer missing capabilities over another variant of an already well-covered example.
+
+domains:
+  - id: azure-openai
+    name: Azure OpenAI
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Minimal model inference reference independent from an agent runtime
+      - Structured output and safe retry reference
+      - Model deployment, quota, and cost guidance tied to a working example
+    candidates: []
+
+  - id: ai-foundry
+    name: Microsoft Foundry and agents
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/agents/pipeline-assistant-foundry
+    gaps:
+      - Minimal Foundry agent lifecycle reference
+      - Tool, evaluation, and publishing variants with current SDK guidance
+    candidates: []
+
+  - id: document-intelligence
+    name: Azure AI Document Intelligence
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/functions/ocr-document-intelligence
+      - solutions/document-ai-portal
+    gaps:
+      - Document classification pipeline
+      - Custom extraction reference
+      - Human validation workflow
+    candidates: []
+
+  - id: ai-search-rag
+    name: Azure AI Search and RAG
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Indexing and retrieval building block
+      - Grounded RAG solution with evaluation
+      - Hybrid and vector search comparison
+    candidates: []
+
+  - id: speech
+    name: Azure AI Speech
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Speech-to-text reference
+      - Text-to-speech reference
+      - Batch transcription workflow
+    candidates: []
+
+  - id: vision
+    name: Azure AI Vision
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Image analysis reference
+      - OCR versus Document Intelligence decision example
+      - Vision-enabled composed solution
+    candidates: []
+
+  - id: language
+    name: Azure AI Language
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Classification and entity extraction reference
+      - Summarization or conversation analysis reference
+    candidates: []
+
+  - id: content-safety
+    name: Azure AI Content Safety
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Text moderation building block
+      - Image moderation building block
+      - Safe integration pattern for AI applications
+    candidates: []
+
+  - id: machine-learning
+    name: Azure Machine Learning
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Training and registration reference
+      - Batch endpoint reference
+      - Managed online endpoint reference
+    candidates: []
+
+  - id: prompt-evaluation
+    name: Prompt flow, evaluation, and quality
+    coverage: none
+    last_reviewed: "2026-07-18"
+    implemented: []
+    gaps:
+      - Dataset-driven evaluation example
+      - Quality and safety scorecard
+      - CI validation for prompts or AI flows
+    candidates: []
+
+  - id: observability
+    name: AI observability
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/observability
+    gaps:
+      - End-to-end tracing example for a non-agent AI workload
+      - Cost and token telemetry reference
+    candidates: []
+
+  - id: ai-gateway
+    name: AI Gateway and API Management
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/gateways/apim-ai-gateway
+    gaps:
+      - Gateway-backed non-agent model application
+      - Multi-backend routing and fallback reference
+    candidates: []
+
+  - id: functions-orchestration
+    name: Functions, Durable Functions, and event-driven AI
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/functions
+      - building-blocks/pipelines/durable-basic-pipeline
+    gaps:
+      - Event Grid or Service Bus AI processing reference
+      - Long-running non-agent AI workflow
+    candidates: []
+
+  - id: storage-data
+    name: Storage and AI data foundations
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/storage/blob-artifact-store
+    gaps:
+      - Dataset and lineage reference
+      - Secure ingestion pattern for AI workloads
+    candidates: []
+
+  - id: security-identity
+    name: Security, identity, and network boundaries
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/security
+    gaps:
+      - End-to-end managed identity reference across an AI solution
+      - Private networking example tied to a concrete solution
+    candidates: []
+
+  - id: devops-deployment
+    name: DevOps, IaC, and deployment
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/devops/github-actions-azure-deploy
+      - building-blocks/devops/azure-pipelines-azure-deploy
+    gaps:
+      - Deployment reference for each major AI workload family
+      - Reusable environment promotion and validation pattern
+    candidates: []
+
+  - id: portals-apis
+    name: Portals and APIs for AI solutions
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - building-blocks/portals/static-status-portal
+      - building-blocks/functions/portal-api-functions
+    gaps:
+      - Generic AI result portal independent from Document AI
+      - Streaming API reference
+    candidates: []
+
+  - id: composed-solutions
+    name: Composed Azure AI solutions
+    coverage: partial
+    last_reviewed: "2026-07-18"
+    implemented:
+      - solutions/document-ai-portal
+    gaps:
+      - Search and RAG solution
+      - Speech solution
+      - Vision solution
+      - Machine learning solution
+      - Content safety integration solution
+    candidates: []
