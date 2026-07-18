@@ -66,3 +66,13 @@ opportunities:
     complexity: large
     status: researched
     document: segments/financial-services/FIN-001-app-scam-intervention.md
+  - id: HEALTH-001
+    title: AI-assisted SUS specialist-access and queue orchestration
+    segment: healthcare
+    summary: Brazilian SUS regulation centers can combine protocol rules with demand, capacity, geography, wait-time, cancellation, and clinical-context models to recommend equitable specialist-access queues and recover unused appointment capacity under human control.
+    intelligent_capability: Constrained demand-capacity forecasting, no-show prediction, and protocol-aware queue and slot recommendation
+    ai_dependency: core
+    fit_score: 88
+    complexity: large
+    status: researched
+    document: segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md
