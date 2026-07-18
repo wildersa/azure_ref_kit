@@ -14,4 +14,20 @@ statuses:
     - superseded
     - parked
 
+entry_contract:
+  purpose: >-
+    Keep a short navigational summary for every full opportunity document without
+    duplicating its research, architecture, risks, or fit rationale.
+  required_fields:
+    - id
+    - title
+    - segment
+    - summary
+    - fit_score
+    - complexity
+    - status
+    - document
+  summary_rule: One concrete sentence describing the problem and proposed solution.
+  summary_max_words: 40
+
 opportunities: []
