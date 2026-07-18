@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 1 |
+| Opportunities | 2 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `human-resources` |
+| Current segment | `financial-services` |
 
 ## Opportunity index
 
@@ -18,6 +18,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | ID | Opportunity | Segment | Short description | Intelligent capability | Fit | Complexity | Status |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | CROSS-001 | [AI-assisted cross-system offboarding risk control plane](segments/cross-industry/CROSS-001-offboarding-control-plane.md) | cross-industry | Organizations with fragmented offboarding can orchestrate known revocations and use access-graph anomaly detection to identify likely residual accounts, privileges, assets, and missing controls for human review. | Identity and access graph anomaly detection with risk-ranked reconciliation | 89 | large | researched |
+| HR-001 | [AI skills-evidence graph for internal mobility and reskilling](segments/human-resources/HR-001-skills-evidence-mobility-graph.md) | human-resources | Organizations can convert employee-approved work evidence into a governed skills graph that identifies capability gaps, ranks internal transition paths, and recommends targeted reskilling without making autonomous employment decisions. | Evidence-grounded skill extraction, taxonomy mapping, gap inference, and internal transition-path ranking | 89 | large | researched |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
