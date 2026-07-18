@@ -36,6 +36,8 @@ docs/opportunities/
    └─ README.md                 # folder and naming rules
 ```
 
+Few-shot breadth examples belong only in the automation prompt. They are not repository opportunities, evidence, templates, or preferred solution patterns.
+
 ## Core principle
 
 ```text
@@ -76,26 +78,20 @@ Every opportunity must state:
 - model or policy evaluation metrics;
 - deterministic validation, human review, abstention, rollback, or manual fallback.
 
-## Breadth anchors, not solution templates
+## Diversity and anti-anchoring
 
-The watcher may use a few short examples only to calibrate the breadth of acceptable opportunities:
+The radar must still explore a broad solution space. Across runs, vary:
 
-- **Small:** an internal HR assistant that answers policy questions from controlled sources and escalates uncertain cases.
-- **Field and multimodal:** smart glasses capture audio and video, transcription identifies spoken evidence markers, relevant frames are extracted, and a draft evidence description is prepared for expert validation.
-- **Complex and integrated:** document validation combining recognition, rules, system integrations, investigation, human review, and an operational command portal.
-- **Optimization:** a log-management platform that builds operational simulations and trains reinforcement-learning policies to recommend safer actions.
-- **Non-generative AI:** an operational exception platform whose anomaly model detects unusual cases and prioritizes human review while deterministic workflows execute approved actions.
+- model family and intelligent technique;
+- business actor and process;
+- company size and operational maturity;
+- software-centric, hardware-assisted, edge, multimodal, optimization, training, and research-oriented architectures;
+- interaction model and delivery channel;
+- complexity and time horizon.
 
-These examples are not preferred sectors, required architectures, public evidence, or ideas to reproduce. They exist only to prevent the radar from collapsing into common patterns such as generic chatbots, agents, RAG, and document tools.
+Do not repeatedly prefer agents, chat interfaces, RAG, document processing, or existing repository capabilities. Requiring intelligence does not mean requiring generative AI.
 
-Anti-bias rules:
-
-- research the selected segment independently before considering any anchor;
-- never cite an anchor as evidence for a new opportunity;
-- do not copy its actor, process, architecture, or technology combination unless current research independently leads there;
-- deliberately vary model families, training approaches, recognition tasks, optimization methods, delivery channels, hardware, edge workloads, data platforms, security models, integrations, and operating models;
-- prefer a materially different process when recent opportunities already use the same dominant pattern;
-- judge originality by the process change and value created, not merely by the novelty of a model or Azure service.
+The automation prompt may contain compact few-shots solely to demonstrate breadth. The watcher must not use those examples as search queries, evidence, candidate ideas, scoring references, or target distributions.
 
 ## Round-robin segment rotation
 
@@ -173,21 +169,7 @@ A high fit score does not cancel regulatory, privacy, safety, integration, bias,
 
 ## Gains and metrics
 
-Do not invent percentage improvements. Describe possible gains and propose metrics such as:
-
-- cycle time;
-- manual effort per case;
-- rework or error rate;
-- service-level compliance;
-- escalation rate;
-- loss, waste, downtime, or fraud avoided;
-- throughput or capacity;
-- prediction, extraction, retrieval, recognition, or recommendation quality;
-- false-positive, false-negative, abstention, and human-override rates;
-- policy reward or optimization outcome;
-- model acceptance and correction rate;
-- cost per transaction;
-- user or customer satisfaction.
+Do not invent percentage improvements. Describe possible gains and propose business and intelligent-capability metrics, including cycle time, effort, error rate, throughput, prediction or recognition quality, false positives, abstention, human overrides, policy reward, cost, and satisfaction where relevant.
 
 Quantified claims require a cited case study or must be labeled as an experiment target.
 
