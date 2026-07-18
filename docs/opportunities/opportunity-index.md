@@ -11,7 +11,15 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 | Completed research cycles | 0 |
 | Current segment | `cross-industry` |
 
-No opportunities have been published yet.
+## Opportunity index
+
+Every published opportunity must appear here as one concise row. The full problem evidence, architecture, gains, risks, and fit rationale remain in the linked document.
+
+| ID | Opportunity | Segment | Short description | Fit | Complexity | Status |
+| --- | --- | --- | --- | ---: | --- | --- |
+| — | No opportunities published yet | — | — | — | — | — |
+
+The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem and the proposed solution. It must not become a second copy of the full opportunity document.
 
 ## Operating links
 
