@@ -46,3 +46,13 @@ opportunities:
     complexity: large
     status: researched
     document: segments/cross-industry/CROSS-001-offboarding-control-plane.md
+  - id: HR-001
+    title: AI skills-evidence graph for internal mobility and reskilling
+    segment: human-resources
+    summary: Organizations can convert employee-approved work evidence into a governed skills graph that identifies capability gaps, ranks internal transition paths, and recommends targeted reskilling without making autonomous employment decisions.
+    intelligent_capability: Evidence-grounded skill extraction, taxonomy mapping, gap inference, and internal transition-path ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: researched
+    document: segments/human-resources/HR-001-skills-evidence-mobility-graph.md
