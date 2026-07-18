@@ -25,11 +25,42 @@ research:
   record_sources: true
   distinguish_fact_from_inference: true
 
+intelligence_requirement:
+  required: true
+  allowed_ai_dependency:
+    - supporting
+    - core
+  forbidden_ai_dependency:
+    - none
+    - optional
+  allowed_capability_families:
+    - machine-learning-training
+    - fine-tuning
+    - generative-ai
+    - agents-and-tool-use
+    - retrieval-augmented-generation
+    - speech-recognition-and-synthesis
+    - computer-vision
+    - document-recognition-and-extraction
+    - classification-and-entity-extraction
+    - anomaly-detection
+    - prediction-and-forecasting
+    - recommendation-and-ranking
+    - optimization-and-reinforcement-learning
+    - multimodal-models
+    - other-explicit-model-based-capability
+  require_business_necessity: true
+  require_inputs_and_outputs: true
+  require_evaluation_plan: true
+  require_deterministic_or_human_fallback: true
+  forbid_decorative_ai: true
+
 publication:
   require_specific_actor: true
   require_specific_process: true
   require_problem_evidence: true
   require_macro_mermaid_architecture: true
+  require_material_intelligent_capability: true
   require_possible_gains: true
   require_measurable_metrics: true
   require_risks_and_constraints: true
