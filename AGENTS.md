@@ -62,6 +62,33 @@ Each solution README should include:
 
 For monorepo-style growth, add nested `AGENTS.md` files only when a subfolder needs different commands, contracts, or conventions. The closest `AGENTS.md` to the changed files is the most specific instruction source.
 
+## Continuous discovery and opportunity radar
+
+The repository has two separate continuous-discovery controls:
+
+- `docs/reference-coverage.yaml` tracks technical Azure AI capabilities, implemented references, gaps, and implementation candidates.
+- `docs/opportunities/` tracks real business and operational problems across segments, including opportunities that may extend beyond the current kit, Azure AI, or AI entirely.
+
+When working on technical coverage:
+
+- read `docs/reference-coverage.yaml` and `docs/catalog.json`;
+- prefer uncovered or partially covered capabilities;
+- research current Microsoft sources first and mature external examples when useful;
+- keep implementation candidates bounded and reusable.
+
+When working on the solution opportunity radar:
+
+- read `docs/opportunities/README.md`, `radar-config.yaml`, `radar-state.yaml`, and `opportunity-index.yaml`;
+- follow the round-robin segment cursor instead of repeatedly selecting a familiar segment;
+- start from a specific actor, process, and evidenced problem, not from a preferred service or AI pattern;
+- allow conventional software, integration, automation, analytics, machine learning, reinforcement learning, generative AI, or combinations;
+- compare against existing opportunities before publishing;
+- update state, index, and append-only history consistently;
+- allow a run to finish with `no-new-fit`; do not manufacture weak opportunities;
+- do not open implementation issues from opportunity hypotheses unless a separate instruction explicitly authorizes it.
+
+The opportunity fit score is symbolic and must include dimension-level rationale. Do not invent percentage gains or treat a high score as proof that regulatory, privacy, safety, data, or integration risks are solved.
+
 ## Microsoft/Azure documentation rule
 
 For any task involving Azure, Microsoft services, Microsoft SDKs, cloud architecture, identity, security, deployment, IaC, CI/CD, networking, pricing-related assumptions, quotas, service limits, supported regions, or preview features, check current official Microsoft documentation before implementing.
