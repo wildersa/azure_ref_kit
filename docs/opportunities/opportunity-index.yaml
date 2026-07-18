@@ -30,4 +30,12 @@ entry_contract:
   summary_rule: One concrete sentence describing the problem and proposed solution.
   summary_max_words: 40
 
-opportunities: []
+opportunities:
+  - id: CROSS-001
+    title: Cross-system offboarding control plane
+    segment: cross-industry
+    summary: Organizations with fragmented offboarding can coordinate HR events, account revocation, asset return, physical access, evidence, and overdue exceptions through one auditable control plane.
+    fit_score: 87
+    complexity: medium
+    status: researched
+    document: segments/cross-industry/CROSS-001-offboarding-control-plane.md
