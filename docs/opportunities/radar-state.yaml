@@ -1,0 +1,96 @@
+schema_version: 1
+last_run: null
+current_segment_index: 0
+completed_cycles: 0
+
+segment_state:
+  cross-industry:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: shared operational bottlenecks and horizontal platforms
+  human-resources:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: employee operations beyond generic policy chatbots
+  financial-services:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: operational controls, document flows, fraud, and regulated decisions
+  healthcare:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: administrative and clinical-support workflows with safe human control
+  retail-ecommerce:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: inventory, customer operations, returns, and store execution
+  manufacturing:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: quality, maintenance, production planning, and industrial knowledge
+  logistics-transport:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: routing, exceptions, fleet, warehouse, and proof-of-delivery processes
+  agriculture:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: field operations, traceability, forecasting, and resource optimization
+  construction-real-estate:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: project controls, inspections, documents, assets, and field coordination
+  energy-utilities:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: reliability, field service, demand, safety, and asset operations
+  telecommunications:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: network operations, support, incident response, and capacity planning
+  education:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: learner support, assessment, operations, and workforce training
+  public-sector:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: citizen service, document processing, case management, and oversight
+  professional-services:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: knowledge work, evidence, engagements, compliance, and delivery operations
+  hospitality-tourism:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: reservations, workforce, service recovery, operations, and demand
+  media-entertainment:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: content operations, rights, audience, production, and asset workflows
+  technology-software:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: software operations, observability, security, support, and optimization
+  nonprofit:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+    next_focus: program delivery, fundraising operations, reporting, and volunteer coordination
