@@ -10,12 +10,29 @@ radar:
   implementation_issue_creation: disabled
   return_to_first_segment_after_cycle: true
 
+market_context:
+  default_primary_market: Brazil
+  default_jurisdiction: Brazil
+  current_date_from_runtime: true
+  search_languages:
+    - pt-BR
+    - en
+  require_brazil_problem_evidence: true
+  require_current_brazil_regulatory_context_for_regulated_segments: true
+  minimum_brazilian_load_bearing_sources: 1
+  current_evidence_window_months: 18
+  foreign_sources_role: secondary-comparison-and-technical-support
+  older_sources_role: historical-or-stable-background-only
+  allow_global_opportunity_only_with_explicit_brazil_applicability: true
+  reject_foreign_only_problem_evidence: true
+  reject_imported_foreign_legal_assumptions: true
+
 research:
   require_current_web_research: true
   source_priority:
-    - regulators-public-institutions-and-official-statistics
-    - industry-associations-and-sector-research
-    - public-case-studies
+    - brazilian-regulators-public-institutions-and-official-statistics
+    - brazilian-industry-associations-sector-research-public-tenders-and-local-cases
+    - current-international-regulators-standards-and-technical-research
     - operational-guides-public-tenders-and-incident-reports
     - academic-and-technical-research
     - mature-open-source-projects-and-reference-architectures
@@ -23,6 +40,7 @@ research:
   reject_marketing-only-evidence: true
   record_queries: true
   record_sources: true
+  record_publication_data_period_and_effective_dates: true
   distinguish_fact_from_inference: true
 
 intelligence_requirement:
@@ -58,7 +76,10 @@ intelligence_requirement:
 publication:
   require_specific_actor: true
   require_specific_process: true
+  require_primary_market_and_jurisdiction: true
+  require_brazil_applicability_section: true
   require_problem_evidence: true
+  require_recent_brazilian_evidence: true
   require_macro_mermaid_architecture: true
   require_material_intelligent_capability: true
   require_possible_gains: true
