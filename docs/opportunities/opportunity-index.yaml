@@ -56,3 +56,13 @@ opportunities:
     complexity: large
     status: researched
     document: segments/human-resources/HR-001-skills-evidence-mobility-graph.md
+  - id: FIN-001
+    title: Real-time APP scam intervention and mule-network risk orchestration
+    segment: financial-services
+    summary: Payment providers can combine transaction, beneficiary, device, behavioral, and network signals to predict likely APP scams and mule accounts, applying proportionate friction and investigator review before irreversible transfers.
+    intelligent_capability: Calibrated scam-risk prediction and graph-based mule-network anomaly detection
+    ai_dependency: core
+    fit_score: 92
+    complexity: large
+    status: researched
+    document: segments/financial-services/FIN-001-app-scam-intervention.md
