@@ -48,6 +48,27 @@ real problem
 
 Do not begin with a preferred Azure service, AI model, or architectural pattern. Start with the problem and verify whether normal software, integration, analytics, automation, machine learning, generative AI, reinforcement learning, or a combination is justified.
 
+## Breadth anchors, not solution templates
+
+The watcher may use a few short examples only to calibrate the breadth of acceptable opportunities:
+
+- **Small:** an internal HR assistant that answers policy questions from controlled sources and escalates uncertain cases.
+- **Field and multimodal:** a Mato Grosso public-sector forensic workflow described by an internal contact, where smart glasses capture audio and video, transcription identifies spoken evidence markers, relevant frames are extracted, and a draft evidence description is prepared for expert validation.
+- **Complex and integrated:** document validation combining recognition, rules, system integrations, investigation, human review, and an operational command portal.
+- **Optimization:** a log-management platform that builds operational simulations and trains reinforcement-learning policies to recommend safer actions.
+- **Non-AI:** a conventional integration and workflow application that removes repeated reconciliation, handoffs, and status checks without using a model.
+
+These examples are not preferred sectors, required architectures, public evidence, or ideas to reproduce. They exist only to prevent the radar from collapsing into common patterns such as generic chatbots, agents, RAG, and tools.
+
+Anti-bias rules:
+
+- research the selected segment independently before considering any anchor;
+- never cite an anchor as evidence for a new opportunity;
+- do not copy its actor, process, architecture, or technology combination unless current research independently leads there;
+- deliberately consider software without AI, physical devices, edge workloads, optimization, data platforms, security, integrations, and new operating models;
+- prefer a materially different process when recent opportunities already use the same dominant pattern;
+- judge originality by the process change and value created, not by the novelty of a model or Azure service.
+
 ## Round-robin segment rotation
 
 Each watcher run processes one enabled segment from `radar-config.yaml`.
