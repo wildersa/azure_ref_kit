@@ -57,10 +57,10 @@ opportunities:
     status: researched
     document: segments/human-resources/HR-001-skills-evidence-mobility-graph.md
   - id: FIN-001
-    title: Real-time APP scam intervention and mule-network risk orchestration
+    title: Real-time Pix scam and mule-account intervention with MED intelligence
     segment: financial-services
-    summary: Payment providers can combine transaction, beneficiary, device, behavioral, and network signals to predict likely APP scams and mule accounts, applying proportionate friction and investigator review before irreversible transfers.
-    intelligent_capability: Calibrated scam-risk prediction and graph-based mule-network anomaly detection
+    summary: Brazilian Pix participants can combine Banco Central security signals, transaction behavior, device context, and payment graphs to detect scams and contas laranja, apply proportionate controls, and prioritize MED investigation before funds disperse.
+    intelligent_capability: Calibrated Pix scam-risk prediction and graph-based conta-laranja and fund-dispersion detection
     ai_dependency: core
     fit_score: 92
     complexity: large
