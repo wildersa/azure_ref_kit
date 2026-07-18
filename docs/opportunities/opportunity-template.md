@@ -3,6 +3,8 @@
 ## Classification
 
 - **Segment:**
+- **Primary market / jurisdiction:** Brazil by default; state another market only with explicit Brazil applicability.
+- **Evidence reference date:** current watcher execution date plus the main data, publication, update, and rule-effective dates used.
 - **Index summary:** one concrete sentence, up to roughly 40 words, describing the problem, proposed solution, and material intelligent capability for `opportunity-index.yaml` and `opportunity-index.md`.
 - **Company profile / size:**
 - **Opportunity type:** quick-win | product | platform | integration | automation | data | optimization | operations | security | industry-solution | research-bet
@@ -22,6 +24,19 @@
 
 Describe the actor, current process, recurring pain, frequency, consequence, and why the problem matters.
 
+## Brazil applicability and current context
+
+Explain why the problem and solution are relevant to Brazilian organizations at the current execution date.
+
+Include:
+
+- current Brazilian market or operating evidence;
+- current Brazilian regulatory, supervisory, standards, procurement, or policy context when applicable;
+- material differences between Brazil and foreign examples;
+- assumptions that still need local validation.
+
+At least one load-bearing Brazilian source must have been published or materially updated within the previous 18 months. A foreign regulation or liability regime must never be presented as applicable to Brazil.
+
 ## Evidence
 
 Separate confirmed evidence from inference.
@@ -36,7 +51,9 @@ Separate confirmed evidence from inference.
 
 ### Sources
 
-- [source title](URL) — relevance and date
+For each important source, record publication or update date, data reference period when relevant, rule effective date when relevant, jurisdiction, and why it supports the opportunity.
+
+- [source title](URL) — jurisdiction; publication/update date; data period/effective date; relevance
 
 ## Current process
 
@@ -112,7 +129,7 @@ Do not invent percentages. Describe plausible outcomes:
 ## Risks, limits, and controls
 
 - Privacy and sensitive data:
-- Regulatory or policy constraints:
+- Brazilian regulatory or policy constraints:
 - Human decision boundaries:
 - Model, retrieval, recognition, or policy failure modes:
 - Bias, drift, weak labels, or insufficient feedback:
@@ -123,9 +140,9 @@ Do not invent percentages. Describe plausible outcomes:
 
 | Dimension | Score | Rationale |
 | --- | ---: | --- |
-| Problem evidence and relevance | /20 | |
+| Problem evidence and relevance | /20 | Include current Brazilian evidence and penalize foreign-only or stale support. |
 | Business or operational value | /20 | |
-| Technical feasibility | /20 | Include data, evaluation, and model-operability realism. |
+| Technical feasibility | /20 | Include data, evaluation, integration, and model-operability realism in Brazil. |
 | Reuse potential | /20 | |
 | Strategic differentiation | /20 | Explain the material contribution of the intelligent capability. |
 | **Total** | **/100** | |
@@ -142,7 +159,7 @@ Do not invent percentages. Describe plausible outcomes:
 
 - **Problem keys:**
 - **Capability keys:** include the intelligent technique and required model behavior.
-- **Research queries used:**
+- **Research queries used:** include Brazil-specific queries.
 - **Related opportunities:**
 - **Uniqueness statement:**
 
