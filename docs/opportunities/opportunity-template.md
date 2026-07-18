@@ -3,6 +3,7 @@
 ## Classification
 
 - **Segment:**
+- **Index summary:** one concrete sentence, up to roughly 40 words, describing the problem and proposed solution for `opportunity-index.yaml` and `opportunity-index.md`.
 - **Company profile / size:**
 - **Opportunity type:** quick-win | product | platform | integration | automation | data | optimization | operations | security | industry-solution | research-bet
 - **Status:** hypothesis
