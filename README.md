@@ -127,26 +127,37 @@ It is designed to run dynamically on either GitHub-hosted runners or on-premises
 
 ## Automatic Catalog Generation
 
-The repository includes a metadata crawler at [scripts/generate_catalog.py](file:///f:/dev/azure_ref_kit/scripts/generate_catalog.py) that scans all `module.yaml` and `solution.yaml` configurations to maintain up-to-date catalog files:
+The repository includes a metadata crawler at [scripts/generate_catalog.py](scripts/generate_catalog.py) that scans all `module.yaml` and `solution.yaml` configurations to maintain up-to-date catalog files:
 
-1. **[docs/catalog.md](file:///f:/dev/azure_ref_kit/docs/catalog.md) (Human-friendly):** A markdown index containing categorised tables with links to all modules, solutions, and their inputs/outputs.
-2. **[docs/catalog.json](file:///f:/dev/azure_ref_kit/docs/catalog.json) (LLM-friendly):** A structured database containing the full catalog metadata to allow quick indexing by LLM agents.
+1. **[docs/catalog.md](docs/catalog.md) (Human-friendly):** A markdown index containing categorised tables with links to all modules, solutions, and their inputs/outputs.
+2. **[docs/catalog.json](docs/catalog.json) (LLM-friendly):** A structured database containing the full catalog metadata to allow quick indexing by LLM agents.
 
 ### How to Run
 
-*   **Regenerate Catalogs:**
-    ```powershell
-    python scripts/generate_catalog.py
-    ```
-*   **Validate Sync Status:**
-    ```powershell
-    python scripts/generate_catalog.py --check
-    ```
+* **Regenerate Catalogs:**
+  ```powershell
+  python scripts/generate_catalog.py
+  ```
+* **Validate Sync Status:**
+  ```powershell
+  python scripts/generate_catalog.py --check
+  ```
 
 ### CI/CD Integration
+
 The CI pipeline runs catalog validation and automated updates on every commit:
-*   On branches/PRs in the main repository, the CI automatically commits and pushes the updated catalog if changes are detected.
-*   On PRs from forks, the CI will fail the build if the catalog is out-of-sync, requiring the contributor to regenerate it locally and commit.
+
+* On branches/PRs in the main repository, the CI automatically commits and pushes the updated catalog if changes are detected.
+* On PRs from forks, the CI will fail the build if the catalog is out-of-sync, requiring the contributor to regenerate it locally and commit.
+
+## Continuous discovery controls
+
+The repository uses two complementary controls:
+
+1. **[Azure AI reference coverage](docs/reference-coverage.md):** tracks technical capabilities, implemented references, missing areas, research candidates, and continuous Azure AI expansion beyond agents.
+2. **[Solution Opportunity Radar](docs/opportunities/README.md):** researches real business and operational problems across segments, including opportunities that may use normal software, integration, analytics, automation, ML, reinforcement learning, generative AI, or combinations of these.
+
+The coverage map answers `what technical references are missing?`. The opportunity radar answers `what real problems are worth solving?`. Opportunities are hypotheses and do not automatically become implementation issues.
 
 ## Design principles
 
