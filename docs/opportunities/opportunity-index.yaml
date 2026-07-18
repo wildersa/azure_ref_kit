@@ -1,0 +1,17 @@
+schema_version: 1
+last_updated: "2026-07-18"
+
+statuses:
+  active:
+    - hypothesis
+    - researched
+    - shortlisted
+    - approved
+    - implementing
+    - implemented
+  terminal:
+    - rejected
+    - superseded
+    - parked
+
+opportunities: []
