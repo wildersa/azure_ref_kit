@@ -23,19 +23,26 @@ entry_contract:
     - title
     - segment
     - summary
+    - intelligent_capability
+    - ai_dependency
     - fit_score
     - complexity
     - status
     - document
-  summary_rule: One concrete sentence describing the problem and proposed solution.
+  summary_rule: One concrete sentence describing the problem, proposed solution, and material intelligent capability.
   summary_max_words: 40
+  allowed_ai_dependency:
+    - supporting
+    - core
 
 opportunities:
   - id: CROSS-001
-    title: Cross-system offboarding control plane
+    title: AI-assisted cross-system offboarding risk control plane
     segment: cross-industry
-    summary: Organizations with fragmented offboarding can coordinate HR events, account revocation, asset return, physical access, evidence, and overdue exceptions through one auditable control plane.
-    fit_score: 87
-    complexity: medium
+    summary: Organizations with fragmented offboarding can orchestrate known revocations and use access-graph anomaly detection to identify likely residual accounts, privileges, assets, and missing controls for human review.
+    intelligent_capability: Identity and access graph anomaly detection with risk-ranked reconciliation
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
     status: researched
     document: segments/cross-industry/CROSS-001-offboarding-control-plane.md
