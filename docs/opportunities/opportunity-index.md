@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 0 |
+| Opportunities | 1 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `cross-industry` |
+| Current segment | `human-resources` |
 
 ## Opportunity index
 
@@ -17,7 +17,7 @@ Every published opportunity must appear here as one concise row. The full proble
 
 | ID | Opportunity | Segment | Short description | Fit | Complexity | Status |
 | --- | --- | --- | --- | ---: | --- | --- |
-| — | No opportunities published yet | — | — | — | — | — |
+| CROSS-001 | [Cross-system offboarding control plane](segments/cross-industry/CROSS-001-offboarding-control-plane.md) | cross-industry | Organizations with fragmented offboarding can coordinate HR events, account revocation, asset return, physical access, evidence, and overdue exceptions through one auditable control plane. | 87 | medium | researched |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem and the proposed solution. It must not become a second copy of the full opportunity document.
 
