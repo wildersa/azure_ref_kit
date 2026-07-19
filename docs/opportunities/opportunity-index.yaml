@@ -66,6 +66,16 @@ opportunities:
     complexity: large
     status: researched
     document: segments/human-resources/HR-001-skills-evidence-mobility-graph.md
+  - id: HR-002
+    title: AI-assisted psychosocial-risk prevention and work-design assurance
+    segment: human-resources
+    summary: Brazilian employers can combine worker consultation, work-design evidence, absence trends, incidents, and operational signals to identify group-level psychosocial hazards and prioritize preventive actions without profiling individual mental health.
+    intelligent_capability: Evidence-grounded psychosocial-hazard classification, group-level anomaly detection, and preventive-review ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: medium
+    status: hypothesis
+    document: segments/human-resources/HR-002-psychosocial-risk-prevention-orchestration.md
   - id: FIN-001
     title: Real-time Pix scam and mule-account intervention with MED intelligence
     segment: financial-services
