@@ -116,3 +116,13 @@ opportunities:
     complexity: medium
     status: hypothesis
     document: segments/education/EDU-001-student-persistence-early-warning.md
+  - id: PUBLIC-001
+    title: AI-assisted public-procurement document assurance before publication
+    segment: public-sector
+    summary: Brazilian public buyers can inspect draft ETPs, terms of reference, price research, and notices for missing evidence, inconsistent quantities, vague requirements, and cross-document contradictions before human approval and PNCP publication.
+    intelligent_capability: Evidence-grounded procurement-document extraction, cross-document contradiction detection, requirement-specificity classification, and risk-ranked review findings
+    ai_dependency: core
+    fit_score: 89
+    complexity: medium
+    status: hypothesis
+    document: segments/public-sector/PUBLIC-001-procurement-document-assurance.md
