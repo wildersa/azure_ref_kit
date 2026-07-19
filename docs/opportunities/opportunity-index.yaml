@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-07-18"
+last_updated: "2026-07-19"
 
 statuses:
   active:
@@ -86,3 +86,13 @@ opportunities:
     complexity: large
     status: researched
     document: segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md
+  - id: ENERGY-001
+    title: AI-assisted water-leak detection and field verification
+    segment: energy-utilities
+    summary: Brazilian water utilities can use acoustic and hydraulic anomaly models to rank suspected hidden leaks, direct field verification, and measure recovered water while retaining geophone confirmation and cost-benefit controls.
+    intelligent_capability: Acoustic leak classification and hydraulic anomaly ranking with human-confirmed localization
+    ai_dependency: core
+    fit_score: 87
+    complexity: medium
+    status: researched
+    document: segments/energy-utilities/ENERGY-001-ai-assisted-water-leak-detection.md
