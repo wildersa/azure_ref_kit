@@ -106,6 +106,16 @@ opportunities:
     complexity: large
     status: researched
     document: segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md
+  - id: HEALTH-002
+    title: AI-assisted antimicrobial stewardship review prioritization
+    segment: healthcare
+    summary: Brazilian hospitals can combine prescriptions, microbiology, laboratory, vital-sign, diagnosis, and local-protocol data to rank antimicrobial reviews and source-grounded intervention candidates under infectious-disease and pharmacy control.
+    intelligent_capability: Calibrated antimicrobial-review prediction, evidence-grounded case classification, and stewardship-priority ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: hypothesis
+    document: segments/healthcare/HEALTH-002-antimicrobial-stewardship-review-prioritization.md
   - id: RETAIL-001
     title: AI-assisted shelf-availability and retail-loss orchestration
     segment: retail-ecommerce
