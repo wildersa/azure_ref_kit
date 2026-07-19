@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 4 |
+| Opportunities | 5 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `retail-ecommerce` |
+| Current segment | `manufacturing` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -22,6 +22,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | HR-001 | [AI skills-evidence graph for internal mobility and reskilling](segments/human-resources/HR-001-skills-evidence-mobility-graph.md) | human-resources | Organizations can convert employee-approved work evidence into a governed skills graph that identifies capability gaps, ranks internal transition paths, and recommends targeted reskilling without making autonomous employment decisions. | Evidence-grounded skill extraction, taxonomy mapping, gap inference, and internal transition-path ranking | 89 | large | researched |
 | FIN-001 | [Real-time Pix scam and mule-account intervention with MED intelligence](segments/financial-services/FIN-001-app-scam-intervention.md) | financial-services | Brazilian Pix participants can combine Banco Central security signals, transaction behavior, device context, and payment graphs to detect scams and contas laranja, apply proportionate controls, and prioritize MED investigation before funds disperse. | Calibrated Pix scam-risk prediction and graph-based conta-laranja and fund-dispersion detection | 92 | large | researched |
 | HEALTH-001 | [AI-assisted SUS specialist-access and queue orchestration](segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md) | healthcare | Brazilian SUS regulation centers can combine protocol rules with demand, capacity, geography, wait-time, cancellation, and clinical-context models to recommend equitable specialist-access queues and recover unused appointment capacity under human control. | Constrained demand-capacity forecasting, no-show prediction, and protocol-aware queue and slot recommendation | 88 | large | researched |
+| RETAIL-001 | [AI-assisted shelf-availability and retail-loss orchestration](segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md) | retail-ecommerce | Brazilian retailers can combine shelf images, inventory, sales, replenishment, and loss events to detect operational rupture and shrinkage anomalies, rank corrective store tasks, and verify execution under human control. | Multimodal shelf-state recognition with inventory-loss anomaly detection and intervention ranking | 89 | large | researched |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
