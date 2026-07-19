@@ -106,3 +106,13 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md
+  - id: EDU-001
+    title: AI-assisted student-persistence early warning and support triage
+    segment: education
+    summary: Brazilian higher-education institutions can combine academic progression, attendance, LMS activity, financial and service signals to rank dropout risk, explain contributing factors, and route bounded support actions under advisor control.
+    intelligent_capability: Calibrated student-persistence risk prediction, risk-factor ranking, and support-case prioritization
+    ai_dependency: core
+    fit_score: 83
+    complexity: medium
+    status: hypothesis
+    document: segments/education/EDU-001-student-persistence-early-warning.md
