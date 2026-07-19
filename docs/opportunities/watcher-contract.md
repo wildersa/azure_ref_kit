@@ -11,6 +11,7 @@ Every published opportunity must include:
 - a current and specific Brazilian problem;
 - a defined actor and operational process;
 - a material intelligent capability;
+- an explicit explanation of where each AI component enters the process;
 - a plausible data and integration path;
 - a bounded prototype or experiment;
 - explicit assumptions, risks, counter-evidence, and failure criteria.
@@ -19,15 +20,13 @@ Conventional software, integration, workflow, hardware, deterministic controls, 
 
 ## Core decision rule
 
-Use this distinction:
-
 ```text
 problem evidence proves that the opportunity matters
 solution evidence changes confidence and maturity
 prototype design proves that the hypothesis is testable
 ```
 
-Lack of a comparable Brazilian production deployment does **not** justify `no-new-fit` by itself.
+Lack of a comparable Brazilian production deployment does not justify `no-new-fit` by itself.
 
 A credible problem-grounded proposal may be published as:
 
@@ -78,11 +77,12 @@ Use the index first. Open full opportunity documents only for plausible duplicat
 5. Research solution patterns, comparable successes, limitations, failures, and conventional alternatives.
 6. Separate confirmed problem evidence, favorable solution evidence, counter-evidence, inference, and unknowns.
 7. Define the current baseline, why intelligence may add value, required data, a bounded prototype, and measurable validation criteria.
-8. Check semantic duplication.
-9. Publish at most one opportunity, normally as a grounded hypothesis unless stronger evidence supports higher maturity.
-10. Use `no-new-fit` only under the explicit conditions below.
-11. Update the complete document, indexes, history, segment state, `next_focus`, and cursor.
-12. Commit documentation changes directly to `main`.
+8. Build the explicit AI role map required below.
+9. Check semantic duplication.
+10. Publish at most one opportunity, normally as a grounded hypothesis unless stronger evidence supports higher maturity.
+11. Use `no-new-fit` only under the explicit conditions below.
+12. Update the complete document, indexes, history, segment state, `next_focus`, and cursor.
+13. Commit documentation changes directly to `main`.
 
 ## Search breadth requirement
 
@@ -109,9 +109,35 @@ Distinguish:
 
 Search for contrary evidence in Portuguese and English and record it when relevant.
 
-Counter-evidence is primarily a **design input**, not an automatic rejection. It should narrow scope, change data or capture strategy, increase abstention or human review, lower confidence, strengthen the baseline comparison, or define prototype failure criteria.
+Counter-evidence is primarily a design input, not an automatic rejection. It should narrow scope, change data or capture strategy, increase abstention or human review, lower confidence, strengthen the baseline comparison, or define prototype failure criteria.
 
 Reject only when contrary evidence invalidates the same central mechanism and no credible bounded mitigation or alternative formulation remains.
+
+## Mandatory AI role explanation
+
+Every opportunity must contain a `Where AI enters` section that makes the intelligent architecture understandable without relying on generic labels.
+
+The section must include an AI role map with, for every intelligent component:
+
+- process stage where it operates;
+- component name;
+- primary role: recognition, extraction, classification, anomaly detection, prediction, ranking, recommendation, optimization, reinforcement learning, generation, retrieval, agent/tool use, or multimodal reasoning;
+- model family: classical ML, deep learning, computer vision, speech, graph ML, time-series model, embedding/retrieval, LLM/foundation model, multimodal model, optimization solver, RL policy, or another explicit family;
+- inputs and outputs;
+- training requirement and cadence;
+- inference location and runtime mode;
+- human or deterministic control.
+
+The watcher must explicitly distinguish:
+
+- **model from agent:** a model predicts or generates; an agent pursues a goal through governed tools and actions;
+- **LLM from classical ML:** do not describe classification, forecasting, anomaly detection, graph ranking, vision, or optimization as an LLM unless an LLM actually performs that task;
+- **training from inference:** state whether the prototype uses pretrained inference, prompt/RAG, fine-tuning, supervised training, self-supervised training, simulation, optimization, or reinforcement learning;
+- **AI from normal software:** rules, APIs, databases, orchestration, search filters, calculations, dashboards, queues, and approvals must be identified as deterministic when they are not model-based.
+
+When no agent is used, say `Agent: not used`. When no LLM is used, say `LLM: not used`. When several intelligent components exist, separate their responsibilities rather than presenting a single generic AI layer.
+
+The macro architecture must name the actual model roles. Do not leave only a generic node called `AI`, `Intelligence`, or `Agent`.
 
 ## Baseline and prototype discipline
 
@@ -152,11 +178,12 @@ Publish when the opportunity includes:
 - current Brazilian regulatory or operating context when applicable;
 - a process-changing solution hypothesis;
 - a material intelligent capability;
+- a complete AI role map;
 - a plausible data and integration path;
 - a realistic baseline comparison;
 - favorable evidence, counter-evidence, inference, and unknowns without pretending certainty;
 - a bounded prototype and measurable validation plan;
-- a macro Mermaid architecture;
+- a macro Mermaid architecture with named model and optional-agent roles;
 - possible gains without invented percentages;
 - risks, limits, and human-control boundaries;
 - fit scoring with dimension-level rationale;
@@ -175,7 +202,7 @@ Record `no-new-fit` only when one or more are true after adequate search breadth
 - the central technical mechanism is contradicted strongly enough that a bounded mitigation is not credible;
 - the candidate is generic and cannot be narrowed to a concrete actor, process, and measurable outcome.
 
-Do **not** record `no-new-fit` merely because:
+Do not record `no-new-fit` merely because:
 
 - there is no Brazilian production deployment;
 - no local false-positive rate is published;
