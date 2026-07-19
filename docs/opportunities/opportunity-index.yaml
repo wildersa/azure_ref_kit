@@ -46,6 +46,16 @@ opportunities:
     complexity: large
     status: researched
     document: segments/cross-industry/CROSS-001-offboarding-control-plane.md
+  - id: CROSS-002
+    title: AI-assisted supplier identity and payment-change assurance
+    segment: cross-industry
+    summary: Brazilian organizations can combine supplier-master history, CNPJ evidence, approval context, communications, and payment behavior to rank suspicious onboarding and bank-detail changes before human-approved payment release.
+    intelligent_capability: Supplier-entity resolution, change-pattern anomaly detection, communication-risk classification, and payment-review ranking
+    ai_dependency: core
+    fit_score: 88
+    complexity: medium
+    status: hypothesis
+    document: segments/cross-industry/CROSS-002-supplier-payment-change-assurance.md
   - id: HR-001
     title: AI skills-evidence graph for internal mobility and reskilling
     segment: human-resources
