@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 12 |
+| Opportunities | 13 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `technology-software` |
+| Current segment | `nonprofit` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -30,6 +30,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | PROF-001 | [AI-assisted process-communication and deadline assurance](segments/professional-services/PROF-001-process-communication-deadline-assurance.md) | professional-services | Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment. | Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review | 87 | medium | hypothesis |
 | HOSP-001 | [AI-assisted hotel occupancy and operations forecasting](segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md) | hospitality-tourism | Brazilian hotels can forecast probabilistic occupancy and operational workload from booking curves, cancellations, events, and local demand signals to recommend staffing and housekeeping capacity under manager control. | Probabilistic occupancy, cancellation, arrival, departure, and operational-workload forecasting with constrained staffing and housekeeping recommendations | 86 | medium | hypothesis |
 | MEDIA-001 | [AI-assisted audiovisual rights monitoring and evidence triage](segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md) | media-entertainment | Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking. | Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification | 90 | large | hypothesis |
+| TECH-001 | [AI-assisted context-aware vulnerability remediation prioritization](segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md) | technology-software | Brazilian software and platform teams can combine vulnerability intelligence with asset exposure, dependency, runtime, ownership, and business-impact signals to rank remediation work and produce auditable evidence under security-engineer control. | Context-aware vulnerability-to-asset matching, exploit-risk prediction, attack-path inference, and remediation-priority ranking | 89 | large | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
