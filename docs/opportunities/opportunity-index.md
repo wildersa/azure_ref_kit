@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 11 |
+| Opportunities | 12 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `media-entertainment` |
+| Current segment | `technology-software` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -29,6 +29,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | PUBLIC-001 | [AI-assisted public-procurement document assurance before publication](segments/public-sector/PUBLIC-001-procurement-document-assurance.md) | public-sector | Brazilian public buyers can inspect draft ETPs, terms of reference, price research, and notices for missing evidence, inconsistent quantities, vague requirements, and cross-document contradictions before human approval and PNCP publication. | Evidence-grounded procurement-document extraction, cross-document contradiction detection, requirement-specificity classification, and risk-ranked review findings | 89 | medium | hypothesis |
 | PROF-001 | [AI-assisted process-communication and deadline assurance](segments/professional-services/PROF-001-process-communication-deadline-assurance.md) | professional-services | Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment. | Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review | 87 | medium | hypothesis |
 | HOSP-001 | [AI-assisted hotel occupancy and operations forecasting](segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md) | hospitality-tourism | Brazilian hotels can forecast probabilistic occupancy and operational workload from booking curves, cancellations, events, and local demand signals to recommend staffing and housekeeping capacity under manager control. | Probabilistic occupancy, cancellation, arrival, departure, and operational-workload forecasting with constrained staffing and housekeeping recommendations | 86 | medium | hypothesis |
+| MEDIA-001 | [AI-assisted audiovisual rights monitoring and evidence triage](segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md) | media-entertainment | Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking. | Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification | 90 | large | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
