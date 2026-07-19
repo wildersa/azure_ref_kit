@@ -136,6 +136,16 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/retail-ecommerce/RETAIL-002-return-inspection-value-recovery.md
+  - id: MANUF-001
+    title: AI-assisted condition monitoring for aging industrial equipment
+    segment: manufacturing
+    summary: Brazilian plants can combine multi-sensor condition signals, maintenance history, and production context to detect equipment degradation and rank human-approved inspections for aging rotating and hydraulic assets.
+    intelligent_capability: Multivariate condition anomaly detection, degradation forecasting, and maintenance-review ranking
+    ai_dependency: core
+    fit_score: 88
+    complexity: large
+    status: hypothesis
+    document: segments/manufacturing/MANUF-001-aging-equipment-condition-maintenance-prioritization.md
   - id: ENERGY-001
     title: AI-assisted water-leak detection and field verification
     segment: energy-utilities
