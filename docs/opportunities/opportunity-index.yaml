@@ -86,6 +86,16 @@ opportunities:
     complexity: large
     status: researched
     document: segments/financial-services/FIN-001-app-scam-intervention.md
+  - id: FIN-002
+    title: AI-assisted motor-claim evidence and assessment assurance
+    segment: financial-services
+    summary: Brazilian motor insurers can combine guided image capture, vehicle and policy data, damage recognition, evidence-integrity checks, and claim-network anomalies to prioritize human review without automating coverage, fraud, or indemnity decisions.
+    intelligent_capability: Multimodal vehicle-damage recognition, evidence-integrity classification, claim-relationship anomaly detection, and review-priority ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: hypothesis
+    document: segments/financial-services/FIN-002-motor-claim-evidence-assurance.md
   - id: HEALTH-001
     title: AI-assisted SUS specialist-access and queue orchestration
     segment: healthcare
