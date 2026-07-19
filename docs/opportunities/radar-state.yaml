@@ -1,6 +1,6 @@
 schema_version: 1
-last_run: "2026-07-19T00:02:56Z"
-current_segment_index: 5
+last_run: "2026-07-19T00:59:12Z"
+current_segment_index: 6
 completed_cycles: 0
 
 segment_state:
@@ -30,10 +30,10 @@ segment_state:
     last_result: RETAIL-001
     next_focus: customer-service exceptions, e-commerce returns, assortment, pricing, and fulfillment without repeating shelf-availability or store-loss orchestration
   manufacturing:
-    runs: 0
-    last_reviewed: null
-    last_result: null
-    next_focus: quality, maintenance, production planning, and industrial knowledge
+    runs: 1
+    last_reviewed: "2026-07-18"
+    last_result: no-new-fit
+    next_focus: production quality, scrap and rework root-cause, process drift, and operator-assisted inspection without defaulting to generic predictive maintenance
   logistics-transport:
     runs: 0
     last_reviewed: null
