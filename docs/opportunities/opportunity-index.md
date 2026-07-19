@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 9 |
+| Opportunities | 10 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `professional-services` |
+| Current segment | `hospitality-tourism` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -27,6 +27,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | TELCO-001 | [AI-assisted network incident correlation and dispatch triage](segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md) | telecommunications | Brazilian telecom NOCs can correlate alarms, topology, performance, tickets, and customer-impact signals to rank likely root causes, recommend safe runbooks, and avoid unnecessary field dispatches under engineer approval. | Topology-aware alarm correlation, incident clustering, root-cause ranking, and dispatch-necessity prediction | 86 | large | hypothesis |
 | EDU-001 | [AI-assisted student-persistence early warning and support triage](segments/education/EDU-001-student-persistence-early-warning.md) | education | Brazilian higher-education institutions can combine academic progression, attendance, LMS activity, financial and service signals to rank dropout risk, explain contributing factors, and route bounded support actions under advisor control. | Calibrated student-persistence risk prediction, risk-factor ranking, and support-case prioritization | 83 | medium | hypothesis |
 | PUBLIC-001 | [AI-assisted public-procurement document assurance before publication](segments/public-sector/PUBLIC-001-procurement-document-assurance.md) | public-sector | Brazilian public buyers can inspect draft ETPs, terms of reference, price research, and notices for missing evidence, inconsistent quantities, vague requirements, and cross-document contradictions before human approval and PNCP publication. | Evidence-grounded procurement-document extraction, cross-document contradiction detection, requirement-specificity classification, and risk-ranked review findings | 89 | medium | hypothesis |
+| PROF-001 | [AI-assisted process-communication and deadline assurance](segments/professional-services/PROF-001-process-communication-deadline-assurance.md) | professional-services | Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment. | Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review | 87 | medium | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
