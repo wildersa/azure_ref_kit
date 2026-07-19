@@ -156,3 +156,13 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md
+  - id: TECH-001
+    title: AI-assisted context-aware vulnerability remediation prioritization
+    segment: technology-software
+    summary: Brazilian software and platform teams can combine vulnerability intelligence with asset exposure, dependency, runtime, ownership, and business-impact signals to rank remediation work and produce auditable evidence under security-engineer control.
+    intelligent_capability: Context-aware vulnerability-to-asset matching, exploit-risk prediction, attack-path inference, and remediation-priority ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: hypothesis
+    document: segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md
