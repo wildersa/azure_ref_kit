@@ -126,6 +126,16 @@ opportunities:
     complexity: large
     status: researched
     document: segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md
+  - id: RETAIL-002
+    title: AI-assisted return inspection and value-recovery routing
+    segment: retail-ecommerce
+    summary: Brazilian omnichannel retailers can inspect returned products with multimodal models and rank resale, refurbishment, supplier-return, or disposal routes while preserving deterministic consumer-rights rules and human disposition authority.
+    intelligent_capability: Multimodal item-condition recognition, return-reason classification, anomaly detection, and expected-value disposition ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: hypothesis
+    document: segments/retail-ecommerce/RETAIL-002-return-inspection-value-recovery.md
   - id: ENERGY-001
     title: AI-assisted water-leak detection and field verification
     segment: energy-utilities
