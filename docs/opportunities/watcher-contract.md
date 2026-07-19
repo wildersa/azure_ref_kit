@@ -2,32 +2,58 @@
 
 ## Goal
 
-Execute one evidence-based research round for the current business segment and maintain the Solution Opportunity Radar without turning weak hypotheses into implementation backlog.
+Execute one evidence-based discovery round for the current business segment and maintain the Solution Opportunity Radar.
 
-The radar is broader than Azure and broader than the capabilities already present in this repository. However, every published opportunity must include a material intelligent capability: model training, fine-tuning, generative AI, an agent, RAG, recognition, prediction, anomaly detection, recommendation, optimization, reinforcement learning, or another explicit model-based capability.
+The radar exists to discover **credible, testable solution hypotheses**. It is not a procurement gate, an investment committee, or a requirement that the solution already be proven in Brazilian production.
 
-Conventional software, integrations, workflows, portals, data platforms, hardware, and deterministic controls may form most of the surrounding architecture. They cannot be the complete solution by themselves.
+Every published opportunity must include:
 
-The watcher must act as solution due diligence, not as an enthusiastic idea generator. Evidence that a problem is large does not prove that the proposed intelligent solution is feasible, adoptable, or economical.
+- a current and specific Brazilian problem;
+- a defined actor and operational process;
+- a material intelligent capability;
+- a plausible data and integration path;
+- a bounded prototype or experiment;
+- explicit assumptions, risks, counter-evidence, and failure criteria.
+
+Conventional software, integration, workflow, hardware, deterministic controls, and human review may form most of the architecture. The intelligent capability must still materially change the process or outcome.
+
+## Core decision rule
+
+Use this distinction:
+
+```text
+problem evidence proves that the opportunity matters
+solution evidence changes confidence and maturity
+prototype design proves that the hypothesis is testable
+```
+
+Lack of a comparable Brazilian production deployment does **not** justify `no-new-fit` by itself.
+
+A credible problem-grounded proposal may be published as:
+
+- `status: hypothesis`;
+- `confidence: low|medium`;
+- `solution_evidence_level: conceptual|prototype|pilot`;
+- `operational_maturity: unvalidated|early`.
+
+Production evidence is required only for claims such as `confidence: high`, `operational_maturity: proven`, or proven business impact.
 
 ## Default market and date context
 
-The default target market is **Brazil**, evaluated against the real conditions and current date of each watcher run.
+The default market and jurisdiction are **Brazil**, evaluated at the actual execution date.
 
 Every run must:
 
-- resolve the actual execution date and use absolute dates in the opportunity;
-- research the selected segment in Portuguese and English, with Brazil-specific queries first;
+- use the real execution date and absolute dates;
+- research in Portuguese and English, with Brazil-specific queries first;
 - prove that the problem exists or is materially applicable in Brazil;
-- prefer Brazilian regulators, public institutions, official statistics, industry associations, public tenders, operational reports, and credible local case studies;
-- use current Brazilian regulation and operating rules for regulated sectors;
-- distinguish the publication date, data reference period, rule effective date, and current validity of each important source.
+- prefer current Brazilian regulators, public institutions, official statistics, industry associations, public tenders, operational reports, and credible local cases;
+- use current Brazilian rules or operating guidance for regulated sectors;
+- distinguish publication date, data period, rule-effective date, and current validity.
 
-A publishable opportunity requires at least one load-bearing Brazilian source published or materially updated within the previous 18 months. For regulated opportunities, it also requires a current Brazilian regulatory, supervisory, or official operating source. Older sources may explain history or stable concepts but cannot establish current urgency by themselves.
+At least one load-bearing Brazilian source published or materially updated within the previous 18 months is required. Regulated opportunities also require a current Brazilian official or regulatory source.
 
-Foreign evidence is secondary. It may support architecture, technical feasibility, comparison, or a pattern that can be adapted, but it must not be the primary proof of the Brazilian problem. Never import a foreign liability rule, reimbursement regime, legal obligation, market structure, acronym, or operating assumption as if it applied in Brazil.
-
-A global opportunity is allowed only when the document explicitly demonstrates its current applicability to Brazilian organizations. If current Brazilian relevance cannot be established, record `no-new-fit`.
+Foreign evidence may support technical plausibility, comparable implementations, architecture, limitations, or failures. It must not define Brazilian law, liability, reimbursement, market structure, or operating assumptions.
 
 ## Required repository sources
 
@@ -41,153 +67,139 @@ Read before each run:
 - `docs/opportunities/opportunity-template.md`
 - recent relevant entries from `docs/opportunities/history.jsonl`
 
-Use the simple index first. Open full opportunity documents only when they are relevant to duplicate checking or the current segment.
+Use the index first. Open full opportunity documents only for plausible duplication or relevant comparison.
 
 ## One-run workflow
 
-1. Read the round-robin cursor and select the current enabled segment.
-2. Review the segment's previous focuses, search themes, existing opportunities, and related cross-industry opportunities.
-3. Resolve the current date and research current Brazilian problems first, using multiple source types when possible.
-4. Confirm Brazil applicability and current regulatory or operational context before using foreign examples.
-5. Separate confirmed evidence from inference and separate evidence of the problem from evidence that the proposed solution works.
-6. Research comparable implementations, including successful production use, failed pilots, cancellations, rollbacks, accuracy limitations, false positives, adoption problems, and operating-cost concerns.
-7. Define the current or non-AI baseline, required data readiness, plausible unit economics, a bounded pilot, and explicit success and kill criteria.
-8. Check semantic duplication before drafting.
-9. Identify an intelligent capability that materially changes the process or outcome and is justified by the researched problem.
-10. Create at most one opportunity when the evidence, specificity, intelligent contribution, measurable value, risks, architecture, Brazil fit, solution feasibility, counter-evidence, and recency meet the repository quality gate.
-11. A valid run may finish as `no-new-fit`; never force a weak opportunity, import a foreign-only case, bolt AI onto a conventional application, or treat problem magnitude as proof of solution maturity.
-12. When publishing, create the full document under the correct segment folder and update both `opportunity-index.yaml` and `opportunity-index.md` with one concise description.
-13. Append the run result to `history.jsonl`.
-14. Update the current segment state, set a different `next_focus`, and advance the round-robin cursor.
-15. Commit documentation changes directly to `main` with a focused commit message.
+1. Read the current round-robin segment and its `next_focus`.
+2. Review recent history and existing opportunities.
+3. Research several current Brazilian problems within the segment; do not stop at the first familiar theme.
+4. Select the strongest specific problem with a plausible material intelligent capability.
+5. Research solution patterns, comparable successes, limitations, failures, and conventional alternatives.
+6. Separate confirmed problem evidence, favorable solution evidence, counter-evidence, inference, and unknowns.
+7. Define the current baseline, why intelligence may add value, required data, a bounded prototype, and measurable validation criteria.
+8. Check semantic duplication.
+9. Publish at most one opportunity, normally as a grounded hypothesis unless stronger evidence supports higher maturity.
+10. Use `no-new-fit` only under the explicit conditions below.
+11. Update the complete document, indexes, history, segment state, `next_focus`, and cursor.
+12. Commit documentation changes directly to `main`.
 
-## Research discipline
+## Search breadth requirement
 
-Prefer evidence in this order when applicable:
+Before concluding `no-new-fit`, investigate at least three materially different problem themes when sources are available.
 
-1. current Brazilian regulators, public institutions, standards bodies, and official statistics;
-2. Brazilian industry associations, sector research, public tenders, operational reports, and credible local case studies;
-3. current international regulators, standards, and technical research used for comparison or architecture support;
-4. operational guides, incident reports, and process documentation;
-5. academic and technical research;
-6. mature open-source projects and public reference architectures;
-7. reputable reporting describing a concrete operational problem.
+Vary:
 
-Marketing claims alone are insufficient. Quantified gains require a source or must be labeled as an experiment target.
+- actor and process;
+- problem type, such as quality, defects, exceptions, loss, fraud, delay, safety, compliance, capacity, maintenance, demand, scheduling, inspection, service recovery, or optimization;
+- intelligent technique, such as vision, speech, document recognition, prediction, ranking, anomaly detection, optimization, agents, RAG, or multimodal models;
+- company size, data type, interaction model, and architecture shape.
 
-Do not begin from a preferred technology. Begin from an actor, a recurring process, a concrete interruption or risk, and a measurable consequence in the Brazilian context. Then determine which intelligent technique is necessary and how normal software, integration, automation, data, hardware, and deterministic controls support it.
+Do not test one generic idea such as predictive maintenance, a generic copilot, generic anomaly detection, or generic computer vision and then declare the segment empty.
 
-## Mandatory solution due diligence
+## Evidence discipline
 
-Every candidate must distinguish:
+Distinguish:
 
-- **problem evidence:** proof that the pain, cost, delay, risk, or interruption exists;
-- **solution evidence:** proof that the proposed intelligent capability can improve that process under comparable operating conditions;
-- **counter-evidence:** failed pilots, cancellations, discontinued products, rollbacks, weak accuracy, false-alert burden, poor adoption, unexpected operating cost, or a simpler baseline performing adequately;
-- **unknowns:** material facts that still require a pilot or customer data.
+- **problem evidence:** proves the pain, cost, delay, risk, interruption, or unmet need;
+- **favorable solution evidence:** supports technical or operational plausibility;
+- **counter-evidence:** failed pilots, cancellations, weak accuracy, false alerts, adoption problems, unexpected cost, or a simpler alternative performing well;
+- **inference:** reasoned but not directly proven;
+- **unknowns:** facts requiring customer data, experiment, prototype, pilot, or legal review.
 
-For the proposed solution pattern, search in Portuguese and English using terms appropriate to the segment, including equivalents of `falhou`, `cancelado`, `descontinuado`, `rollback`, `piloto`, `resultados`, `precisão`, `falso positivo`, `adoção`, `custo operacional`, `failed`, `cancelled`, `discontinued`, `accuracy`, and `false positives`.
+Search for contrary evidence in Portuguese and English and record it when relevant.
 
-The opportunity must include:
+Counter-evidence is primarily a **design input**, not an automatic rejection. It should narrow scope, change data or capture strategy, increase abstention or human review, lower confidence, strengthen the baseline comparison, or define prototype failure criteria.
 
-- at least one reviewed comparable deployment when public evidence exists;
-- favorable and contrary solution evidence, rather than selecting only supportive sources;
-- the current manual, deterministic, rules-based, analytics, or conventional-software baseline;
-- why the intelligent capability should outperform that baseline;
-- data-access, label-quality, coverage, drift, privacy, integration, and feedback-loop readiness;
-- the principal cost drivers for capture, hardware, integration, inference, storage, model operations, and human review;
-- a narrow pilot population, process slice, baseline or control, success criteria, and explicit kill criteria;
-- the operational consequence of false positives, false negatives, abstention, model degradation, and employee rejection.
+Reject only when contrary evidence invalidates the same central mechanism and no credible bounded mitigation or alternative formulation remains.
 
-When no public comparable deployment exists, state that explicitly. Absence of contrary evidence is not proof of success.
+## Baseline and prototype discipline
 
-Apply these evidence boundaries:
+Every opportunity must define:
 
-- high confidence requires credible comparable production evidence, realistic data readiness, and no unresolved failure of the same central capability;
-- vendor announcements, demonstrations, prototypes, and unmeasured pilots do not establish production feasibility;
-- when no comparable production evidence exists, technical feasibility is capped by `radar-config.yaml` and confidence cannot be high;
-- when a comparable implementation failed in the same central capability, the opportunity must explain a concrete architectural, scope, data, or operating-model mitigation;
-- an unmitigated comparable failure requires rejection or classification as a low-confidence `research-bet` under the score caps in `radar-config.yaml`;
-- if a deterministic or manual baseline is likely cheaper and sufficiently effective, record `no-new-fit` unless the opportunity identifies a measurable context in which intelligence materially changes the outcome.
+- the current manual or system process;
+- the strongest realistic deterministic, rules-based, analytics, integration, workflow, or conventional-software baseline;
+- the exact context in which intelligence may add incremental value;
+- data owners, access path, coverage, labels or feedback, quality risks, privacy, drift, and integration assumptions;
+- a narrow prototype or experiment;
+- business, model-quality, workflow, and safety metrics;
+- stop, redesign, or scale criteria.
+
+A strong non-AI baseline does not automatically invalidate the opportunity. It becomes the comparison target.
+
+Publish when the intelligent capability has a plausible testable advantage in a defined context, even if that advantage has not yet been proven.
 
 ## Mandatory intelligent-capability test
 
 Every published opportunity must satisfy all of these:
 
-- `ai_dependency` is `supporting` or `core`; `none` and `optional` are invalid;
-- the document names the model-based capability and why it is necessary;
-- it defines the inputs consumed and outputs produced;
-- it explains training, fine-tuning, grounding, inference, or optimization behavior when applicable;
-- it defines how model quality or policy performance will be evaluated;
-- it defines deterministic validation, human review, abstention, rollback, or another safe fallback;
-- removing the intelligent capability would materially reduce the solution's value or make the proposed process change incomplete.
+- `ai_dependency` is `supporting` or `core`;
+- the model-based capability is explicitly named;
+- its inputs and outputs are defined;
+- training, grounding, inference, optimization, or model-use assumptions are described;
+- model or policy quality can be evaluated;
+- deterministic validation, human review, abstention, rollback, or manual fallback is defined;
+- removing the intelligent capability would materially reduce the proposed value.
 
-Reject a candidate when AI is merely a summary feature, decorative chat interface, optional assistant, or label attached to a conventional workflow.
+Reject decorative AI such as an optional summary, chat box, or assistant attached to a workflow that remains equally valuable without it.
 
 ## Opportunity quality gate
 
-Publish only when the opportunity includes:
+Publish when the opportunity includes:
 
-- a specific segment, company profile, actor, and process;
-- a declared primary market and jurisdiction, normally Brazil;
-- recent Brazilian evidence that the problem exists or is materially applicable;
-- current Brazilian regulatory or operating context when the segment is regulated;
-- separate problem evidence, solution evidence, counter-evidence, and unknowns;
-- a reviewed non-AI baseline and a reason the intelligent capability should outperform it;
-- a solution-evidence level and operational-maturity classification;
-- a realistic data-readiness assessment;
-- a bounded pilot, success criteria, kill criteria, and plausible unit-economics hypothesis;
-- a process-changing solution rather than a technology label;
-- a material intelligent capability meeting the mandatory test above;
+- a specific company profile, actor, process, and Brazilian problem;
+- recent Brazilian problem evidence;
+- current Brazilian regulatory or operating context when applicable;
+- a process-changing solution hypothesis;
+- a material intelligent capability;
+- a plausible data and integration path;
+- a realistic baseline comparison;
+- favorable evidence, counter-evidence, inference, and unknowns without pretending certainty;
+- a bounded prototype and measurable validation plan;
 - a macro Mermaid architecture;
 - possible gains without invented percentages;
-- measurable business and model-quality validation metrics;
-- material risks, limits, and human-control boundaries;
-- fit scoring with dimension-level rationale and all configured caps applied;
-- duplicate-control keys and a uniqueness statement;
-- repository alignment that does not influence the fit score;
-- an index description of roughly 40 words or fewer.
+- risks, limits, and human-control boundaries;
+- fit scoring with dimension-level rationale;
+- duplicate-control keys and a uniqueness statement.
 
-Reject generic ideas such as `AI chatbot for HR` unless the exact user, process, data, intelligent behavior, boundaries, integrations, evaluation, measurable outcome, Brazilian applicability, current evidence, baseline, counter-evidence, and pilot decision rules are defined.
+A hypothesis does not need production proof, proven ROI, local model metrics, known false-positive rates, completed OSS integration, or demonstrated employee adoption. Those are prototype questions unless the document claims higher maturity.
 
-## Diversity and anti-anchoring rules
+## Valid `no-new-fit` reasons
 
-Actively diversify across consecutive runs:
+Record `no-new-fit` only when one or more are true after adequate search breadth:
 
-- company size and operational maturity;
-- user and business process;
-- intelligent technique and model family;
-- solution type and architecture shape;
-- interaction model and delivery channel;
-- complexity and time horizon;
-- software-centric, hardware-assisted, edge, multimodal, data, integration, optimization, training, and research-oriented opportunities.
+- no current Brazilian evidence supports a specific problem;
+- all credible findings duplicate existing opportunities;
+- the intelligent capability is decorative or unnecessary;
+- no plausible data, model, integration, simulation, or prototype path can be defined;
+- the central technical mechanism is contradicted strongly enough that a bounded mitigation is not credible;
+- the candidate is generic and cannot be narrowed to a concrete actor, process, and measurable outcome.
 
-Do not repeatedly prefer agents, chat interfaces, RAG, document processing, or the repository's existing capabilities. The intelligence requirement does not mean every opportunity should use generative AI.
+Do **not** record `no-new-fit` merely because:
 
-The few-shot examples in the watcher prompt define only the permitted breadth of solutions. They are not preferred ideas, search queries, templates, scoring references, or target distributions. Research the selected segment independently and do not copy, remix, or prioritize examples because they appear in the prompt.
+- there is no Brazilian production deployment;
+- no local false-positive rate is published;
+- ROI has not been demonstrated;
+- labels, integration effort, adoption, or operating cost are still unknown;
+- a deterministic baseline exists;
+- the solution still requires a prototype.
 
-## Duplicate prevention
-
-Before publishing:
-
-- compare the proposed problem against index titles and short descriptions;
-- compare `problem_keys`, `capability_keys`, actor, process, expected outcome, and intelligent technique;
-- inspect related full documents only when similarity is plausible;
-- treat a new model applied to the same process as a duplicate unless the process, decision, or outcome changes materially;
-- record `no-new-fit` when all credible findings duplicate existing opportunities.
+Those facts reduce confidence, identify unknowns, or shape the experiment.
 
 ## Fit and decision boundaries
 
-Use the five 0–20 dimensions defined in `radar-config.yaml`. The score is symbolic and must not hide low confidence, high complexity, regulated risk, weak data availability, stale evidence, foreign-only applicability, an unproven intelligent technique, or contrary production evidence.
+Use the five 0–20 dimensions in `radar-config.yaml`.
 
-Apply every configured feasibility and total-score cap before publishing. A high problem-evidence score, business value, reuse potential, or strategic differentiation cannot compensate for technical feasibility below the configured boundary.
+Technical feasibility means **prototype feasibility and testability**, not proven production success. Evaluate whether a bounded implementation can be built and meaningfully compared against a baseline with obtainable data or simulation.
+
+The score must not hide uncertainty, complexity, regulated risk, weak data assumptions, or counter-evidence. However, uncertainty belongs in confidence, maturity, risk, prototype design, and rationale rather than becoming an automatic publication veto.
 
 The watcher may create and update opportunity documents and radar control files. It must not:
 
 - open implementation issues;
 - create implementation branches or pull requests;
 - add runtime code or infrastructure;
-- mark an opportunity `approved` without an explicit human decision;
+- mark an opportunity `approved` without explicit human decision;
 - convert an opportunity into backlog merely because its fit score is high.
 
-New opportunities start as `hypothesis` or `researched`, depending on evidence quality. `Researched` and `confidence: high` require solution evidence, not only strong evidence of the problem.
+New opportunities normally start as `hypothesis`. Use `researched` only when evidence about the solution pattern is materially stronger than conceptual plausibility.
