@@ -166,6 +166,16 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/agriculture/AGRI-001-grain-storage-condition-assurance.md
+  - id: CONST-001
+    title: AI-assisted construction progress and deviation assurance
+    segment: construction-real-estate
+    summary: Brazilian construction teams can compare guided site imagery with schedule and BIM baselines to estimate progress, flag likely deviations, and assemble review evidence without automating measurement approval or payment certification.
+    intelligent_capability: Visual work-state recognition, schedule/BIM alignment, progress estimation, and deviation-priority ranking
+    ai_dependency: core
+    fit_score: 87
+    complexity: large
+    status: hypothesis
+    document: segments/construction-real-estate/CONST-001-visual-progress-deviation-assurance.md
   - id: ENERGY-001
     title: AI-assisted water-leak detection and field verification
     segment: energy-utilities
