@@ -166,3 +166,13 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md
+  - id: NONPROFIT-001
+    title: AI-assisted donor-retention uplift and outreach orchestration
+    segment: nonprofit
+    summary: Brazilian OSCs can estimate which donors are likely to lapse and which bounded outreach may causally improve retention, prioritizing human-approved campaigns without inferring sensitive traits or automating solicitation.
+    intelligent_capability: Donor-lapse prediction and causal uplift ranking for bounded retention interventions
+    ai_dependency: core
+    fit_score: 87
+    complexity: medium
+    status: hypothesis
+    document: segments/nonprofit/NONPROFIT-001-donor-retention-uplift-orchestration.md
