@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 14 |
+| Opportunities | 15 |
 | Segments configured | 18 |
 | Completed research cycles | 1 |
-| Current segment | `cross-industry` |
+| Current segment | `human-resources` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -19,6 +19,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | ID | Opportunity | Segment | Short description | Intelligent capability | Fit | Complexity | Status |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | CROSS-001 | [AI-assisted cross-system offboarding risk control plane](segments/cross-industry/CROSS-001-offboarding-control-plane.md) | cross-industry | Organizations with fragmented offboarding can orchestrate known revocations and use access-graph anomaly detection to identify likely residual accounts, privileges, assets, and missing controls for human review. | Identity and access graph anomaly detection with risk-ranked reconciliation | 89 | large | researched |
+| CROSS-002 | [AI-assisted supplier identity and payment-change assurance](segments/cross-industry/CROSS-002-supplier-payment-change-assurance.md) | cross-industry | Brazilian organizations can combine supplier-master history, CNPJ evidence, approval context, communications, and payment behavior to rank suspicious onboarding and bank-detail changes before human-approved payment release. | Supplier-entity resolution, change-pattern anomaly detection, communication-risk classification, and payment-review ranking | 88 | medium | hypothesis |
 | HR-001 | [AI skills-evidence graph for internal mobility and reskilling](segments/human-resources/HR-001-skills-evidence-mobility-graph.md) | human-resources | Organizations can convert employee-approved work evidence into a governed skills graph that identifies capability gaps, ranks internal transition paths, and recommends targeted reskilling without making autonomous employment decisions. | Evidence-grounded skill extraction, taxonomy mapping, gap inference, and internal transition-path ranking | 89 | large | researched |
 | FIN-001 | [Real-time Pix scam and mule-account intervention with MED intelligence](segments/financial-services/FIN-001-app-scam-intervention.md) | financial-services | Brazilian Pix participants can combine Banco Central security signals, transaction behavior, device context, and payment graphs to detect scams and contas laranja, apply proportionate controls, and prioritize MED investigation before funds disperse. | Calibrated Pix scam-risk prediction and graph-based conta-laranja and fund-dispersion detection | 92 | large | researched |
 | HEALTH-001 | [AI-assisted SUS specialist-access and queue orchestration](segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md) | healthcare | Brazilian SUS regulation centers can combine protocol rules with demand, capacity, geography, wait-time, cancellation, and clinical-context models to recommend equitable specialist-access queues and recover unused appointment capacity under human control. | Constrained demand-capacity forecasting, no-show prediction, and protocol-aware queue and slot recommendation | 88 | large | researched |
