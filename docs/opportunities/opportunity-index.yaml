@@ -156,6 +156,16 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/logistics-transport/LOG-001-pharmaceutical-cold-chain-excursion-assurance.md
+  - id: AGRI-001
+    title: AI-assisted grain-storage condition and spoilage-risk assurance
+    segment: agriculture
+    summary: Brazilian grain-storage operators can combine temperature, humidity, aeration, inventory, weather, and inspection data to predict deterioration risk and rank human-approved inspection and aeration actions without replacing sampling or laboratory confirmation.
+    intelligent_capability: Multivariate grain-condition anomaly detection, deterioration-risk forecasting, and inspection or aeration priority ranking
+    ai_dependency: core
+    fit_score: 88
+    complexity: large
+    status: hypothesis
+    document: segments/agriculture/AGRI-001-grain-storage-condition-assurance.md
   - id: ENERGY-001
     title: AI-assisted water-leak detection and field verification
     segment: energy-utilities
