@@ -146,6 +146,16 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/manufacturing/MANUF-001-aging-equipment-condition-maintenance-prioritization.md
+  - id: LOG-001
+    title: AI-assisted pharmaceutical cold-chain excursion assurance
+    segment: logistics-transport
+    summary: Brazilian pharmaceutical logistics operators can combine sensor telemetry, route context, equipment state, and shipment constraints to predict thermal-excursion risk and prioritize human intervention without automating product release or disposal.
+    intelligent_capability: Multivariate thermal-excursion prediction, sensor-quality anomaly detection, and intervention-priority ranking
+    ai_dependency: core
+    fit_score: 88
+    complexity: large
+    status: hypothesis
+    document: segments/logistics-transport/LOG-001-pharmaceutical-cold-chain-excursion-assurance.md
   - id: ENERGY-001
     title: AI-assisted water-leak detection and field verification
     segment: energy-utilities
