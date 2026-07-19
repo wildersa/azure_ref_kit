@@ -17,6 +17,7 @@
 - **Operational maturity:** unvalidated | early | proven
 - **Azure fit:** none | low | medium | high
 - **AI dependency:** supporting | core
+- **Primary AI role:** recognition | extraction | classification | anomaly-detection | prediction | ranking-recommendation | optimization | reinforcement-learning | generative-ai | rag | agent-tool-use | multimodal | other
 - **Intelligent capability:** concise required model-based capability
 - **Repository alignment:** reuse-existing | extend-kit | new-solution | outside-current-kit
 
@@ -94,7 +95,31 @@ The existence of a strong baseline does not reject the opportunity. It defines w
 
 Describe the process change before naming technology. State what remains deterministic, where intelligence adds value, where humans decide, what systems integrate, and how known limitations affect scope.
 
-## Intelligent capability
+## Where AI enters
+
+Explain the AI architecture in plain language. Do not use `AI`, `agent`, `LLM`, or `model` as interchangeable labels.
+
+### AI role map
+
+| Process stage | AI component | AI type / model family | What it does | Runtime mode | Output | Human or deterministic control |
+| --- | --- | --- | --- | --- | --- | --- |
+| [stage] | [component] | [classical ML, deep learning, graph model, time-series model, computer vision, speech model, embedding/retrieval, LLM, multimodal foundation model, RL policy, agent] | [specific responsibility] | [batch, online, real-time, edge, asynchronous, human-in-the-loop] | [prediction, extraction, ranking, generated text, action proposal, policy decision] | [approval, threshold, rule, abstention, rollback] |
+
+### Required distinctions
+
+- **Primary AI role:** recognition | extraction | classification | anomaly detection | prediction | ranking/recommendation | optimization | reinforcement learning | generation | retrieval | agent/tool use | multimodal reasoning.
+- **Model family:** identify whether this is classical ML, deep learning, computer vision, speech, graph ML, time-series forecasting, embeddings/retrieval, an LLM/foundation model, multimodal model, optimization solver, or RL policy.
+- **Training requirement:** pretrained inference only | prompt and grounding | supervised training | fine-tuning | self-supervised training | simulation | reinforcement learning | no custom training.
+- **Training location and cadence:** offline initial training, periodic retraining, continuous feedback, per-customer adaptation, or none.
+- **Inference location:** cloud | edge | device | batch pipeline | real-time service.
+- **Agent role, when any:** state the goal, tools, permissions, planning boundary, memory, and actions it may propose or execute.
+- **LLM role, when any:** state whether it generates, extracts, classifies, reasons over retrieved context, creates explanations, or selects tools.
+- **Non-LLM intelligence:** explicitly name classical ML, vision, forecasting, graph, ranking, anomaly, optimization, or RL components rather than calling everything an LLM.
+- **Not AI:** identify rules, workflow, APIs, databases, search filters, calculations, orchestration, dashboards, and human decisions that remain deterministic.
+
+When the solution does not use an agent or LLM, say so explicitly. When it combines several intelligent components, separate their responsibilities instead of describing a generic AI layer.
+
+## Intelligent capability details
 
 - **Technique / model family:**
 - **Why it is necessary:**
@@ -142,14 +167,18 @@ Do not invent ROI. Cost drivers may be listed as assumptions, not publication ga
 ```mermaid
 flowchart LR
   Input[User system device document event sensor or simulation] --> Intake[Capture API workflow integration or edge intake]
-  Intake --> Core[Core solution services]
+  Intake --> Core[Deterministic application and orchestration]
   Core --> Data[Operational data knowledge labels or simulation]
-  Data --> Intelligence[Required AI ML recognition agent or optimization]
-  Intelligence --> Validation[Rules confidence evaluation and controls]
+  Data --> Model[Named model recognition prediction ranking generation or optimization]
+  Model --> Agent[Optional governed agent and tools]
+  Model --> Validation[Rules confidence evaluation and controls]
+  Agent --> Validation
   Validation --> Integration[Enterprise systems and workflow actions]
   Validation --> Human[Human review when required]
   Core --> Metrics[Prototype model workflow and business metrics]
 ```
+
+Remove the `Agent` node when no agent exists. Name the actual model role instead of leaving a generic intelligence box.
 
 ## Capabilities and possible technologies
 
@@ -158,6 +187,8 @@ flowchart LR
 - Integration capabilities:
 - Required AI / ML capabilities:
 - Training, grounding, recognition, or optimization capabilities:
+- Agent and tool-use capabilities, or `not used`:
+- LLM / foundation-model capabilities, or `not used`:
 - Evaluation and model-operations capabilities:
 - Security and governance capabilities:
 - Azure services that may fit:
@@ -188,6 +219,8 @@ Do not invent percentages.
 - Brazilian regulatory or policy constraints:
 - Human decision boundaries:
 - Model or policy failure modes:
+- Agent or tool-execution failure modes, when applicable:
+- LLM hallucination, grounding, or prompt-injection risks, when applicable:
 - Comparable failures and applicable lessons:
 - Bias, drift, weak labels, or insufficient feedback:
 - Integration and data risks:
@@ -202,7 +235,7 @@ Technical feasibility means **whether a bounded prototype can be built and meani
 | --- | ---: | --- |
 | Problem evidence and relevance | /20 | Current Brazilian evidence and specificity. |
 | Business or operational value | /20 | Plausible value if the hypothesis succeeds. |
-| Technical feasibility | /20 | Prototype testability, obtainable data or simulation, model plausibility, integration scope, controls, and counter-evidence. |
+| Technical feasibility | /20 | Prototype testability, obtainable data or simulation, named model family, training/inference path, integration scope, controls, and counter-evidence. |
 | Reuse potential | /20 | |
 | Strategic differentiation | /20 | Material advantage created by intelligence beyond deterministic automation. |
 | **Total** | **/100** | |
