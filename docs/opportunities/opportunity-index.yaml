@@ -96,3 +96,13 @@ opportunities:
     complexity: medium
     status: researched
     document: segments/energy-utilities/ENERGY-001-ai-assisted-water-leak-detection.md
+  - id: TELCO-001
+    title: AI-assisted network incident correlation and dispatch triage
+    segment: telecommunications
+    summary: Brazilian telecom NOCs can correlate alarms, topology, performance, tickets, and customer-impact signals to rank likely root causes, recommend safe runbooks, and avoid unnecessary field dispatches under engineer approval.
+    intelligent_capability: Topology-aware alarm correlation, incident clustering, root-cause ranking, and dispatch-necessity prediction
+    ai_dependency: core
+    fit_score: 86
+    complexity: large
+    status: hypothesis
+    document: segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md
