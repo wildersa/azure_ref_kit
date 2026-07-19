@@ -6,6 +6,7 @@ radar:
   allow_no_new_fit: true
   minimum_fit_to_publish: 55
   minimum_sources: 1
+  minimum_distinct_problem_themes_before_no_new_fit: 3
   prefer_multiple_source_types: true
   implementation_issue_creation: disabled
   return_to_first_segment_after_cycle: true
@@ -37,7 +38,8 @@ research:
     - academic-and-technical-research
     - mature-open-source-projects-and-reference-architectures
     - reputable-reporting
-  reject_marketing_only_evidence: true
+  reject_marketing_only_problem_evidence: true
+  allow_vendor_or_case_evidence_for_solution_plausibility_when_labeled: true
   record_queries: true
   record_sources: true
   record_publication_data_period_and_effective_dates: true
@@ -45,28 +47,12 @@ research:
   separate_problem_evidence_from_solution_evidence: true
   require_counter_evidence_search: true
   require_comparable_deployment_review_when_public: true
-  require_favorable_and_contrary_solution_evidence: true
+  counter_evidence_is_design_input_not_default_rejection: true
+  absence_of_production_evidence_is_not_rejection: true
+  absence_of_brazilian_solution_validation_is_not_rejection: true
   counter_evidence_search_languages:
     - pt-BR
     - en
-  counter_evidence_search_concepts:
-    - failed
-    - cancelled
-    - discontinued
-    - rollback
-    - pilot-results
-    - accuracy-limitations
-    - false-positives
-    - low-adoption
-    - operating-cost
-    - falhou
-    - cancelado
-    - descontinuado
-    - resultados-de-piloto
-    - limitacoes-de-precisao
-    - falsos-positivos
-    - baixa-adocao
-    - custo-operacional
 
 intelligence_requirement:
   required: true
@@ -99,6 +85,7 @@ intelligence_requirement:
   forbid_decorative_ai: true
 
 publication:
+  default_new_status: hypothesis
   require_specific_actor: true
   require_specific_process: true
   require_primary_market_and_jurisdiction: true
@@ -109,19 +96,22 @@ publication:
   require_operational_maturity: true
   require_counter_evidence_section: true
   require_non_ai_baseline: true
-  require_data_readiness_assessment: true
-  require_unit_economics_hypothesis: true
-  require_bounded_pilot_scope: true
-  require_success_criteria: true
-  require_kill_criteria: true
+  require_data_assumptions: true
+  require_bounded_prototype_scope: true
+  require_validation_metrics: true
+  require_failure_or_redesign_criteria: true
   require_macro_mermaid_architecture: true
   require_material_intelligent_capability: true
   require_possible_gains: true
-  require_measurable_metrics: true
   require_risks_and_constraints: true
   require_fit_breakdown: true
   require_duplicate_keys: true
   forbid_unsubstantiated_percentages: true
+  production_evidence_required: false
+  brazilian_solution_case_required: false
+  proven_roi_required: false
+  known_local_false_positive_rate_required: false
+  completed_integration_required: false
 
 solution_evidence_levels:
   - conceptual
@@ -135,18 +125,37 @@ operational_maturity_levels:
   - early
   - proven
 
+confidence_rules:
+  low: plausible hypothesis with major unknowns
+  medium: supported by technical research, comparable patterns, prototype, or pilot evidence
+  high: supported by credible comparable production evidence and realistic data readiness
+
 fit_guardrails:
-  minimum_technical_feasibility_for_non_research_publish: 10
-  no_comparable_production_evidence_max_technical_feasibility: 12
-  announcement_demo_or_unmeasured_pilot_max_technical_feasibility: 10
-  unmitigated_comparable_failure_max_technical_feasibility: 8
-  unmitigated_comparable_failure_max_total_fit: 69
-  high_confidence_requires_comparable_production_evidence: true
-  high_confidence_requires_realistic_data_readiness: true
-  high_confidence_forbidden_with_unresolved_comparable_failure: true
-  large_or_research_complexity_requires_operational_maturity_rationale: true
-  technical_feasibility_below_minimum_allowed_only_for_research_bet: true
-  problem_business_reuse_and_differentiation_cannot_override_feasibility_cap: true
+  technical_feasibility_means_prototype_testability: true
+  minimum_technical_feasibility_to_publish: 8
+  no_production_evidence_score_cap: disabled
+  no_brazilian_solution_validation_score_cap: disabled
+  deterministic_baseline_is_comparison_not_rejection: true
+  unresolved_unknowns_reduce_confidence_not_automatic_fit: true
+  core_mechanism_invalidated_without_mitigation_max_technical_feasibility: 7
+  core_mechanism_invalidated_without_mitigation_max_total_fit: 54
+  problem_business_reuse_and_differentiation_cannot_override_invalid_core_mechanism: true
+
+valid_no_new_fit_reasons:
+  - no-current-brazilian-problem-evidence
+  - duplicate-of-existing-opportunity
+  - decorative-or-unnecessary-ai
+  - no-plausible-data-model-integration-simulation-or-prototype-path
+  - central-mechanism-invalidated-without-credible-mitigation
+  - generic-candidate-cannot-be-narrowed
+
+invalid_no_new_fit_reasons:
+  - no-brazilian-production-deployment
+  - no-local-false-positive-rate
+  - roi-not-yet-proven
+  - labels-integration-cost-or-adoption-still-unknown
+  - deterministic-baseline-exists
+  - prototype-still-required
 
 fit_dimensions:
   - id: problem-evidence
