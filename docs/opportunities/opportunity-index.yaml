@@ -126,3 +126,13 @@ opportunities:
     complexity: medium
     status: hypothesis
     document: segments/public-sector/PUBLIC-001-procurement-document-assurance.md
+  - id: PROF-001
+    title: AI-assisted process-communication and deadline assurance
+    segment: professional-services
+    summary: Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment.
+    intelligent_capability: Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review
+    ai_dependency: core
+    fit_score: 87
+    complexity: medium
+    status: hypothesis
+    document: segments/professional-services/PROF-001-process-communication-deadline-assurance.md
