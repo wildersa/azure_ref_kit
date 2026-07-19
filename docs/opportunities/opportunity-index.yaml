@@ -146,3 +146,13 @@ opportunities:
     complexity: medium
     status: hypothesis
     document: segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md
+  - id: MEDIA-001
+    title: AI-assisted audiovisual rights monitoring and evidence triage
+    segment: media-entertainment
+    summary: Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking.
+    intelligent_capability: Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification
+    ai_dependency: core
+    fit_score: 90
+    complexity: large
+    status: hypothesis
+    document: segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md
