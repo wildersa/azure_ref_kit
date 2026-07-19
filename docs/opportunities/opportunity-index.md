@@ -6,10 +6,10 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 7 |
+| Opportunities | 8 |
 | Segments configured | 18 |
 | Completed research cycles | 0 |
-| Current segment | `education` |
+| Current segment | `public-sector` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -25,6 +25,7 @@ Every published opportunity must appear here as one concise row. The full proble
 | RETAIL-001 | [AI-assisted shelf-availability and retail-loss orchestration](segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md) | retail-ecommerce | Brazilian retailers can combine shelf images, inventory, sales, replenishment, and loss events to detect operational rupture and shrinkage anomalies, rank corrective store tasks, and verify execution under human control. | Multimodal shelf-state recognition with inventory-loss anomaly detection and intervention ranking | 89 | large | researched |
 | ENERGY-001 | [AI-assisted water-leak detection and field verification](segments/energy-utilities/ENERGY-001-ai-assisted-water-leak-detection.md) | energy-utilities | Brazilian water utilities can use acoustic and hydraulic anomaly models to rank suspected hidden leaks, direct field verification, and measure recovered water while retaining geophone confirmation and cost-benefit controls. | Acoustic leak classification and hydraulic anomaly ranking with human-confirmed localization | 87 | medium | researched |
 | TELCO-001 | [AI-assisted network incident correlation and dispatch triage](segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md) | telecommunications | Brazilian telecom NOCs can correlate alarms, topology, performance, tickets, and customer-impact signals to rank likely root causes, recommend safe runbooks, and avoid unnecessary field dispatches under engineer approval. | Topology-aware alarm correlation, incident clustering, root-cause ranking, and dispatch-necessity prediction | 86 | large | hypothesis |
+| EDU-001 | [AI-assisted student-persistence early warning and support triage](segments/education/EDU-001-student-persistence-early-warning.md) | education | Brazilian higher-education institutions can combine academic progression, attendance, LMS activity, financial and service signals to rank dropout risk, explain contributing factors, and route bounded support actions under advisor control. | Calibrated student-persistence risk prediction, risk-factor ranking, and support-case prioritization | 83 | medium | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
