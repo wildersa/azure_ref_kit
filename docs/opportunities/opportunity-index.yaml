@@ -76,3 +76,13 @@ opportunities:
     complexity: large
     status: researched
     document: segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md
+  - id: RETAIL-001
+    title: AI-assisted shelf-availability and retail-loss orchestration
+    segment: retail-ecommerce
+    summary: Brazilian retailers can combine shelf images, inventory, sales, replenishment, and loss events to detect operational rupture and shrinkage anomalies, rank corrective store tasks, and verify execution under human control.
+    intelligent_capability: Multimodal shelf-state recognition with inventory-loss anomaly detection and intervention ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: researched
+    document: segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md
