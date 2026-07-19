@@ -4,11 +4,11 @@
 
 - **Segment:**
 - **Primary market / jurisdiction:** Brazil by default; state another market only with explicit Brazil applicability.
-- **Evidence reference date:** current watcher execution date plus the main data, publication, update, and rule-effective dates used.
-- **Index summary:** one concrete sentence, up to roughly 40 words, describing the problem, proposed solution, and material intelligent capability for `opportunity-index.yaml` and `opportunity-index.md`.
+- **Evidence reference date:** current watcher date plus main publication, data-period, update, and rule-effective dates.
+- **Index summary:** one concrete sentence, roughly 40 words or fewer.
 - **Company profile / size:**
 - **Opportunity type:** quick-win | product | platform | integration | automation | data | optimization | operations | security | industry-solution | research-bet
-- **Status:** hypothesis
+- **Status:** hypothesis | researched
 - **Confidence:** low | medium | high
 - **Complexity:** small | medium | large | research
 - **Horizon:** short | medium | long
@@ -17,33 +17,29 @@
 - **Operational maturity:** unvalidated | early | proven
 - **Azure fit:** none | low | medium | high
 - **AI dependency:** supporting | core
-- **Intelligent capability:** concise name for the required model-based capability
+- **Intelligent capability:** concise required model-based capability
 - **Repository alignment:** reuse-existing | extend-kit | new-solution | outside-current-kit
 
-`AI dependency: none` and `optional` are invalid. The intelligent capability must materially contribute to the solution rather than decorate a conventional application.
-
-`Confidence: high` requires comparable production evidence, realistic data readiness, and no unresolved failure of the same central capability. Problem magnitude alone cannot justify high confidence.
+New opportunities normally start as `hypothesis`. Production proof is not required to publish. Use `confidence: high` or `operational maturity: proven` only with credible production evidence.
 
 ## Problem
 
-Describe the actor, current process, recurring pain, frequency, consequence, and why the problem matters.
+Describe the actor, current process, recurring pain, frequency, consequence, and why it matters.
 
 ## Brazil applicability and current context
 
-Explain why the problem and solution are relevant to Brazilian organizations at the current execution date.
+Explain why the problem is currently relevant to Brazilian organizations.
 
 Include:
 
 - current Brazilian market or operating evidence;
-- current Brazilian regulatory, supervisory, standards, procurement, or policy context when applicable;
-- material differences between Brazil and foreign examples;
-- assumptions that still need local validation.
+- current Brazilian regulatory or official operating context when applicable;
+- material differences from foreign examples;
+- assumptions requiring local validation.
 
-At least one load-bearing Brazilian source must have been published or materially updated within the previous 18 months. A foreign regulation or liability regime must never be presented as applicable to Brazil.
+At least one load-bearing Brazilian source must have been published or materially updated within the previous 18 months.
 
 ## Evidence
-
-Separate evidence that the problem exists from evidence that the proposed solution works. Record both supportive and contrary findings.
 
 ### Confirmed problem evidence
 
@@ -51,28 +47,28 @@ Separate evidence that the problem exists from evidence that the proposed soluti
 
 ### Favorable solution evidence
 
-- [comparable implementation, measured pilot, production deployment, technical benchmark, or operational result]
+- [technical research, prototype, pilot, production case, benchmark, mature implementation pattern, or other evidence supporting plausibility]
 
-### Counter-evidence and failed comparables
+### Counter-evidence and limitations
 
-- [failed pilot, cancelled or discontinued deployment, rollback, accuracy limitation, false-alert burden, adoption problem, unexpected cost, or effective simpler baseline]
-- [concrete mitigation, or explain why the failure still applies]
+- [failed comparable, cancellation, accuracy limitation, false-alert burden, adoption issue, unexpected cost, or strong conventional alternative]
+- [how this changes scope, confidence, design, human controls, or prototype validation]
 
-If no public comparable or counter-evidence was found, state that explicitly and record the searches performed. Absence of negative evidence is not evidence of success.
+Counter-evidence is normally a design input. Reject only when it invalidates the central mechanism and no credible bounded mitigation remains.
 
 ### Inference
 
-- [reasoned implication that is not directly proven]
+- [reasoned implication not directly proven]
 
 ### Unknowns
 
-- [material fact requiring customer data, experiment, pilot, legal review, or operational validation]
+- [fact requiring customer data, prototype, experiment, pilot, integration test, or legal review]
 
 ### Sources
 
-For each important source, record publication or update date, data reference period when relevant, rule effective date when relevant, jurisdiction, and why it supports or challenges the opportunity.
+For each important source, record jurisdiction, publication/update date, data period or effective date when relevant, and whether it supports the problem, solution plausibility, or a limitation.
 
-- [source title](URL) — jurisdiction; publication/update date; data period/effective date; favorable, contrary, or contextual relevance
+- [source title](URL) — jurisdiction; date; relevance
 
 ## Current process
 
@@ -85,79 +81,74 @@ flowchart LR
 
 ## Baseline without AI
 
-Describe the current manual process and the best realistic deterministic, rules-based, analytics, integration, workflow, or conventional-software alternative.
-
 - **Current baseline:**
-- **Stronger non-AI alternative:**
-- **Baseline cost or effort drivers:**
-- **Baseline quality and limitations:**
-- **Why intelligence should materially outperform it:**
-- **Condition under which the non-AI baseline should be preferred:**
+- **Strongest realistic non-AI alternative:**
+- **Baseline strengths:**
+- **Baseline limitations:**
+- **Context where intelligence may add incremental value:**
+- **Condition where the non-AI baseline should be preferred:**
 
-Reject or record `no-new-fit` when the non-AI baseline is likely cheaper, safer, and sufficiently effective for the target process.
+The existence of a strong baseline does not reject the opportunity. It defines what the prototype must beat or complement.
 
 ## Proposed solution
 
-Explain the process change before naming technologies. State what remains deterministic, where the intelligent capability changes the process or decision, where humans approve decisions, what systems must integrate, and how the design addresses relevant failed comparables.
+Describe the process change before naming technology. State what remains deterministic, where intelligence adds value, where humans decide, what systems integrate, and how known limitations affect scope.
 
 ## Intelligent capability
 
 - **Technique / model family:**
-- **Why it is necessary:** explain the value lost if this capability is removed.
-- **Inputs:** data, documents, audio, video, events, telemetry, context, labels, feedback, or simulation state consumed.
-- **Outputs:** prediction, extraction, classification, recommendation, generated artifact, ranked queue, action policy, or other result produced.
-- **Training / grounding / optimization:** describe training, fine-tuning, RAG grounding, prompt/evaluation data, simulation, reward signal, or inference-only assumptions.
-- **Evaluation:** define model, retrieval, recognition, ranking, policy, or business-quality metrics and compare against the non-AI baseline.
-- **Fallback and controls:** deterministic validation, human review, abstention threshold, rollback, safe default, or manual process.
+- **Why it is necessary:**
+- **Inputs:**
+- **Outputs:**
+- **Training / grounding / optimization assumptions:**
+- **Evaluation:** model or policy quality and comparison against baseline
+- **Fallback and controls:** deterministic validation, human review, abstention, rollback, or manual process
 
-Reject the opportunity if this section can only say that AI summarizes, chats about, or optionally assists a workflow that remains equally valuable without it.
+Reject decorative AI that leaves the workflow equally valuable without the model-based capability.
 
-## Data readiness
-
-Assess whether the required data can realistically support the proposed capability.
+## Data and integration assumptions
 
 - **Data owners and access path:**
-- **Volume, history, frequency, and coverage:**
-- **Labels or outcome feedback available:**
-- **Known quality, missingness, imbalance, and leakage risks:**
+- **Expected volume, history, frequency, and coverage:**
+- **Labels, outcomes, feedback, or simulation available:**
+- **Known quality, imbalance, missingness, and leakage risks:**
 - **Brazilian or local-context representativeness:**
-- **Privacy, retention, consent, surveillance, or data-sharing constraints:**
-- **Integration and synchronization risks:**
+- **Privacy, retention, consent, surveillance, or sharing constraints:**
+- **Integration and synchronization assumptions:**
 - **Drift and change sources:**
-- **Minimum viable dataset for a pilot:**
+- **Minimum viable data for a prototype:**
 
-Do not assume that operational systems contain clean labels merely because they contain transactions, images, documents, or events.
+Unknown labels, integration effort, adoption, or operating cost reduce confidence but do not automatically invalidate a prototype hypothesis.
 
-## Pilot, economics, and kill criteria
+## Prototype validation plan
 
-Define a bounded experiment rather than assuming full rollout.
+Define a bounded experiment rather than assuming rollout.
 
-- **Pilot population / process slice:**
-- **Duration or event volume:**
-- **Baseline or control group:**
-- **Required integrations and human effort:**
-- **Principal cost drivers:** capture, hardware, integration, inference, storage, model operations, support, and human review as applicable.
-- **Business success criteria:**
-- **Model-quality success criteria:**
-- **Adoption and workflow success criteria:**
-- **Safety or compliance stop conditions:**
-- **Kill criteria:** explicit thresholds that end or redesign the pilot when performance, cost, adoption, or risk is unacceptable.
-- **Scale decision:** what evidence is required before expanding stores, users, processes, regions, or automation authority.
+- **Prototype scope / process slice:**
+- **Users, sites, assets, documents, events, or simulated cases:**
+- **Baseline or comparison:**
+- **Required data and integrations:**
+- **Model-quality metrics:**
+- **Business or workflow metrics:**
+- **Human acceptance, correction, or override metrics:**
+- **Safety and compliance boundaries:**
+- **Failure or redesign criteria:**
+- **Evidence required before a pilot or broader implementation:**
 
-Do not invent ROI. State hypotheses, cost drivers, measurement methods, and decision thresholds.
+Do not invent ROI. Cost drivers may be listed as assumptions, not publication gates.
 
 ## Macro architecture
 
 ```mermaid
 flowchart LR
-  User[User system device or event] --> Entry[Portal API event workflow or edge intake]
-  Entry --> Core[Core solution services]
+  Input[User system device document event sensor or simulation] --> Intake[Capture API workflow integration or edge intake]
+  Intake --> Core[Core solution services]
   Core --> Data[Operational data knowledge labels or simulation]
-  Data --> Intelligence[Required AI ML recognition agent or optimization capability]
-  Intelligence --> Validation[Rules confidence evaluation and safety controls]
+  Data --> Intelligence[Required AI ML recognition agent or optimization]
+  Intelligence --> Validation[Rules confidence evaluation and controls]
   Validation --> Integration[Enterprise systems and workflow actions]
   Validation --> Human[Human review when required]
-  Core --> Audit[Observability audit business model and pilot metrics]
+  Core --> Metrics[Prototype model workflow and business metrics]
 ```
 
 ## Capabilities and possible technologies
@@ -166,7 +157,7 @@ flowchart LR
 - Data capabilities:
 - Integration capabilities:
 - Required AI / ML capabilities:
-- Training, fine-tuning, grounding, recognition, or optimization capabilities:
+- Training, grounding, recognition, or optimization capabilities:
 - Evaluation and model-operations capabilities:
 - Security and governance capabilities:
 - Azure services that may fit:
@@ -174,7 +165,7 @@ flowchart LR
 
 ## Possible gains
 
-Do not invent percentages. Describe plausible outcomes:
+Do not invent percentages.
 
 - [possible gain]
 - [possible gain]
@@ -183,43 +174,38 @@ Do not invent percentages. Describe plausible outcomes:
 
 ### Business and operational metrics
 
-- [baseline and target metric]
-- [quality or risk metric]
-- [operational or financial metric]
-- [cost per reviewed, detected, prevented, generated, or optimized outcome]
+- [baseline comparison]
+- [quality, risk, time, capacity, cost, or outcome metric]
 
 ### Intelligent-capability metrics
 
-- [accuracy, precision/recall, extraction quality, ranking quality, groundedness, policy reward, false-positive rate, abstention rate, or another appropriate metric]
-- [human acceptance, override, correction, or escalation metric]
-- [incremental value versus the non-AI baseline]
+- [accuracy, precision/recall, ranking quality, groundedness, reward, false-positive, abstention, or appropriate metric]
+- [human acceptance, override, correction, or escalation]
 
 ## Risks, limits, and controls
 
 - Privacy and sensitive data:
 - Brazilian regulatory or policy constraints:
 - Human decision boundaries:
-- Model, retrieval, recognition, or policy failure modes:
-- Comparable deployment failures and applicability:
+- Model or policy failure modes:
+- Comparable failures and applicable lessons:
 - Bias, drift, weak labels, or insufficient feedback:
-- Integration and data availability risks:
+- Integration and data risks:
 - Adoption and change-management risks:
-- Cost, latency, infrastructure, and operational-support risks:
+- Prototype cost or operational assumptions:
 
 ## Fit score
 
-Apply all hard caps from `radar-config.yaml` before publishing. Strong problem evidence, business value, reuse potential, or differentiation cannot compensate for weak technical feasibility.
+Technical feasibility means **whether a bounded prototype can be built and meaningfully tested**, not whether production success is already proven.
 
 | Dimension | Score | Rationale |
 | --- | ---: | --- |
-| Problem evidence and relevance | /20 | Include current Brazilian evidence and penalize foreign-only or stale support. |
-| Business or operational value | /20 | Evaluate measurable value against the current and non-AI baseline. |
-| Technical feasibility | /20 | Include solution evidence, counter-evidence, comparable failures, data readiness, integration, evaluation, operating cost, and model-operability realism in Brazil. |
+| Problem evidence and relevance | /20 | Current Brazilian evidence and specificity. |
+| Business or operational value | /20 | Plausible value if the hypothesis succeeds. |
+| Technical feasibility | /20 | Prototype testability, obtainable data or simulation, model plausibility, integration scope, controls, and counter-evidence. |
 | Reuse potential | /20 | |
-| Strategic differentiation | /20 | Explain the material contribution of the intelligent capability beyond deterministic alternatives. |
-| **Raw total** | **/100** | Sum before configured caps. |
-| **Applied cap** | **none or value** | Name the exact guardrail from `radar-config.yaml`. |
-| **Final total** | **/100** | Score after all caps. |
+| Strategic differentiation | /20 | Material advantage created by intelligence beyond deterministic automation. |
+| **Total** | **/100** | |
 
 ## Repository relationship
 
@@ -232,8 +218,8 @@ Apply all hard caps from `radar-config.yaml` before publishing. Strong problem e
 ## Duplicate control
 
 - **Problem keys:**
-- **Capability keys:** include the intelligent technique and required model behavior.
-- **Research queries used:** include Brazil-specific and counter-evidence queries.
+- **Capability keys:**
+- **Research queries used:** include Brazil-specific and counter-evidence queries
 - **Related opportunities:**
 - **Uniqueness statement:**
 
@@ -242,9 +228,9 @@ Apply all hard caps from `radar-config.yaml` before publishing. Strong problem e
 Choose one:
 
 - continue research;
+- prototype candidate;
 - shortlist for review;
-- approve for implementation planning;
-- park until a dependency or market signal changes;
+- park until a dependency or signal changes;
 - reject with reason.
 
-`Approve for implementation planning` requires explicit human decision and cannot be inferred from a high score.
+Implementation approval remains an explicit human decision.
