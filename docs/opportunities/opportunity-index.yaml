@@ -136,3 +136,13 @@ opportunities:
     complexity: medium
     status: hypothesis
     document: segments/professional-services/PROF-001-process-communication-deadline-assurance.md
+  - id: HOSP-001
+    title: AI-assisted hotel occupancy and operations forecasting
+    segment: hospitality-tourism
+    summary: Brazilian hotels can forecast probabilistic occupancy and operational workload from booking curves, cancellations, events, and local demand signals to recommend staffing and housekeeping capacity under manager control.
+    intelligent_capability: Probabilistic occupancy, cancellation, arrival, departure, and operational-workload forecasting with constrained staffing and housekeeping recommendations
+    ai_dependency: core
+    fit_score: 86
+    complexity: medium
+    status: hypothesis
+    document: segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md
