@@ -37,11 +37,36 @@ research:
     - academic-and-technical-research
     - mature-open-source-projects-and-reference-architectures
     - reputable-reporting
-  reject_marketing-only-evidence: true
+  reject_marketing_only_evidence: true
   record_queries: true
   record_sources: true
   record_publication_data_period_and_effective_dates: true
   distinguish_fact_from_inference: true
+  separate_problem_evidence_from_solution_evidence: true
+  require_counter_evidence_search: true
+  require_comparable_deployment_review_when_public: true
+  require_favorable_and_contrary_solution_evidence: true
+  counter_evidence_search_languages:
+    - pt-BR
+    - en
+  counter_evidence_search_concepts:
+    - failed
+    - cancelled
+    - discontinued
+    - rollback
+    - pilot-results
+    - accuracy-limitations
+    - false-positives
+    - low-adoption
+    - operating-cost
+    - falhou
+    - cancelado
+    - descontinuado
+    - resultados-de-piloto
+    - limitacoes-de-precisao
+    - falsos-positivos
+    - baixa-adocao
+    - custo-operacional
 
 intelligence_requirement:
   required: true
@@ -80,6 +105,15 @@ publication:
   require_brazil_applicability_section: true
   require_problem_evidence: true
   require_recent_brazilian_evidence: true
+  require_solution_evidence_level: true
+  require_operational_maturity: true
+  require_counter_evidence_section: true
+  require_non_ai_baseline: true
+  require_data_readiness_assessment: true
+  require_unit_economics_hypothesis: true
+  require_bounded_pilot_scope: true
+  require_success_criteria: true
+  require_kill_criteria: true
   require_macro_mermaid_architecture: true
   require_material_intelligent_capability: true
   require_possible_gains: true
@@ -88,6 +122,31 @@ publication:
   require_fit_breakdown: true
   require_duplicate_keys: true
   forbid_unsubstantiated_percentages: true
+
+solution_evidence_levels:
+  - conceptual
+  - prototype
+  - pilot
+  - production
+  - repeated-production
+
+operational_maturity_levels:
+  - unvalidated
+  - early
+  - proven
+
+fit_guardrails:
+  minimum_technical_feasibility_for_non_research_publish: 10
+  no_comparable_production_evidence_max_technical_feasibility: 12
+  announcement_demo_or_unmeasured_pilot_max_technical_feasibility: 10
+  unmitigated_comparable_failure_max_technical_feasibility: 8
+  unmitigated_comparable_failure_max_total_fit: 69
+  high_confidence_requires_comparable_production_evidence: true
+  high_confidence_requires_realistic_data_readiness: true
+  high_confidence_forbidden_with_unresolved_comparable_failure: true
+  large_or_research_complexity_requires_operational_maturity_rationale: true
+  technical_feasibility_below_minimum_allowed_only_for_research_bet: true
+  problem_business_reuse_and_differentiation_cannot_override_feasibility_cap: true
 
 fit_dimensions:
   - id: problem-evidence
