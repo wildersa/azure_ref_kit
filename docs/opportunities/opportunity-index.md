@@ -6,10 +6,10 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 28 |
+| Opportunities | 29 |
 | Segments configured | 18 |
-| Completed research cycles | 1 |
-| Current segment | `nonprofit` |
+| Completed research cycles | 2 |
+| Current segment | `cross-industry` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -46,6 +46,7 @@ Every active published opportunity must appear here as one concise row. Rejected
 | TECH-001 | [AI-assisted context-aware vulnerability remediation prioritization](segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md) | technology-software | Brazilian software and platform teams can combine vulnerability intelligence with asset exposure, dependency, runtime, ownership, and business-impact signals to rank remediation work and produce auditable evidence under security-engineer control. | Context-aware vulnerability-to-asset matching, exploit-risk prediction, attack-path inference, and remediation-priority ranking | 89 | large | hypothesis |
 | TECH-002 | [Privacy-safe tenant incident reproduction assurance](segments/technology-software/TECH-002-privacy-safe-tenant-incident-reproduction.md) | technology-software | Brazilian SaaS teams can reconstruct privacy-minimized tenant-specific failure states from support evidence and telemetry, then generate reviewable reproduction scripts and regression tests without copying unrestricted production data. | Evidence-grounded failure-state reconstruction, tenant-context minimization, governed sandbox reproduction, and regression-test synthesis | 82 | large | hypothesis |
 | NONPROFIT-001 | [AI-assisted donor-retention uplift and outreach orchestration](segments/nonprofit/NONPROFIT-001-donor-retention-uplift-orchestration.md) | nonprofit | Brazilian OSCs can estimate which donors are likely to lapse and which bounded outreach may causally improve retention, prioritizing human-approved campaigns without inferring sensitive traits or automating solicitation. | Donor-lapse prediction and causal uplift ranking for bounded retention interventions | 87 | medium | hypothesis |
+| NONPROFIT-002 | [AI-assisted program evidence-chain assurance](segments/nonprofit/NONPROFIT-002-program-evidence-chain-assurance.md) | nonprofit | Brazilian OSCs can connect plans, activities, beneficiary records, expenses, and field evidence to funder-specific outcomes, using multimodal extraction and contradiction detection to flag unsupported claims before human-approved reporting. | Multimodal evidence extraction, indicator mapping, cross-document contradiction detection, and unsupported-claim review ranking | 81 | medium | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
