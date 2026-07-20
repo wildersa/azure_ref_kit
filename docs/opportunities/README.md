@@ -1,47 +1,44 @@
 # Solution Opportunity Radar
 
-This area tracks current Brazilian business and operational problems that may justify AI-enabled software, data, automation, integration, machine learning, recognition, prediction, optimization, agents, or related solutions.
+This area tracks AI-enabled solution opportunities derived from **simulated business and operational work** across Brazilian market segments.
 
-The radar is intentionally broader than the current Azure Reference Kit catalog. Every published opportunity must include a material intelligent capability, but conventional software, integration, deterministic controls, hardware, and human review may form most of the architecture.
+The radar is broader than the current Azure Reference Kit catalog. Every active opportunity must include a material intelligent capability, but conventional software, integration, deterministic controls, hardware, and human review may form most of the architecture.
 
 ## Purpose
 
-The radar discovers **credible, testable solution hypotheses**.
+The radar discovers **credible, differentiated, testable hypotheses** by acting like an operational observer:
+
+1. choose a real actor and bounded activity;
+2. simulate how the work proceeds under normal, exception, and degraded conditions;
+3. expose decisions, uncertainty, delays, rework, handoffs, and missed outcomes;
+4. test whether ordinary software or process improvement is sufficient;
+5. formulate candidate intelligent interventions for the remaining gaps;
+6. use external research to validate relevance, regulation, plausibility, and novelty;
+7. define a bounded prototype and measurable comparison.
 
 It is not:
 
 - a procurement approval process;
+- a vendor catalog;
+- a market-report summarizer;
 - a requirement for an existing Brazilian production deployment;
 - proof of ROI;
 - an implementation backlog by default.
 
-A useful opportunity can be published before production validation when it has:
-
-- a specific current Brazilian problem;
-- a defined actor and process;
-- a plausible material intelligent capability;
-- a realistic data or simulation path;
-- a bounded prototype validation plan;
-- explicit risks, assumptions, counter-evidence, and human controls.
-
 ## Core principle
 
 ```text
-real Brazilian problem
-→ actor and affected process
-→ current baseline
-→ solution hypothesis
-→ material intelligent capability
-→ data and integration assumptions
+operational simulation
+→ decision, exception, uncertainty, or coordination gap
+→ deterministic baseline test
+→ candidate intelligent intervention
+→ Brazilian problem and regulatory validation
+→ existing-solution novelty check
 → bounded prototype and measurable comparison
-→ risks, counter-evidence and controls
-→ fit and confidence
-→ optional human-approved implementation planning
+→ risks, controls, confidence, and fit
 ```
 
-Problem evidence proves that the opportunity matters. Solution evidence changes confidence and maturity. Prototype design proves that the hypothesis can be tested.
-
-Lack of production evidence does not reject a hypothesis by itself.
+Research follows the initial simulation. It validates or contradicts the hypothesis; it must not become the only source of ideas.
 
 ## Files
 
@@ -58,9 +55,120 @@ docs/opportunities/
 └─ segments/
 ```
 
+## Operational simulation method
+
+Each round selects a concrete organization and actor archetype in the current segment.
+
+The simulation must define:
+
+- organization type and approximate size;
+- actor role and decision authority;
+- bounded process, trigger, objective, and completion condition;
+- inputs, systems, documents, devices, data, and physical context;
+- rules, deadlines, cost, safety, and regulatory constraints;
+- upstream and downstream handoffs.
+
+At minimum, trace:
+
+### Normal flow
+
+Routine work with expected data, expected system behavior, and ordinary staffing.
+
+### Exception flow
+
+Incomplete, contradictory, unusual, ambiguous, or high-risk inputs that require judgment or escalation.
+
+### Peak or degraded flow
+
+Volume spikes, staff shortage, system delay, equipment degradation, communication loss, deadline pressure, or another operating stressor.
+
+For each scenario, identify:
+
+- information available at each step;
+- manual actions and system interactions;
+- decisions and judgment calls;
+- uncertainty and missing context;
+- queues, handoffs, waiting, re-entry, and reconciliation;
+- errors, false alarms, missed cases, rework, loss, delay, safety, or service consequences;
+- outcomes and corrections that may become labels, feedback, rewards, or evaluation signals.
+
+Simulated details are not facts. The brief must label assumptions and synthetic events explicitly.
+
+## Candidate generation
+
+Candidate interventions must be derived from the simulated process before broad product or market searches.
+
+Useful questions include:
+
+- What must the actor recognize or extract from noisy information?
+- What future event, demand, failure, duration, or outcome must be predicted?
+- Which cases, actions, resources, or inspections must be ranked?
+- Which constrained plan, schedule, route, allocation, or control policy must be optimized?
+- Which knowledge must be retrieved and grounded in a decision?
+- Which multimodal evidence must be compared?
+- Is there a real multi-step goal requiring a governed agent and tools?
+
+Before accepting an AI candidate, test whether the same gap is adequately solved by:
+
+- process redesign;
+- forms and mandatory structured fields;
+- system integration;
+- deterministic rules;
+- search and filters;
+- analytics or dashboards;
+- alerts, queues, or workflow automation.
+
+A strong deterministic solution is the preferred answer when it closes the gap.
+
+## Role of external research
+
+Research is required after candidate generation to:
+
+- confirm the load-bearing problem is current in Brazil;
+- verify Brazilian regulation or official operating guidance;
+- validate or challenge simulation assumptions;
+- find existing official, commercial, sector, roadmap, API, tender, and open-source solutions;
+- support technical plausibility;
+- identify failures, false positives, adoption barriers, and costs;
+- narrow scope and define prototype failure criteria.
+
+Do not require a citation for every simulated micro-step. Require evidence for:
+
+- the load-bearing Brazilian problem;
+- regulatory and legal claims;
+- market and operating-scale claims;
+- existing-solution capabilities and roadmaps;
+- claims of demonstrated outcomes.
+
+Every active opportunity needs at least one load-bearing Brazilian source published or materially updated within the previous 18 months. Regulated opportunities also need current Brazilian official or regulatory context.
+
+## Existing-solution guardrail
+
+The radar must not present an existing solution as a new opportunity.
+
+Review, when relevant:
+
+- official and regulator platforms;
+- government systems and roadmaps;
+- commercial and sector products;
+- recent launches and announced capabilities;
+- APIs and extension points;
+- public tenders and procurement records;
+- maintained open-source solutions.
+
+Choose one disposition:
+
+- `build`: no adequate current solution covers the specific gap;
+- `extend`: an existing platform needs a material differentiated capability;
+- `integrate`: value comes from connecting existing systems around a distinct gap;
+- `adopt`: the current need is adequately addressed;
+- `no-new-fit`: no separate differentiated opportunity remains.
+
+Changing cloud, model vendor, architecture, or UI is not differentiation. Generic RAG, clustering, dashboards, agents, or ranking are not differentiation unless they change a material process or measurable outcome.
+
 ## Intelligent-capability requirement
 
-At least one model-based capability must be `supporting` or `core`, such as:
+Every active opportunity requires at least one material model-based capability with `ai_dependency: supporting|core`, such as:
 
 - model training or fine-tuning;
 - generative AI with grounding and evaluation;
@@ -72,164 +180,100 @@ At least one model-based capability must be `supporting` or `core`, such as:
 - optimization or reinforcement learning;
 - multimodal inference.
 
-A chat box, summary button, or optional assistant added to an otherwise unchanged workflow does not qualify.
+A chat box, summary button, generic copilot, or optional assistant added to an unchanged workflow does not qualify.
 
 Every opportunity must define:
 
-- why the intelligent capability matters;
-- its inputs and outputs;
-- model-use, training, grounding, or optimization assumptions;
+- the exact process stage and decision where intelligence enters;
+- inputs and outputs;
+- training, grounding, simulation, inference, or optimization assumptions;
 - evaluation metrics;
-- fallback, abstention, deterministic validation, or human review.
+- fallback, abstention, deterministic validation, rollback, and human review.
 
 ## Evidence model
 
 Separate:
 
-- **problem evidence:** confirms the pain, cost, delay, risk, or interruption;
-- **favorable solution evidence:** supports technical or operational plausibility;
-- **counter-evidence:** failed pilots, cancellations, limitations, false alerts, adoption problems, cost concerns, or strong conventional alternatives;
+- **simulated observation:** a workflow-derived assumption;
+- **problem evidence:** confirms current pain, delay, risk, loss, interruption, or unmet need;
+- **existing-solution evidence:** confirms what is available or planned;
+- **favorable evidence:** supports plausibility of the uncovered intervention;
+- **counter-evidence:** failures, limitations, false alerts, adoption issues, cost, or strong alternatives;
 - **inference:** reasoned implication not directly proven;
-- **unknowns:** facts requiring prototype, pilot, customer data, integration test, or legal review.
+- **unknowns:** facts requiring observation, customer data, prototype, pilot, integration test, or legal review.
 
-Counter-evidence is normally a design input. It can reduce confidence, narrow scope, strengthen human controls, or define prototype failure criteria. It is not automatically a reason to reject the opportunity.
+Counter-evidence normally changes scope, confidence, controls, or failure criteria. It is not automatically a rejection.
 
-## Prototype-first validation
+## Simulation breadth
 
-The opportunity must define:
+Before returning `no-new-fit`, the watcher must simulate at least three materially different workflows or scenario variants when the segment supports them.
 
-- the current manual or system baseline;
-- the strongest realistic non-AI alternative;
-- the context in which intelligence may add incremental value;
-- expected data sources, labels or feedback, quality risks, privacy, drift, and integration assumptions;
-- a bounded prototype scope;
-- model, workflow, business, adoption, and safety metrics;
-- failure, redesign, and scale criteria.
+Vary:
 
-Unknown local false-positive rates, integration effort, labels, cost, or adoption belong in the prototype plan. They do not automatically invalidate discovery.
+- actor and authority;
+- front-office, back-office, field, physical, analytical, or supervisory work;
+- normal, exception, peak, degraded, safety, and recovery conditions;
+- organization size and maturity;
+- structured, text, document, image, speech, event, sensor, spatial, graph, and time-series data;
+- batch, synchronous, asynchronous, mobile, edge, and human-in-the-loop interaction.
 
-## Search breadth
-
-Each run processes one enabled segment. Before returning `no-new-fit`, the watcher must investigate at least three materially different problem themes when sources are available.
-
-Do not evaluate only one generic pattern and declare the segment empty. Vary:
-
-- actor and process;
-- problem family;
-- company size and maturity;
-- model family and data type;
-- software, sensor, edge, document, speech, vision, prediction, ranking, optimization, or agentic architecture.
-
-## Research expectations
-
-Use multiple source types when possible:
-
-1. current Brazilian regulators, institutions, official statistics, and standards;
-2. Brazilian industry research, tenders, operational reports, and credible cases;
-3. international technical research, standards, and comparable solution patterns;
-4. operational guides, incident reports, failure reports, and process documentation;
-5. academic and technical research;
-6. mature open-source projects and public architectures;
-7. reputable reporting.
-
-Marketing claims cannot prove the Brazilian problem. They may be recorded as limited evidence of solution direction when clearly labeled.
+The requirement is not “three search themes.” It is three believable operational views.
 
 ## Opportunity quality gate
 
-Publish when the opportunity contains:
+Publish only when the opportunity contains:
 
-- a specific actor, process, company profile, and current Brazilian problem;
-- recent Brazilian problem evidence;
-- current Brazilian official context when regulated;
-- a process-changing solution hypothesis;
-- a material intelligent capability;
-- a plausible data, model, integration, or simulation path;
-- a baseline comparison;
-- favorable evidence, counter-evidence, inference, and unknowns;
-- a bounded prototype validation plan;
-- macro architecture, risks, controls, metrics, and fit rationale;
-- duplicate-control keys and a uniqueness statement.
+- a concrete operational simulation with explicit assumptions;
+- a specific actor, process, and current Brazilian problem;
+- at least one material decision, exception, uncertainty, or coordination gap;
+- a deterministic baseline test;
+- an existing-solution landscape and explicit `build|extend|integrate` disposition;
+- a material uncovered gap and differentiation statement;
+- a necessary intelligent capability;
+- a plausible data, feedback, integration, or simulation path;
+- a bounded prototype;
+- model, workflow, business, adoption, and safety metrics;
+- failure, redesign, and scale criteria;
+- risks, controls, fit rationale, duplicate keys, and uniqueness statement.
 
-Production deployment, proven ROI, known local error rates, completed integration, and demonstrated employee adoption are not publication requirements for a `hypothesis`.
+Production deployment, proven ROI, known local error rates, completed integration, and demonstrated adoption are not requirements for a `hypothesis`.
 
 ## Valid `no-new-fit`
 
-Use `no-new-fit` only when:
+Use `no-new-fit` only after adequate simulation and novelty research when:
 
-- no current Brazilian evidence supports a specific problem;
-- the candidate duplicates an existing opportunity;
+- no current Brazilian evidence supports any load-bearing simulated problem;
+- all viable candidates duplicate repository opportunities;
+- an existing solution covers the actor, process, capability, and outcome without a material gap;
+- adoption or configuration is sufficient;
+- deterministic software or process improvement is sufficient;
 - AI is decorative or unnecessary;
-- no plausible prototype path can be defined;
-- the central mechanism is invalidated without credible mitigation;
-- the idea cannot be narrowed to a concrete actor, process, and measurable outcome.
+- no plausible data, feedback, model, integration, simulation, or prototype path exists;
+- the central mechanism is invalidated without mitigation;
+- no candidate can be narrowed to a concrete actor, process, and measurable outcome.
 
-Do not use `no-new-fit` merely because production validation, ROI, local metrics, labels, integrations, adoption, or cost are still unknown.
+Failure of external research to suggest an idea is not a valid `no-new-fit` reason.
 
 ## Fit score
 
-The symbolic fit score is a discovery aid, not a financial forecast.
+The fit score is a discovery aid, not a financial forecast.
 
 | Dimension | Range | Meaning |
 | --- | ---: | --- |
-| Problem evidence and relevance | 0–20 | Strength and specificity of current Brazilian evidence |
-| Business or operational value | 0–20 | Plausible value if the hypothesis succeeds |
+| Process-opportunity fit | 0–20 | Materiality and specificity of the simulated decision, exception, uncertainty, or coordination gap |
+| Business or operational value | 0–20 | Plausible value if the intervention works |
 | Technical feasibility | 0–20 | Whether a bounded prototype can be built and meaningfully tested |
-| Reuse potential | 0–20 | Applicability across organizations or repeated contexts |
-| Strategic differentiation | 0–20 | Material intelligent advantage beyond deterministic automation |
+| Reuse potential | 0–20 | Applicability across repeated workflows or organizations |
+| Strategic differentiation | 0–20 | Uncovered capability or outcome beyond existing solutions and deterministic automation |
 
-Record separately:
+Record confidence, complexity, horizon, risk, solution evidence, operational maturity, Azure fit, and AI dependency separately.
 
-- confidence;
-- complexity;
-- horizon;
-- risk;
-- solution evidence level;
-- operational maturity;
-- Azure fit;
-- AI dependency.
-
-Use `confidence: high` and `operational maturity: proven` only with strong production evidence. Lower confidence is valid for publishable prototype hypotheses.
-
-## Status lifecycle
+## Status and boundaries
 
 ```text
-hypothesis
-→ researched
-→ shortlisted
-→ approved
-→ implementing
-→ implemented
+hypothesis → researched → shortlisted → approved → implementing → implemented
 ```
 
-Alternative states:
+Alternative states: `rejected`, `superseded`, and `parked`.
 
-```text
-rejected
-superseded
-parked
-```
-
-The watcher may create and update opportunities, indexes, state, and history. It must not open implementation issues or approve implementation without explicit human direction.
-
-## Duplicate prevention
-
-Each opportunity must record:
-
-- `problem_keys`;
-- `capability_keys`;
-- research queries, including counter-evidence searches;
-- related opportunities;
-- a concise uniqueness statement.
-
-A different model applied to the same process is not automatically a new opportunity.
-
-## Relationship to Azure Reference Kit
-
-Classify repository alignment as:
-
-- `reuse-existing`;
-- `extend-kit`;
-- `new-solution`;
-- `outside-current-kit`.
-
-Repository alignment is descriptive and must not inflate the fit score.
+The watcher may create and update opportunities, indexes, state, and history. It must not open implementation issues, add runtime code, or approve implementation without explicit human direction.
