@@ -2,14 +2,44 @@ schema_version: 1
 
 radar:
   mode: round-robin
+  discovery_mode: workflow-simulation-first
   opportunities_per_run: 1
   allow_no_new_fit: true
   minimum_fit_to_publish: 55
   minimum_sources: 1
-  minimum_distinct_problem_themes_before_no_new_fit: 3
-  prefer_multiple_source_types: true
+  minimum_workflow_simulations_before_no_new_fit: 3
   implementation_issue_creation: disabled
   return_to_first_segment_after_cycle: true
+
+operational_simulation:
+  required: true
+  run_before_broad_web_research: true
+  require_candidate_generation_before_solution_search: true
+  organization_archetype_required: true
+  actor_role_required: true
+  bounded_process_required: true
+  required_scenarios:
+    - normal-flow
+    - exception-flow
+    - peak-or-degraded-flow
+  required_trace_fields:
+    - trigger
+    - expected-outcome
+    - actors-and-handoffs
+    - inputs-and-systems
+    - information-available-at-each-step
+    - decisions-and-judgment
+    - uncertainty-and-missing-context
+    - queues-waiting-rework-and-reconciliation
+    - failure-or-loss-consequence
+    - feedback-label-reward-or-correction-signal
+  allow_explicit_operational_assumptions: true
+  allow_synthetic_events_and_cases: true
+  require_assumptions_to_be_labeled: true
+  require_deterministic_alternative_test: true
+  require_ai_candidate_to_map_to_specific_decision_exception_or_uncertainty: true
+  research_validates_simulation_not_replaces_it: true
+  do_not_require_source_for_every_simulated_microstep: true
 
 market_context:
   default_primary_market: Brazil
@@ -26,22 +56,24 @@ market_context:
   reject_imported_foreign_legal_assumptions: true
 
 research:
+  required: true
+  role: validate-context-regulation-plausibility-counterevidence-and-novelty
+  run_after_initial_operational_simulation: true
   require_current_web_research: true
   source_priority:
     - brazilian-regulators-public-institutions-and-official-statistics
-    - brazilian-industry-associations-sector-research-public-tenders-and-local-cases
-    - official-platform-product-api-and-roadmap-documentation
+    - brazilian-industry-associations-operational-reports-public-tenders-and-local-cases
+    - official-platform-product-api-release-and-roadmap-documentation
     - current-commercial-sector-and-open-source-solution-documentation
+    - operational-guides-incident-reports-and-process-documentation
     - current-international-regulators-standards-and-technical-research
-    - operational-guides-public-tenders-and-incident-reports
     - academic-and-technical-research
     - reputable-reporting
   reject_marketing_only_problem_evidence: true
   allow_vendor_or_case_evidence_for_solution_plausibility_when_labeled: true
   record_queries: true
   record_sources: true
-  distinguish_fact_from_inference: true
-  separate_problem_evidence_from_solution_evidence: true
+  distinguish_simulated_observation_fact_inference_and_unknown: true
   require_counter_evidence_search: true
   counter_evidence_is_design_input_not_default_rejection: true
   absence_of_production_evidence_is_not_rejection: true
@@ -49,23 +81,19 @@ research:
 
 existing_solution_landscape:
   required: true
+  role: novelty-and-positioning-guardrail
+  run_after_candidate_generation: true
   require_current_official_platform_search: true
   require_current_product_and_vendor_search: true
   require_public_roadmap_and_release_note_review_when_available: true
   require_open_source_search_when_relevant: true
   require_api_and_integration_documentation_review_when_available: true
-  required_disposition:
-    - build
-    - extend
-    - integrate
-    - adopt
-    - no-new-fit
-  require_current_capability_summary: true
-  require_actor_process_capability_outcome_overlap_analysis: true
+  required_disposition: [build, extend, integrate, adopt, no-new-fit]
+  require_actor_process_capability_integration_authority_outcome_comparison: true
   require_material_uncovered_gap: true
   require_differentiation_statement: true
   reject_new_solution_framing_when_core_solution_exists: true
-  cloud_model_vendor_or_ui_change_is_not_differentiation: true
+  cloud_model_vendor_ui_or_architecture_change_is_not_differentiation: true
   generic_agent_rag_clustering_dashboard_or_ranking_is_not_differentiation: true
   roadmap_capability_counts_as_existing_landscape: true
   adoption_is_valid_no_new_fit_outcome: true
@@ -90,8 +118,10 @@ intelligence_requirement:
     - optimization-and-reinforcement-learning
     - multimodal-models
     - other-explicit-model-based-capability
+  require_process_stage_and_decision_mapping: true
   require_business_necessity: true
   require_inputs_and_outputs: true
+  require_training_grounding_inference_or_optimization_assumptions: true
   require_evaluation_plan: true
   require_deterministic_or_human_fallback: true
   require_explicit_ai_role_map: true
@@ -99,27 +129,24 @@ intelligence_requirement:
 
 publication:
   default_new_status: hypothesis
+  require_operational_simulation_section: true
+  require_normal_exception_and_peak_or_degraded_scenarios: true
+  require_simulated_observations_and_assumptions: true
   require_specific_actor: true
   require_specific_process: true
   require_primary_market_and_jurisdiction: true
   require_brazil_applicability_section: true
-  require_problem_evidence: true
-  require_recent_brazilian_evidence: true
+  require_recent_brazilian_problem_evidence: true
   require_existing_solutions_and_differentiation_section: true
-  require_build_extend_integrate_adopt_or_no_new_fit_disposition: true
+  require_build_extend_or_integrate_disposition_for_active_opportunity: true
   require_material_uncovered_gap: true
-  require_solution_evidence_level: true
-  require_operational_maturity: true
-  require_counter_evidence_section: true
-  require_non_ai_and_existing_product_baseline: true
-  require_data_assumptions: true
+  require_existing_product_and_non_ai_baselines: true
+  require_data_feedback_and_simulation_assumptions: true
   require_bounded_prototype_scope: true
-  require_validation_metrics: true
-  require_failure_or_redesign_criteria: true
+  require_model_workflow_business_adoption_and_safety_metrics: true
+  require_failure_redesign_and_scale_criteria: true
   require_macro_mermaid_architecture: true
   require_material_intelligent_capability: true
-  require_possible_gains: true
-  require_risks_and_constraints: true
   require_fit_breakdown: true
   require_duplicate_keys: true
   forbid_unsubstantiated_percentages: true
@@ -132,34 +159,35 @@ solution_evidence_levels: [conceptual, prototype, pilot, production, repeated-pr
 operational_maturity_levels: [unvalidated, early, proven]
 
 confidence_rules:
-  low: plausible differentiated hypothesis with major unknowns
-  medium: differentiated hypothesis supported by technical research, comparable patterns, prototype, or pilot evidence
+  low: simulation-derived differentiated hypothesis with major unknowns
+  medium: differentiated hypothesis supported by current problem and technical evidence
   high: supported by credible comparable production evidence and realistic data readiness
 
 fit_guardrails:
   technical_feasibility_means_prototype_testability: true
+  process_opportunity_fit_must_come_from_simulation: true
   minimum_technical_feasibility_to_publish: 8
-  no_production_evidence_score_cap: disabled
   deterministic_baseline_is_comparison_not_rejection: true
   unresolved_unknowns_reduce_confidence_not_automatic_fit: true
   core_existing_solution_overlap_without_material_gap_max_strategic_differentiation: 4
   core_existing_solution_overlap_without_material_gap_max_total_fit: 54
-  invalid_new_solution_framing_requires_reject_or_reframe: true
   core_mechanism_invalidated_without_mitigation_max_technical_feasibility: 7
   core_mechanism_invalidated_without_mitigation_max_total_fit: 54
 
 valid_no_new_fit_reasons:
-  - no-current-brazilian-problem-evidence
+  - no-current-brazilian-problem-evidence-after-simulation
   - duplicate-of-existing-repository-opportunity
   - duplicate-of-current-official-commercial-sector-or-open-source-solution
-  - existing-platform-adoption-or-extension-is-sufficient
+  - existing-platform-adoption-or-configuration-is-sufficient
+  - deterministic-process-or-software-improvement-is-sufficient
   - no-material-uncovered-gap
   - decorative-or-unnecessary-ai
-  - no-plausible-data-model-integration-simulation-or-prototype-path
+  - no-plausible-data-model-integration-feedback-simulation-or-prototype-path
   - central-mechanism-invalidated-without-credible-mitigation
   - generic-candidate-cannot-be-narrowed
 
 invalid_no_new_fit_reasons:
+  - external-research-did-not-suggest-an-idea
   - no-brazilian-production-deployment
   - no-local-false-positive-rate
   - roi-not-yet-proven
@@ -168,7 +196,7 @@ invalid_no_new_fit_reasons:
   - prototype-still-required
 
 fit_dimensions:
-  - {id: problem-evidence, max_score: 20}
+  - {id: process-opportunity-fit, max_score: 20}
   - {id: business-value, max_score: 20}
   - {id: technical-feasibility, max_score: 20}
   - {id: reuse-potential, max_score: 20}
