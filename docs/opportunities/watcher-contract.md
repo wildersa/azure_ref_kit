@@ -4,38 +4,38 @@
 
 Execute one evidence-based discovery round for the current business segment and maintain the Solution Opportunity Radar.
 
-The radar exists to discover **credible, testable solution hypotheses**. It is not a procurement gate, an investment committee, or a requirement that the solution already be proven in Brazilian production.
+The radar discovers **credible, differentiated, testable solution hypotheses**. It is not a procurement gate and does not require an existing Brazilian production deployment, proven ROI, completed integration, clean labels, or demonstrated adoption before publishing a hypothesis.
 
-Every published opportunity must include:
+It also must not present an already available platform, product, official roadmap capability, or mature open-source solution as a new opportunity.
+
+Every active opportunity must include:
 
 - a current and specific Brazilian problem;
 - a defined actor and operational process;
+- a current existing-solution landscape;
+- a material gap or distinct outcome not already delivered;
 - a material intelligent capability;
-- an explicit explanation of where each AI component enters the process;
+- an explicit explanation of where each AI component enters;
 - a plausible data and integration path;
 - a bounded prototype or experiment;
-- explicit assumptions, risks, counter-evidence, and failure criteria.
-
-Conventional software, integration, workflow, hardware, deterministic controls, and human review may form most of the architecture. The intelligent capability must still materially change the process or outcome.
+- assumptions, risks, counter-evidence, failure criteria, and human controls.
 
 ## Core decision rule
 
 ```text
 problem evidence proves that the opportunity matters
+existing-solution research proves whether it is actually an opportunity
 solution evidence changes confidence and maturity
-prototype design proves that the hypothesis is testable
+prototype design proves that the remaining hypothesis is testable
 ```
 
-Lack of a comparable Brazilian production deployment does not justify `no-new-fit` by itself.
+A known solution does not automatically eliminate every adjacent opportunity. It changes the required framing:
 
-A credible problem-grounded proposal may be published as:
-
-- `status: hypothesis`;
-- `confidence: low|medium`;
-- `solution_evidence_level: conceptual|prototype|pilot`;
-- `operational_maturity: unvalidated|early`.
-
-Production evidence is required only for claims such as `confidence: high`, `operational_maturity: proven`, or proven business impact.
+- **build:** no adequate current solution covers the defined gap;
+- **extend:** an existing platform should receive a clearly differentiated capability;
+- **integrate:** value comes from connecting existing systems or models around a distinct process gap;
+- **adopt:** the need is already adequately addressed and the correct recommendation is adoption, not a new opportunity;
+- **no-new-fit:** the candidate substantially duplicates an existing solution without a material uncovered gap.
 
 ## Default market and date context
 
@@ -48,11 +48,11 @@ Every run must:
 - prove that the problem exists or is materially applicable in Brazil;
 - prefer current Brazilian regulators, public institutions, official statistics, industry associations, public tenders, operational reports, and credible local cases;
 - use current Brazilian rules or operating guidance for regulated sectors;
-- distinguish publication date, data period, rule-effective date, and current validity.
+- distinguish publication date, data period, rule-effective date, roadmap date, launch date, and current validity.
 
-At least one load-bearing Brazilian source published or materially updated within the previous 18 months is required. Regulated opportunities also require a current Brazilian official or regulatory source.
+At least one load-bearing Brazilian problem source published or materially updated within the previous 18 months is required. Regulated opportunities also require a current Brazilian official or regulatory source.
 
-Foreign evidence may support technical plausibility, comparable implementations, architecture, limitations, or failures. It must not define Brazilian law, liability, reimbursement, market structure, or operating assumptions.
+Foreign evidence may support technical plausibility, architecture, limitations, failures, or existing-solution comparison. It must not define Brazilian law, liability, reimbursement, market structure, or operating assumptions.
 
 ## Required repository sources
 
@@ -71,162 +71,140 @@ Use the index first. Open full opportunity documents only for plausible duplicat
 ## One-run workflow
 
 1. Read the current round-robin segment and its `next_focus`.
-2. Review recent history and existing opportunities.
-3. Research several current Brazilian problems within the segment; do not stop at the first familiar theme.
+2. Review recent history and existing repository opportunities.
+3. Research at least three materially different current Brazilian problem themes when sources are available.
 4. Select the strongest specific problem with a plausible material intelligent capability.
-5. Research solution patterns, comparable successes, limitations, failures, and conventional alternatives.
-6. Separate confirmed problem evidence, favorable solution evidence, counter-evidence, inference, and unknowns.
-7. Define the current baseline, why intelligence may add value, required data, a bounded prototype, and measurable validation criteria.
-8. Build the explicit AI role map required below.
-9. Check semantic duplication.
-10. Publish at most one opportunity, normally as a grounded hypothesis unless stronger evidence supports higher maturity.
-11. Use `no-new-fit` only under the explicit conditions below.
-12. Update the complete document, indexes, history, segment state, `next_focus`, and cursor.
-13. Commit documentation changes directly to `main`.
+5. Search the current solution landscape before drafting: official platforms, regulator or government systems, vendor products, sector platforms, startups, public roadmaps, recent launches, public tenders, reference implementations, and mature open source.
+6. Compare actor, process, inputs, outputs, intelligent mechanism, integrations, authority, and measured outcome against existing solutions.
+7. Decide `build`, `extend`, `integrate`, `adopt`, or `no-new-fit`.
+8. Research comparable successes, limitations, failures, cancellations, and conventional alternatives.
+9. Separate confirmed problem evidence, existing-solution facts, favorable solution evidence, counter-evidence, inference, and unknowns.
+10. Define the baseline, differentiated gap, required data, bounded prototype, AI role map, and validation criteria.
+11. Check semantic duplication against the repository and external solution landscape.
+12. Publish at most one differentiated opportunity, normally as `hypothesis`.
+13. Update the full document, active indexes, history, segment state, `next_focus`, and cursor.
+14. Commit documentation changes directly to `main`.
 
-## Search breadth requirement
+## Search breadth
 
-Before concluding `no-new-fit`, investigate at least three materially different problem themes when sources are available.
-
-Vary:
+Do not evaluate one generic theme and declare the segment empty. Vary:
 
 - actor and process;
-- problem type, such as quality, defects, exceptions, loss, fraud, delay, safety, compliance, capacity, maintenance, demand, scheduling, inspection, service recovery, or optimization;
-- intelligent technique, such as vision, speech, document recognition, prediction, ranking, anomaly detection, optimization, agents, RAG, or multimodal models;
-- company size, data type, interaction model, and architecture shape.
+- problem family;
+- company or institution size;
+- data type and integration shape;
+- model family and intelligent technique;
+- software, edge, hardware-assisted, multimodal, optimization, simulation, or agent architecture.
 
-Do not test one generic idea such as predictive maintenance, a generic copilot, generic anomaly detection, or generic computer vision and then declare the segment empty.
+## Mandatory existing-solution landscape
+
+Before publication, search current solutions using the exact actor and process plus terms such as:
+
+- plataforma, sistema, software, produto, serviço, inteligência artificial, automação, lançamento, roadmap, piloto, API, edital, fornecedor;
+- platform, product, software, solution, AI, automation, launch, roadmap, API, procurement, vendor, open source.
+
+Prefer official product documentation, regulator or government pages, release notes, current roadmaps, API documentation, public procurement records, and maintained repositories over generic market articles.
+
+Every brief must include an `Existing solutions and differentiation` section with:
+
+- **Existing solutions reviewed:** name, owner/vendor, current date, and evidence;
+- **Current capabilities:** what each solution already performs;
+- **Overlap:** actor, process, capability, integration, and outcome already covered;
+- **Uncovered gap:** precise missing capability or underserved context;
+- **Disposition:** build | extend | integrate | adopt | no-new-fit;
+- **Differentiation statement:** why the candidate is not merely a renamed existing solution.
+
+Apply these rules:
+
+- an existing solution covering the same actor, process, central capability, and outcome invalidates a `new-solution` framing;
+- a roadmap or recently launched capability counts as existing landscape even when rollout is incomplete;
+- changing the cloud provider, model vendor, UI, or architecture does not create a new opportunity;
+- adding generic clustering, dashboards, RAG, an agent, or a ranking layer is not differentiation unless it changes a material process or measurable outcome;
+- an extension is valid only when the uncovered gap is specific, evidenced, and testable;
+- when adoption of an existing solution is the reasonable answer, record `no-new-fit` rather than designing a duplicate.
 
 ## Evidence discipline
 
 Distinguish:
 
 - **problem evidence:** proves the pain, cost, delay, risk, interruption, or unmet need;
-- **favorable solution evidence:** supports technical or operational plausibility;
-- **counter-evidence:** failed pilots, cancellations, weak accuracy, false alerts, adoption problems, unexpected cost, or a simpler alternative performing well;
+- **existing-solution evidence:** proves what is already available or planned;
+- **favorable solution evidence:** supports technical or operational plausibility for the uncovered gap;
+- **counter-evidence:** failures, weak accuracy, false alerts, adoption problems, unexpected cost, or effective simpler alternatives;
 - **inference:** reasoned but not directly proven;
-- **unknowns:** facts requiring customer data, experiment, prototype, pilot, or legal review.
+- **unknowns:** facts requiring customer data, prototype, pilot, integration test, or legal review.
 
-Search for contrary evidence in Portuguese and English and record it when relevant.
-
-Counter-evidence is primarily a design input, not an automatic rejection. It should narrow scope, change data or capture strategy, increase abstention or human review, lower confidence, strengthen the baseline comparison, or define prototype failure criteria.
-
-Reject only when contrary evidence invalidates the same central mechanism and no credible bounded mitigation or alternative formulation remains.
+Counter-evidence is primarily a design input. Reject only when it invalidates the central mechanism without a credible bounded mitigation.
 
 ## Mandatory AI role explanation
 
-Every opportunity must contain a `Where AI enters` section that makes the intelligent architecture understandable without relying on generic labels.
+Every active opportunity must contain a `Where AI enters` section. For every intelligent component, identify:
 
-The section must include an AI role map with, for every intelligent component:
-
-- process stage where it operates;
-- component name;
-- primary role: recognition, extraction, classification, anomaly detection, prediction, ranking, recommendation, optimization, reinforcement learning, generation, retrieval, agent/tool use, or multimodal reasoning;
-- model family: classical ML, deep learning, computer vision, speech, graph ML, time-series model, embedding/retrieval, LLM/foundation model, multimodal model, optimization solver, RL policy, or another explicit family;
+- process stage;
+- component and primary role;
+- model family;
 - inputs and outputs;
-- training requirement and cadence;
+- training or grounding requirement and cadence;
 - inference location and runtime mode;
-- human or deterministic control.
+- deterministic and human controls.
 
-The watcher must explicitly distinguish:
+Do not use `AI`, `agent`, `LLM`, and `model` as synonyms. State `Agent: not used` and `LLM: not used` when applicable. Identify APIs, databases, rules, calculations, queues, dashboards, orchestration, and approvals as non-AI when they are deterministic.
 
-- **model from agent:** a model predicts or generates; an agent pursues a goal through governed tools and actions;
-- **LLM from classical ML:** do not describe classification, forecasting, anomaly detection, graph ranking, vision, or optimization as an LLM unless an LLM actually performs that task;
-- **training from inference:** state whether the prototype uses pretrained inference, prompt/RAG, fine-tuning, supervised training, self-supervised training, simulation, optimization, or reinforcement learning;
-- **AI from normal software:** rules, APIs, databases, orchestration, search filters, calculations, dashboards, queues, and approvals must be identified as deterministic when they are not model-based.
+The macro architecture must name actual model roles, not a generic `AI` box.
 
-When no agent is used, say `Agent: not used`. When no LLM is used, say `LLM: not used`. When several intelligent components exist, separate their responsibilities rather than presenting a single generic AI layer.
-
-The macro architecture must name the actual model roles. Do not leave only a generic node called `AI`, `Intelligence`, or `Agent`.
-
-## Baseline and prototype discipline
+## Prototype discipline
 
 Every opportunity must define:
 
 - the current manual or system process;
-- the strongest realistic deterministic, rules-based, analytics, integration, workflow, or conventional-software baseline;
-- the exact context in which intelligence may add incremental value;
-- data owners, access path, coverage, labels or feedback, quality risks, privacy, drift, and integration assumptions;
+- the strongest realistic non-AI and existing-product baseline;
+- the exact differentiated context where intelligence may add value;
+- data owners, access, coverage, labels or feedback, privacy, drift, and integration assumptions;
 - a narrow prototype or experiment;
-- business, model-quality, workflow, and safety metrics;
-- stop, redesign, or scale criteria.
+- model, business, workflow, adoption, and safety metrics;
+- stop, redesign, and scale criteria.
 
-A strong non-AI baseline does not automatically invalidate the opportunity. It becomes the comparison target.
-
-Publish when the intelligent capability has a plausible testable advantage in a defined context, even if that advantage has not yet been proven.
-
-## Mandatory intelligent-capability test
-
-Every published opportunity must satisfy all of these:
-
-- `ai_dependency` is `supporting` or `core`;
-- the model-based capability is explicitly named;
-- its inputs and outputs are defined;
-- training, grounding, inference, optimization, or model-use assumptions are described;
-- model or policy quality can be evaluated;
-- deterministic validation, human review, abstention, rollback, or manual fallback is defined;
-- removing the intelligent capability would materially reduce the proposed value.
-
-Reject decorative AI such as an optional summary, chat box, or assistant attached to a workflow that remains equally valuable without it.
+Technical feasibility means prototype feasibility and testability, not proven production success.
 
 ## Opportunity quality gate
 
-Publish when the opportunity includes:
+Publish only when the brief includes:
 
-- a specific company profile, actor, process, and Brazilian problem;
-- recent Brazilian problem evidence;
-- current Brazilian regulatory or operating context when applicable;
-- a process-changing solution hypothesis;
-- a material intelligent capability;
-- a complete AI role map;
-- a plausible data and integration path;
-- a realistic baseline comparison;
-- favorable evidence, counter-evidence, inference, and unknowns without pretending certainty;
-- a bounded prototype and measurable validation plan;
-- a macro Mermaid architecture with named model and optional-agent roles;
-- possible gains without invented percentages;
-- risks, limits, and human-control boundaries;
-- fit scoring with dimension-level rationale;
-- duplicate-control keys and a uniqueness statement.
-
-A hypothesis does not need production proof, proven ROI, local model metrics, known false-positive rates, completed OSS integration, or demonstrated employee adoption. Those are prototype questions unless the document claims higher maturity.
+- specific actor, process, Brazilian problem, and current evidence;
+- current existing-solution landscape;
+- explicit build/extend/integrate disposition;
+- material uncovered gap and differentiation statement;
+- material intelligent capability and complete AI role map;
+- plausible data and integration path;
+- baseline comparison;
+- favorable evidence, counter-evidence, inference, and unknowns;
+- bounded prototype and measurable validation plan;
+- named macro architecture;
+- risks, controls, fit rationale, duplicate keys, and uniqueness statement.
 
 ## Valid `no-new-fit` reasons
 
-Record `no-new-fit` only when one or more are true after adequate search breadth:
+Record `no-new-fit` when one or more are true after adequate search breadth:
 
 - no current Brazilian evidence supports a specific problem;
-- all credible findings duplicate existing opportunities;
+- all credible findings duplicate repository opportunities;
+- a current official, commercial, sector, or open-source solution already covers the actor, process, central capability, and outcome without a material evidenced gap;
+- adoption or extension of an existing platform is sufficient and no separate prototype opportunity remains;
 - the intelligent capability is decorative or unnecessary;
-- no plausible data, model, integration, simulation, or prototype path can be defined;
-- the central technical mechanism is contradicted strongly enough that a bounded mitigation is not credible;
-- the candidate is generic and cannot be narrowed to a concrete actor, process, and measurable outcome.
+- no plausible data, model, integration, simulation, or prototype path exists;
+- the central mechanism is invalidated without credible mitigation;
+- the candidate cannot be narrowed to a concrete actor, process, and measurable outcome.
 
-Do not record `no-new-fit` merely because:
+Do not reject merely because production evidence, ROI, local metrics, clean labels, completed integration, or adoption proof are unavailable.
 
-- there is no Brazilian production deployment;
-- no local false-positive rate is published;
-- ROI has not been demonstrated;
-- labels, integration effort, adoption, or operating cost are still unknown;
-- a deterministic baseline exists;
-- the solution still requires a prototype.
+## Repository actions and boundaries
 
-Those facts reduce confidence, identify unknowns, or shape the experiment.
+The watcher may create, update, reject, supersede, and remove opportunity records from the active indexes. Rejected records may remain in segment folders for audit.
 
-## Fit and decision boundaries
-
-Use the five 0–20 dimensions in `radar-config.yaml`.
-
-Technical feasibility means **prototype feasibility and testability**, not proven production success. Evaluate whether a bounded implementation can be built and meaningfully compared against a baseline with obtainable data or simulation.
-
-The score must not hide uncertainty, complexity, regulated risk, weak data assumptions, or counter-evidence. However, uncertainty belongs in confidence, maturity, risk, prototype design, and rationale rather than becoming an automatic publication veto.
-
-The watcher may create and update opportunity documents and radar control files. It must not:
+It must not:
 
 - open implementation issues;
 - create implementation branches or pull requests;
 - add runtime code or infrastructure;
 - mark an opportunity `approved` without explicit human decision;
-- convert an opportunity into backlog merely because its fit score is high.
-
-New opportunities normally start as `hypothesis`. Use `researched` only when evidence about the solution pattern is materially stronger than conceptual plausibility.
+- convert a high score directly into implementation backlog.
