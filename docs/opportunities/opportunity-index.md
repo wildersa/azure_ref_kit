@@ -1,12 +1,12 @@
 # Solution Opportunity Radar
 
-This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
+This dashboard summarizes active opportunities recorded in `opportunity-index.yaml`.
 
 ## Current state
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 27 |
+| Opportunities | 26 |
 | Segments configured | 18 |
 | Completed research cycles | 1 |
 | Current segment | `professional-services` |
@@ -14,7 +14,7 @@ This dashboard summarizes opportunities recorded in `opportunity-index.yaml`.
 
 ## Opportunity index
 
-Every published opportunity must appear here as one concise row. The full problem evidence, intelligent-capability design, architecture, gains, risks, and fit rationale remain in the linked document.
+Every active published opportunity must appear here as one concise row. Rejected, superseded, and parked records may remain in their segment folders for audit but are excluded from the active count.
 
 | ID | Opportunity | Segment | Short description | Intelligent capability | Fit | Complexity | Status |
 | --- | --- | --- | --- | --- | ---: | --- | --- |
@@ -39,7 +39,6 @@ Every published opportunity must appear here as one concise row. The full proble
 | EDU-001 | [AI-assisted student-persistence early warning and support triage](segments/education/EDU-001-student-persistence-early-warning.md) | education | Brazilian higher-education institutions can combine academic progression, attendance, LMS activity, financial and service signals to rank dropout risk, explain contributing factors, and route bounded support actions under advisor control. | Calibrated student-persistence risk prediction, risk-factor ranking, and support-case prioritization | 83 | medium | hypothesis |
 | EDU-002 | [AI-assisted accessible learning-material assurance](segments/education/EDU-002-accessible-learning-material-assurance.md) | education | Brazilian education networks can use multimodal extraction and accessibility-quality models to draft and verify descriptions, structure, reading order, and alternative representations of learning materials before specialist approval. | Multimodal educational-content extraction, context-aware alternative-description generation, accessibility-defect classification, and specialist-review ranking | 88 | medium | hypothesis |
 | PUBLIC-001 | [AI-assisted public-procurement document assurance before publication](segments/public-sector/PUBLIC-001-procurement-document-assurance.md) | public-sector | Brazilian public buyers can inspect draft ETPs, terms of reference, price research, and notices for missing evidence, inconsistent quantities, vague requirements, and cross-document contradictions before human approval and PNCP publication. | Evidence-grounded procurement-document extraction, cross-document contradiction detection, requirement-specificity classification, and risk-ranked review findings | 89 | medium | hypothesis |
-| PUBLIC-002 | [AI-assisted ombudsman triage and service-failure assurance](segments/public-sector/PUBLIC-002-ombudsman-service-failure-assurance.md) | public-sector | Brazilian public bodies can classify, cluster, and rank ombudsman manifestations to detect recurrent service failures and SLA risk while civil servants retain routing, response, investigation, and remedy authority. | Portuguese-language manifestation classification, semantic clustering, recurrent-failure detection, and SLA-risk ranking with source-grounded evidence | 88 | medium | hypothesis |
 | PROF-001 | [AI-assisted process-communication and deadline assurance](segments/professional-services/PROF-001-process-communication-deadline-assurance.md) | professional-services | Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment. | Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review | 87 | medium | hypothesis |
 | HOSP-001 | [AI-assisted hotel occupancy and operations forecasting](segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md) | hospitality-tourism | Brazilian hotels can forecast probabilistic occupancy and operational workload from booking curves, cancellations, events, and local demand signals to recommend staffing and housekeeping capacity under manager control. | Probabilistic occupancy, cancellation, arrival, departure, and operational-workload forecasting with constrained staffing and housekeeping recommendations | 86 | medium | hypothesis |
 | MEDIA-001 | [AI-assisted audiovisual rights monitoring and evidence triage](segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md) | media-entertainment | Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking. | Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification | 90 | large | hypothesis |
@@ -63,4 +62,4 @@ The default target market is Brazil. New opportunities require current Brazilian
 
 ## Publication rule
 
-A watcher run may end without creating an opportunity. Publish only when a specific problem, current Brazilian evidence, a necessary intelligent capability, measurable business and model outcomes, macro architecture, risks, and fit breakdown are available.
+A watcher run may end without creating an opportunity. Publish only when a specific problem, current Brazilian evidence, a necessary intelligent capability, measurable business and model outcomes, macro architecture, risks, differentiation from existing solutions, and fit breakdown are available.
