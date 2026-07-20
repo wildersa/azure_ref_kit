@@ -1,5 +1,5 @@
 schema_version: 1
-last_updated: "2026-07-19"
+last_updated: "2026-07-20"
 
 statuses:
   active:
@@ -186,6 +186,16 @@ opportunities:
     complexity: medium
     status: researched
     document: segments/energy-utilities/ENERGY-001-ai-assisted-water-leak-detection.md
+  - id: ENERGY-002
+    title: AI-assisted outage restoration and crew prioritization
+    segment: energy-utilities
+    summary: Brazilian electricity distributors can combine outage, topology, weather, vegetation, crew, and customer-impact signals to rank restoration actions while dispatch and switching remain under operator control.
+    intelligent_capability: Topology-aware outage-cause prediction, restoration-time forecasting, and constrained crew/action ranking
+    ai_dependency: core
+    fit_score: 89
+    complexity: large
+    status: hypothesis
+    document: segments/energy-utilities/ENERGY-002-outage-restoration-prioritization.md
   - id: TELCO-001
     title: AI-assisted network incident correlation and dispatch triage
     segment: telecommunications
@@ -196,6 +206,16 @@ opportunities:
     complexity: large
     status: hypothesis
     document: segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md
+  - id: TELCO-002
+    title: AI-assisted mobile capacity-hotspot assurance
+    segment: telecommunications
+    summary: Brazilian mobile operators can forecast cell-level demand and rank capacity interventions using traffic, quality, coverage, event, and topology signals while engineers retain authority over configuration and investment decisions.
+    intelligent_capability: Spatiotemporal cell-demand forecasting, hotspot anomaly detection, and constrained capacity-intervention ranking
+    ai_dependency: core
+    fit_score: 87
+    complexity: large
+    status: hypothesis
+    document: segments/telecommunications/TELCO-002-capacity-hotspot-assurance.md
   - id: EDU-001
     title: AI-assisted student-persistence early warning and support triage
     segment: education
