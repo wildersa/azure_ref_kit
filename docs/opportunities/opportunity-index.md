@@ -6,10 +6,10 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 26 |
+| Opportunities | 27 |
 | Segments configured | 18 |
 | Completed research cycles | 1 |
-| Current segment | `professional-services` |
+| Current segment | `technology-software` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -42,6 +42,7 @@ Every active published opportunity must appear here as one concise row. Rejected
 | PROF-001 | [AI-assisted process-communication and deadline assurance](segments/professional-services/PROF-001-process-communication-deadline-assurance.md) | professional-services | Brazilian law firms can extract obligations, parties, procedural events, and candidate deadlines from official communications, then reconcile them with deterministic calendar rules and human confirmation before task assignment. | Source-grounded legal communication classification and structured obligation extraction with confidence-ranked deadline review | 87 | medium | hypothesis |
 | HOSP-001 | [AI-assisted hotel occupancy and operations forecasting](segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md) | hospitality-tourism | Brazilian hotels can forecast probabilistic occupancy and operational workload from booking curves, cancellations, events, and local demand signals to recommend staffing and housekeeping capacity under manager control. | Probabilistic occupancy, cancellation, arrival, departure, and operational-workload forecasting with constrained staffing and housekeeping recommendations | 86 | medium | hypothesis |
 | MEDIA-001 | [AI-assisted audiovisual rights monitoring and evidence triage](segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md) | media-entertainment | Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking. | Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification | 90 | large | hypothesis |
+| MEDIA-002 | [AI-assisted live-caption semantic continuity assurance](segments/media-entertainment/MEDIA-002-live-caption-semantic-continuity-assurance.md) | media-entertainment | Brazilian regional broadcasters can compare outgoing captions with program audio, video cues, rundowns, and source changes to detect semantically unusable live accessibility before operators receive viewer complaints. | Real-time Portuguese speech-to-caption semantic alignment, timing and readability anomaly detection, non-speech accessibility-cue classification, and incident-priority ranking | 82 | medium | hypothesis |
 | TECH-001 | [AI-assisted context-aware vulnerability remediation prioritization](segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md) | technology-software | Brazilian software and platform teams can combine vulnerability intelligence with asset exposure, dependency, runtime, ownership, and business-impact signals to rank remediation work and produce auditable evidence under security-engineer control. | Context-aware vulnerability-to-asset matching, exploit-risk prediction, attack-path inference, and remediation-priority ranking | 89 | large | hypothesis |
 | NONPROFIT-001 | [AI-assisted donor-retention uplift and outreach orchestration](segments/nonprofit/NONPROFIT-001-donor-retention-uplift-orchestration.md) | nonprofit | Brazilian OSCs can estimate which donors are likely to lapse and which bounded outreach may causally improve retention, prioritizing human-approved campaigns without inferring sensitive traits or automating solicitation. | Donor-lapse prediction and causal uplift ranking for bounded retention interventions | 87 | medium | hypothesis |
 
