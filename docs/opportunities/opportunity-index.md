@@ -6,10 +6,10 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 27 |
+| Opportunities | 28 |
 | Segments configured | 18 |
 | Completed research cycles | 1 |
-| Current segment | `technology-software` |
+| Current segment | `nonprofit` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -44,6 +44,7 @@ Every active published opportunity must appear here as one concise row. Rejected
 | MEDIA-001 | [AI-assisted audiovisual rights monitoring and evidence triage](segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md) | media-entertainment | Brazilian audiovisual rights holders can detect likely transformed copies and retransmissions, assemble time-coded evidence, and prioritize expert review using robust media fingerprints and multimodal similarity models without automating legal conclusions or blocking. | Transformation-robust video and audio fingerprint matching, multimodal similarity ranking, and evidence-quality classification | 90 | large | hypothesis |
 | MEDIA-002 | [AI-assisted live-caption semantic continuity assurance](segments/media-entertainment/MEDIA-002-live-caption-semantic-continuity-assurance.md) | media-entertainment | Brazilian regional broadcasters can compare outgoing captions with program audio, video cues, rundowns, and source changes to detect semantically unusable live accessibility before operators receive viewer complaints. | Real-time Portuguese speech-to-caption semantic alignment, timing and readability anomaly detection, non-speech accessibility-cue classification, and incident-priority ranking | 82 | medium | hypothesis |
 | TECH-001 | [AI-assisted context-aware vulnerability remediation prioritization](segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md) | technology-software | Brazilian software and platform teams can combine vulnerability intelligence with asset exposure, dependency, runtime, ownership, and business-impact signals to rank remediation work and produce auditable evidence under security-engineer control. | Context-aware vulnerability-to-asset matching, exploit-risk prediction, attack-path inference, and remediation-priority ranking | 89 | large | hypothesis |
+| TECH-002 | [Privacy-safe tenant incident reproduction assurance](segments/technology-software/TECH-002-privacy-safe-tenant-incident-reproduction.md) | technology-software | Brazilian SaaS teams can reconstruct privacy-minimized tenant-specific failure states from support evidence and telemetry, then generate reviewable reproduction scripts and regression tests without copying unrestricted production data. | Evidence-grounded failure-state reconstruction, tenant-context minimization, governed sandbox reproduction, and regression-test synthesis | 82 | large | hypothesis |
 | NONPROFIT-001 | [AI-assisted donor-retention uplift and outreach orchestration](segments/nonprofit/NONPROFIT-001-donor-retention-uplift-orchestration.md) | nonprofit | Brazilian OSCs can estimate which donors are likely to lapse and which bounded outreach may causally improve retention, prioritizing human-approved campaigns without inferring sensitive traits or automating solicitation. | Donor-lapse prediction and causal uplift ranking for bounded retention interventions | 87 | medium | hypothesis |
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
