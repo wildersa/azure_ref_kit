@@ -3,9 +3,9 @@
 ## Classification
 
 - **Segment:**
-- **Primary market / jurisdiction:** Brazil by default; state another market only with explicit Brazil applicability.
-- **Evidence reference date:** current watcher date plus main publication, data-period, update, and rule-effective dates.
-- **Index summary:** one concrete sentence, roughly 40 words or fewer.
+- **Primary market / jurisdiction:** Brazil by default
+- **Evidence reference date:**
+- **Index summary:** one concrete sentence, roughly 40 words or fewer
 - **Company profile / size:**
 - **Opportunity type:** quick-win | product | platform | integration | automation | data | optimization | operations | security | industry-solution | research-bet
 - **Status:** hypothesis | researched
@@ -15,47 +15,74 @@
 - **Risk:** low | medium | high | regulated
 - **Solution evidence level:** conceptual | prototype | pilot | production | repeated-production
 - **Operational maturity:** unvalidated | early | proven
+- **Existing-solution disposition:** build | extend | integrate | adopt | no-new-fit
 - **Azure fit:** none | low | medium | high
 - **AI dependency:** supporting | core
 - **Primary AI role:** recognition | extraction | classification | anomaly-detection | prediction | ranking-recommendation | optimization | reinforcement-learning | generative-ai | rag | agent-tool-use | multimodal | other
-- **Intelligent capability:** concise required model-based capability
+- **Intelligent capability:**
 - **Repository alignment:** reuse-existing | extend-kit | new-solution | outside-current-kit
 
-New opportunities normally start as `hypothesis`. Production proof is not required to publish. Use `confidence: high` or `operational maturity: proven` only with credible production evidence.
+New opportunities normally start as `hypothesis`. Production proof is not required. Existing-solution research and material differentiation are required.
 
 ## Problem
 
-Describe the actor, current process, recurring pain, frequency, consequence, and why it matters.
+Describe the actor, process, recurring pain, frequency, consequence, and measurable outcome.
 
 ## Brazil applicability and current context
 
-Explain why the problem is currently relevant to Brazilian organizations.
-
 Include:
 
-- current Brazilian market or operating evidence;
-- current Brazilian regulatory or official operating context when applicable;
+- current Brazilian problem evidence;
+- current regulation or official operating context when applicable;
+- publication, update, launch, roadmap, data-period, and effective dates;
 - material differences from foreign examples;
 - assumptions requiring local validation.
 
-At least one load-bearing Brazilian source must have been published or materially updated within the previous 18 months.
+At least one load-bearing Brazilian problem source must have been published or materially updated within the previous 18 months.
+
+## Existing solutions and differentiation
+
+Research what already exists before proposing architecture.
+
+### Existing solutions reviewed
+
+| Solution / platform | Owner or vendor | Current capabilities | Evidence date | Coverage overlap |
+| --- | --- | --- | --- | --- |
+| [name] | [owner] | [what it already performs] | [date] | [actor, process, capability, integration, outcome] |
+
+Include current official platforms, commercial products, sector systems, announced roadmap capabilities, public tenders, APIs, and mature open-source solutions when relevant.
+
+### Gap and disposition
+
+- **What is already solved:**
+- **Material uncovered gap:**
+- **Underserved actor, context, integration, or outcome:**
+- **Disposition:** build | extend | integrate | adopt | no-new-fit
+- **Why changing vendor, cloud, model, UI, or architecture is insufficient:**
+- **Differentiation statement:**
+
+Do not publish as `new-solution` when an existing solution already covers the same actor, process, central capability, and outcome. Generic clustering, dashboards, RAG, agents, or ranking are not differentiation by themselves.
+
+When adoption or a minor configuration of an existing platform is sufficient, use `no-new-fit`.
 
 ## Evidence
 
 ### Confirmed problem evidence
 
-- [source-backed fact proving the pain, cost, delay, risk, or interruption]
+- [source-backed fact]
 
-### Favorable solution evidence
+### Existing-solution evidence
 
-- [technical research, prototype, pilot, production case, benchmark, mature implementation pattern, or other evidence supporting plausibility]
+- [official product, platform, API, release, roadmap, procurement, or repository evidence]
+
+### Favorable evidence for the uncovered gap
+
+- [research, prototype, implementation pattern, benchmark, pilot, or production evidence]
 
 ### Counter-evidence and limitations
 
-- [failed comparable, cancellation, accuracy limitation, false-alert burden, adoption issue, unexpected cost, or strong conventional alternative]
-- [how this changes scope, confidence, design, human controls, or prototype validation]
-
-Counter-evidence is normally a design input. Reject only when it invalidates the central mechanism and no credible bounded mitigation remains.
+- [failure, cancellation, accuracy limitation, false-alert burden, adoption issue, cost, or strong alternative]
+- [how it changes scope, confidence, design, controls, or prototype]
 
 ### Inference
 
@@ -63,128 +90,119 @@ Counter-evidence is normally a design input. Reject only when it invalidates the
 
 ### Unknowns
 
-- [fact requiring customer data, prototype, experiment, pilot, integration test, or legal review]
+- [fact requiring data, experiment, prototype, integration test, or legal review]
 
 ### Sources
 
-For each important source, record jurisdiction, publication/update date, data period or effective date when relevant, and whether it supports the problem, solution plausibility, or a limitation.
+- [source title](URL) — jurisdiction; date; problem, existing-solution, favorable, contrary, or contextual relevance
 
-- [source title](URL) — jurisdiction; date; relevance
-
-## Current process
+## Current process and current solution
 
 ```mermaid
 flowchart LR
-  A[Current trigger] --> B[Manual or system process]
-  B --> C[Problem or delay]
-  C --> D[Current outcome]
+  A[Current trigger] --> B[Current manual process or existing platform]
+  B --> C[Remaining gap]
+  C --> D[Current consequence]
 ```
 
-## Baseline without AI
+## Baseline
 
-- **Current baseline:**
+- **Current manual or system baseline:**
+- **Existing product or platform baseline:**
 - **Strongest realistic non-AI alternative:**
 - **Baseline strengths:**
 - **Baseline limitations:**
-- **Context where intelligence may add incremental value:**
-- **Condition where the non-AI baseline should be preferred:**
+- **Exact context where the proposed intelligence adds incremental value:**
+- **Condition where adoption or the baseline should be preferred:**
 
-The existence of a strong baseline does not reject the opportunity. It defines what the prototype must beat or complement.
+## Proposed solution or extension
 
-## Proposed solution
-
-Describe the process change before naming technology. State what remains deterministic, where intelligence adds value, where humans decide, what systems integrate, and how known limitations affect scope.
+Describe the process change before naming technology. Make clear whether this is a new build, extension, integration, or adoption recommendation. State what remains deterministic, what existing platform is reused, where intelligence adds differentiated value, and where humans decide.
 
 ## Where AI enters
 
-Explain the AI architecture in plain language. Do not use `AI`, `agent`, `LLM`, or `model` as interchangeable labels.
-
 ### AI role map
 
-| Process stage | AI component | AI type / model family | What it does | Runtime mode | Output | Human or deterministic control |
-| --- | --- | --- | --- | --- | --- | --- |
-| [stage] | [component] | [classical ML, deep learning, graph model, time-series model, computer vision, speech model, embedding/retrieval, LLM, multimodal foundation model, RL policy, agent] | [specific responsibility] | [batch, online, real-time, edge, asynchronous, human-in-the-loop] | [prediction, extraction, ranking, generated text, action proposal, policy decision] | [approval, threshold, rule, abstention, rollback] |
+| Process stage | AI component | AI type / model family | Inputs | What it does | Runtime mode | Output | Human or deterministic control |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [stage] | [component] | [classical ML, graph ML, time series, vision, speech, embeddings, LLM, multimodal model, RL, agent] | [inputs] | [specific responsibility] | [batch, online, real-time, edge, asynchronous] | [prediction, extraction, ranking, generated text, action proposal] | [rule, threshold, abstention, approval, rollback] |
 
 ### Required distinctions
 
-- **Primary AI role:** recognition | extraction | classification | anomaly detection | prediction | ranking/recommendation | optimization | reinforcement learning | generation | retrieval | agent/tool use | multimodal reasoning.
-- **Model family:** identify whether this is classical ML, deep learning, computer vision, speech, graph ML, time-series forecasting, embeddings/retrieval, an LLM/foundation model, multimodal model, optimization solver, or RL policy.
-- **Training requirement:** pretrained inference only | prompt and grounding | supervised training | fine-tuning | self-supervised training | simulation | reinforcement learning | no custom training.
-- **Training location and cadence:** offline initial training, periodic retraining, continuous feedback, per-customer adaptation, or none.
-- **Inference location:** cloud | edge | device | batch pipeline | real-time service.
-- **Agent role, when any:** state the goal, tools, permissions, planning boundary, memory, and actions it may propose or execute.
-- **LLM role, when any:** state whether it generates, extracts, classifies, reasons over retrieved context, creates explanations, or selects tools.
-- **Non-LLM intelligence:** explicitly name classical ML, vision, forecasting, graph, ranking, anomaly, optimization, or RL components rather than calling everything an LLM.
-- **Not AI:** identify rules, workflow, APIs, databases, search filters, calculations, orchestration, dashboards, and human decisions that remain deterministic.
+- **Primary AI role:**
+- **Model family:**
+- **Training requirement:** pretrained inference | prompt and grounding | supervised training | fine-tuning | self-supervised training | simulation | reinforcement learning | no custom training
+- **Training location and cadence:**
+- **Inference location:** cloud | edge | device | batch pipeline | real-time service
+- **Agent role:** state goal, tools, permissions, memory, planning boundary, and permitted actions, or `not used`
+- **LLM role:** state exact generation, extraction, classification, reasoning, or tool-selection responsibility, or `not used`
+- **Non-LLM intelligence:**
+- **Not AI:** rules, APIs, databases, calculations, workflow, queues, dashboards, orchestration, and approvals
 
-When the solution does not use an agent or LLM, say so explicitly. When it combines several intelligent components, separate their responsibilities instead of describing a generic AI layer.
+Do not use `AI`, `agent`, `LLM`, and `model` as synonyms.
 
 ## Intelligent capability details
 
-- **Technique / model family:**
-- **Why it is necessary:**
+- **Why it is necessary for the uncovered gap:**
 - **Inputs:**
 - **Outputs:**
 - **Training / grounding / optimization assumptions:**
-- **Evaluation:** model or policy quality and comparison against baseline
-- **Fallback and controls:** deterministic validation, human review, abstention, rollback, or manual process
+- **Evaluation against existing product and non-AI baselines:**
+- **Fallback and controls:**
 
-Reject decorative AI that leaves the workflow equally valuable without the model-based capability.
+Reject decorative AI that does not create material incremental value beyond existing solutions.
 
 ## Data and integration assumptions
 
 - **Data owners and access path:**
 - **Expected volume, history, frequency, and coverage:**
-- **Labels, outcomes, feedback, or simulation available:**
-- **Known quality, imbalance, missingness, and leakage risks:**
+- **Labels, outcomes, feedback, or simulation:**
+- **Quality, imbalance, missingness, and leakage risks:**
 - **Brazilian or local-context representativeness:**
 - **Privacy, retention, consent, surveillance, or sharing constraints:**
+- **Existing platform APIs, exports, extension points, and limits:**
 - **Integration and synchronization assumptions:**
 - **Drift and change sources:**
 - **Minimum viable data for a prototype:**
 
-Unknown labels, integration effort, adoption, or operating cost reduce confidence but do not automatically invalidate a prototype hypothesis.
-
 ## Prototype validation plan
-
-Define a bounded experiment rather than assuming rollout.
 
 - **Prototype scope / process slice:**
 - **Users, sites, assets, documents, events, or simulated cases:**
-- **Baseline or comparison:**
+- **Existing solution baseline:**
+- **Non-AI baseline:**
 - **Required data and integrations:**
 - **Model-quality metrics:**
+- **Incremental-value metrics beyond the existing solution:**
 - **Business or workflow metrics:**
 - **Human acceptance, correction, or override metrics:**
 - **Safety and compliance boundaries:**
 - **Failure or redesign criteria:**
-- **Evidence required before a pilot or broader implementation:**
+- **Evidence required before pilot or broader implementation:**
 
-Do not invent ROI. Cost drivers may be listed as assumptions, not publication gates.
+Do not invent ROI. Cost drivers and benefits may be hypotheses.
 
 ## Macro architecture
 
 ```mermaid
 flowchart LR
-  Input[User system device document event sensor or simulation] --> Intake[Capture API workflow integration or edge intake]
-  Intake --> Core[Deterministic application and orchestration]
-  Core --> Data[Operational data knowledge labels or simulation]
-  Data --> Model[Named model recognition prediction ranking generation or optimization]
-  Model --> Agent[Optional governed agent and tools]
-  Model --> Validation[Rules confidence evaluation and controls]
-  Agent --> Validation
-  Validation --> Integration[Enterprise systems and workflow actions]
-  Validation --> Human[Human review when required]
-  Core --> Metrics[Prototype model workflow and business metrics]
+  Existing[Existing platform or current workflow] --> Gap[Uncovered process gap]
+  Gap --> Data[Operational data labels knowledge or simulation]
+  Data --> Model[Named recognition prediction ranking generation or optimization model]
+  Model --> Controls[Rules confidence abstention and audit]
+  Controls --> Human[Human review or approval]
+  Controls --> Integration[Existing platform API or workflow extension]
+  Human --> Metrics[Prototype model workflow and incremental-value metrics]
 ```
 
-Remove the `Agent` node when no agent exists. Name the actual model role instead of leaving a generic intelligence box.
+Add an agent node only when a real governed agent exists.
 
 ## Capabilities and possible technologies
 
+- Existing platform capabilities reused:
 - Application and workflow capabilities:
 - Data capabilities:
-- Integration capabilities:
+- Integration and extension capabilities:
 - Required AI / ML capabilities:
 - Training, grounding, recognition, or optimization capabilities:
 - Agent and tool-use capabilities, or `not used`:
@@ -192,21 +210,19 @@ Remove the `Agent` node when no agent exists. Name the actual model role instead
 - Evaluation and model-operations capabilities:
 - Security and governance capabilities:
 - Azure services that may fit:
-- Non-Azure or open-source alternatives worth considering:
+- Non-Azure or open-source alternatives:
 
 ## Possible gains
 
-Do not invent percentages.
-
-- [possible gain]
-- [possible gain]
+- [possible incremental gain beyond existing solution]
+- [possible incremental gain]
 
 ## Metrics for validation
 
 ### Business and operational metrics
 
 - [baseline comparison]
-- [quality, risk, time, capacity, cost, or outcome metric]
+- [incremental process or outcome metric]
 
 ### Intelligent-capability metrics
 
@@ -215,45 +231,48 @@ Do not invent percentages.
 
 ## Risks, limits, and controls
 
+- Existing-solution overlap and roadmap risk:
 - Privacy and sensitive data:
 - Brazilian regulatory or policy constraints:
 - Human decision boundaries:
 - Model or policy failure modes:
 - Agent or tool-execution failure modes, when applicable:
 - LLM hallucination, grounding, or prompt-injection risks, when applicable:
-- Comparable failures and applicable lessons:
+- Comparable failures and lessons:
 - Bias, drift, weak labels, or insufficient feedback:
-- Integration and data risks:
+- Integration and vendor/platform dependency risks:
 - Adoption and change-management risks:
 - Prototype cost or operational assumptions:
 
 ## Fit score
 
-Technical feasibility means **whether a bounded prototype can be built and meaningfully tested**, not whether production success is already proven.
+Technical feasibility means whether a bounded differentiated prototype can be built and tested. Strategic differentiation must be scored against current solutions, not only against manual work.
 
 | Dimension | Score | Rationale |
 | --- | ---: | --- |
 | Problem evidence and relevance | /20 | Current Brazilian evidence and specificity. |
-| Business or operational value | /20 | Plausible value if the hypothesis succeeds. |
-| Technical feasibility | /20 | Prototype testability, obtainable data or simulation, named model family, training/inference path, integration scope, controls, and counter-evidence. |
+| Business or operational value | /20 | Incremental value beyond existing solutions and baselines. |
+| Technical feasibility | /20 | Prototype testability, data, model, integration, extension points, controls, and counter-evidence. |
 | Reuse potential | /20 | |
-| Strategic differentiation | /20 | Material advantage created by intelligence beyond deterministic automation. |
+| Strategic differentiation | /20 | Material uncovered capability or outcome beyond current products, platforms, and roadmaps. |
 | **Total** | **/100** | |
 
 ## Repository relationship
 
 - Existing references that may be reused:
-- Missing capabilities exposed by this opportunity:
+- Missing capabilities exposed by the differentiated gap:
 - Potential building blocks:
-- Potential composed solution:
-- Reasons to keep it outside the current kit, when applicable:
+- Potential composed solution or extension:
+- Reasons to keep it outside the current kit:
 
 ## Duplicate control
 
 - **Problem keys:**
 - **Capability keys:**
-- **Research queries used:** include Brazil-specific and counter-evidence queries
-- **Related opportunities:**
+- **Existing solutions reviewed:**
+- **Research queries used:** include Brazil-specific, existing-solution, roadmap, product, API, open-source, and counter-evidence queries
+- **Related repository opportunities:**
+- **External overlap statement:**
 - **Uniqueness statement:**
 
 ## Next decision
@@ -263,7 +282,9 @@ Choose one:
 - continue research;
 - prototype candidate;
 - shortlist for review;
-- park until a dependency or signal changes;
+- adopt existing solution;
+- extend or integrate existing solution;
+- park;
 - reject with reason.
 
 Implementation approval remains an explicit human decision.
