@@ -1,7 +1,7 @@
 schema_version: 1
-last_run: "2026-07-20T08:16:33Z"
-current_segment_index: 17
-completed_cycles: 1
+last_run: "2026-07-20T15:06:13Z"
+current_segment_index: 0
+completed_cycles: 2
 
 governance_correction:
   date: "2026-07-19"
@@ -95,7 +95,7 @@ segment_state:
     last_result: TECH-002
     next_focus: cloud-cost anomaly remediation, developer-environment recovery, release-risk assurance, dependency provenance, and support knowledge decay without repeating vulnerability prioritization or tenant-specific incident reproduction
   nonprofit:
-    runs: 1
-    last_reviewed: "2026-07-19"
-    last_result: NONPROFIT-001
-    next_focus: program-outcome evidence, grant reporting, volunteer scheduling and retention, and beneficiary-service operations without repeating donor-retention or fundraising outreach optimization
+    runs: 2
+    last_reviewed: "2026-07-20"
+    last_result: NONPROFIT-002
+    next_focus: volunteer scheduling and retention, beneficiary-service operations, safeguarding evidence, and restricted-fund allocation without repeating donor-retention optimization or program evidence-chain assurance
