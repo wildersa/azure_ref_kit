@@ -1,6 +1,6 @@
 schema_version: 1
-last_run: "2026-07-20T15:06:13Z"
-current_segment_index: 0
+last_run: "2026-07-20T16:03:08Z"
+current_segment_index: 1
 completed_cycles: 2
 
 governance_correction:
@@ -10,10 +10,10 @@ governance_correction:
 
 segment_state:
   cross-industry:
-    runs: 2
-    last_reviewed: "2026-07-19"
-    last_result: CROSS-002
-    next_focus: shared master-data changes, cross-functional approval evidence, invoice exceptions, and enterprise service recovery without repeating offboarding or supplier payment-change assurance
+    runs: 3
+    last_reviewed: "2026-07-20"
+    last_result: CROSS-003
+    next_focus: cross-functional approval evidence, invoice exceptions outside tax-reform configuration, and enterprise service recovery without repeating offboarding, supplier payment-change, or IBS/CBS configuration assurance
   human-resources:
     runs: 2
     last_reviewed: "2026-07-19"
