@@ -6,10 +6,10 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 
 | Metric | Value |
 | --- | ---: |
-| Opportunities | 29 |
+| Opportunities | 30 |
 | Segments configured | 18 |
 | Completed research cycles | 2 |
-| Current segment | `cross-industry` |
+| Current segment | `human-resources` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -20,6 +20,7 @@ Every active published opportunity must appear here as one concise row. Rejected
 | --- | --- | --- | --- | --- | ---: | --- | --- |
 | CROSS-001 | [AI-assisted cross-system offboarding risk control plane](segments/cross-industry/CROSS-001-offboarding-control-plane.md) | cross-industry | Organizations with fragmented offboarding can orchestrate known revocations and use access-graph anomaly detection to identify likely residual accounts, privileges, assets, and missing controls for human review. | Identity and access graph anomaly detection with risk-ranked reconciliation | 89 | large | researched |
 | CROSS-002 | [AI-assisted supplier identity and payment-change assurance](segments/cross-industry/CROSS-002-supplier-payment-change-assurance.md) | cross-industry | Brazilian organizations can combine supplier-master history, CNPJ evidence, approval context, communications, and payment behavior to rank suspicious onboarding and bank-detail changes before human-approved payment release. | Supplier-entity resolution, change-pattern anomaly detection, communication-risk classification, and payment-review ranking | 88 | medium | hypothesis |
+| CROSS-003 | [AI-assisted Brazilian tax-reform configuration assurance](segments/cross-industry/CROSS-003-tax-reform-configuration-assurance.md) | cross-industry | Brazilian companies can trace official IBS/CBS changes into ERP configuration and generated fiscal documents, using grounded extraction and contradiction detection to prioritize human review before rejected or inconsistent invoices reach production. | Grounded regulatory-change extraction, configuration-impact mapping, semantic contradiction detection, and risk-ranked regression-test generation | 86 | large | hypothesis |
 | HR-001 | [AI skills-evidence graph for internal mobility and reskilling](segments/human-resources/HR-001-skills-evidence-mobility-graph.md) | human-resources | Organizations can convert employee-approved work evidence into a governed skills graph that identifies capability gaps, ranks internal transition paths, and recommends targeted reskilling without making autonomous employment decisions. | Evidence-grounded skill extraction, taxonomy mapping, gap inference, and internal transition-path ranking | 89 | large | researched |
 | HR-002 | [AI-assisted psychosocial-risk prevention and work-design assurance](segments/human-resources/HR-002-psychosocial-risk-prevention-orchestration.md) | human-resources | Brazilian employers can combine worker consultation, work-design evidence, absence trends, incidents, and operational signals to identify group-level psychosocial hazards and prioritize preventive actions without profiling individual mental health. | Evidence-grounded psychosocial-hazard classification, group-level anomaly detection, and preventive-review ranking | 89 | medium | hypothesis |
 | FIN-001 | [Real-time Pix scam and mule-account intervention with MED intelligence](segments/financial-services/FIN-001-app-scam-intervention.md) | financial-services | Brazilian Pix participants can combine Banco Central security signals, transaction behavior, device context, and payment graphs to detect scams and contas laranja, apply proportionate controls, and prioritize MED investigation before funds disperse. | Calibrated Pix scam-risk prediction and graph-based conta-laranja and fund-dispersion detection | 92 | large | researched |
