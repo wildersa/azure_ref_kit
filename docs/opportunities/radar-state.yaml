@@ -1,7 +1,70 @@
-schema_version: 1
+schema_version: 2
 last_run: "2026-07-25T15:00:45Z"
+
 current_segment_index: 11
-completed_cycles: 2
+completed_segment_cycles: 2
+
+current_technical_focus_index: 0
+completed_technical_focus_cycles: 0
+next_technical_focus: classical-supervised-ml
+
+technical_focus_state:
+  classical-supervised-ml:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  anomaly-and-unsupervised-learning:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  time-series-and-sequence-models:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  specialized-neural-networks:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  small-language-models-and-nlp:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  conversational-llm-and-rag:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  llm-agents-and-tool-use:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  recommendation-and-ranking:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  causal-and-uplift-learning:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  bandits-and-reinforcement-learning:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+  forecasting-and-optimization:
+    runs: 0
+    last_reviewed: null
+    last_result: null
+
+technical_coverage_state:
+  tracking_started: "2026-07-25"
+  evaluated_rounds: 0
+  published_rounds: 0
+  investigated_custom_training_or_fine_tuning: 0
+  published_custom_training_or_fine_tuning: 0
+  investigated_pretrained_llm_or_rag_primary: 0
+  published_pretrained_llm_or_rag_primary: 0
+  investigated_rl_bandit_causal_or_uplift: 0
+  published_rl_bandit_causal_or_uplift: 0
+  note: Coverage targets apply prospectively and guide investigation, not publication quotas. Existing opportunities are tagged only when materially revalidated.
 
 governance_correction:
   date: "2026-07-19"
