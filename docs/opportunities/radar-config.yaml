@@ -1,8 +1,13 @@
-schema_version: 1
+schema_version: 2
 
 radar:
-  mode: round-robin
+  mode: independent-dual-round-robin
   discovery_mode: workflow-simulation-first
+  selection_axes: [segment, technical-focus]
+  segment_cursor: independent-round-robin
+  technical_focus_cursor: independent-round-robin
+  advance_both_cursors_after_every_completed_run: true
+  technical_focus_guides_simulation_not_solution: true
   opportunities_per_run: 1
   allow_no_new_fit: true
   minimum_fit_to_publish: 55
@@ -10,6 +15,59 @@ radar:
   minimum_workflow_simulations_before_no_new_fit: 3
   implementation_issue_creation: disabled
   return_to_first_segment_after_cycle: true
+  return_to_first_technical_focus_after_cycle: true
+
+technical_focus_rotation:
+  required: true
+  state_source: radar-state.yaml
+  method_source: technical-focus-rotation.md
+  independent_from_segment_cursor: true
+  reject_forced_algorithm_selection: true
+  allow_focus_rejection: true
+  allow_no_compatible_process: true
+  focuses:
+    - id: classical-supervised-ml
+      process_signals: [repeated-observations, known-outcomes, prediction-time-features, operational-labels]
+      candidate_model_families: [linear-models, decision-trees, random-forests, gradient-boosting, calibrated-classifiers]
+    - id: anomaly-and-unsupervised-learning
+      process_signals: [rare-deviations, weak-labels, peer-groups, operating-envelope, review-corrections]
+      candidate_model_families: [clustering, isolation-methods, one-class-models, density-estimation, autoencoders, graph-anomaly-detection]
+    - id: time-series-and-sequence-models
+      process_signals: [temporal-order, windows, delayed-outcomes, degradation, seasonality, state-transitions]
+      candidate_model_families: [statistical-forecasting, gradient-boosting-with-temporal-features, lstm, gru, temporal-convolution, state-space-models, temporal-transformer]
+    - id: specialized-neural-networks
+      process_signals: [image, video, audio, waveform, graph, spatial, multimodal-structure]
+      candidate_model_families: [cnn, vision-transformer, graph-neural-network, autoencoder, multimodal-encoder, domain-specific-neural-network]
+    - id: small-language-models-and-nlp
+      process_signals: [bounded-text-classification, extraction, matching, routing, latency, privacy, cost]
+      candidate_model_families: [compact-encoder, sentence-transformer, small-generative-model, fine-tuned-classifier, token-classifier, domain-extractor]
+    - id: conversational-llm-and-rag
+      process_signals: [conversational-task, grounded-retrieval, source-attribution, document-synthesis, interactive-clarification]
+      candidate_model_families: [pretrained-llm, embedding-model, reranker, retrieval-pipeline, grounded-response-model]
+    - id: llm-agents-and-tool-use
+      process_signals: [multi-step-goal, tools, permissions, changing-state, checkpoints, bounded-planning]
+      candidate_model_families: [tool-using-llm, constrained-planner-executor, deterministic-workflow-with-model-routing, policy-governed-agent]
+    - id: recommendation-and-ranking
+      process_signals: [candidate-set, eligibility, ordering-decision, observed-choice, observable-outcome]
+      candidate_model_families: [learning-to-rank, matrix-factorization, two-tower-retrieval, candidate-generation-and-reranking, calibrated-recommender]
+    - id: causal-and-uplift-learning
+      process_signals: [intervention-alternatives, treatment-assignment, confounding, outcome, policy-question]
+      candidate_model_families: [uplift-tree, causal-forest, doubly-robust-estimation, propensity-method, heterogeneous-treatment-effect-model]
+    - id: bandits-and-reinforcement-learning
+      process_signals: [repeated-decision, alternative-actions, state, reward, delayed-effect, exploration-constraint, offline-or-simulated-evaluation]
+      candidate_model_families: [multi-armed-bandit, contextual-bandit, offline-rl, constrained-rl, simulation-trained-policy]
+    - id: forecasting-and-optimization
+      process_signals: [future-demand-or-capacity, constraints, objective-function, feasible-actions, planning-decision]
+      candidate_model_families: [probabilistic-forecasting, mathematical-optimization, constraint-programming, simulation-optimization, learned-forecast-with-deterministic-solver]
+
+coverage_targets:
+  role: investigation-guidance-not-publication-quota
+  tracking_window: complete-technical-focus-cycle
+  custom_training_minimum_share: 0.35
+  pretrained_or_rag_maximum_share: 0.45
+  experimental_rl_or_causal_minimum_per_cycle: 1
+  no_new_fit_allowed: true
+  never_manufacture_opportunity_to_meet_target: true
 
 operational_simulation:
   required: true
@@ -18,6 +76,9 @@ operational_simulation:
   organization_archetype_required: true
   actor_role_required: true
   bounded_process_required: true
+  require_current_technical_focus_scan: true
+  technical_focus_selects_process_signals_not_algorithm: true
+  technical_focus_may_be_rejected: true
   required_scenarios:
     - normal-flow
     - exception-flow
@@ -37,6 +98,7 @@ operational_simulation:
   allow_synthetic_events_and_cases: true
   require_assumptions_to_be_labeled: true
   require_deterministic_alternative_test: true
+  require_statistical_and_simpler_model_baseline_when_relevant: true
   require_ai_candidate_to_map_to_specific_decision_exception_or_uncertainty: true
   research_validates_simulation_not_replaces_it: true
   do_not_require_source_for_every_simulated_microstep: true
@@ -57,7 +119,7 @@ market_context:
 
 research:
   required: true
-  role: validate-context-regulation-plausibility-counterevidence-and-novelty
+  role: validate-context-regulation-plausibility-data-counterevidence-and-novelty
   run_after_initial_operational_simulation: true
   require_current_web_research: true
   source_priority:
@@ -127,8 +189,84 @@ intelligence_requirement:
   require_explicit_ai_role_map: true
   forbid_decorative_ai: true
 
+technical_classification:
+  required_for_new_opportunities: true
+  required_when_existing_opportunity_is_materially_revalidated: true
+  speculative_bulk_backfill_forbidden: true
+  template: opportunity-technical-classification-template.md
+  required_fields:
+    - technical_focus
+    - technical_class
+    - model_strategy
+    - candidate_model_families
+    - learning_paradigm
+    - data_modalities
+    - interaction_pattern
+    - training_requirement
+    - data_readiness
+  allowed_model_strategy:
+    - custom-trained
+    - fine-tuned
+    - pretrained
+    - rag-grounded
+    - simulation-trained
+    - optimization-with-learned-components
+    - rules-plus-model
+    - hybrid
+  allowed_learning_paradigm:
+    - supervised
+    - unsupervised
+    - self-supervised
+    - semi-supervised
+    - contextual-bandit
+    - reinforcement-learning
+    - causal-inference
+    - no-custom-training
+    - hybrid
+  allowed_training_requirement: [required, optional, not-required]
+  allowed_data_readiness:
+    - ready
+    - viable-with-data-work
+    - pilot-data-needed
+    - not-currently-trainable
+    - knowledge-base-required
+    - not-applicable
+
+training_data_analysis:
+  required_when_model_strategy: [custom-trained, fine-tuned]
+  required_when_training_requirement: required
+  required_primary_mechanisms:
+    - classical-supervised-ml
+    - specialized-neural-networks
+    - time-series-and-sequence-models
+    - recommendation-and-ranking
+    - causal-and-uplift-learning
+    - bandits-and-reinforcement-learning
+    - learned-forecasting
+  required_fields:
+    - observation_unit
+    - input_data
+    - target_or_reward
+    - label_source
+    - prediction_time
+    - expected_volume
+    - class_balance
+    - historical_coverage
+    - train_validation_split
+    - leakage_risks
+    - representativeness_risks
+    - feedback_loop
+    - privacy_and_usage_constraints
+    - fallback_if_data_is_insufficient
+  distinguish_confirmed_assumed_and_unknown: true
+  invent_dataset_properties: forbidden
+  trainable_readiness_values: [ready, viable-with-data-work, pilot-data-needed, not-currently-trainable]
+  fine_tuning_requires_comparison_against: [prompting, rag, pretrained-inference, compact-supervised-model, conventional-training]
+
 publication:
   default_new_status: hypothesis
+  base_template: opportunity-template.md
+  technical_classification_template: opportunity-technical-classification-template.md
   require_operational_simulation_section: true
   require_normal_exception_and_peak_or_degraded_scenarios: true
   require_simulated_observations_and_assumptions: true
@@ -142,6 +280,8 @@ publication:
   require_material_uncovered_gap: true
   require_existing_product_and_non_ai_baselines: true
   require_data_feedback_and_simulation_assumptions: true
+  require_technical_classification: true
+  require_conditional_training_data_analysis: true
   require_bounded_prototype_scope: true
   require_model_workflow_business_adoption_and_safety_metrics: true
   require_failure_redesign_and_scale_criteria: true
@@ -169,6 +309,7 @@ fit_guardrails:
   minimum_technical_feasibility_to_publish: 8
   deterministic_baseline_is_comparison_not_rejection: true
   unresolved_unknowns_reduce_confidence_not_automatic_fit: true
+  not_currently_trainable_rejects_or_redesigns_training_hypothesis: true
   core_existing_solution_overlap_without_material_gap_max_strategic_differentiation: 4
   core_existing_solution_overlap_without_material_gap_max_total_fit: 54
   core_mechanism_invalidated_without_mitigation_max_technical_feasibility: 7
@@ -182,7 +323,9 @@ valid_no_new_fit_reasons:
   - deterministic-process-or-software-improvement-is-sufficient
   - no-material-uncovered-gap
   - decorative-or-unnecessary-ai
+  - no-focus-compatible-process-after-simulation
   - no-plausible-data-model-integration-feedback-simulation-or-prototype-path
+  - insufficient-data-path-for-selected-technical-hypothesis
   - central-mechanism-invalidated-without-credible-mitigation
   - generic-candidate-cannot-be-narrowed
 
@@ -194,6 +337,7 @@ invalid_no_new_fit_reasons:
   - labels-integration-cost-or-adoption-still-unknown
   - deterministic-baseline-exists
   - prototype-still-required
+  - technical-focus-was-not-the-most-obvious-ai
 
 fit_dimensions:
   - {id: process-opportunity-fit, max_score: 20}
