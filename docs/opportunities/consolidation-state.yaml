@@ -1,12 +1,12 @@
 schema_version: 1
 last_updated: '2026-07-25'
 phase: complete
-last_run: '2026-07-25T17:58:48Z'
+last_run: '2026-07-25T18:59:48Z'
 next_candidate_group: null
 last_review:
   type: existing-family
-  family_id: FAMILY-008
-  opportunities: [CROSS-001, FIN-001, NONPROFIT-001]
+  family_id: FAMILY-006
+  opportunities: [RETAIL-001, CONST-001, MEDIA-002]
   result: mappings-confirmed
   integrity_repairs: []
   mapping_changes: []
