@@ -263,3 +263,12 @@ flowchart LR
 ## Next decision
 
 Prototype candidate. Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-002 — Condition-risk monitoring and inspection prioritization`](../../solution-families/FAMILY-002-condition-risk-monitoring-inspection-prioritization.md)
+- **Disposition:** `fit-with-adapters`
+- **Reused architecture:** Time-aligned condition signals, deterministic sensor/product controls, excursion-risk prediction, prioritized intervention, human disposition authority, and confirmation feedback.
+- **Case-specific adapters:** Shipment, product constraints, route, weather, logger telemetry, refrigeration equipment, handling events, and quality-release workflow.
+- **Case-specific extension:** Sensor-quality anomaly detection and route-context features.
+- **Why no separate architecture yet:** These are domain signal adapters within the same condition-risk and human intervention architecture.

@@ -259,3 +259,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Case snapshot, deterministic protocol/eligibility gates, calibrated intervention-need prediction, ranked review queue, abstention, specialist decision, and delayed-outcome feedback.
+- **Case-specific adapters:** Hospital EHR, prescribing, microbiology, laboratory, vital signs, diagnosis, local antimicrobial protocols, pharmacy and infection-control workflow.
+- **Case-specific extension:** None beyond domain feature and protocol adapters.
+- **Why no separate architecture yet:** The case matches the base named-risk, bounded human intervention, deterministic gate, and adjudicated outcome architecture.

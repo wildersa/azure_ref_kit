@@ -230,3 +230,12 @@ flowchart LR
 ## Next decision
 
 Prototype candidate. Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-002 — Condition-risk monitoring and inspection prioritization`](../../solution-families/FAMILY-002-condition-risk-monitoring-inspection-prioritization.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Time-aligned condition signals, deterministic sensor/safety checks, multivariate anomaly and degradation prediction, ranked inspections, human maintenance decision, and confirmed outcome feedback.
+- **Case-specific adapters:** Plant historian, sensors, CMMS, production context, asset hierarchy, maintenance records, operating regime, and inspection workflow.
+- **Case-specific extension:** None beyond asset-specific features and maintenance adapters.
+- **Why no separate architecture yet:** The case directly matches the condition-risk, hard-threshold, human inspection, and maintenance feedback architecture.

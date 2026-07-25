@@ -260,3 +260,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-005 — Multimodal item assessment and human disposition routing`](../../solution-families/FAMILY-005-multimodal-item-assessment-disposition-routing.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Guided item capture, deterministic consumer-right and order controls, multimodal condition/integrity assessment, permissible disposition filtering, human routing, and realized recovery feedback.
+- **Case-specific adapters:** Order and product master, return reason, consumer-right rules, item taxonomy, resale/refurbishment/supplier/disposal route catalog, and warehouse workflow.
+- **Case-specific extension:** None beyond item and route adapters.
+- **Why no separate architecture yet:** The case directly matches the physical-item condition, route constraint, human disposition, and downstream-outcome contract.

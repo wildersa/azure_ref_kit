@@ -277,3 +277,23 @@ hypothesis → researched → shortlisted → approved → implementing → impl
 Alternative states: `rejected`, `superseded`, and `parked`.
 
 The watcher may create and update opportunities, indexes, state, and history. It must not open implementation issues, add runtime code, or approve implementation without explicit human direction.
+
+## Solution consolidation
+
+Discovery and consolidation are separate controls:
+
+```text
+operational simulation and discovery
+→ concrete business opportunity
+→ reusable solution family
+→ applied-case adapters or extensions
+→ rare architecture-derivation review
+```
+
+The opportunity remains the source of truth for business context, Brazilian evidence, regulation, case-specific data, and prototype assumptions. The solution family is the source of truth for reusable logical architecture, invariant controls, human authority, integration contracts, evaluation, and building blocks.
+
+- [Consolidation method](solution-consolidation-method.md)
+- [Solution family index](solution-family-index.yaml)
+- [Opportunity-to-family map](opportunity-family-map.yaml)
+- [Consolidation state](consolidation-state.yaml)
+- [Solution family catalog](solution-families/)

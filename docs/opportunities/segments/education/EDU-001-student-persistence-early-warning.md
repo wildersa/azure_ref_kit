@@ -261,3 +261,12 @@ flowchart LR
 - prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Student case snapshot, deterministic eligibility/privacy controls, calibrated persistence-risk prediction, bounded support queue, advisor authority, abstention, and delayed outcome feedback.
+- **Case-specific adapters:** Academic progression, attendance, LMS, financial/service signals, support history, consent/privacy, and student-services workflow.
+- **Case-specific extension:** Risk-factor explanation for advisor review.
+- **Why no separate architecture yet:** The case directly matches named-risk prediction, bounded human support intervention, deterministic safeguards, and outcome evaluation.

@@ -271,3 +271,12 @@ flowchart LR
 - prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-005 — Multimodal item assessment and human disposition routing`](../../solution-families/FAMILY-005-multimodal-item-assessment-disposition-routing.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Guided capture, deterministic case/policy controls, multimodal condition assessment, evidence-integrity findings, permissible route filtering, human review, and outcome feedback.
+- **Case-specific adapters:** Vehicle identity, policy/claim data, guided damage views, repair estimates, prior claims, coverage and regulatory rules.
+- **Case-specific extension:** Claim-relationship anomaly features for specialist fraud review.
+- **Why no separate architecture yet:** The graph anomaly extension is secondary; damage assessment, integrity, route constraints, human authority, and feedback remain within the base item-assessment architecture.

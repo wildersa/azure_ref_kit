@@ -198,3 +198,12 @@ flowchart LR
 ## Next decision
 
 - shortlist for review.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-003 — Forecast-driven capacity planning under constraints`](../../solution-families/FAMILY-003-forecast-driven-capacity-planning.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Versioned planning snapshot, probabilistic demand/capacity forecast, deterministic protocol and fairness constraints, feasible queue/slot options, manager approval, and realized-outcome evaluation.
+- **Case-specific adapters:** SUS regulation systems, referral protocols, specialty capacity, geography, wait time, cancellations, clinical context, and municipal/state workflows.
+- **Case-specific extension:** No-show prediction and equity-aware queue/slot optimization.
+- **Why no separate architecture yet:** These are expected planning extensions; the probabilistic forecast, hard constraints, human regulation authority, and outcome ledger remain unchanged.

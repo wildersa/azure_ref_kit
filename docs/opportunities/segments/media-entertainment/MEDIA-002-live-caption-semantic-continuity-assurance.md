@@ -365,3 +365,12 @@ flowchart LR
 Prototype candidate, conditional on broadcaster observation and vendor capability validation. Reclassify to `adopt existing solution` or `extend existing platform` if current caption QoE products already detect the defined semantic incidents with acceptable Brazilian Portuguese performance.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-006 — Observed-state conformance and corrective work prioritization`](../../solution-families/FAMILY-006-observed-state-conformance-corrective-prioritization.md)
+- **Disposition:** `candidate-variant`
+- **Reused architecture:** Versioned expected program/rundown context, multimodal observed output, deterministic timing/readability checks, semantic conformance findings, operator incident queue, and correction feedback.
+- **Case-specific adapters:** Live audio, outgoing captions, video cues, rundowns, source changes, broadcast automation, accessibility rules, and operator console.
+- **Case-specific extension:** Continuous low-latency rolling alignment, stateful stream windows, and immediate operator incident generation.
+- **Why no separate architecture yet:** The expected-versus-observed conformance job is shared, but streaming state, latency, and failure handling are material enough for derivation review.

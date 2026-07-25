@@ -270,3 +270,12 @@ flowchart LR
 ## Next decision
 
 Continue research and consider a bounded prototype only after an accessibility or education-content owner confirms material volume, target formats, specialist review capacity, and an obtainable Portuguese golden set.
+
+## Solution family mapping
+
+- **Family:** `UNMAPPED — no coherent reusable family yet`
+- **Disposition:** `unmapped`
+- **Reused architecture:** None; the case remains standalone until another content-remediation case proves the same generation-and-assurance architecture.
+- **Case-specific adapters:** Learning content repositories, document/media formats, WCAG/accessibility rules, curriculum context, publishing workflow, and specialist review.
+- **Case-specific extension:** Multimodal content extraction, alternative-description generation, structural remediation, and accessibility defect classification.
+- **Why no separate architecture yet:** Its primary output is newly generated or transformed accessible content, not risk scoring, conformance-to-physical-baseline, or evidence contradiction; forcing it into those families would hide the generation/evaluation loop.

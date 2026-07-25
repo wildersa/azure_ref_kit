@@ -340,3 +340,12 @@ flowchart LR
 Prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Versioned evidence manifest, deterministic rule checks, grounded cross-source extraction/reconciliation, typed contradictions, abstention, and human approval.
+- **Case-specific adapters:** Official Brazilian tax sources, effective-date rules, ERP tax configuration, fiscal-document schemas, product/jurisdiction mappings, and release pipeline connectors.
+- **Case-specific extension:** Regulatory-change impact mapping and risk-ranked regression-test candidate generation.
+- **Why no separate architecture yet:** Impact and test generation are optional outputs layered on the same evidence-consistency gate; they do not change the approval authority or core contradiction contract.

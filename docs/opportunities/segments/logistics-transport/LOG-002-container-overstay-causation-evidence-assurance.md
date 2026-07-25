@@ -352,3 +352,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-007 — Evidence-grounded timeline and obligation reconstruction`](../../solution-families/FAMILY-007-evidence-grounded-timeline-obligation-reconstruction.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Provenance-preserving source ingestion, grounded event/party extraction, deterministic interval reconciliation, ambiguity/abstention, human chronology confirmation, and downstream case action.
+- **Case-specific adapters:** Terminal, carrier, customs, port, transport, email, contract/free-time, invoice, and dispute-system adapters.
+- **Case-specific extension:** Responsibility-candidate classification and cross-party contradiction findings for attributable intervals.
+- **Why no separate architecture yet:** Responsibility candidates remain non-binding evidence layered on the same grounded chronology and deterministic temporal engine.

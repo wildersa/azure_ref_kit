@@ -295,3 +295,12 @@ Technical feasibility means whether a bounded prototype can be built and meaning
 - shortlist for review.
 
 The shortlist recommendation authorizes no implementation. It means the problem is current, the intelligent capability is material, and a bounded read-only prototype can test incremental value against strengthened deterministic controls and normal human review.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Versioned procurement evidence manifest, deterministic completeness/legal controls, grounded extraction and cross-document contradiction findings, abstention, human approval, and correction feedback.
+- **Case-specific adapters:** ETP, term of reference, price research, notice, quantities, procurement rules, templates, approvals, and PNCP publication workflow.
+- **Case-specific extension:** Requirement-specificity classification.
+- **Why no separate architecture yet:** Specificity is a typed finding within the same pre-publication evidence-consistency gate.

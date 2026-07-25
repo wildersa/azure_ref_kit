@@ -178,3 +178,12 @@ flowchart LR
 ## Next decision
 
 - Continue research through an organization-specific data audit, employee-consent design, legal classification, and small offline evaluation before shortlisting.
+
+## Solution family mapping
+
+- **Family:** `UNMAPPED — no coherent reusable family yet`
+- **Disposition:** `unmapped`
+- **Reused architecture:** None; the case remains a standalone opportunity until a second long-lived skills-evidence graph case demonstrates the same architecture.
+- **Case-specific adapters:** HRIS, learning platforms, employee-approved work evidence, skills taxonomies, job architecture, consent, and employment-policy adapters.
+- **Case-specific extension:** Long-lived governed skills graph, taxonomy alignment, gap inference, and transition-path recommendation.
+- **Why no separate architecture yet:** Its persistent graph lifecycle, consent boundary, taxonomy governance, and career-path recommendation are not represented coherently by the current case-risk or evidence-review families.

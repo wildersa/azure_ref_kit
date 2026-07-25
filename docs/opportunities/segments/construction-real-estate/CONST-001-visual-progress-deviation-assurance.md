@@ -273,3 +273,12 @@ flowchart LR
 - prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-006 — Observed-state conformance and corrective work prioritization`](../../solution-families/FAMILY-006-observed-state-conformance-corrective-prioritization.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Versioned BIM/schedule baseline, guided site observations, deterministic coverage/tolerance checks, visual state alignment, progress/deviation findings, human corrective work, and repeat verification.
+- **Case-specific adapters:** BIM, schedule/WBS, location hierarchy, guided site imagery, progress records, issue/task systems, and measurement workflow.
+- **Case-specific extension:** Progress estimation and schedule-impact calculation.
+- **Why no separate architecture yet:** These are expected conformance outputs; the baseline alignment, human validation, and non-automated certification boundary remain coherent.

@@ -203,3 +203,12 @@ flowchart LR
 ## Next decision
 
 Continue research through a bounded shadow-mode architecture using Brazilian Pix data contracts, current Banco Central rules, LGPD controls, and institution-specific model-risk assessment before any implementation approval.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `candidate-variant`
+- **Reused architecture:** Named-risk case/event scoring, deterministic policy controls, graph-derived features, calibrated confidence, human investigation, and outcome feedback.
+- **Case-specific adapters:** Pix transaction stream, device and account context, Banco Central security signals, DICT/MED processes, participant rules, and payment graph.
+- **Case-specific extension:** Sub-second streaming inference, graph propagation, and proportionate governed transaction controls before human MED investigation.
+- **Why no separate architecture yet:** The base family is asynchronous and advisory; this case changes runtime, authority, failure tolerance, and write semantics, so it is queued for architecture derivation review.

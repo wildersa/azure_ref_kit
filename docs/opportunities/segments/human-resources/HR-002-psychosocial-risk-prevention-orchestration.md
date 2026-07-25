@@ -258,3 +258,12 @@ flowchart LR
 Prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Versioned case/group snapshot, deterministic eligibility and privacy controls, calibrated hazard risk, prioritized preventive review, abstention, and adjudicated outcomes.
+- **Case-specific adapters:** Worker consultation, work-design evidence, absence/incidents, organizational units, NR-1/PGR context, privacy thresholds, and action-plan workflow.
+- **Case-specific extension:** Group-level aggregation, minimum cohort thresholds, and privacy-preserving hazard classification.
+- **Why no separate architecture yet:** The privacy extension changes feature preparation but retains the same bounded risk target, advisory queue, human preventive action, and evaluation loop.

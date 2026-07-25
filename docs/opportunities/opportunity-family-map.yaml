@@ -1,12 +1,1309 @@
 schema_version: 1
-last_updated: "2026-07-25"
-
+last_updated: '2026-07-25'
 allowed_dispositions:
-  - direct-fit
-  - fit-with-adapters
-  - fit-with-extension
-  - candidate-variant
-  - unmapped
-  - duplicate-or-weak
-
-mappings: []
+- direct-fit
+- fit-with-adapters
+- fit-with-extension
+- candidate-variant
+- unmapped
+- duplicate-or-weak
+active_opportunity_count: 34
+mapped_to_family_count: 30
+unmapped_count: 4
+duplicate_or_weak_count: 0
+mappings:
+- opportunity_id: CROSS-001
+  document: segments/cross-industry/CROSS-001-offboarding-control-plane.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: candidate-variant
+  fingerprint:
+    actor: Offboarding coordinator or security analyst
+    bounded_process: Close a leaver or mover case across digital access, physical access, assets, and evidence
+    trigger: Authoritative employment termination, contractor end, or role-change event
+    primary_decision: Which residual-access or incomplete-control findings require investigation while mandatory tasks are completed
+    material_outcome: Reduce residual access and incomplete offboarding controls with auditable completion evidence
+    input_modalities:
+    - structured records
+    - identity and access graph
+    - tickets
+    - connector outcomes
+    - asset and badge records
+    - activity signals
+    primary_intelligent_mechanism: Identity/access graph anomaly detection and residual-control risk ranking
+    execution_model: durable asynchronous case orchestration
+    deterministic_controls:
+    - required task policy
+    - deadlines
+    - approvals
+    - legal holds
+    - connector authorization
+    - segregation of duties
+    human_authority: Security, HR, manager, and control owners approve findings, waivers, and consequential actions
+    integration_shape: Stateful control plane with read/write connectors plus a ranked investigation queue
+    feedback_and_evaluation: Confirmed or dismissed residual findings, connector results, reopened cases, and post-offboarding discoveries
+  reused_architecture: Canonical case snapshot, deterministic policy gates, graph-derived risk scoring, confidence/abstention, human review, and
+    adjudicated feedback.
+  case_specific_adapters: HR/contractor events; identity, SaaS, badge, device, asset, ITSM, and SCIM connectors; role and legal-hold rules.
+  case_specific_extension: Durable policy-derived task orchestration, evidence ledger, connector write actions, and a long-lived identity/access
+    graph.
+  why_no_separate_architecture_yet: The risk-scoring and review core is comparable, but durable write-oriented orchestration is structurally larger
+    and is queued for derivation review instead of being absorbed into the advisory base.
+  validation_delta: Use a separate prototype track because runtime, authority, or learning metrics are not fully comparable with the base.
+  derivation_signal: Durable multi-system task orchestration and governed write actions.
+- opportunity_id: CROSS-002
+  document: segments/cross-industry/CROSS-002-supplier-payment-change-assurance.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Accounts-payable, procurement, supplier-master, or fraud reviewer
+    bounded_process: Review supplier onboarding or bank-detail change before payment release
+    trigger: New supplier registration or a material supplier identity/payment change
+    primary_decision: Hold, clear, or escalate the change for human-approved payment processing
+    material_outcome: Prevent misdirected or fraudulent supplier payments without blocking valid changes unnecessarily
+    input_modalities:
+    - structured master data
+    - documents
+    - registry evidence
+    - communications
+    - payment history
+    - approval records
+    primary_intelligent_mechanism: Entity resolution, change-pattern anomaly detection, and calibrated payment-change risk scoring
+    execution_model: asynchronous pre-release review
+    deterministic_controls:
+    - CNPJ and bank-field validation
+    - approval separation
+    - mandatory evidence
+    - payment hold
+    - authorized change workflow
+    human_authority: Authorized supplier-master and payment reviewers approve or reject changes and payment release
+    integration_shape: Read-oriented assurance service connected to ERP/procurement/payment workflow with hold status
+    feedback_and_evaluation: Confirmed fraud, legitimate change, reviewer override, payment outcome, and later supplier correction
+  reused_architecture: Case-event intake, deterministic eligibility and approval controls, calibrated named-risk prediction, ranked human review,
+    abstention, and outcome feedback.
+  case_specific_adapters: Supplier master, CNPJ and banking evidence, ERP/procurement workflows, communications, approval history, and payment-release
+    rules.
+  case_specific_extension: Supplier-entity resolution, communication-risk classification, and payment-change pattern features.
+  why_no_separate_architecture_yet: These extensions enrich the canonical case snapshot but preserve the same advisory risk score, deterministic
+    release gate, human authority, and feedback contract.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: CROSS-003
+  document: segments/cross-industry/CROSS-003-tax-reform-configuration-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Tax, fiscal, ERP configuration, and release reviewer
+    bounded_process: Translate an official IBS/CBS change into reviewed ERP configuration and fiscal-document validation
+    trigger: New or materially changed official tax rule, technical note, schema, or effective date
+    primary_decision: Hold, correct, or approve configuration and regression evidence for release
+    material_outcome: Reduce inconsistent fiscal configuration and rejected or incorrect invoices during tax reform
+    input_modalities:
+    - official documents
+    - structured tax rules
+    - ERP configuration
+    - fiscal XML/documents
+    - test results
+    primary_intelligent_mechanism: Grounded regulatory extraction, impact mapping, and cross-artifact contradiction detection
+    execution_model: asynchronous change-review cycle
+    deterministic_controls:
+    - effective dates
+    - schema validation
+    - mandatory fields
+    - tax calculation checks
+    - release approvals
+    - version control
+    human_authority: Tax and ERP owners approve interpretation, configuration, tests, and production release
+    integration_shape: Read-oriented assurance layer around regulatory sources, ERP configuration, and CI/regression workflow
+    feedback_and_evaluation: Reviewer-corrected impacts, escaped configuration defects, regression outcomes, and production rejection patterns
+  reused_architecture: Versioned evidence manifest, deterministic rule checks, grounded cross-source extraction/reconciliation, typed contradictions,
+    abstention, and human approval.
+  case_specific_adapters: Official Brazilian tax sources, effective-date rules, ERP tax configuration, fiscal-document schemas, product/jurisdiction
+    mappings, and release pipeline connectors.
+  case_specific_extension: Regulatory-change impact mapping and risk-ranked regression-test candidate generation.
+  why_no_separate_architecture_yet: Impact and test generation are optional outputs layered on the same evidence-consistency gate; they do not
+    change the approval authority or core contradiction contract.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: HR-001
+  document: segments/human-resources/HR-001-skills-evidence-mobility-graph.md
+  family_id: null
+  family_name: null
+  disposition: unmapped
+  fingerprint:
+    actor: Employee, talent-mobility advisor, manager, and learning owner
+    bounded_process: Build an employee-approved evidence profile and recommend internal transition and reskilling paths
+    trigger: Employee opts in, updates evidence, or explores an internal role transition
+    primary_decision: Which skills evidence is valid and which transition/reskilling paths should be reviewed
+    material_outcome: Improve internal mobility and targeted reskilling without autonomous employment decisions
+    input_modalities:
+    - documents
+    - work artifacts
+    - structured HR records
+    - learning records
+    - skills taxonomy
+    - graph relationships
+    primary_intelligent_mechanism: Evidence-grounded skill extraction, taxonomy mapping, gap inference, and path ranking
+    execution_model: interactive and asynchronous long-lived graph
+    deterministic_controls:
+    - employee consent
+    - allowed evidence
+    - taxonomy versions
+    - role access
+    - prohibited employment decisions
+    human_authority: Employees control evidence; authorized HR and managers make employment and development decisions
+    integration_shape: Persistent skills graph and recommendation service integrated with HR and learning systems
+    feedback_and_evaluation: Employee corrections, advisor validation, transition outcomes, learning completion, and taxonomy updates
+  reused_architecture: None; the case remains a standalone opportunity until a second long-lived skills-evidence graph case demonstrates the same
+    architecture.
+  case_specific_adapters: HRIS, learning platforms, employee-approved work evidence, skills taxonomies, job architecture, consent, and employment-policy
+    adapters.
+  case_specific_extension: Long-lived governed skills graph, taxonomy alignment, gap inference, and transition-path recommendation.
+  why_no_separate_architecture_yet: Its persistent graph lifecycle, consent boundary, taxonomy governance, and career-path recommendation are
+    not represented coherently by the current case-risk or evidence-review families.
+  validation_delta: Standalone prototype and metrics remain owned by the opportunity until a coherent family appears.
+  derivation_signal: unmapped; await another structurally comparable case
+- opportunity_id: HR-002
+  document: segments/human-resources/HR-002-psychosocial-risk-prevention-orchestration.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Occupational safety, HR, worker-representation, and work-design committee
+    bounded_process: Review group-level psychosocial hazards and prioritize preventive work-design actions
+    trigger: Periodic risk review, consultation cycle, incident trend, or material work-design change
+    primary_decision: Which group-level hazards require investigation and preventive action
+    material_outcome: Prioritize prevention without profiling individual mental health or automating employment decisions
+    input_modalities:
+    - consultation text
+    - structured surveys
+    - absence trends
+    - incident records
+    - work-design and workload signals
+    primary_intelligent_mechanism: Group-level psychosocial-hazard classification, anomaly detection, and calibrated preventive-review risk
+    execution_model: periodic asynchronous review
+    deterministic_controls:
+    - minimum cohort size
+    - data minimization
+    - prohibited individual scoring
+    - mandatory consultation
+    - authorized action catalog
+    human_authority: Authorized safety/HR committees validate hazards and approve preventive actions
+    integration_shape: Read-oriented group-risk service feeding a governed preventive-action workflow
+    feedback_and_evaluation: Committee dispositions, worker consultation, action completion, repeated hazards, and group-level operational outcomes
+  reused_architecture: Versioned case/group snapshot, deterministic eligibility and privacy controls, calibrated hazard risk, prioritized preventive
+    review, abstention, and adjudicated outcomes.
+  case_specific_adapters: Worker consultation, work-design evidence, absence/incidents, organizational units, NR-1/PGR context, privacy thresholds,
+    and action-plan workflow.
+  case_specific_extension: Group-level aggregation, minimum cohort thresholds, and privacy-preserving hazard classification.
+  why_no_separate_architecture_yet: The privacy extension changes feature preparation but retains the same bounded risk target, advisory queue,
+    human preventive action, and evaluation loop.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: FIN-001
+  document: segments/financial-services/FIN-001-app-scam-intervention.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: candidate-variant
+  fingerprint:
+    actor: Pix fraud operations, transaction-risk engine owner, and MED investigator
+    bounded_process: Assess an outgoing Pix transaction and subsequent fund-dispersion path for scam or mule risk
+    trigger: Pix initiation and immediate post-transaction account/graph events
+    primary_decision: Allow, step up, delay, block within policy, or prioritize MED investigation
+    material_outcome: Interrupt scams and mule-account dispersion while limiting false blocks
+    input_modalities:
+    - streaming transactions
+    - device telemetry
+    - account behavior
+    - security signals
+    - payment graph
+    - customer interaction
+    primary_intelligent_mechanism: Calibrated scam-risk prediction and graph-based mule/fund-dispersion detection
+    execution_model: real-time streaming with governed action
+    deterministic_controls:
+    - Banco Central rules
+    - transaction limits
+    - step-up policy
+    - action authorization
+    - MED deadlines
+    - hard security signals
+    human_authority: Fraud policy owners govern automated controls; investigators and authorized staff handle MED and final case decisions
+    integration_shape: Inline transaction-risk service plus streaming graph detection and investigation workflow
+    feedback_and_evaluation: Confirmed scams, customer challenges, MED outcomes, recovered funds, false blocks, chargebacks, and graph discoveries
+  reused_architecture: Named-risk case/event scoring, deterministic policy controls, graph-derived features, calibrated confidence, human investigation,
+    and outcome feedback.
+  case_specific_adapters: Pix transaction stream, device and account context, Banco Central security signals, DICT/MED processes, participant
+    rules, and payment graph.
+  case_specific_extension: Sub-second streaming inference, graph propagation, and proportionate governed transaction controls before human MED
+    investigation.
+  why_no_separate_architecture_yet: The base family is asynchronous and advisory; this case changes runtime, authority, failure tolerance, and
+    write semantics, so it is queued for architecture derivation review.
+  validation_delta: Use a separate prototype track because runtime, authority, or learning metrics are not fully comparable with the base.
+  derivation_signal: Sub-second streaming inference and proportionate automated transaction controls.
+- opportunity_id: FIN-002
+  document: segments/financial-services/FIN-002-motor-claim-evidence-assurance.md
+  family_id: FAMILY-005
+  family_name: Multimodal item assessment and human disposition routing
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Motor-claim adjuster, inspection reviewer, or claims specialist
+    bounded_process: Assess submitted vehicle evidence and route a motor claim for appropriate human review
+    trigger: Motor claim first notice or guided evidence submission
+    primary_decision: Which damage findings and review route require adjuster confirmation
+    material_outcome: Accelerate evidence assessment while preserving coverage, fraud, liability, and indemnity authority
+    input_modalities:
+    - guided images/video
+    - vehicle and policy records
+    - claim documents
+    - capture metadata
+    - claim relationship graph
+    primary_intelligent_mechanism: Multimodal vehicle-damage recognition and evidence-integrity classification
+    execution_model: interactive or asynchronous case assessment
+    deterministic_controls:
+    - policy eligibility
+    - mandatory views
+    - vehicle identity
+    - coverage rules
+    - fraud-decision prohibition
+    - review escalation
+    human_authority: Authorized claims staff decide coverage, fraud escalation, liability, repair, and indemnity
+    integration_shape: Secure evidence intake and assessment service integrated with claims workflow
+    feedback_and_evaluation: Adjuster corrections, repair outcomes, supplemental damage, fraud investigation, disputes, and recapture results
+  reused_architecture: Guided capture, deterministic case/policy controls, multimodal condition assessment, evidence-integrity findings, permissible
+    route filtering, human review, and outcome feedback.
+  case_specific_adapters: Vehicle identity, policy/claim data, guided damage views, repair estimates, prior claims, coverage and regulatory rules.
+  case_specific_extension: Claim-relationship anomaly features for specialist fraud review.
+  why_no_separate_architecture_yet: The graph anomaly extension is secondary; damage assessment, integrity, route constraints, human authority,
+    and feedback remain within the base item-assessment architecture.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: HEALTH-001
+  document: segments/healthcare/HEALTH-001-sus-specialist-access-orchestration.md
+  family_id: FAMILY-003
+  family_name: Forecast-driven capacity planning under constraints
+  disposition: fit-with-extension
+  fingerprint:
+    actor: SUS regulation-center clinician, scheduler, or access manager
+    bounded_process: Prioritize specialist access and recover available appointment capacity
+    trigger: Planning cycle, new referral, cancellation, or capacity update
+    primary_decision: Which protocol-compliant queue or slot recommendation should be adopted
+    material_outcome: Reduce avoidable waits and unused specialist capacity while preserving clinical and regulatory control
+    input_modalities:
+    - structured referrals
+    - clinical context
+    - capacity schedules
+    - wait lists
+    - geography
+    - cancellation history
+    primary_intelligent_mechanism: Demand-capacity forecasting, no-show prediction, and constrained queue/slot recommendation
+    execution_model: scheduled and event-refreshed planning
+    deterministic_controls:
+    - clinical protocols
+    - priority rules
+    - fairness/equity constraints
+    - eligibility
+    - capacity
+    - human override
+    human_authority: Authorized regulation-center clinicians and managers approve queue and slot changes
+    integration_shape: Planning and recommendation layer connected to regulation and scheduling systems
+    feedback_and_evaluation: Attendance, cancellation, wait, clinical review, slot use, overrides, and access outcomes
+  reused_architecture: Versioned planning snapshot, probabilistic demand/capacity forecast, deterministic protocol and fairness constraints, feasible
+    queue/slot options, manager approval, and realized-outcome evaluation.
+  case_specific_adapters: SUS regulation systems, referral protocols, specialty capacity, geography, wait time, cancellations, clinical context,
+    and municipal/state workflows.
+  case_specific_extension: No-show prediction and equity-aware queue/slot optimization.
+  why_no_separate_architecture_yet: These are expected planning extensions; the probabilistic forecast, hard constraints, human regulation authority,
+    and outcome ledger remain unchanged.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: HEALTH-002
+  document: segments/healthcare/HEALTH-002-antimicrobial-stewardship-review-prioritization.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: direct-fit
+  fingerprint:
+    actor: Antimicrobial stewardship pharmacist, infectious-disease clinician, or review team
+    bounded_process: Prioritize active antimicrobial orders for specialist review
+    trigger: New or changed antimicrobial prescription and relevant clinical/laboratory events
+    primary_decision: Which cases require timely stewardship review and which grounded intervention candidates merit consideration
+    material_outcome: Focus stewardship capacity on higher-value reviews without autonomous treatment changes
+    input_modalities:
+    - prescriptions
+    - structured clinical data
+    - microbiology
+    - laboratory
+    - vital signs
+    - diagnoses
+    - protocol text
+    primary_intelligent_mechanism: Calibrated antimicrobial-review need prediction and evidence-grounded case classification
+    execution_model: near-real-time asynchronous clinical review
+    deterministic_controls:
+    - allergy and hard safety alerts
+    - local protocols
+    - authorized roles
+    - mandatory escalation
+    - no autonomous medication change
+    human_authority: Authorized clinicians and pharmacists approve any intervention or treatment change
+    integration_shape: Read-oriented scoring service feeding the existing stewardship review queue
+    feedback_and_evaluation: Reviewer disposition, accepted intervention, clinician response, culture result, therapy change, and patient outcome
+  reused_architecture: Case snapshot, deterministic protocol/eligibility gates, calibrated intervention-need prediction, ranked review queue,
+    abstention, specialist decision, and delayed-outcome feedback.
+  case_specific_adapters: Hospital EHR, prescribing, microbiology, laboratory, vital signs, diagnosis, local antimicrobial protocols, pharmacy
+    and infection-control workflow.
+  case_specific_extension: None beyond domain feature and protocol adapters.
+  why_no_separate_architecture_yet: The case matches the base named-risk, bounded human intervention, deterministic gate, and adjudicated outcome
+    architecture.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: RETAIL-001
+  document: segments/retail-ecommerce/RETAIL-001-shelf-availability-loss-orchestration.md
+  family_id: FAMILY-006
+  family_name: Observed-state conformance and corrective work prioritization
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Store operations manager, replenishment lead, or loss-prevention reviewer
+    bounded_process: Detect shelf availability or shrinkage deviations, assign corrective work, and verify execution
+    trigger: Scheduled aisle scan, staff/customer signal, inventory discrepancy, or replenishment cycle
+    primary_decision: Which shelf deviations require replenishment, investigation, recount, or escalation
+    material_outcome: Improve shelf availability and reduce unresolved operational loss
+    input_modalities:
+    - shelf images
+    - planogram
+    - inventory
+    - sales
+    - replenishment
+    - loss events
+    - task records
+    primary_intelligent_mechanism: Shelf-state recognition, planogram/inventory alignment, and deviation prioritization
+    execution_model: interactive or asynchronous store rounds
+    deterministic_controls:
+    - SKU/location identity
+    - inventory rules
+    - task eligibility
+    - hard stock exceptions
+    - no disciplinary conclusion
+    human_authority: Store and loss-prevention staff confirm findings and authorize corrective or investigative work
+    integration_shape: Observation/conformance service integrated with inventory and store-task systems
+    feedback_and_evaluation: Confirmed shelf state, task completion, recapture, inventory correction, sale recovery, and loss investigation result
+  reused_architecture: Versioned expected shelf/inventory baseline, guided observations, deterministic reconciliation, multimodal state alignment,
+    deviation ranking, corrective tasks, and verification.
+  case_specific_adapters: Planogram, shelf location, SKU/master data, inventory, sales, replenishment, loss events, store tasks, and mobile capture.
+  case_specific_extension: Inventory-loss anomaly scoring alongside visual conformance.
+  why_no_separate_architecture_yet: Loss scoring is adjacent evidence; the core observed-state comparison, task creation, human confirmation,
+    and recapture verification remain stable.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: RETAIL-002
+  document: segments/retail-ecommerce/RETAIL-002-return-inspection-value-recovery.md
+  family_id: FAMILY-005
+  family_name: Multimodal item assessment and human disposition routing
+  disposition: direct-fit
+  fingerprint:
+    actor: Returns inspection, warehouse, customer-service, or reverse-logistics reviewer
+    bounded_process: Inspect a returned item and select a permissible value-recovery route
+    trigger: Returned product received or guided return evidence submitted
+    primary_decision: Resell, refurbish, return to supplier, inspect further, or dispose under policy
+    material_outcome: Increase recovery value and reduce inspection delay without weakening consumer rights
+    input_modalities:
+    - guided images/video
+    - product/order records
+    - return reason
+    - item metadata
+    - prior condition
+    - warehouse evidence
+    primary_intelligent_mechanism: Multimodal item-condition recognition, return-reason classification, and route-value ranking
+    execution_model: interactive or asynchronous item assessment
+    deterministic_controls:
+    - consumer rights
+    - return eligibility
+    - hazard rules
+    - mandatory inspection
+    - permissible routes
+    - human approval
+    human_authority: Authorized returns and warehouse staff decide final condition and disposition
+    integration_shape: Assessment service connected to order, warehouse, and reverse-logistics workflow
+    feedback_and_evaluation: Inspector correction, resale/refurbishment yield, supplier acceptance, disposal outcome, dispute, and recapture
+  reused_architecture: Guided item capture, deterministic consumer-right and order controls, multimodal condition/integrity assessment, permissible
+    disposition filtering, human routing, and realized recovery feedback.
+  case_specific_adapters: Order and product master, return reason, consumer-right rules, item taxonomy, resale/refurbishment/supplier/disposal
+    route catalog, and warehouse workflow.
+  case_specific_extension: None beyond item and route adapters.
+  why_no_separate_architecture_yet: The case directly matches the physical-item condition, route constraint, human disposition, and downstream-outcome
+    contract.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: MANUF-001
+  document: segments/manufacturing/MANUF-001-aging-equipment-condition-maintenance-prioritization.md
+  family_id: FAMILY-002
+  family_name: Condition-risk monitoring and inspection prioritization
+  disposition: direct-fit
+  fingerprint:
+    actor: Reliability engineer, maintenance planner, or condition-monitoring technician
+    bounded_process: Monitor aging equipment condition and prioritize inspection or maintenance review
+    trigger: New sensor window, operating-state change, alarm, or maintenance planning cycle
+    primary_decision: Which assets require inspection or maintenance attention and on what horizon
+    material_outcome: Detect degradation earlier and focus maintenance capacity on credible risks
+    input_modalities:
+    - time-series sensors
+    - maintenance history
+    - production context
+    - asset metadata
+    - inspection records
+    primary_intelligent_mechanism: Multivariate condition anomaly detection and degradation forecasting
+    execution_model: streaming or micro-batch monitoring
+    deterministic_controls:
+    - sensor quality
+    - hard safety limits
+    - asset operating envelope
+    - maintenance authorization
+    - manual alarms
+    human_authority: Reliability and maintenance staff approve inspection, shutdown, and maintenance actions
+    integration_shape: Read-oriented condition scoring service connected to historian and CMMS
+    feedback_and_evaluation: Inspection confirmation, maintenance finding, failure, false alarm, downtime, and post-repair condition
+  reused_architecture: Time-aligned condition signals, deterministic sensor/safety checks, multivariate anomaly and degradation prediction, ranked
+    inspections, human maintenance decision, and confirmed outcome feedback.
+  case_specific_adapters: Plant historian, sensors, CMMS, production context, asset hierarchy, maintenance records, operating regime, and inspection
+    workflow.
+  case_specific_extension: None beyond asset-specific features and maintenance adapters.
+  why_no_separate_architecture_yet: The case directly matches the condition-risk, hard-threshold, human inspection, and maintenance feedback architecture.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: MANUF-002
+  document: segments/manufacturing/MANUF-002-allergen-changeover-release-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: direct-fit
+  fingerprint:
+    actor: Food quality, sanitation, production-release, or allergen-control reviewer
+    bounded_process: Verify allergen changeover evidence before releasing a line or batch
+    trigger: Changeover to a new recipe/product and evidence package ready for release
+    primary_decision: Hold, correct, or approve the changeover for quality release
+    material_outcome: Prevent unsafe allergen cross-contact or labeling mismatch from passing release
+    input_modalities:
+    - recipes
+    - labels
+    - cleaning records
+    - line images
+    - test results
+    - equipment state
+    - batch records
+    primary_intelligent_mechanism: Multimodal line-clearance recognition and cross-source contradiction detection
+    execution_model: asynchronous pre-release review
+    deterministic_controls:
+    - allergen matrix
+    - mandatory cleaning/test steps
+    - label version
+    - batch identity
+    - release authorization
+    - hard test thresholds
+    human_authority: Authorized quality personnel approve line or batch release
+    integration_shape: Read-oriented assurance gate connected to MES/QMS/label/recipe systems
+    feedback_and_evaluation: Reviewer findings, failed/passed tests, correction evidence, escaped issue, and later quality incident
+  reused_architecture: Versioned evidence manifest, deterministic allergen and release controls, multimodal extraction/reconciliation, typed contradictions,
+    abstention, quality review, and correction feedback.
+  case_specific_adapters: Recipe/BOM, allergen matrix, labels, cleaning records, line state, images, test results, equipment status, batch and
+    quality systems.
+  case_specific_extension: Domain-specific line-clearance vision recognition.
+  why_no_separate_architecture_yet: Vision is an expected evidence adapter; the release hold, contradiction contract, quality authority, and feedback
+    loop match the family directly.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: LOG-001
+  document: segments/logistics-transport/LOG-001-pharmaceutical-cold-chain-excursion-assurance.md
+  family_id: FAMILY-002
+  family_name: Condition-risk monitoring and inspection prioritization
+  disposition: fit-with-adapters
+  fingerprint:
+    actor: Pharmaceutical logistics control-tower or quality reviewer
+    bounded_process: Monitor a shipment for thermal excursion risk and prioritize intervention or quality review
+    trigger: New shipment telemetry, route/equipment event, or predicted excursion horizon
+    primary_decision: Intervene operationally, inspect, hold, or escalate for quality review
+    material_outcome: Reduce preventable excursions while preserving product-release/disposal authority
+    input_modalities:
+    - temperature/humidity telemetry
+    - route events
+    - weather
+    - equipment state
+    - shipment/product records
+    primary_intelligent_mechanism: Multivariate thermal-excursion prediction and sensor-quality anomaly detection
+    execution_model: streaming shipment monitoring
+    deterministic_controls:
+    - product temperature limits
+    - sensor quality
+    - route/handling rules
+    - quality hold
+    - no automatic release/disposal
+    human_authority: Operations and authorized quality staff approve handling, hold, release, or disposal
+    integration_shape: Condition-risk service connected to TMS/cold-chain telemetry and quality workflow
+    feedback_and_evaluation: Confirmed excursion, logger validation, intervention, product assessment, release/disposal, and false alarm
+  reused_architecture: Time-aligned condition signals, deterministic sensor/product controls, excursion-risk prediction, prioritized intervention,
+    human disposition authority, and confirmation feedback.
+  case_specific_adapters: Shipment, product constraints, route, weather, logger telemetry, refrigeration equipment, handling events, and quality-release
+    workflow.
+  case_specific_extension: Sensor-quality anomaly detection and route-context features.
+  why_no_separate_architecture_yet: These are domain signal adapters within the same condition-risk and human intervention architecture.
+  validation_delta: Segment evaluation by source adapter, rule pack, operating context, and domain outcome.
+  derivation_signal: none
+- opportunity_id: LOG-002
+  document: segments/logistics-transport/LOG-002-container-overstay-causation-evidence-assurance.md
+  family_id: FAMILY-007
+  family_name: Evidence-grounded timeline and obligation reconstruction
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Importer logistics, demurrage/detention, legal, or claims reviewer
+    bounded_process: Reconstruct container-overstay intervals and prepare evidence for dispute or conciliation
+    trigger: Overstay charge, disputed interval, or case review request
+    primary_decision: Which intervals and evidence require challenge, acceptance, or further investigation
+    material_outcome: Reduce unsupported charges and manual chronology effort without automating legal responsibility
+    input_modalities:
+    - documents
+    - emails
+    - terminal/carrier events
+    - customs records
+    - contracts
+    - invoices
+    - structured timestamps
+    primary_intelligent_mechanism: Grounded event extraction, temporal reconciliation, responsibility-candidate classification, and contradiction
+      detection
+    execution_model: asynchronous case reconstruction
+    deterministic_controls:
+    - free-time rules
+    - calendar/interval arithmetic
+    - source precedence
+    - contract terms
+    - human submission approval
+    human_authority: Authorized logistics/legal staff confirm chronology, responsibility position, and dispute submission
+    integration_shape: Read-oriented chronology service feeding dispute/conciliation workflow
+    feedback_and_evaluation: Reviewer corrections, accepted/rejected disputes, reconciled charges, missing-source discoveries, and final case
+      outcome
+  reused_architecture: Provenance-preserving source ingestion, grounded event/party extraction, deterministic interval reconciliation, ambiguity/abstention,
+    human chronology confirmation, and downstream case action.
+  case_specific_adapters: Terminal, carrier, customs, port, transport, email, contract/free-time, invoice, and dispute-system adapters.
+  case_specific_extension: Responsibility-candidate classification and cross-party contradiction findings for attributable intervals.
+  why_no_separate_architecture_yet: Responsibility candidates remain non-binding evidence layered on the same grounded chronology and deterministic
+    temporal engine.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: AGRI-001
+  document: segments/agriculture/AGRI-001-grain-storage-condition-assurance.md
+  family_id: FAMILY-002
+  family_name: Condition-risk monitoring and inspection prioritization
+  disposition: direct-fit
+  fingerprint:
+    actor: Grain-storage manager, quality technician, or aeration operator
+    bounded_process: Monitor stored grain condition and prioritize inspection or aeration action
+    trigger: New sensor window, weather/operating change, inventory movement, or scheduled review
+    primary_decision: Which storage zones require inspection, sampling, aeration, or escalation
+    material_outcome: Detect spoilage risk earlier while preserving sampling and quality authority
+    input_modalities:
+    - temperature/humidity telemetry
+    - aeration state
+    - inventory
+    - weather
+    - inspection and laboratory results
+    primary_intelligent_mechanism: Multivariate grain-condition anomaly detection and deterioration forecasting
+    execution_model: streaming or scheduled monitoring
+    deterministic_controls:
+    - sensor quality
+    - safe aeration constraints
+    - hard condition limits
+    - inventory identity
+    - sampling requirements
+    human_authority: Storage and quality staff authorize aeration, inspection, handling, and disposition
+    integration_shape: Condition-risk service connected to storage controls, inventory, and inspection workflow
+    feedback_and_evaluation: Sample/lab result, inspection, aeration response, spoilage, quality grade, false alarm, and avoided loss
+  reused_architecture: Time-aligned condition intake, deterministic sensor and safe-operating checks, multivariate deterioration prediction, ranked
+    inspection/aeration review, human action, and sample/outcome feedback.
+  case_specific_adapters: Silo/bin inventory, temperature/humidity, aeration, weather, grain type, storage age, inspection, sampling, and laboratory
+    systems.
+  case_specific_extension: None beyond grain-specific condition and aeration features.
+  why_no_separate_architecture_yet: The case directly matches condition risk, hard thresholds, human inspection/aeration, and confirmation through
+    sampling.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: CONST-001
+  document: segments/construction-real-estate/CONST-001-visual-progress-deviation-assurance.md
+  family_id: FAMILY-006
+  family_name: Observed-state conformance and corrective work prioritization
+  disposition: direct-fit
+  fingerprint:
+    actor: Site engineer, planner, project-controls, or measurement reviewer
+    bounded_process: Compare observed construction state with plan/schedule and prioritize deviation review
+    trigger: Scheduled site capture, milestone review, or suspected deviation
+    primary_decision: Which progress/deviation findings require correction, measurement review, or schedule action
+    material_outcome: Improve progress visibility and reduce missed deviations without automating payment certification
+    input_modalities:
+    - site images/video
+    - BIM
+    - schedule
+    - location metadata
+    - progress records
+    - issue evidence
+    primary_intelligent_mechanism: Visual work-state recognition, BIM/schedule alignment, progress estimation, and deviation ranking
+    execution_model: asynchronous site review
+    deterministic_controls:
+    - baseline version
+    - location/capture coverage
+    - measurement rules
+    - approval roles
+    - no automatic certification/payment
+    human_authority: Authorized engineering and project-controls staff validate progress, deviations, and commercial consequences
+    integration_shape: Observation/conformance service integrated with BIM, schedule, and issue/workflow systems
+    feedback_and_evaluation: Reviewer correction, completed work, recapture, schedule update, rework, certified measurement, and escaped deviation
+  reused_architecture: Versioned BIM/schedule baseline, guided site observations, deterministic coverage/tolerance checks, visual state alignment,
+    progress/deviation findings, human corrective work, and repeat verification.
+  case_specific_adapters: BIM, schedule/WBS, location hierarchy, guided site imagery, progress records, issue/task systems, and measurement workflow.
+  case_specific_extension: Progress estimation and schedule-impact calculation.
+  why_no_separate_architecture_yet: These are expected conformance outputs; the baseline alignment, human validation, and non-automated certification
+    boundary remain coherent.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: CONST-002
+  document: segments/construction-real-estate/CONST-002-ev-charging-fire-safety-evidence-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: fit-with-adapters
+  fingerprint:
+    actor: Property engineer, electrical reviewer, fire-safety consultant, or authority liaison
+    bounded_process: Review EV-charger retrofit evidence before engineering or authority acceptance
+    trigger: Retrofit design/as-built evidence package ready for review
+    primary_decision: Hold, correct, or accept the package for engineer/authority progression
+    material_outcome: Expose plan-to-site and requirement contradictions before unsafe or noncompliant acceptance
+    input_modalities:
+    - plans
+    - requirements
+    - site images
+    - test results
+    - equipment records
+    - as-built documents
+    primary_intelligent_mechanism: Version-aware regulatory extraction and multimodal plan-to-site contradiction detection
+    execution_model: asynchronous project approval review
+    deterministic_controls:
+    - electrical tests
+    - mandatory documents
+    - version/effective rules
+    - equipment ratings
+    - authorized engineering review
+    human_authority: Engineers and competent authorities retain technical acceptance and approval authority
+    integration_shape: Read-oriented assurance gate around project document and inspection workflow
+    feedback_and_evaluation: Reviewer findings, corrected design/as-built evidence, authority outcome, test failure, and later incident/inspection
+  reused_architecture: Versioned evidence manifest, deterministic electrical/fire-safety checks, grounded plan/site reconciliation, contradiction
+    findings, abstention, engineer review, and correction revisions.
+  case_specific_adapters: Retrofit design, charger/electrical data, as-built evidence, tests, fire-safety requirements, site images, building
+    records, and authority workflow.
+  case_specific_extension: Plan-to-site multimodal alignment.
+  why_no_separate_architecture_yet: The physical evidence adapter does not alter the pre-approval contradiction gate, deterministic controls,
+    or engineer/authority decision boundary.
+  validation_delta: Segment evaluation by source adapter, rule pack, operating context, and domain outcome.
+  derivation_signal: none
+- opportunity_id: ENERGY-001
+  document: segments/energy-utilities/ENERGY-001-ai-assisted-water-leak-detection.md
+  family_id: FAMILY-002
+  family_name: Condition-risk monitoring and inspection prioritization
+  disposition: fit-with-adapters
+  fingerprint:
+    actor: Water-loss analyst, network operator, or field-verification crew
+    bounded_process: Rank suspected hidden leaks and direct bounded field verification
+    trigger: Acoustic/hydraulic anomaly window, customer signal, or network review cycle
+    primary_decision: Which suspected leak locations justify field verification or repair planning
+    material_outcome: Improve leak detection yield and recovered water while avoiding unnecessary excavation
+    input_modalities:
+    - acoustic signals
+    - hydraulic telemetry
+    - network topology
+    - geospatial records
+    - work history
+    - field confirmation
+    primary_intelligent_mechanism: Acoustic leak classification and hydraulic anomaly ranking
+    execution_model: streaming or scheduled monitoring with field queue
+    deterministic_controls:
+    - sensor quality
+    - network constraints
+    - field safety
+    - cost-benefit threshold
+    - mandatory geophone/field confirmation
+    human_authority: Utility operators and field staff confirm localization and authorize repair
+    integration_shape: Condition scoring service connected to telemetry/GIS and work-order workflow
+    feedback_and_evaluation: Field confirmation, repair result, recovered water, false positive, repeat leak, and sensor quality
+  reused_architecture: Condition signal intake, deterministic data-quality and field-safety checks, anomaly/classification risk ranking, human
+    field confirmation, and confirmed leak/outcome feedback.
+  case_specific_adapters: Acoustic sensors, hydraulic telemetry, network/geospatial data, work orders, geophone confirmation, repair cost and
+    recovered-water measurement.
+  case_specific_extension: Acoustic leak classifier and human-confirmed localization.
+  why_no_separate_architecture_yet: Acoustic recognition is a modality adapter inside the same condition-risk and inspection-prioritization loop.
+  validation_delta: Segment evaluation by source adapter, rule pack, operating context, and domain outcome.
+  derivation_signal: none
+- opportunity_id: ENERGY-002
+  document: segments/energy-utilities/ENERGY-002-outage-restoration-prioritization.md
+  family_id: FAMILY-004
+  family_name: Incident diagnosis and human-controlled response prioritization
+  disposition: direct-fit
+  fingerprint:
+    actor: Electric-distribution control-room operator or restoration coordinator
+    bounded_process: Diagnose an outage and prioritize restoration and crew actions
+    trigger: Outage alarm, customer interruption cluster, or material topology event
+    primary_decision: Which likely cause and safe restoration/dispatch option should be pursued
+    material_outcome: Reduce diagnosis and restoration time while preserving switching and dispatch control
+    input_modalities:
+    - streaming alarms
+    - topology
+    - weather
+    - vegetation
+    - crew state
+    - customer impact
+    - tickets
+    primary_intelligent_mechanism: Topology-aware outage-cause prediction, restoration forecasting, and response ranking
+    execution_model: real-time incident response
+    deterministic_controls:
+    - switching safety
+    - crew qualification
+    - topology validity
+    - mandatory escalation
+    - authorized action catalog
+    human_authority: Control-room operators authorize switching, dispatch, and restoration actions
+    integration_shape: Read-oriented incident intelligence feeding authoritative OMS/SCADA/dispatch systems
+    feedback_and_evaluation: Confirmed cause, switching/dispatch result, restoration time, repeat outage, false cluster, and operator override
+  reused_architecture: Live event/topology intake, deterministic safety/action gates, cause and impact ranking, bounded crew/restoration options,
+    operator control, and incident outcome feedback.
+  case_specific_adapters: OMS/SCADA, network topology, weather, vegetation, crew skills/location, customer impact, switching procedures, and dispatch
+    systems.
+  case_specific_extension: Restoration-time forecasting and constrained crew/action ranking.
+  why_no_separate_architecture_yet: These are expected incident-response extensions; the event correlation, operator authority, and safe action
+    catalog remain unchanged.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: ENERGY-003
+  document: segments/energy-utilities/ENERGY-003-field-work-isolation-evidence-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: fit-with-adapters
+  fingerprint:
+    actor: Electrical safety coordinator, switching authority, or field-work authorizer
+    bounded_process: Verify isolation and work-package evidence before authorizing field work
+    trigger: Work package and isolation evidence ready for release
+    primary_decision: Hold, correct, or authorize the work package
+    material_outcome: Prevent mismatched switching, isolation, grounding, crew, or field evidence from reaching authorization
+    input_modalities:
+    - switching documents
+    - live topology
+    - crew records
+    - briefings
+    - grounding evidence
+    - field images
+    - structured work records
+    primary_intelligent_mechanism: Version-aware multimodal entity/state reconciliation and contradiction detection
+    execution_model: asynchronous pre-work authorization
+    deterministic_controls:
+    - identity
+    - qualification
+    - switching sequence
+    - topology version
+    - mandatory grounding/tests
+    - authorization roles
+    human_authority: Authorized safety/switching supervisors approve field-work release
+    integration_shape: Read-only assurance layer around switching, workforce, and work-management systems
+    feedback_and_evaluation: Reviewer-confirmed contradiction, corrected package, field finding, near miss, work outcome, and audit result
+  reused_architecture: Versioned work/evidence manifest, deterministic identity/qualification/isolation checks, multimodal cross-source reconciliation,
+    contradiction findings, abstention, and human work authorization.
+  case_specific_adapters: Switching orders, live topology, crew qualifications, grounding records, job briefing, permits, field images, and work-management
+    systems.
+  case_specific_extension: Live-topology and field-image reconciliation.
+  why_no_separate_architecture_yet: These adapters preserve the same evidence gate and human authorization boundary; the model cannot authorize
+    or execute field work.
+  validation_delta: Segment evaluation by source adapter, rule pack, operating context, and domain outcome.
+  derivation_signal: none
+- opportunity_id: TELCO-001
+  document: segments/telecommunications/TELCO-001-ai-assisted-network-incident-correlation.md
+  family_id: FAMILY-004
+  family_name: Incident diagnosis and human-controlled response prioritization
+  disposition: direct-fit
+  fingerprint:
+    actor: Telecom NOC engineer, incident manager, or dispatch coordinator
+    bounded_process: Correlate a network incident and decide whether remote action or field dispatch is warranted
+    trigger: Alarm storm, performance degradation, ticket cluster, or customer-impact event
+    primary_decision: Which root-cause candidate and safe response/dispatch option should be pursued
+    material_outcome: Reduce diagnosis time and unnecessary field dispatches
+    input_modalities:
+    - streaming alarms
+    - topology
+    - performance metrics
+    - tickets
+    - customer impact
+    - change history
+    primary_intelligent_mechanism: Topology-aware alarm correlation, incident clustering, root-cause and dispatch-necessity ranking
+    execution_model: real-time incident response
+    deterministic_controls:
+    - approved runbooks
+    - change authorization
+    - network safety
+    - topology version
+    - mandatory escalation
+    human_authority: NOC engineers authorize remote actions, changes, and dispatch
+    integration_shape: Incident intelligence layer feeding OSS/NMS/ITSM and dispatch workflow
+    feedback_and_evaluation: Confirmed root cause, remote resolution, dispatch result, restoration time, false correlation, and operator override
+  reused_architecture: Live event/topology intake, deterministic action/runbook gates, incident clustering and root-cause ranking, bounded dispatch
+    recommendations, engineer control, and outcome feedback.
+  case_specific_adapters: NMS/OSS alarms, topology, performance, tickets, customer impact, field dispatch, approved runbooks, and change records.
+  case_specific_extension: Dispatch-necessity prediction and approved runbook retrieval.
+  why_no_separate_architecture_yet: These are normal incident-response extensions; the core live correlation, bounded action, and engineer authority
+    are unchanged.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: TELCO-002
+  document: segments/telecommunications/TELCO-002-capacity-hotspot-assurance.md
+  family_id: FAMILY-003
+  family_name: Forecast-driven capacity planning under constraints
+  disposition: direct-fit
+  fingerprint:
+    actor: Radio network capacity planner or optimization engineer
+    bounded_process: Forecast cell-level capacity hotspots and prioritize intervention candidates
+    trigger: Periodic planning cycle, major event forecast, growth trend, or quality degradation
+    primary_decision: Which capacity intervention should be investigated or planned
+    material_outcome: Improve capacity planning and reduce avoidable congestion under engineer control
+    input_modalities:
+    - time-series traffic
+    - quality metrics
+    - coverage
+    - topology
+    - events
+    - asset/capacity records
+    primary_intelligent_mechanism: Spatiotemporal demand forecasting, hotspot anomaly detection, and constrained intervention ranking
+    execution_model: scheduled planning with event refresh
+    deterministic_controls:
+    - coverage/quality targets
+    - spectrum and topology constraints
+    - approved intervention catalog
+    - budget and change authority
+    human_authority: Network engineers approve configuration, field work, and investment decisions
+    integration_shape: Planning recommendation layer connected to OSS, planning, GIS, and investment systems
+    feedback_and_evaluation: Actual demand, congestion, implemented intervention, quality change, override, and forecast error
+  reused_architecture: Versioned planning snapshot, probabilistic demand forecast, deterministic coverage/quality/investment constraints, feasible
+    intervention ranking, engineer approval, and realized-capacity evaluation.
+  case_specific_adapters: Cell traffic, quality, coverage, topology, events, spectrum, planned work, asset/capacity inventory, and investment
+    workflow.
+  case_specific_extension: Spatial hotspot detection and scenario ranking.
+  why_no_separate_architecture_yet: These are expected planning features; the forecast-to-constrained-option architecture remains direct.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: EDU-001
+  document: segments/education/EDU-001-student-persistence-early-warning.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: direct-fit
+  fingerprint:
+    actor: Student-success advisor, academic support team, or retention manager
+    bounded_process: Identify students who may need timely bounded support and prioritize advisor outreach
+    trigger: Periodic scoring cycle or material academic/attendance/service event
+    primary_decision: Which students should receive a human support review and which approved support path to offer
+    material_outcome: Improve persistence support without autonomous academic or financial decisions
+    input_modalities:
+    - academic records
+    - attendance
+    - LMS activity
+    - financial/service signals
+    - support history
+    primary_intelligent_mechanism: Calibrated student-persistence risk prediction and support-case prioritization
+    execution_model: periodic asynchronous triage
+    deterministic_controls:
+    - support eligibility
+    - privacy/minimization
+    - prohibited decisions
+    - mandatory human review
+    - approved support catalog
+    human_authority: Advisors and authorized institutional staff decide outreach and support
+    integration_shape: Read-oriented risk scoring feeding student-support case management
+    feedback_and_evaluation: Advisor disposition, contact, accepted support, enrollment/persistence outcome, false alert, and no-action sample
+  reused_architecture: Student case snapshot, deterministic eligibility/privacy controls, calibrated persistence-risk prediction, bounded support
+    queue, advisor authority, abstention, and delayed outcome feedback.
+  case_specific_adapters: Academic progression, attendance, LMS, financial/service signals, support history, consent/privacy, and student-services
+    workflow.
+  case_specific_extension: Risk-factor explanation for advisor review.
+  why_no_separate_architecture_yet: The case directly matches named-risk prediction, bounded human support intervention, deterministic safeguards,
+    and outcome evaluation.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: EDU-002
+  document: segments/education/EDU-002-accessible-learning-material-assurance.md
+  family_id: null
+  family_name: null
+  disposition: unmapped
+  fingerprint:
+    actor: Accessibility specialist, instructional designer, or content publisher
+    bounded_process: Create and verify accessible alternatives and structure for learning material before publication
+    trigger: New or changed learning material enters accessibility review
+    primary_decision: Which generated descriptions/structure and defect corrections are acceptable for publication
+    material_outcome: Increase accessible learning-material quality while preserving specialist approval
+    input_modalities:
+    - documents
+    - slides
+    - images
+    - audio/video
+    - layout/reading order
+    - curriculum context
+    primary_intelligent_mechanism: Multimodal extraction, context-aware alternative-description generation, and accessibility defect classification
+    execution_model: asynchronous content transformation and review
+    deterministic_controls:
+    - format validation
+    - WCAG checks
+    - mandatory human approval
+    - content provenance
+    - publishing workflow
+    human_authority: Accessibility specialists approve descriptions, structure, alternatives, and publication
+    integration_shape: Content processing and draft-generation service integrated with repository/publishing systems
+    feedback_and_evaluation: Specialist edits, accessibility test outcomes, learner feedback, publication defects, and content-version changes
+  reused_architecture: None; the case remains standalone until another content-remediation case proves the same generation-and-assurance architecture.
+  case_specific_adapters: Learning content repositories, document/media formats, WCAG/accessibility rules, curriculum context, publishing workflow,
+    and specialist review.
+  case_specific_extension: Multimodal content extraction, alternative-description generation, structural remediation, and accessibility defect
+    classification.
+  why_no_separate_architecture_yet: Its primary output is newly generated or transformed accessible content, not risk scoring, conformance-to-physical-baseline,
+    or evidence contradiction; forcing it into those families would hide the generation/evaluation loop.
+  validation_delta: Standalone prototype and metrics remain owned by the opportunity until a coherent family appears.
+  derivation_signal: unmapped; await another structurally comparable case
+- opportunity_id: PUBLIC-001
+  document: segments/public-sector/PUBLIC-001-procurement-document-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: direct-fit
+  fingerprint:
+    actor: Public buyer, procurement planner, legal/control reviewer, or approving authority
+    bounded_process: Review procurement planning and notice documents before approval and PNCP publication
+    trigger: Draft procurement package ready for formal review
+    primary_decision: Hold, correct, or approve the package for publication
+    material_outcome: Reduce missing evidence, inconsistent quantities, vague requirements, and cross-document defects before publication
+    input_modalities:
+    - procurement documents
+    - price research
+    - structured quantities
+    - templates
+    - regulatory requirements
+    - approval records
+    primary_intelligent_mechanism: Grounded procurement extraction, requirement-specificity classification, and cross-document contradiction detection
+    execution_model: asynchronous pre-publication review
+    deterministic_controls:
+    - mandatory documents
+    - legal thresholds
+    - quantity arithmetic
+    - template/version checks
+    - segregation of duties
+    - publication approval
+    human_authority: Authorized public officials retain procurement interpretation, approval, and publication authority
+    integration_shape: Read-oriented assurance gate connected to document, workflow, and PNCP processes
+    feedback_and_evaluation: Reviewer findings, corrected package, tender challenge, audit result, failed publication, and later procurement outcome
+  reused_architecture: Versioned procurement evidence manifest, deterministic completeness/legal controls, grounded extraction and cross-document
+    contradiction findings, abstention, human approval, and correction feedback.
+  case_specific_adapters: ETP, term of reference, price research, notice, quantities, procurement rules, templates, approvals, and PNCP publication
+    workflow.
+  case_specific_extension: Requirement-specificity classification.
+  why_no_separate_architecture_yet: Specificity is a typed finding within the same pre-publication evidence-consistency gate.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: PROF-001
+  document: segments/professional-services/PROF-001-process-communication-deadline-assurance.md
+  family_id: FAMILY-007
+  family_name: Evidence-grounded timeline and obligation reconstruction
+  disposition: direct-fit
+  fingerprint:
+    actor: Lawyer, paralegal, docketing, or legal-operations reviewer
+    bounded_process: Process an official communication into confirmed obligations, candidate deadlines, and tasks
+    trigger: New official communication, publication, service, or case event
+    primary_decision: Which obligations and candidate deadlines are valid and which task should be assigned
+    material_outcome: Reduce missed or misclassified procedural obligations while preserving legal judgment
+    input_modalities:
+    - official communications
+    - documents
+    - email
+    - portal metadata
+    - case records
+    - calendar rules
+    primary_intelligent_mechanism: Grounded legal communication classification and structured obligation/event extraction
+    execution_model: asynchronous communication processing
+    deterministic_controls:
+    - receipt/publication time
+    - calendar/holiday rules
+    - source precedence
+    - case identity
+    - human deadline confirmation
+    human_authority: Authorized legal professionals confirm deadlines, obligations, and task assignment
+    integration_shape: Read-oriented extraction/calculation service feeding legal case and task management
+    feedback_and_evaluation: Reviewer corrections, completed/missed tasks, court outcome, deadline dispute, and source-classification corrections
+  reused_architecture: Provenance-preserving communication intake, grounded obligation/event extraction, deterministic calendar calculation, ambiguity/abstention,
+    human confirmation, task creation, and outcome feedback.
+  case_specific_adapters: Court/official portals, email, case-management, party/process records, procedural calendars, holidays, and task workflow.
+  case_specific_extension: None beyond legal communication and calendar adapters.
+  why_no_separate_architecture_yet: The case directly matches source-grounded chronology/obligation extraction, deterministic temporal rules,
+    and human-confirmed action.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: HOSP-001
+  document: segments/hospitality-tourism/HOSP-001-occupancy-operations-forecasting.md
+  family_id: FAMILY-003
+  family_name: Forecast-driven capacity planning under constraints
+  disposition: direct-fit
+  fingerprint:
+    actor: Hotel revenue/operations manager, front-office lead, or housekeeping planner
+    bounded_process: Forecast occupancy and operational workload and prepare staffing/housekeeping capacity
+    trigger: Daily/weekly planning cycle or material booking/event change
+    primary_decision: Which staffing, room-turn, and housekeeping plan should be adopted
+    material_outcome: Reduce understaffing, overtime, room delays, and idle capacity
+    input_modalities:
+    - booking curves
+    - cancellations
+    - arrivals/departures
+    - events
+    - room inventory
+    - staff/workload records
+    primary_intelligent_mechanism: Probabilistic occupancy, cancellation, arrival/departure, and workload forecasting
+    execution_model: scheduled planning
+    deterministic_controls:
+    - labor rules
+    - skills and shift limits
+    - room inventory
+    - service targets
+    - approved staffing authority
+    human_authority: Hotel managers approve staffing, housekeeping, and operational plans
+    integration_shape: Planning layer connected to PMS/CRS, workforce, and housekeeping systems
+    feedback_and_evaluation: Actual occupancy, cancellation, workload, overtime, room readiness, service outcome, and planner override
+  reused_architecture: Versioned demand/capacity snapshot, probabilistic occupancy/workload forecast, deterministic staffing/room constraints,
+    feasible operational recommendations, manager approval, and realized-outcome backtesting.
+  case_specific_adapters: PMS/CRS bookings, cancellations, arrivals/departures, local events, room inventory, staffing, housekeeping status, and
+    labor rules.
+  case_specific_extension: None beyond hotel planning-unit and workload adapters.
+  why_no_separate_architecture_yet: The case directly matches forecast-to-constrained-capacity planning with manager authority.
+  validation_delta: Use the family metrics with domain-specific labels, thresholds, and workflow outcomes.
+  derivation_signal: none
+- opportunity_id: MEDIA-001
+  document: segments/media-entertainment/MEDIA-001-audiovisual-rights-monitoring-evidence-triage.md
+  family_id: null
+  family_name: null
+  disposition: unmapped
+  fingerprint:
+    actor: Audiovisual rights-monitoring analyst or legal/evidence reviewer
+    bounded_process: Detect likely transformed copies or retransmissions and assemble evidence for expert review
+    trigger: New monitored media segment or scheduled corpus scan
+    primary_decision: Which similarity matches are credible enough for expert rights review
+    material_outcome: Find likely unauthorized uses and reduce manual evidence search without automating legal conclusions or blocking
+    input_modalities:
+    - video
+    - audio
+    - reference media
+    - fingerprints
+    - rights metadata
+    - channel/platform context
+    primary_intelligent_mechanism: Transformation-robust media fingerprint matching and multimodal similarity ranking
+    execution_model: streaming and batch corpus search
+    deterministic_controls:
+    - rights ownership/version
+    - territory/window
+    - evidence retention
+    - match thresholds
+    - no automatic takedown/blocking
+    human_authority: Rights and legal experts determine infringement, action, and evidence sufficiency
+    integration_shape: Long-lived fingerprint/vector index with monitoring intake and evidence-review workflow
+    feedback_and_evaluation: Expert match disposition, legal action outcome, false match, transformation type, and reference-rights correction
+  reused_architecture: None; the case remains standalone until another transformation-robust media identity and evidence-search case demonstrates
+    the same corpus architecture.
+  case_specific_adapters: Content registry, rights metadata, reference masters, broadcast/web/social monitoring, fingerprint index, takedown/legal
+    workflow, and expert review.
+  case_specific_extension: Large-scale transformation-robust audio/video fingerprint matching, candidate evidence assembly, and expert triage.
+  why_no_separate_architecture_yet: Its long-lived similarity index, open-world corpus search, rights ownership model, and evidence retrieval
+    loop are structurally different from bounded conformance or case-risk families.
+  validation_delta: Standalone prototype and metrics remain owned by the opportunity until a coherent family appears.
+  derivation_signal: unmapped; await another structurally comparable case
+- opportunity_id: MEDIA-002
+  document: segments/media-entertainment/MEDIA-002-live-caption-semantic-continuity-assurance.md
+  family_id: FAMILY-006
+  family_name: Observed-state conformance and corrective work prioritization
+  disposition: candidate-variant
+  fingerprint:
+    actor: Broadcast accessibility operator, caption supervisor, or master-control operator
+    bounded_process: Monitor outgoing live captions for semantic continuity and accessibility failure
+    trigger: Continuous live program audio/caption/video stream and source transition
+    primary_decision: Which caption incidents require immediate operator intervention
+    material_outcome: Detect semantically unusable live captions before prolonged viewer impact
+    input_modalities:
+    - live audio
+    - caption stream
+    - video cues
+    - rundown
+    - source-change events
+    - timing/readability metrics
+    primary_intelligent_mechanism: Real-time speech-to-caption semantic alignment and accessibility anomaly detection
+    execution_model: continuous streaming
+    deterministic_controls:
+    - timing/readability thresholds
+    - caption presence
+    - source state
+    - approved incident rules
+    - operator authority
+    human_authority: Broadcast operators decide intervention, source switch, correction, and escalation
+    integration_shape: Streaming conformance monitor connected to caption/broadcast systems and operator incident console
+    feedback_and_evaluation: Operator-confirmed incident, viewer complaint, source correction, caption recovery, false alarm, and stream replay
+  reused_architecture: Versioned expected program/rundown context, multimodal observed output, deterministic timing/readability checks, semantic
+    conformance findings, operator incident queue, and correction feedback.
+  case_specific_adapters: Live audio, outgoing captions, video cues, rundowns, source changes, broadcast automation, accessibility rules, and
+    operator console.
+  case_specific_extension: Continuous low-latency rolling alignment, stateful stream windows, and immediate operator incident generation.
+  why_no_separate_architecture_yet: The expected-versus-observed conformance job is shared, but streaming state, latency, and failure handling
+    are material enough for derivation review.
+  validation_delta: Use a separate prototype track because runtime, authority, or learning metrics are not fully comparable with the base.
+  derivation_signal: Continuous rolling multimodal alignment and immediate operator incidents.
+- opportunity_id: TECH-001
+  document: segments/technology-software/TECH-001-context-aware-vulnerability-remediation-prioritization.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: fit-with-extension
+  fingerprint:
+    actor: Product security, vulnerability management, platform, or application owner
+    bounded_process: Prioritize vulnerability remediation across real assets and dependencies
+    trigger: New vulnerability, asset exposure/change, exploit intelligence, or remediation review cycle
+    primary_decision: Which vulnerability-asset cases require remediation, mitigation, acceptance review, or escalation
+    material_outcome: Focus remediation on contextually exploitable and impactful exposure with auditable reasoning
+    input_modalities:
+    - vulnerability intelligence
+    - asset inventory
+    - SBOM/dependency graph
+    - runtime exposure
+    - ownership
+    - business impact
+    primary_intelligent_mechanism: Context-aware exploit-risk prediction and attack-path-informed remediation ranking
+    execution_model: event-driven and scheduled asynchronous triage
+    deterministic_controls:
+    - severity/mandatory SLA
+    - asset ownership
+    - exposure rules
+    - exception authority
+    - no autonomous risk acceptance
+    human_authority: Security engineers and asset owners approve remediation, mitigation, or risk acceptance
+    integration_shape: Read-oriented scoring service feeding vulnerability and work-management systems
+    feedback_and_evaluation: Remediation result, exploit evidence, exception, false positive, asset correction, incident, and risk-acceptance
+      outcome
+  reused_architecture: Versioned case snapshot, deterministic vulnerability/exposure controls, calibrated named-risk prediction, prioritized remediation
+    queue, security-engineer authority, abstention, and outcome feedback.
+  case_specific_adapters: Vulnerability feeds, SBOM/dependencies, asset inventory, internet/runtime exposure, ownership, business impact, exceptions,
+    and remediation workflow.
+  case_specific_extension: Attack-path and dependency-graph feature generation.
+  why_no_separate_architecture_yet: Graph features enrich the case but the output remains an advisory calibrated remediation risk and bounded
+    human work queue.
+  validation_delta: Evaluate the extension separately and prove incremental value over the base family pipeline.
+  derivation_signal: none
+- opportunity_id: TECH-002
+  document: segments/technology-software/TECH-002-privacy-safe-tenant-incident-reproduction.md
+  family_id: null
+  family_name: null
+  disposition: unmapped
+  fingerprint:
+    actor: SaaS support engineer, site-reliability engineer, or product developer
+    bounded_process: Reconstruct a tenant-specific failure safely and produce reviewable reproduction/regression artifacts
+    trigger: Escalated support incident lacking a safe reproducible case
+    primary_decision: Which minimized state and generated reproduction/test artifacts are safe and valid to use
+    material_outcome: Reduce incident reproduction time without copying unrestricted production data
+    input_modalities:
+    - support text
+    - logs/telemetry
+    - structured tenant config
+    - schemas
+    - code context
+    - sandbox execution results
+    primary_intelligent_mechanism: Grounded failure-state reconstruction and governed regression-test synthesis
+    execution_model: durable agent with sandboxed tool execution
+    deterministic_controls:
+    - tenant isolation
+    - data minimization
+    - allowlisted tools
+    - sandbox limits
+    - secret redaction
+    - human code review
+    human_authority: Authorized engineers approve reconstructed data, execution, generated tests, and repository changes
+    integration_shape: Privacy-minimization service plus isolated sandbox agent and code-review workflow
+    feedback_and_evaluation: Successful reproduction, reviewer edits, regression-test result, privacy findings, incident fix, and sandbox failure
+  reused_architecture: None; the case remains standalone until another privacy-minimized sandbox reconstruction and test-synthesis case demonstrates
+    the same governed agent runtime.
+  case_specific_adapters: Support evidence, tenant telemetry, schemas, feature flags, code/test repository, sandbox environment, privacy policy,
+    and approval workflow.
+  case_specific_extension: Evidence-grounded failure-state reconstruction, privacy minimization, governed sandbox execution, and regression-test
+    synthesis.
+  why_no_separate_architecture_yet: Its durable agent/tool execution, tenant-specific isolation, generated executable artifacts, and sandbox lifecycle
+    are not compatible with advisory review or evidence-consistency families.
+  validation_delta: Standalone prototype and metrics remain owned by the opportunity until a coherent family appears.
+  derivation_signal: unmapped; await another structurally comparable case
+- opportunity_id: NONPROFIT-001
+  document: segments/nonprofit/NONPROFIT-001-donor-retention-uplift-orchestration.md
+  family_id: FAMILY-008
+  family_name: Calibrated case-risk triage for bounded human intervention
+  disposition: candidate-variant
+  fingerprint:
+    actor: Fundraising, donor-relations, CRM, or campaign manager
+    bounded_process: Prioritize donors for bounded retention outreach and select approved outreach candidates
+    trigger: Scheduled retention campaign or donor lapse-risk window
+    primary_decision: Which donors and approved outreach options merit human campaign review
+    material_outcome: Improve donor retention with fewer unnecessary contacts and no sensitive-trait inference
+    input_modalities:
+    - donation history
+    - campaign interactions
+    - consent/preferences
+    - relationship history
+    - outreach outcomes
+    primary_intelligent_mechanism: Donor-lapse prediction and causal uplift ranking for bounded interventions
+    execution_model: batch campaign planning
+    deterministic_controls:
+    - consent/channel rules
+    - contact limits
+    - sensitive-feature prohibition
+    - approved outreach catalog
+    - human campaign approval
+    human_authority: Authorized fundraising staff approve campaign membership and outreach
+    integration_shape: Analytical scoring and policy-evaluation layer feeding CRM/campaign workflow
+    feedback_and_evaluation: Randomized or quasi-experimental outreach assignment, response, retention, opt-out, complaint, and long-term donation
+      outcome
+  reused_architecture: Versioned donor case snapshot, deterministic eligibility/privacy controls, bounded human outreach workflow, abstention,
+    and delayed outcome feedback.
+  case_specific_adapters: Donation history, consent/channel preferences, campaign interactions, relationship history, outreach catalog, and OSC
+    privacy/fundraising rules.
+  case_specific_extension: Individual treatment-effect/uplift estimation and experiment-aware policy evaluation.
+  why_no_separate_architecture_yet: The human-intervention workflow is similar, but causal uplift changes the primary model, required randomized/quasi-experimental
+    feedback, and success metrics, so it is queued for derivation review.
+  validation_delta: Use a separate prototype track because runtime, authority, or learning metrics are not fully comparable with the base.
+  derivation_signal: Causal uplift learning and experiment-based policy evaluation.
+- opportunity_id: NONPROFIT-002
+  document: segments/nonprofit/NONPROFIT-002-program-evidence-chain-assurance.md
+  family_id: FAMILY-001
+  family_name: Evidence-consistent human approval gate
+  disposition: fit-with-adapters
+  fingerprint:
+    actor: Program manager, monitoring-and-evaluation analyst, finance reviewer, or report approver
+    bounded_process: Assemble and verify an evidence chain for funder reporting
+    trigger: Reporting cycle, claim drafting, or material program/expense update
+    primary_decision: Which claims are supported, contradictory, incomplete, or require correction before approval
+    material_outcome: Reduce unsupported program claims and manual evidence reconciliation
+    input_modalities:
+    - plans
+    - activity records
+    - beneficiary data
+    - expenses
+    - documents
+    - field images/video
+    - indicator definitions
+    primary_intelligent_mechanism: Multimodal evidence extraction, indicator mapping, and unsupported-claim contradiction detection
+    execution_model: asynchronous pre-report review
+    deterministic_controls:
+    - indicator formulas
+    - eligibility
+    - expense arithmetic
+    - consent/privacy
+    - mandatory evidence
+    - report approval
+    human_authority: Authorized program, finance, and reporting staff approve claims and reports
+    integration_shape: Read-oriented evidence assurance gate around program/finance/reporting systems
+    feedback_and_evaluation: Reviewer correction, funder acceptance/query, audit result, unsupported claim, missing evidence, and program outcome
+  reused_architecture: Versioned evidence manifest, deterministic indicator/eligibility checks, multimodal extraction and cross-source contradiction
+    findings, abstention, human report approval, and correction feedback.
+  case_specific_adapters: Program plans, activities, beneficiary records, expenses, field media, funder indicator definitions, consent/privacy,
+    and reporting workflow.
+  case_specific_extension: Indicator mapping and unsupported-claim classification.
+  why_no_separate_architecture_yet: These are typed evidence findings within the same pre-report approval gate and do not change the human authority
+    or core reconciliation model.
+  validation_delta: Segment evaluation by source adapter, rule pack, operating context, and domain outcome.
+  derivation_signal: none

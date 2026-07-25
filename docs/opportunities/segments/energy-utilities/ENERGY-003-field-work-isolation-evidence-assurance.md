@@ -342,3 +342,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `fit-with-adapters`
+- **Reused architecture:** Versioned work/evidence manifest, deterministic identity/qualification/isolation checks, multimodal cross-source reconciliation, contradiction findings, abstention, and human work authorization.
+- **Case-specific adapters:** Switching orders, live topology, crew qualifications, grounding records, job briefing, permits, field images, and work-management systems.
+- **Case-specific extension:** Live-topology and field-image reconciliation.
+- **Why no separate architecture yet:** These adapters preserve the same evidence gate and human authorization boundary; the model cannot authorize or execute field work.

@@ -259,3 +259,12 @@ flowchart LR
 ## Next decision
 
 Continue research and shortlist for human review after validating public or partner-accessible precision, false-positive, total-cost, and recovered-water evidence across more than one Brazilian provider.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-002 — Condition-risk monitoring and inspection prioritization`](../../solution-families/FAMILY-002-condition-risk-monitoring-inspection-prioritization.md)
+- **Disposition:** `fit-with-adapters`
+- **Reused architecture:** Condition signal intake, deterministic data-quality and field-safety checks, anomaly/classification risk ranking, human field confirmation, and confirmed leak/outcome feedback.
+- **Case-specific adapters:** Acoustic sensors, hydraulic telemetry, network/geospatial data, work orders, geophone confirmation, repair cost and recovered-water measurement.
+- **Case-specific extension:** Acoustic leak classifier and human-confirmed localization.
+- **Why no separate architecture yet:** Acoustic recognition is a modality adapter inside the same condition-risk and inspection-prioritization loop.

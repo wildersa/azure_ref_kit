@@ -339,3 +339,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `fit-with-adapters`
+- **Reused architecture:** Versioned evidence manifest, deterministic electrical/fire-safety checks, grounded plan/site reconciliation, contradiction findings, abstention, engineer review, and correction revisions.
+- **Case-specific adapters:** Retrofit design, charger/electrical data, as-built evidence, tests, fire-safety requirements, site images, building records, and authority workflow.
+- **Case-specific extension:** Plan-to-site multimodal alignment.
+- **Why no separate architecture yet:** The physical evidence adapter does not alter the pre-approval contradiction gate, deterministic controls, or engineer/authority decision boundary.
