@@ -1,0 +1,12 @@
+schema_version: 1
+last_updated: "2026-07-25"
+
+allowed_dispositions:
+  - direct-fit
+  - fit-with-adapters
+  - fit-with-extension
+  - candidate-variant
+  - unmapped
+  - duplicate-or-weak
+
+mappings: []
