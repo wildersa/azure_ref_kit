@@ -317,3 +317,12 @@ flowchart LR
 Prototype candidate: run a read-only historical replay against one completed grant and reject the hypothesis if deterministic controls or an existing configured product deliver equivalent assurance at lower cost.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `fit-with-adapters`
+- **Reused architecture:** Versioned evidence manifest, deterministic indicator/eligibility checks, multimodal extraction and cross-source contradiction findings, abstention, human report approval, and correction feedback.
+- **Case-specific adapters:** Program plans, activities, beneficiary records, expenses, field media, funder indicator definitions, consent/privacy, and reporting workflow.
+- **Case-specific extension:** Indicator mapping and unsupported-claim classification.
+- **Why no separate architecture yet:** These are typed evidence findings within the same pre-report approval gate and do not change the human authority or core reconciliation model.

@@ -273,3 +273,12 @@ flowchart LR
 - shortlist for review.
 
 The shortlist recommendation means the hypothesis is specific and testable. It does not approve implementation or claim proven Brazilian production outcomes.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-003 — Forecast-driven capacity planning under constraints`](../../solution-families/FAMILY-003-forecast-driven-capacity-planning.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Versioned demand/capacity snapshot, probabilistic occupancy/workload forecast, deterministic staffing/room constraints, feasible operational recommendations, manager approval, and realized-outcome backtesting.
+- **Case-specific adapters:** PMS/CRS bookings, cancellations, arrivals/departures, local events, room inventory, staffing, housekeeping status, and labor rules.
+- **Case-specific extension:** None beyond hotel planning-unit and workload adapters.
+- **Why no separate architecture yet:** The case directly matches forecast-to-constrained-capacity planning with manager authority.

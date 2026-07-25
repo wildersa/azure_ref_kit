@@ -259,3 +259,12 @@ flowchart LR
 - shortlist for review.
 
 The shortlist recommendation approves further prototype review only. It does not approve donor deployment, autonomous solicitation, or implementation.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `candidate-variant`
+- **Reused architecture:** Versioned donor case snapshot, deterministic eligibility/privacy controls, bounded human outreach workflow, abstention, and delayed outcome feedback.
+- **Case-specific adapters:** Donation history, consent/channel preferences, campaign interactions, relationship history, outreach catalog, and OSC privacy/fundraising rules.
+- **Case-specific extension:** Individual treatment-effect/uplift estimation and experiment-aware policy evaluation.
+- **Why no separate architecture yet:** The human-intervention workflow is similar, but causal uplift changes the primary model, required randomized/quasi-experimental feedback, and success metrics, so it is queued for derivation review.

@@ -81,7 +81,7 @@ During allergen-related product changeovers, quality supervisors must release a 
 
 ## Brazil applicability and current context
 
-Brazilian enforcement shows that allergen and label failures remain operationally material. On 10 July 2025, Anvisa ordered recall and suspension of food products that omitted required allergen-related information. On 12 June 2026, Anvisa suspended popcorn whose label simultaneously claimed absence of gluten and warned of cross-contact with wheat. In 2025 Anvisa also conducted sector dialogues to revise allergen-label rules, confirming that requirements and implementation details remain active subjects of regulatory attention. Broader 2026 manufacturing actions against supplement producers also demonstrate that serious production-control failures can trigger suspension of all affected production. These sources confirm the consequence and current regulatory context, but they do not prove the frequency of cross-system release mismatches inside a typical plant. citeturn662471search1turn662471search8turn662471search7turn662471search2
+Brazilian enforcement shows that allergen and label failures remain operationally material. On 10 July 2025, Anvisa ordered recall and suspension of food products that omitted required allergen-related information. On 12 June 2026, Anvisa suspended popcorn whose label simultaneously claimed absence of gluten and warned of cross-contact with wheat. In 2025 Anvisa also conducted sector dialogues to revise allergen-label rules, confirming that requirements and implementation details remain active subjects of regulatory attention. Broader 2026 manufacturing actions against supplement producers also demonstrate that serious production-control failures can trigger suspension of all affected production. These sources confirm the consequence and current regulatory context, but they do not prove the frequency of cross-system release mismatches inside a typical plant.
 
 ## Existing solutions and differentiation
 
@@ -114,20 +114,20 @@ Brazilian enforcement shows that allergen and label failures remain operationall
 
 ### Confirmed problem evidence
 
-- Anvisa ordered a 2025 recall where products failed to declare allergen-related information. citeturn662471search1
-- Anvisa suspended a 2026 popcorn product for contradictory gluten and wheat cross-contact labeling. citeturn662471search8
-- Current Brazilian regulatory discussions continue to review allergen-label requirements. citeturn662471search7turn662471search10
+- Anvisa ordered a 2025 recall where products failed to declare allergen-related information.
+- Anvisa suspended a 2026 popcorn product for contradictory gluten and wheat cross-contact labeling.
+- Current Brazilian regulatory discussions continue to review allergen-label requirements.
 
 ### Existing-solution evidence
 
-- Neogen supports direct allergen-control verification through rapid tests and swabs. citeturn662471search12
-- MachineMetrics released digital FAI and AI-supported shift handover capabilities in 2026. citeturn297936search7
-- Instrumental provides image traceability, visual anomaly detection and root-cause correlation. citeturn297936search3
+- Neogen supports direct allergen-control verification through rapid tests and swabs.
+- MachineMetrics released digital FAI and AI-supported shift handover capabilities in 2026.
+- Instrumental provides image traceability, visual anomaly detection and root-cause correlation.
 
 ### Favorable evidence for the uncovered gap
 
-- First-article inspection explicitly verifies production-intent materials, tooling, settings and methods before volume production, supporting the bounded release-gate pattern. citeturn297936search0turn297936search9
-- Multistage vision, OCR and anomaly methods have been demonstrated for industrial identification and defect checks, supporting a scoped visual component. citeturn297936academia50
+- First-article inspection explicitly verifies production-intent materials, tooling, settings and methods before volume production, supporting the bounded release-gate pattern.
+- Multistage vision, OCR and anomaly methods have been demonstrated for industrial identification and defect checks, supporting a scoped visual component.
 
 ### Counter-evidence and limitations
 
@@ -348,3 +348,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-001 — Evidence-consistent human approval gate`](../../solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Versioned evidence manifest, deterministic allergen and release controls, multimodal extraction/reconciliation, typed contradictions, abstention, quality review, and correction feedback.
+- **Case-specific adapters:** Recipe/BOM, allergen matrix, labels, cleaning records, line state, images, test results, equipment status, batch and quality systems.
+- **Case-specific extension:** Domain-specific line-clearance vision recognition.
+- **Why no separate architecture yet:** Vision is an expected evidence adapter; the release hold, contradiction contract, quality authority, and feedback loop match the family directly.

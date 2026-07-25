@@ -265,3 +265,12 @@ flowchart LR
 - shortlist for review.
 
 The recommendation approves only a bounded prototype hypothesis, not implementation or automated enforcement.
+
+## Solution family mapping
+
+- **Family:** `UNMAPPED — no coherent reusable family yet`
+- **Disposition:** `unmapped`
+- **Reused architecture:** None; the case remains standalone until another transformation-robust media identity and evidence-search case demonstrates the same corpus architecture.
+- **Case-specific adapters:** Content registry, rights metadata, reference masters, broadcast/web/social monitoring, fingerprint index, takedown/legal workflow, and expert review.
+- **Case-specific extension:** Large-scale transformation-robust audio/video fingerprint matching, candidate evidence assembly, and expert triage.
+- **Why no separate architecture yet:** Its long-lived similarity index, open-world corpus search, rights ownership model, and evidence retrieval loop are structurally different from bounded conformance or case-risk families.

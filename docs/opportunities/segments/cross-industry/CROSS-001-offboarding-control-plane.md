@@ -196,3 +196,12 @@ flowchart LR
 ## Next decision
 
 - shortlist for review.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `candidate-variant`
+- **Reused architecture:** Canonical case snapshot, deterministic policy gates, graph-derived risk scoring, confidence/abstention, human review, and adjudicated feedback.
+- **Case-specific adapters:** HR/contractor events; identity, SaaS, badge, device, asset, ITSM, and SCIM connectors; role and legal-hold rules.
+- **Case-specific extension:** Durable policy-derived task orchestration, evidence ledger, connector write actions, and a long-lived identity/access graph.
+- **Why no separate architecture yet:** The risk-scoring and review core is comparable, but durable write-oriented orchestration is structurally larger and is queued for derivation review instead of being absorbed into the advisory base.

@@ -258,3 +258,12 @@ flowchart LR
 ## Next decision
 
 Prototype candidate. Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-003 — Forecast-driven capacity planning under constraints`](../../solution-families/FAMILY-003-forecast-driven-capacity-planning.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Versioned planning snapshot, probabilistic demand forecast, deterministic coverage/quality/investment constraints, feasible intervention ranking, engineer approval, and realized-capacity evaluation.
+- **Case-specific adapters:** Cell traffic, quality, coverage, topology, events, spectrum, planned work, asset/capacity inventory, and investment workflow.
+- **Case-specific extension:** Spatial hotspot detection and scenario ranking.
+- **Why no separate architecture yet:** These are expected planning features; the forecast-to-constrained-option architecture remains direct.

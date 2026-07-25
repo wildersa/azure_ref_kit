@@ -248,3 +248,12 @@ flowchart LR
 - shortlist for review.
 
 The shortlist recommendation means the prototype hypothesis is specific and testable. It does not approve implementation or claim proven Brazilian production outcomes.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-004 — Incident diagnosis and human-controlled response prioritization`](../../solution-families/FAMILY-004-incident-diagnosis-response-prioritization.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Live event/topology intake, deterministic action/runbook gates, incident clustering and root-cause ranking, bounded dispatch recommendations, engineer control, and outcome feedback.
+- **Case-specific adapters:** NMS/OSS alarms, topology, performance, tickets, customer impact, field dispatch, approved runbooks, and change records.
+- **Case-specific extension:** Dispatch-necessity prediction and approved runbook retrieval.
+- **Why no separate architecture yet:** These are normal incident-response extensions; the core live correlation, bounded action, and engineer authority are unchanged.

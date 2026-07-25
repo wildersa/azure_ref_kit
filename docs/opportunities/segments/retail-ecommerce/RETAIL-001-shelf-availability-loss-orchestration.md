@@ -196,3 +196,12 @@ flowchart LR
 ## Next decision
 
 - continue research;
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-006 — Observed-state conformance and corrective work prioritization`](../../solution-families/FAMILY-006-observed-state-conformance-corrective-prioritization.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Versioned expected shelf/inventory baseline, guided observations, deterministic reconciliation, multimodal state alignment, deviation ranking, corrective tasks, and verification.
+- **Case-specific adapters:** Planogram, shelf location, SKU/master data, inventory, sales, replenishment, loss events, store tasks, and mobile capture.
+- **Case-specific extension:** Inventory-loss anomaly scoring alongside visual conformance.
+- **Why no separate architecture yet:** Loss scoring is adjacent evidence; the core observed-state comparison, task creation, human confirmation, and recapture verification remain stable.

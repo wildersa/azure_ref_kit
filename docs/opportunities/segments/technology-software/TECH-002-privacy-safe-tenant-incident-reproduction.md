@@ -385,3 +385,12 @@ flowchart LR
 ## Next decision
 
 **Prototype candidate.** First run an offline replay against historical difficult escalations and the deterministic baseline. Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** `UNMAPPED — no coherent reusable family yet`
+- **Disposition:** `unmapped`
+- **Reused architecture:** None; the case remains standalone until another privacy-minimized sandbox reconstruction and test-synthesis case demonstrates the same governed agent runtime.
+- **Case-specific adapters:** Support evidence, tenant telemetry, schemas, feature flags, code/test repository, sandbox environment, privacy policy, and approval workflow.
+- **Case-specific extension:** Evidence-grounded failure-state reconstruction, privacy minimization, governed sandbox execution, and regression-test synthesis.
+- **Why no separate architecture yet:** Its durable agent/tool execution, tenant-specific isolation, generated executable artifacts, and sandbox lifecycle are not compatible with advisory review or evidence-consistency families.

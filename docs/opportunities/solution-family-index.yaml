@@ -1,8 +1,147 @@
 schema_version: 1
-last_updated: "2026-07-25"
-
+last_updated: '2026-07-25'
 statuses:
-  active: [proposed, active]
-  terminal: [parked, superseded]
-
-families: []
+  active:
+  - proposed
+  - active
+  terminal:
+  - parked
+  - superseded
+family_count: 8
+applied_case_count: 30
+families:
+- id: FAMILY-001
+  name: Evidence-consistent human approval gate
+  status: active
+  document: solution-families/FAMILY-001-evidence-consistent-human-approval-gate.md
+  reusable_outcome: Prevent incomplete, inconsistent, outdated, or unsupported evidence packages from reaching a governed approval, publication,
+    release, or compliance decision.
+  primary_architectural_spine: An asynchronous evidence package is normalized, checked by deterministic controls, reconciled by a grounded contradiction
+    model, and held for an authorized human approval decision.
+  primary_intelligent_mechanism: Grounded cross-source entity, state, and requirement reconciliation with contradiction detection
+  execution_model: asynchronous
+  human_authority: The authorized reviewer approves, rejects, holds, or requests correction; model output never releases the governed process.
+  applied_case_count: 6
+  applied_opportunities:
+  - CROSS-003
+  - MANUF-002
+  - CONST-002
+  - ENERGY-003
+  - PUBLIC-001
+  - NONPROFIT-002
+- id: FAMILY-002
+  name: Condition-risk monitoring and inspection prioritization
+  status: active
+  document: solution-families/FAMILY-002-condition-risk-monitoring-inspection-prioritization.md
+  reusable_outcome: Detect deteriorating physical or environmental conditions early enough to prioritize bounded human inspection and intervention
+    before material loss, failure, or safety impact.
+  primary_architectural_spine: Operational signals are quality-checked, transformed into condition features, scored for degradation or excursion
+    risk, and ranked for human-confirmed inspection or intervention.
+  primary_intelligent_mechanism: Multivariate condition anomaly detection and near-term degradation or excursion forecasting
+  execution_model: streaming
+  human_authority: Operators approve inspection, maintenance, localization, aeration, handling, release, or disposal actions.
+  applied_case_count: 4
+  applied_opportunities:
+  - MANUF-001
+  - LOG-001
+  - AGRI-001
+  - ENERGY-001
+- id: FAMILY-003
+  name: Forecast-driven capacity planning under constraints
+  status: active
+  document: solution-families/FAMILY-003-forecast-driven-capacity-planning.md
+  reusable_outcome: Convert uncertain future demand into reviewable, constraint-compliant capacity recommendations that improve service levels
+    without delegating resource authority to the model.
+  primary_architectural_spine: Probabilistic demand or workload forecasts feed a deterministic constraint solver that proposes capacity and scheduling
+    adjustments for manager approval.
+  primary_intelligent_mechanism: Probabilistic demand, workload, cancellation, and hotspot forecasting
+  execution_model: batch
+  human_authority: Authorized planners approve queue, slot, staffing, housekeeping, or network-capacity changes.
+  applied_case_count: 3
+  applied_opportunities:
+  - HEALTH-001
+  - TELCO-002
+  - HOSP-001
+- id: FAMILY-004
+  name: Incident diagnosis and human-controlled response prioritization
+  status: active
+  document: solution-families/FAMILY-004-incident-diagnosis-response-prioritization.md
+  reusable_outcome: Reduce time spent correlating noisy incident signals and direct scarce response capacity toward the most plausible causes
+    and safe next actions.
+  primary_architectural_spine: An active operational incident is correlated across events and topology, deterministic safety rules filter actions,
+    and likely causes and responses are ranked for operator control.
+  primary_intelligent_mechanism: Topology-aware event correlation, incident clustering, and root-cause or restoration ranking
+  execution_model: streaming
+  human_authority: Operators retain dispatch, switching, runbook, restoration, and field-action authority.
+  applied_case_count: 2
+  applied_opportunities:
+  - ENERGY-002
+  - TELCO-001
+- id: FAMILY-005
+  name: Multimodal item assessment and human disposition routing
+  status: active
+  document: solution-families/FAMILY-005-multimodal-item-assessment-disposition-routing.md
+  reusable_outcome: Produce a reviewable condition assessment and route options for a physical item without automating legal, financial, consumer-rights,
+    or fraud conclusions.
+  primary_architectural_spine: Guided capture and structured case data are deterministically validated, a multimodal model estimates item condition
+    and evidence integrity, and permissible dispositions are ranked for human decision.
+  primary_intelligent_mechanism: Multimodal physical-item condition recognition with evidence-integrity classification
+  execution_model: synchronous
+  human_authority: Authorized claims, inspection, or returns personnel decide coverage, fraud, liability, value, and final disposition.
+  applied_case_count: 2
+  applied_opportunities:
+  - FIN-002
+  - RETAIL-002
+- id: FAMILY-006
+  name: Observed-state conformance and corrective work prioritization
+  status: active
+  document: solution-families/FAMILY-006-observed-state-conformance-corrective-prioritization.md
+  reusable_outcome: Turn field or operational observations into evidence-backed deviation cases and prioritized corrective work without automating
+    certification, payment, or safety approval.
+  primary_architectural_spine: A planned or expected baseline is aligned with observed multimodal state, deterministic tolerances are applied,
+    and likely deviations are ranked for human corrective work and verification.
+  primary_intelligent_mechanism: Multimodal observed-state recognition and alignment to a versioned expected baseline
+  execution_model: asynchronous
+  human_authority: Operational, engineering, or quality personnel validate deviations, create work, certify completion, and approve commercial
+    consequences.
+  applied_case_count: 3
+  applied_opportunities:
+  - RETAIL-001
+  - CONST-001
+  - MEDIA-002
+- id: FAMILY-007
+  name: Evidence-grounded timeline and obligation reconstruction
+  status: active
+  document: solution-families/FAMILY-007-evidence-grounded-timeline-obligation-reconstruction.md
+  reusable_outcome: Reconstruct a reviewable chronology and obligation set from fragmented communications and records so a human can act without
+    losing provenance or relying on model-generated legal conclusions.
+  primary_architectural_spine: Unstructured authoritative communications and records are classified and extracted into a provenance-preserving
+    event/obligation graph, deterministic temporal rules reconcile dates, and humans confirm the operational case.
+  primary_intelligent_mechanism: Source-grounded event, party, obligation, and temporal-relation extraction
+  execution_model: asynchronous
+  human_authority: Authorized legal or operations staff confirm chronology, responsibility candidates, deadlines, disputes, and task creation.
+  applied_case_count: 2
+  applied_opportunities:
+  - LOG-002
+  - PROF-001
+- id: FAMILY-008
+  name: Calibrated case-risk triage for bounded human intervention
+  status: active
+  document: solution-families/FAMILY-008-calibrated-case-risk-triage.md
+  reusable_outcome: Focus limited human review or support capacity on bounded cases most likely to benefit from timely intervention while preserving
+    deterministic eligibility and human authority.
+  primary_architectural_spine: A bounded case or change event passes deterministic eligibility controls, a calibrated model estimates a defined
+    adverse-outcome or intervention-need risk, and authorized staff work a prioritized queue with feedback.
+  primary_intelligent_mechanism: Calibrated case-level adverse-outcome or intervention-need prediction
+  execution_model: asynchronous
+  human_authority: Authorized domain staff choose the intervention, approve release, assign work, or accept risk; the base family is advisory.
+  applied_case_count: 8
+  applied_opportunities:
+  - CROSS-001
+  - CROSS-002
+  - HR-002
+  - FIN-001
+  - HEALTH-002
+  - EDU-001
+  - TECH-001
+  - NONPROFIT-001

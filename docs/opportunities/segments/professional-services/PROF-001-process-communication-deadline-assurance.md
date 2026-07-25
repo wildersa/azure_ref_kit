@@ -263,3 +263,12 @@ flowchart LR
 - shortlist for review.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-007 — Evidence-grounded timeline and obligation reconstruction`](../../solution-families/FAMILY-007-evidence-grounded-timeline-obligation-reconstruction.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Provenance-preserving communication intake, grounded obligation/event extraction, deterministic calendar calculation, ambiguity/abstention, human confirmation, task creation, and outcome feedback.
+- **Case-specific adapters:** Court/official portals, email, case-management, party/process records, procedural calendars, holidays, and task workflow.
+- **Case-specific extension:** None beyond legal communication and calendar adapters.
+- **Why no separate architecture yet:** The case directly matches source-grounded chronology/obligation extraction, deterministic temporal rules, and human-confirmed action.

@@ -7,6 +7,8 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 | Metric | Value |
 | --- | ---: |
 | Opportunities | 34 |
+| Unmapped opportunities | 4 |
+| Solution families | 8 |
 | Segments configured | 18 |
 | Completed research cycles | 2 |
 | Current segment | `telecommunications` |
@@ -67,6 +69,10 @@ The default target market is Brazil. New opportunities require current Brazilian
 - [Radar state](radar-state.yaml)
 - [Opportunity template](opportunity-template.md)
 - [Execution history](history.jsonl)
+- [Consolidation state](consolidation-state.yaml)
+- [Opportunity-to-family map](opportunity-family-map.yaml)
+- [Solution family index](solution-family-index.yaml)
+- [Solution consolidation method](solution-consolidation-method.md)
 
 ## Publication rule
 

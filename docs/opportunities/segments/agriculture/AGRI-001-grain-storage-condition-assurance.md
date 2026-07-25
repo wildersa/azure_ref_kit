@@ -257,3 +257,12 @@ flowchart LR
 ## Next decision
 
 Prototype candidate. Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-002 — Condition-risk monitoring and inspection prioritization`](../../solution-families/FAMILY-002-condition-risk-monitoring-inspection-prioritization.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Time-aligned condition intake, deterministic sensor and safe-operating checks, multivariate deterioration prediction, ranked inspection/aeration review, human action, and sample/outcome feedback.
+- **Case-specific adapters:** Silo/bin inventory, temperature/humidity, aeration, weather, grain type, storage age, inspection, sampling, and laboratory systems.
+- **Case-specific extension:** None beyond grain-specific condition and aeration features.
+- **Why no separate architecture yet:** The case directly matches condition risk, hard thresholds, human inspection/aeration, and confirmation through sampling.

@@ -244,3 +244,12 @@ flowchart LR
 - prototype candidate.
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-008 — Calibrated case-risk triage for bounded human intervention`](../../solution-families/FAMILY-008-calibrated-case-risk-triage.md)
+- **Disposition:** `fit-with-extension`
+- **Reused architecture:** Case-event intake, deterministic eligibility and approval controls, calibrated named-risk prediction, ranked human review, abstention, and outcome feedback.
+- **Case-specific adapters:** Supplier master, CNPJ and banking evidence, ERP/procurement workflows, communications, approval history, and payment-release rules.
+- **Case-specific extension:** Supplier-entity resolution, communication-risk classification, and payment-change pattern features.
+- **Why no separate architecture yet:** These extensions enrich the canonical case snapshot but preserve the same advisory risk score, deterministic release gate, human authority, and feedback contract.

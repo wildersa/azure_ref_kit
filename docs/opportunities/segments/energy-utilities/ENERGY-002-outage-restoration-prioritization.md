@@ -210,3 +210,12 @@ flowchart LR
 - prototype candidate
 
 Implementation approval remains an explicit human decision.
+
+## Solution family mapping
+
+- **Family:** [`FAMILY-004 — Incident diagnosis and human-controlled response prioritization`](../../solution-families/FAMILY-004-incident-diagnosis-response-prioritization.md)
+- **Disposition:** `direct-fit`
+- **Reused architecture:** Live event/topology intake, deterministic safety/action gates, cause and impact ranking, bounded crew/restoration options, operator control, and incident outcome feedback.
+- **Case-specific adapters:** OMS/SCADA, network topology, weather, vegetation, crew skills/location, customer impact, switching procedures, and dispatch systems.
+- **Case-specific extension:** Restoration-time forecasting and constrained crew/action ranking.
+- **Why no separate architecture yet:** These are expected incident-response extensions; the event correlation, operator authority, and safe action catalog remain unchanged.
