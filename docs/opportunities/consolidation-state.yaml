@@ -1,0 +1,12 @@
+schema_version: 1
+last_updated: "2026-07-25"
+phase: inventory
+last_run: null
+next_candidate_group: null
+processed_opportunities: []
+unmapped_opportunities: []
+family_review_queue: []
+derivation_review_queue: []
+notes:
+  - Discovery remains a separate method and must not be rewritten by consolidation.
+  - The first consolidation pass must reconcile active indexes before clustering.

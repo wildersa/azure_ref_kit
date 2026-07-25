@@ -1,0 +1,8 @@
+schema_version: 1
+last_updated: "2026-07-25"
+
+statuses:
+  active: [proposed, active]
+  terminal: [parked, superseded]
+
+families: []
