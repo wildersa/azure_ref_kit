@@ -1,6 +1,6 @@
 schema_version: 1
-last_run: "2026-07-20T20:02:15Z"
-current_segment_index: 5
+last_run: "2026-07-25T10:13:51Z"
+current_segment_index: 6
 completed_cycles: 2
 
 governance_correction:
@@ -35,10 +35,10 @@ segment_state:
     last_result: RETAIL-003
     next_focus: customer-service exceptions, fulfillment recovery, catalog-quality issues, and demand sensing without repeating shelf-loss orchestration, return inspection and disposition routing, or promotion-terms execution assurance
   manufacturing:
-    runs: 1
-    last_reviewed: "2026-07-19"
-    last_result: MANUF-001
-    next_focus: production quality, scrap and rework root-cause, process drift, operator-assisted inspection, and industrial scheduling without repeating aging-equipment condition monitoring or maintenance prioritization
+    runs: 2
+    last_reviewed: "2026-07-25"
+    last_result: MANUF-002
+    next_focus: scrap and rework root-cause, process drift, industrial scheduling, supplier-quality evidence, and operator-assisted inspection without repeating aging-equipment monitoring or allergen changeover release assurance
   logistics-transport:
     runs: 1
     last_reviewed: "2026-07-19"
