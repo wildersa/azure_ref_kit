@@ -1,8 +1,16 @@
 schema_version: 1
 last_updated: '2026-07-25'
 phase: complete
-last_run: '2026-07-25T15:58:18.007061+00:00'
+last_run: '2026-07-25T17:58:48Z'
 next_candidate_group: null
+last_review:
+  type: existing-family
+  family_id: FAMILY-008
+  opportunities: [CROSS-001, FIN-001, NONPROFIT-001]
+  result: mappings-confirmed
+  integrity_repairs: []
+  mapping_changes: []
+  derivation_queue_changes: []
 processed_opportunities:
 - CROSS-001
 - CROSS-002
@@ -47,23 +55,19 @@ family_review_queue: []
 derivation_review_queue:
 - opportunity_id: CROSS-001
   base_family_id: FAMILY-008
-  reason: Durable policy-derived task orchestration, evidence lifecycle, and governed connector write actions make the case structurally larger
-    than the advisory triage base.
-  review_question: Should a derived governed control-orchestration architecture separate model advisory findings from deterministic multi-system
-    execution?
+  reason: Durable policy-derived task orchestration, evidence lifecycle, and governed connector write actions make the case structurally larger than the advisory triage base.
+  review_question: Should a derived governed control-orchestration architecture separate model advisory findings from deterministic multi-system execution?
 - opportunity_id: FIN-001
   base_family_id: FAMILY-008
-  reason: Real-time streaming, graph propagation, proportionate automatic controls, and payment-latency failure handling change runtime and authority.
+  reason: Real-time streaming, graph propagation, proportionate operational safeguards, and payment-latency failure handling change runtime and authority.
   review_question: Should a derived real-time governed intervention architecture be created for transaction-risk cases?
 - opportunity_id: NONPROFIT-001
   base_family_id: FAMILY-008
-  reason: Causal uplift requires treatment-effect estimation, experiment-aware data, and policy-value metrics rather than ordinary calibrated
-    risk triage.
+  reason: Causal uplift requires treatment-effect estimation, experiment-aware data, and policy-value metrics rather than ordinary calibrated risk triage.
   review_question: Should a derived causal intervention-selection architecture be created when another uplift case appears?
 - opportunity_id: MEDIA-002
   base_family_id: FAMILY-006
-  reason: Continuous low-latency multimodal alignment requires rolling state, stream recovery, and immediate incident handling rather than bounded
-    asynchronous observations.
+  reason: Continuous low-latency multimodal alignment requires rolling state, stream recovery, and immediate incident handling rather than bounded asynchronous observations.
   review_question: Should a derived streaming conformance-monitor architecture be created when another continuous case appears?
 validation:
   active_opportunities: 34
@@ -77,6 +81,8 @@ validation:
   markdown_and_mermaid: validated
   discovery_controls: unchanged
   new_business_opportunities: 0
+  last_review_bidirectional_mapping: validated
+  last_review_discovery_controls: unchanged
 notes:
 - Discovery remains a separate simulation-first method and was not modified.
 - No architecture variant was created; material structural differences remain in derivation_review_queue.
