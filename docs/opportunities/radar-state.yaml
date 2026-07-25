@@ -1,6 +1,6 @@
 schema_version: 1
-last_run: "2026-07-25T12:23:07Z"
-current_segment_index: 8
+last_run: "2026-07-25T13:16:13Z"
+current_segment_index: 9
 completed_cycles: 2
 
 governance_correction:
@@ -50,10 +50,10 @@ segment_state:
     last_result: AGRI-002
     next_focus: livestock-health exceptions, harvest-quality and loss evidence, input traceability, and field-recovery workflows without repeating grain-storage condition assurance or spray-application evidence assurance
   construction-real-estate:
-    runs: 1
-    last_reviewed: "2026-07-19"
-    last_result: CONST-001
-    next_focus: defect evidence, handover and warranty claims, materials traceability, safety inspections, and asset-condition workflows without repeating visual progress or schedule-deviation assurance
+    runs: 2
+    last_reviewed: "2026-07-25"
+    last_result: CONST-002
+    next_focus: handover and warranty defect causation, materials provenance, occupied-building safety inspections, and asset-condition workflows without repeating visual progress assurance or EV-charging fire-safety evidence assurance
   energy-utilities:
     runs: 2
     last_reviewed: "2026-07-20"
