@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-07-26T05:58:22Z",
+  "event": "technical-focus-research-round",
+  "segment": "human-resources",
+  "technical_focus": "causal-and-uplift-learning",
+  "result": "no-new-fit",
+  "technical_focus_result": "insufficient-data-path",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "operational_simulation": {
+    "organization": "medium or large Brazilian employer with HR, occupational health, safety, CIPA, managers, and worker representation",
+    "actor": "occupational-risk and people-analytics coordinator under SST and worker-participation governance",
+    "processes": [
+      "choose group-level work-design interventions after psychosocial-risk review",
+      "compare ergonomic and workload redesign alternatives",
+      "evaluate whether an intervention reduced absence, incidents, turnover, or reported hazards"
+    ],
+    "scenarios": ["normal review cycle", "contradictory or sensitive evidence", "peak absence or operational pressure"],
+    "baseline": "participatory risk assessment, deterministic eligibility and safety rules, expert intervention design, phased or cluster pilots, and aggregated before-after monitoring"
+  },
+  "technical_hypothesis": {
+    "technical_class": ["causal-and-uplift-learning"],
+    "model_strategy": ["custom-trained"],
+    "candidate_model_families": ["uplift-tree", "causal-forest", "doubly-robust-estimation", "propensity-method", "heterogeneous-treatment-effect-model"],
+    "learning_paradigm": ["causal"],
+    "data_modalities": ["tabular", "time-series", "survey"],
+    "interaction_pattern": ["batch", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable"
+  },
+  "training_data": {
+    "observation_unit": "organizational group or work unit at an intervention decision point",
+    "input_data": "pre-intervention work-design, staffing, schedule, workload, incident, absence, turnover, consultation, and contextual measures",
+    "target_or_reward": "post-intervention change in group-level hazard, absence, incident, turnover, service, and worker-reported outcomes",
+    "label_source": "prospective intervention records plus agreed follow-up measures; historical HR records alone do not identify treatment effect",
+    "prediction_time": "before selecting or assigning a preventive intervention",
+    "expected_volume": "unknown; likely limited because interventions are infrequent and heterogeneous",
+    "class_balance": "unknown; treatment groups and outcomes may be highly uneven",
+    "historical_coverage": "unknown; existing records are unlikely to capture intervention definition, assignment rationale, adherence, and comparable control groups consistently",
+    "train_validation_split": "prospective split by organization or time; random row splits would leak organizational context",
+    "leakage_risks": "post-intervention absence, manager decisions, adherence, later complaints, and revised risk inventories entering prediction-time features",
+    "representativeness_risks": "organizational culture, occupation, shift, region, workforce composition, intervention fidelity, and management practice differ materially",
+    "feedback_loop": "worker participation, SST review, intervention adoption, follow-up outcomes, and explicit correction of causal claims",
+    "privacy_and_usage_constraints": "no individual mental-health, employability, disciplinary, compensation, promotion, dismissal, or medical scoring; use aggregated groups and purpose-limited occupational-risk governance",
+    "fallback_if_data_is_insufficient": "use participatory work redesign, deterministic controls, expert prioritization, and prospective cluster or stepped-wedge evaluation without individualized uplift modeling"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HR-002", "HR-003", "NONPROFIT-001"],
+    "material_differentiation": "The causal question is legitimate, but a separate opportunity would mostly add treatment-effect estimation to HR-002's existing group-level psychosocial-risk prevention workflow.",
+    "repeated_pattern_gate": "rejected"
+  },
+  "research": {
+    "queries": [
+      "site:gov.br trabalho 2026 NR-1 riscos psicossociais prevenção organização do trabalho",
+      "site:gov.br fundacentro 2026 absenteísmo intervenção trabalho saúde ocupacional",
+      "causal uplift workplace intervention absenteeism employee wellbeing randomized trial 2025",
+      "employee wellbeing intervention platform personalized recommendations causal uplift product"
+    ],
+    "sources": [
+      "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/canpat-2/canpat-2025",
+      "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/nr-1",
+      "https://www.gov.br/fundacentro/pt-br/comunicacao/noticias/noticias/2026/maio/fundacentro-lanca-diretrizes-para-aplicar-nr-1-com-inclusao-dos-riscos-psicossociais",
+      "https://www.gov.br/fundacentro/pt-br/comunicacao/noticias/noticias/2026/janeiro/programa-traz-beneficios-a-saude-de-trabalhadoras-da-atencao-basica",
+      "https://www.viwell.com/",
+      "https://era-app.org/"
+    ]
+  },
+  "notes": "Brazilian guidance requires organizational and worker-participatory prevention rather than individualized health profiling. Causal or uplift modeling would require prospectively recorded interventions, assignment rationale, comparable controls, adherence, and stable group-level outcomes. Historical observational HR data are materially confounded, and the resulting workflow duplicates HR-002 more than it creates a distinct opportunity. Advanced segment cursor to financial-services and technical-focus cursor to bandits-and-reinforcement-learning."
+}
