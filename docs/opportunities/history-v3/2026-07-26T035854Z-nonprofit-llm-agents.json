@@ -1,0 +1,67 @@
+{
+  "timestamp": "2026-07-26T03:58:54Z",
+  "event": "technical-focus-research-round",
+  "segment": "nonprofit",
+  "technical_focus": "llm-agents-and-tool-use",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "simulation": {
+    "organization_and_actor": "Brazilian civil-society organization delivering social-assistance or rights programs; program coordinator, volunteer coordinator, safeguarding lead, and authorized case worker",
+    "processes": [
+      "beneficiary-service intake and multi-system follow-up",
+      "volunteer onboarding, scheduling, and exception recovery",
+      "safeguarding or defender-protection coordination under human authority"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "case-management workflow, mandatory fields, eligibility and safeguarding rules, task queues, calendar and messaging integrations, role-based approvals, and audit logs",
+    "remaining_gap": "multi-step context gathering and tool orchestration could reduce administrative effort, but the same operational shape is already covered by configurable case-management platforms and nonprofit agent templates"
+  },
+  "technical_classification": {
+    "technical_class": ["llm-agents-and-tool-use"],
+    "model_strategy": ["pretrained", "tool-grounded"],
+    "candidate_model_families": ["pretrained-llm", "tool-calling-model"],
+    "learning_paradigm": ["no-custom-training"],
+    "data_modalities": ["text", "document", "structured-records"],
+    "interaction_pattern": ["conversational", "asynchronous-workflow"],
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-and-tool-contracts-required"
+  },
+  "agent_boundary": {
+    "allowed": "retrieve authorized case context, draft follow-ups, propose tasks, call bounded read or low-risk workflow tools, and checkpoint for approval",
+    "forbidden": "autonomous eligibility, benefit, safeguarding, protection, fund-allocation, legal, or high-impact case decisions",
+    "human_control": "authorized staff approve communications, case changes, escalations, protection actions, payments, and closure"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["NONPROFIT-001", "NONPROFIT-002"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "the candidate would mainly repackage generic case-management and nonprofit operations agents rather than expose a distinct actor, tool boundary, authority model, and measurable outcome"
+  },
+  "queries": [
+    "site:gov.br organizações da sociedade civil Brasil 2025 atendimento beneficiários prestação de contas voluntariado",
+    "Brasil 2025 organizações sociais gestão de voluntários atendimento beneficiários digitalização",
+    "nonprofit case management AI agent tool use volunteer scheduling existing platforms 2026",
+    "Microsoft Copilot Studio nonprofit case management agents tools volunteer management",
+    "Brasil organizações da sociedade civil proteção beneficiários safeguarding 2025"
+  ],
+  "sources": [
+    "https://aplicacoes.mds.gov.br/snas/regulacao/visualizar.php?codigo=6890",
+    "https://www.gov.br/mds/pt-br/acoes-e-programas/suas/entidades-de-assistencia-social/marco-regulatorio-das-organizacoes-da-sociedade-civil-2013-mrosc",
+    "https://agenciagov.ebc.com.br/noticias/202604/brasil-protegeu-1-524-defensores-dos-direitos-humanos-e-do-meio-ambiente-em-2025",
+    "https://learn.microsoft.com/en-us/dynamics365/customer-service/develop/case-management-agent-integration",
+    "https://learn.microsoft.com/en-us/training/modules/enhance-nonprofit-volunteer-management-microsoft-copilot/",
+    "https://adoption.microsoft.com/copilot-scenario-library/nonprofit/",
+    "https://nonprofits.tsi.microsoft.com/EN-US/Microsoft-Nonprofit-Copilot-Agent-Playbook/"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 7,
+    "investigated_pretrained_llm_or_rag_primary": 2,
+    "publication_forced": false
+  },
+  "cursor_advance": {
+    "segment": "nonprofit -> cross-industry",
+    "technical_focus": "llm-agents-and-tool-use -> recommendation-and-ranking"
+  },
+  "notes": "No opportunity published. Brazilian OSC operations provide credible multi-step coordination needs, including rights and assistance workflows, but configurable case-management agents and nonprofit Copilot patterns already cover the central tool-use shape. Sensitive eligibility, safeguarding, protection, finance, and closure decisions require explicit human authority."
+}
