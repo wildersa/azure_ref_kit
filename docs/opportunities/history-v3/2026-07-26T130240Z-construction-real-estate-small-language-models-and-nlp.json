@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-07-26T13:02:40Z",
+  "event": "technical-focus-round",
+  "segment": "construction-real-estate",
+  "technical_focus": "small-language-models-and-nlp",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Brazilian residential developer or construction company with a post-handover service team; warranty coordinator, technical-assistance engineer, and customer-service analyst",
+    "processes": [
+      "receive and normalize homeowner warranty or defect requests from portal, email, messaging, photos, and voice-note transcription",
+      "classify the building system, location, urgency, likely warranty path, and required evidence before technical inspection",
+      "route recurring defect descriptions to the responsible contractor and preserve a reviewable service history"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "official intake channel, mandatory structured fields, unit and room identifiers, warranty matrix, owner manual, rule-based eligibility, attachment checklist, queue routing, SLA, and engineer review",
+    "remaining_gap": "Compact Portuguese NLP could reduce manual normalization and routing of free-text requests, but the bounded value is already covered by structured post-handover workflows and current warranty-management products that centralize, categorize, assign, and track claims."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["small-language-models-and-nlp"],
+    "candidate_model_families": ["compact-text-encoder", "sentence-transformer", "fine-tuned-text-classifier", "token-classifier"],
+    "model_strategy": ["custom-trained", "fine-tuned", "rules-plus-model"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["text", "document"],
+    "interaction_pattern": ["online", "asynchronous", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "training_data": {
+      "observation_unit": "one post-handover service request at the first complete triage point",
+      "input_data": "request text or transcription plus unit, room, system, delivery date, warranty item, declared urgency, and attachment-presence fields available before routing",
+      "target_or_reward": "engineer-confirmed defect category, responsible queue or contractor, evidence-completeness class, and valid escalation outcome",
+      "label_source": "historical ticket resolution, engineer correction, contractor reassignment, inspection result, and explicit false-routing review",
+      "prediction_time": "after minimum intake validation and before technical assignment or site inspection",
+      "expected_volume": "unknown; must be measured per developer, portfolio size, delivery cohort, channel, and warranty period",
+      "class_balance": "rare safety-critical or structural cases are likely minority classes; exact distribution is unknown",
+      "historical_coverage": "requires multiple developments, building systems, suppliers, delivery periods, customer vocabularies, and both accepted and rejected warranty requests",
+      "train_validation_split": "hold out later delivery cohorts and entire developments; prevent repeated messages, follow-ups, and the same defect case from crossing splits",
+      "leakage_risks": "using inspection findings, final responsibility, contractor response, warranty approval, repair outcome, or fields added after initial routing",
+      "representativeness_risks": "different construction methods, manuals, regional vocabulary, resident communication quality, channels, suppliers, and company-specific category taxonomies",
+      "feedback_loop": "engineer recategorization, queue reassignment, inspection result, request closure reason, and explicit false-positive or abstention correction",
+      "privacy_and_usage_constraints": "protect resident identity, contact data, unit location, images of private homes, accessibility information, and evidence shared with contractors",
+      "fallback_if_data_is_insufficient": "retain structured intake, deterministic warranty rules, keyword search, mandatory evidence checks, manual triage, and existing post-handover service platforms"
+    }
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["CONST-001", "CONST-002", "PROF-001", "RETAIL-003"],
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt",
+    "reason": "The remaining NLP task is bounded classification and routing inside a post-handover workflow. Current Brazilian and international products already centralize warranty requests, capture evidence, categorize defects, assign ownership, and track resolution; a smaller classifier is an implementation option, not a differentiated opportunity."
+  },
+  "sources": [
+    "https://cbic.org.br/projeto-vicios-construtivos-faz-balanco-do-ano-e-projeta-acoes-para-garantir-seguranca-juridica-ao-setor/",
+    "https://www.camara.leg.br/noticias/1153491-comissao-aprova-projeto-que-aprimora-garantia-pos-obra-de-imoveis/",
+    "https://www.fastbuilt.com.br/post/o-sistema-fastbuilt-assist%C3%AAncia-t%C3%A9cnica-%C3%A9-gest%C3%A3o-de-p%C3%B3s-obra-para-construtoras-e-incorporadoras",
+    "https://demity.com/",
+    "https://www.sitewarden.ai/",
+    "https://support.procore.com/products/online/materials-user-guide-with-project-financials/resolve-defects"
+  ],
+  "cursor_advance": {
+    "segment": "construction-real-estate -> energy-utilities",
+    "technical_focus": "small-language-models-and-nlp -> conversational-llm-and-rag"
+  }
+}
