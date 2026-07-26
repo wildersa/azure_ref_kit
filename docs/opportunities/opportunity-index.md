@@ -11,7 +11,7 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 | Solution families | 8 |
 | Segments configured | 18 |
 | Completed research cycles | 3 |
-| Current segment | `hospitality-tourism` |
+| Current segment | `media-entertainment` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
