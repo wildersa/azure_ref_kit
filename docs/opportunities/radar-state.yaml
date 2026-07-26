@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-26T02:02:32Z"
+last_run: "2026-07-26T03:00:28Z"
 
-current_segment_index: 16
+current_segment_index: 17
 completed_segment_cycles: 2
 
-current_technical_focus_index: 5
+current_technical_focus_index: 6
 completed_technical_focus_cycles: 0
-next_technical_focus: conversational-llm-and-rag
+next_technical_focus: llm-agents-and-tool-use
 
 technical_focus_state:
   classical-supervised-ml:
@@ -30,9 +30,9 @@ technical_focus_state:
     last_reviewed: "2026-07-26"
     last_result: rejected
   conversational-llm-and-rag:
-    runs: 0
-    last_reviewed: null
-    last_result: null
+    runs: 1
+    last_reviewed: "2026-07-26"
+    last_result: rejected
   llm-agents-and-tool-use:
     runs: 0
     last_reviewed: null
@@ -56,11 +56,11 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 5
+  evaluated_rounds: 6
   published_rounds: 0
   investigated_custom_training_or_fine_tuning: 5
   published_custom_training_or_fine_tuning: 0
-  investigated_pretrained_llm_or_rag_primary: 0
+  investigated_pretrained_llm_or_rag_primary: 1
   published_pretrained_llm_or_rag_primary: 0
   investigated_rl_bandit_causal_or_uplift: 0
   published_rl_bandit_causal_or_uplift: 0
@@ -153,10 +153,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: creator-contract and credit operations, regional-language content routing, provenance exceptions, and audience-service recovery without repeating audiovisual piracy, live-caption continuity, generic archive tagging, semantic MAM search, or automated metadata enrichment
   technology-software:
-    runs: 2
-    last_reviewed: "2026-07-20"
-    last_result: TECH-002
-    next_focus: cloud-cost anomaly remediation, developer-environment recovery, release-risk assurance, dependency provenance, and support knowledge decay without repeating vulnerability prioritization or tenant-specific incident reproduction
+    runs: 3
+    last_reviewed: "2026-07-26"
+    last_result: no-new-fit
+    next_focus: cloud-cost remediation actions, release and dependency decision support, developer-environment recovery, and support escalation workflows without repeating vulnerability prioritization, tenant-specific incident reproduction, generic codebase chat, documentation Q&A, or support knowledge-base RAG
   nonprofit:
     runs: 2
     last_reviewed: "2026-07-20"
