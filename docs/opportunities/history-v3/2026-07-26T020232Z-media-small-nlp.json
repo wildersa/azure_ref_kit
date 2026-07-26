@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-07-26T02:02:32Z",
+  "event": "research-round",
+  "segment": "media-entertainment",
+  "technical_focus": "small-language-models-and-nlp",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "model_strategy": ["fine-tuned", "rules-plus-model"],
+  "training_requirement": "required",
+  "data_readiness": "viable-with-data-work",
+  "queries": [
+    "Brasil 2025 arquivo audiovisual metadados acervo digital emissoras preservação audiovisual IA NLP",
+    "site:gov.br audiovisual acervo metadados preservação 2025 Brasil",
+    "small language model media metadata classification archival audiovisual products 2025",
+    "AI media asset management automatic metadata tagging archive commercial solutions 2025"
+  ],
+  "sources": [
+    "https://www.gov.br/cultura/pt-br/assuntos/cinema-do-brasil/preservacao",
+    "https://www.gov.br/secom/pt-br/acompanhe-a-secom/noticias/2025/06/governo-federal-cria-programa-de-preservacao-do-audiovisual-brasileiro",
+    "https://www.gov.br/ibict/pt-br/central-de-conteudos/noticias/2025/outubro/rede-cariniana-e-fiocruz-promovem-webinario-sobre-metadados-de-preservacao-para-documentos-audiovisuais",
+    "https://www.reuters.com/media-center/reuters-imagen-integrates-magnifi-ai-automate-highlights-live-archive-video-2026-03-10/",
+    "https://www.tvtechnology.com/news/telestream-to-show-new-vantage-ai-at-ibc-2025",
+    "https://www.tvtechnology.com/news/vizrt-launches-viz-one-8-1-with-ai-powered-features"
+  ],
+  "notes": "Simulated archive intake, metadata normalization, regional-language routing, and peak digitization flows. A compact Portuguese classifier or token extractor could support bounded metadata routing, but current MAM and archive platforms already provide transcription, tagging, semantic search, metadata enrichment, and controlled deployment. The remaining institution-specific taxonomy and preservation-schema work is better handled through adoption, configuration, deterministic validation, and specialist review. No differentiated opportunity was published. Advanced segment to technology-software and technical focus to conversational-llm-and-rag.",
+  "history_append_status": "pending-monolithic-append",
+  "history_append_note": "The connector exposed history.jsonl only as truncated content, so this immutable event shard preserves the complete event without risking destructive replacement of the monolithic history file."
+}
