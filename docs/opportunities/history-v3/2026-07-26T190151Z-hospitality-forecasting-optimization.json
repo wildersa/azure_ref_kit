@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-07-26T19:01:51Z",
+  "event": "technical-focus-research-round",
+  "segment": "hospitality-tourism",
+  "technical_focus": "forecasting-and-optimization",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "operational_simulations": [
+    "small hotel staffing and housekeeping allocation under volatile arrivals and cancellations",
+    "destination disruption recovery for weather, transport interruption, and event-driven demand shifts",
+    "small-property maintenance, guest-request, and back-office workload planning under reduced staffing"
+  ],
+  "deterministic_and_statistical_baselines": [
+    "PMS booking curves and occupancy forecast",
+    "minimum staffing rules and skill constraints",
+    "priority queues, shift templates, and manual manager overrides",
+    "statistical demand forecasting feeding deterministic scheduling or optimization"
+  ],
+  "technical_class": ["forecasting-and-optimization"],
+  "candidate_model_families": [
+    "probabilistic-demand-forecasting",
+    "hierarchical-forecasting",
+    "constraint-programming",
+    "mixed-integer-optimization",
+    "learned-forecast-plus-deterministic-solver"
+  ],
+  "model_strategy": ["custom-trained", "optimization-with-learned-components", "rules-plus-model"],
+  "learning_paradigm": ["supervised", "hybrid"],
+  "data_modalities": ["tabular", "time-series", "event"],
+  "interaction_pattern": ["batch", "online", "human-in-the-loop"],
+  "training_requirement": "required",
+  "data_readiness": "viable-with-data-work",
+  "training_data": {
+    "observation_unit": "property-day or property-shift planning decision",
+    "input_data": "booking curve, cancellations, arrivals, departures, room status, events, weather, staffing availability, skills, tasks, maintenance and guest requests available at planning time",
+    "target_or_reward": "realized workload, service delay, overtime, room turnaround, unmet demand and constrained operating cost",
+    "label_source": "PMS, workforce, housekeeping, maintenance and guest-service outcomes; availability and consistency are unknown",
+    "prediction_time": "before daily or shift-level staffing and task allocation",
+    "expected_volume": "unknown; likely limited for individual small properties and more viable across multi-property groups",
+    "class_balance": "not applicable for continuous demand targets; disruption and severe service-failure events are expected to be rare",
+    "historical_coverage": "unknown; requires synchronized booking, task, staffing and outcome history across seasonality and disruptions",
+    "train_validation_split": "time-based split with holdout seasons, properties and disruption periods",
+    "leakage_risks": "using final occupancy, same-day task completions, overtime, complaints, revised staffing or disruption outcomes unavailable at planning time",
+    "representativeness_risks": "property size, destination, season, service model, labor practice, channel mix and exceptional events vary materially",
+    "feedback_loop": "manager overrides and realized service outcomes should be retained separately from model recommendations",
+    "privacy_and_usage_constraints": "minimize guest and worker personal data; avoid employee surveillance or automated employment decisions",
+    "fallback_if_data_is_insufficient": "booking-curve statistics, configured workload ratios, constraint-based scheduling and manager approval"
+  },
+  "closest_repository_patterns": ["HOSP-001", "HEALTH-001", "FAMILY-003"],
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Current hotel operations and revenue-management platforms already combine demand forecasting, staffing, housekeeping, task prioritization and constrained operational planning. A new case would duplicate HOSP-001 or represent a product configuration rather than a differentiated opportunity."
+  },
+  "sources": [
+    "https://observatorio.sebrae.com.br/profile/industry/meios-de-hospedagem",
+    "https://www.sciencedirect.com/science/article/abs/pii/S0278431925004025",
+    "https://www.operato.live/",
+    "https://hoxell.com/",
+    "https://www.hans.global/"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 22,
+    "investigated_custom_training_or_fine_tuning": 18,
+    "investigated_pretrained_llm_or_rag_primary": 4,
+    "investigated_rl_bandit_causal_or_uplift": 4
+  },
+  "cursor_advance": {
+    "segment": "hospitality-tourism -> media-entertainment",
+    "technical_focus": "forecasting-and-optimization -> classical-supervised-ml",
+    "completed_technical_focus_cycles": 2
+  },
+  "notes": "No opportunity published. Forecasting and constrained scheduling are technically plausible, but the operational outcome overlaps HOSP-001 and mature hotel operations/revenue-management products. The main remaining work for small properties is data integration, configuration and adoption rather than a distinct intelligent architecture."
+}
