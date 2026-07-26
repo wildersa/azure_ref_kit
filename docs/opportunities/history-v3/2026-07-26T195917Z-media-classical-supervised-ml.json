@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-07-26T19:59:17Z",
+  "event": "technical-focus-research-round",
+  "segment": "media-entertainment",
+  "technical_focus": "classical-supervised-ml",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "operational_simulations": [
+    "audiovisual producer verifies contracts, credits, territorial rights, windows and required registration metadata before delivery",
+    "broadcaster or platform handles contradictory ownership, missing contributor records and late rights changes before publication",
+    "regional media operation processes a release peak with incomplete metadata, multiple versions and reduced legal or archive staffing"
+  ],
+  "deterministic_and_statistical_baselines": [
+    "mandatory structured rights and credit fields with versioned validation rules",
+    "contract and title registries, rights-window matrices, approval workflow and human legal review",
+    "duplicate, completeness and date-overlap checks before distribution",
+    "simple calibrated classifier only for residual review prioritization"
+  ],
+  "technical_class": ["classical-supervised-ml"],
+  "candidate_model_families": [
+    "logistic-regression",
+    "decision-tree",
+    "random-forest",
+    "gradient-boosting",
+    "calibrated-classifier"
+  ],
+  "model_strategy": ["custom-trained", "rules-plus-model"],
+  "learning_paradigm": ["supervised"],
+  "data_modalities": ["tabular", "text", "document"],
+  "interaction_pattern": ["batch", "asynchronous", "human-in-the-loop"],
+  "training_requirement": "required",
+  "data_readiness": "viable-with-data-work",
+  "training_data": {
+    "observation_unit": "one audiovisual title, version or distribution package evaluated at a defined pre-release checkpoint",
+    "input_data": "contract metadata, contributor and credit records, title registration fields, rights territories and windows, delivery package metadata and validation results available before release",
+    "target_or_reward": "later confirmed rights, credit, registration or distribution exception requiring correction, hold or escalation",
+    "label_source": "legal, rights-management, registry, distribution and post-release correction records; consistency and completeness are unknown",
+    "prediction_time": "after deterministic completeness and consistency checks but before release, registration submission or platform delivery",
+    "expected_volume": "unknown and likely organization-dependent; independent producers may have too few comparable releases for stable local training",
+    "class_balance": "material exceptions are expected to be uncommon and heterogeneous",
+    "historical_coverage": "unknown; requires versioned linkage among contracts, metadata snapshots, release decisions and later confirmed corrections",
+    "train_validation_split": "time-based split with holdout productions, distributors and release periods to reduce title and counterparty leakage",
+    "leakage_risks": "using final corrected metadata, later legal decisions, release holds, registry outcomes or post-release disputes unavailable at the prediction checkpoint",
+    "representativeness_risks": "production type, contractual structure, distribution window, territory, platform, language, organization size and documentation practice vary materially",
+    "feedback_loop": "review outcomes and corrections should be stored separately from the model score and deterministic findings",
+    "privacy_and_usage_constraints": "contracts and contributor records may contain confidential commercial and personal data; access and retention require strict purpose limitation",
+    "fallback_if_data_is_insufficient": "structured rights and credit schema, mandatory fields, deterministic date and scope validation, document checklist and specialist approval"
+  },
+  "closest_repository_patterns": ["MEDIA-001", "MEDIA-002", "PROF-001", "NONPROFIT-002"],
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Rights, registration, credits and distribution metadata are primarily governed by structured registries, mandatory fields, contract workflows and human authority. Current media-management products already provide metadata enrichment, rights controls and governed distribution. A supervised exception classifier would be an implementation option for residual triage, not a differentiated solution opportunity."
+  },
+  "sources": [
+    "https://www.gov.br/ancine/pt-br/assuntos/atribuicoes-ancine/registro/registro-de-obras-nao-publicitarias/certificado-de-produto-brasileiro",
+    "https://www.gov.br/ancine/pt-br/acesso-a-informacao/legislacao/instrucoes-normativas/instrucao-normativa-171",
+    "https://www.gov.br/ancine/pt-br/assuntos/noticias/ancine-divulga-panorama-do-mercado-de-video-por-demanda-no-brasil-2025",
+    "https://www4.ecad.org.br/noticias/ecad-distribui-r-17-bilhao-em-2025-e-tem-alta-de-15-na-arrecadacao/",
+    "https://www.reuters.com/media-center/reuters-imagen-integrates-magnifi-ai-automate-highlights-live-archive-video-2026-03-10/"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 23,
+    "investigated_custom_training_or_fine_tuning": 19,
+    "investigated_pretrained_llm_or_rag_primary": 4,
+    "investigated_rl_bandit_causal_or_uplift": 4
+  },
+  "cursor_advance": {
+    "segment": "media-entertainment -> technology-software",
+    "technical_focus": "classical-supervised-ml -> anomaly-and-unsupervised-learning",
+    "completed_technical_focus_cycles": 2
+  },
+  "notes": "No opportunity published. The supervised hypothesis was seriously investigated, but deterministic metadata controls and existing media-management capabilities cover the primary workflow. Available labels are sparse, delayed and shaped by prior review practices, leaving no material differentiated architecture beyond residual triage."
+}
