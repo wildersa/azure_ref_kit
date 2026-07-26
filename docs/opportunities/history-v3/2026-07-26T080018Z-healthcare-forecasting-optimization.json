@@ -1,0 +1,74 @@
+{
+  "timestamp": "2026-07-26T08:00:18Z",
+  "event": "technical-focus-round",
+  "segment": "healthcare",
+  "technical_focus": "forecasting-and-optimization",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "simulation": {
+    "organization_and_actor": "medium or large Brazilian hospital or SUS hospital network; hospital operations manager and pharmacy supply coordinator",
+    "processes": [
+      "forecast bed and emergency demand and allocate constrained capacity",
+      "forecast medication consumption and recommend reorder or redeployment quantities",
+      "plan staffing and operating-room capacity under demand uncertainty"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_and_statistical_baselines": [
+      "bed-management Kanban and operational huddles",
+      "minimum/maximum stock, reorder point, safety stock and expiry rules",
+      "moving averages, seasonal forecasting and constrained mathematical optimization",
+      "manual pharmacist and operations-manager approval"
+    ]
+  },
+  "technical_hypothesis": {
+    "technical_class": ["forecasting-and-optimization"],
+    "model_strategy": ["custom-trained", "rules-plus-model", "mathematical-optimization"],
+    "candidate_model_families": ["statistical-forecasting", "gradient-boosting-with-temporal-features", "hierarchical-forecasting", "mixed-integer-optimization"],
+    "learning_paradigm": ["supervised", "operations-research"],
+    "data_modalities": ["time-series", "tabular", "event"],
+    "interaction_pattern": ["batch", "decision-support"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "primary_training_data_risk": "stock movements, substitutions, shortages, delayed postings and exceptional clinical demand can make observed consumption differ from unconstrained need; random splits would leak seasonality and policy changes"
+  },
+  "training_data": {
+    "observation_unit": "medication-SKU by hospital unit and day, or capacity unit by time interval",
+    "input_data": "historical dispensing or consumption, current stock, expiry, purchase lead time, scheduled procedures, admissions, occupancy, seasonality and operational constraints",
+    "target_or_reward": "future demand and downstream service-level, expiry, shortage and inventory-cost outcomes",
+    "label_source": "later stock movements, dispensations, admissions, occupancy and validated shortage or expiry events",
+    "prediction_time": "before purchasing, transfer, staffing or capacity-allocation decisions",
+    "expected_volume": "unknown; must be measured per hospital, SKU and unit",
+    "class_balance": "intermittent demand and rare shortage events likely; unknown until profiling",
+    "historical_coverage": "daily BNAFAR reporting improves availability in SUS, but local completeness, substitutions and hospital-unit granularity remain unknown",
+    "train_validation_split": "rolling or forward-chaining split by time, with holdout periods covering seasonal and policy changes",
+    "leakage_risks": "post-decision stock corrections, emergency purchases, later substitutions, discharge information and future procedure changes",
+    "representativeness_risks": "hospital case mix, formulary, procurement cycles and local reporting quality vary materially",
+    "feedback_loop": "pharmacist and operations overrides plus realized demand, shortage, waste and service-level outcomes",
+    "privacy_and_usage_constraints": "prefer aggregated operational data; patient-level linkage only when necessary and governed under LGPD and clinical access controls",
+    "fallback_if_data_is_insufficient": "use deterministic inventory policy, statistical seasonal baseline and scenario-based optimization without learned forecasts"
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["HEALTH-001", "HOSP-001", "LOG-001"],
+    "material_differentiation": "none sufficient: hospital capacity forecasting overlaps HEALTH-001, while pharmacy inventory forecasting and optimization is a mature product category and largely an adoption/integration problem",
+    "repeated_pattern_gate": "rejected"
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "notes": "BNAFAR already provides daily stock and movement reporting infrastructure; commercial hospital-pharmacy platforms already forecast demand, recommend PAR/reorder levels and prioritize expiry redeployment. A separate repository opportunity would duplicate established capabilities without a specific uncovered operational boundary."
+  },
+  "sources": [
+    "https://www.gov.br/saude/pt-br/composicao/sectics/daf/bnafar/bnafar",
+    "https://www.gov.br/saude/pt-br/composicao/sectics/daf/bnafar/faq/faq/o-que-foi-estabelecido-pela-1",
+    "https://guia-indicadores.saude.go.gov.br/index",
+    "https://pubmed.ncbi.nlm.nih.gov/40774167/",
+    "https://www.scielo.br/j/rgenf/a/c8hh84Yy3Y6zVTySSfrqRmB/?lang=en",
+    "https://www.bd.com/en-us/products-and-solutions/products/product-brands/healthsight",
+    "https://learn.microsoft.com/en-us/dynamics365/supply-chain/master-planning/demand-forecasting-setup"
+  ],
+  "cursor_advance": {
+    "segment": "healthcare -> retail-ecommerce",
+    "technical_focus": "forecasting-and-optimization -> classical-supervised-ml",
+    "completed_technical_focus_cycles": 1
+  }
+}
