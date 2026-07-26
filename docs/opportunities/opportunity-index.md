@@ -10,8 +10,8 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 | Unmapped opportunities | 4 |
 | Solution families | 8 |
 | Segments configured | 18 |
-| Completed research cycles | 3 |
-| Current segment | `nonprofit` |
+| Completed research cycles | 4 |
+| Current segment | `cross-industry` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
