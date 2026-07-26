@@ -1,0 +1,86 @@
+{
+  "timestamp": "2026-07-26T16:58:24Z",
+  "event": "technical-focus-round",
+  "segment": "public-sector",
+  "technical_focus": "causal-and-uplift-learning",
+  "technical_focus_result": "insufficient-data-path",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Municipal or state social-policy administration; program manager, SUAS coordination, and evaluation team",
+    "processes": [
+      "choose outreach intensity for Cadastro Unico update and benefit-access campaigns",
+      "compare light-touch messaging, assisted scheduling, mobile service, and active-search visits",
+      "evaluate which intervention changes service access without automating eligibility"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "eligibility rules, universal communications, territorial prioritization, scheduled mobile service, structured active-search protocols, phased rollout, and human casework",
+    "remaining_gap": "estimate heterogeneous causal effects of bounded outreach alternatives rather than predicting vulnerability or eligibility"
+  },
+  "technical_hypothesis": {
+    "technical_class": ["causal-and-uplift-learning"],
+    "candidate_model_families": ["uplift-trees", "causal-forests", "doubly-robust-estimation", "propensity-methods"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": ["causal-inference"],
+    "data_modalities": ["tabular", "event"],
+    "interaction_pattern": ["batch", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable",
+    "training_data": {
+      "observation_unit": "eligible household or territorial cohort at the moment an outreach intervention is assigned",
+      "input_data": "only pre-intervention administrative, territorial, channel-access, and prior-service-contact attributes permitted for policy evaluation",
+      "target_or_reward": "verified registration update, completed service access, or program take-up within a prespecified window",
+      "label_source": "prospective experiment or governed phased rollout with recorded intervention assignment and later administrative outcome",
+      "prediction_time": "before outreach assignment",
+      "expected_volume": "unknown; must be established by the participating program and municipality",
+      "class_balance": "unknown; depends on baseline take-up and the selected outcome window",
+      "historical_coverage": "current administrative history does not reliably preserve treatment assignment, propensity, adherence, and comparable untreated outcomes",
+      "train_validation_split": "prospective time- and municipality-separated evaluation; randomization or a defensible quasi-experimental design preferred",
+      "leakage_risks": "using post-contact updates, completed appointments, benefit decisions, later caseworker notes, or outcomes recorded after assignment",
+      "representativeness_risks": "municipality capacity, connectivity, territorial access, program rules, disability, language, and channel availability vary materially",
+      "feedback_loop": "program evaluators review aggregate treatment effects, subgroup uncertainty, non-response, and unintended access barriers",
+      "privacy_and_usage_constraints": "no automated eligibility, denial, individual vulnerability scoring, punitive targeting, or use beyond the defined public-policy purpose",
+      "fallback_if_data_is_insufficient": "use universal or rule-based outreach and run a bounded randomized or phased evaluation before any uplift model"
+    }
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["PUBLIC-001", "NONPROFIT-001", "HR-002"],
+    "material_differentiation": "none proven; the causal capability would be an evaluation method for outreach policy, not a distinct operational solution architecture",
+    "repeated_pattern_gate": "rejected"
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "notes": "Brazil already has integrated Cadastro Unico infrastructure, professional active-search workflows, and formal public-policy evaluation mechanisms. International field experiments show simple universal outreach may outperform precise targeting, weakening the need for an uplift product before prospective local experimentation."
+  },
+  "sources": [
+    {
+      "title": "Cadastro Unico completes 25 years with inclusion, security and data quality",
+      "url": "https://www.gov.br/mds/pt-br/noticias-e-conteudos/desenvolvimento-social/noticias-desenvolvimento-social/cadastro-unico-completa-25-anos-com-mais-inclusao-social-seguranca-e-qualidade-dos-dados",
+      "date": "2026-04-16"
+    },
+    {
+      "title": "New Cadastro Unico improves service and security",
+      "url": "https://www.gov.br/mds/pt-br/noticias-e-conteudos/desenvolvimento-social/noticias-desenvolvimento-social/novo-cadastro-unico-agiliza-atendimento-e-fortalece-seguranca",
+      "date": "2025-12-23"
+    },
+    {
+      "title": "CMAP public-policy evaluations",
+      "url": "https://www.gov.br/planejamento/pt-br/assuntos/avaliacao-de-politicas-publicas/conselho-de-monitoramento-e-avaliacao-de-politicas-publicas-cmap/avaliacoes",
+      "date": "2026-06-25"
+    },
+    {
+      "title": "Interventions to bolster benefits take-up",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12452829/",
+      "date": "2025"
+    }
+  ],
+  "coverage_effect": {
+    "custom_training_investigated": true,
+    "rl_bandit_causal_or_uplift_investigated": true,
+    "publication_forced": false
+  },
+  "cursor_advance": {
+    "segment": "public-sector -> professional-services",
+    "technical_focus": "causal-and-uplift-learning -> bandits-and-reinforcement-learning"
+  }
+}
