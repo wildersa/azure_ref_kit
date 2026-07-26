@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-07-26T04:58:19Z",
+  "event": "technical-focus-research-round",
+  "segment": "cross-industry",
+  "technical_focus": "recommendation-and-ranking",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "model_strategy": "custom-trained",
+  "training_requirement": "required",
+  "data_readiness": "viable-with-data-work",
+  "processes_simulated": [
+    "shared-services work-item prioritization and assignment",
+    "accounts-payable exception ordering and resolver recommendation",
+    "cross-functional enterprise service-recovery queue routing"
+  ],
+  "deterministic_and_product_baselines": [
+    "SLA, age, value, risk and eligibility rules",
+    "skills, capacity and queue-priority routing",
+    "Dynamics 365 unified routing",
+    "ServiceNow Predictive Intelligence and Recommended Actions"
+  ],
+  "training_data": {
+    "observation_unit": "one work item at a defined queue-decision timestamp",
+    "input_data": "request type, timestamps, SLA, value or impact, eligibility, required skills, queue state, available capacity and prior handling context",
+    "target_or_reward": "resolution outcome, SLA compliance, reassignment, rework, escalation or accepted resolver/action",
+    "label_source": "historical queue outcomes and reviewed assignments; consistency and causal usefulness remain unknown",
+    "prediction_time": "before prioritization or assignment",
+    "expected_volume": "unknown and organization-specific",
+    "class_balance": "unknown; rare severe exceptions are likely imbalanced",
+    "historical_coverage": "unknown; requires stable workflow history across comparable queues",
+    "train_validation_split": "time-based and queue-aware split required to avoid future and organizational leakage",
+    "leakage_risks": "using post-assignment fields, final severity, resolver identity or later SLA state",
+    "representativeness_risks": "policy changes, heterogeneous business units, changing staffing and different service catalogs",
+    "feedback_loop": "supervisor overrides, reassignment, final resolution, SLA outcome and explicit recommendation acceptance",
+    "privacy_and_usage_constraints": "employee performance, customer, supplier and financial context require minimization, access control and purpose limitation",
+    "fallback_if_data_is_insufficient": "configured queue priorities, eligibility rules, skills-based routing, capacity balancing and supervisor control"
+  },
+  "queries": [
+    "Brasil 2025 centros de serviços compartilhados backlog priorização chamados pesquisa",
+    "Brasil 2025 contas a pagar exceções notas fiscais automação pesquisa",
+    "ServiceNow predictive intelligence task assignment prioritization official documentation",
+    "Microsoft Dynamics 365 customer service unified routing prioritization official"
+  ],
+  "sources": [
+    "https://www.gov.br/servicoscompartilhados/pt-br/assuntos/gestao-de-pessoas/catalogo-de-servicos/Catalogo-de-Servicos",
+    "https://ieg.com.br/",
+    "https://www.em.com.br/mundo-corporativo/2025/08/7219679-cscs-estudo-do-ieg-reforca-importancia-de-controle-de-kpis.html",
+    "https://learn.microsoft.com/en-us/dynamics365/customer-service/administer/overview-unified-routing",
+    "https://learn.microsoft.com/en-us/dynamics365/customer-service/administer/assignment-methods",
+    "https://www.servicenow.com/docs/r/intelligent-experiences/predictive-intelligence/using-predictive-intelligence.html",
+    "https://www.servicenow.com/docs/r/it-service-management/service-operations-workspace/configuring-recommended-actions-for-itsm-in-service-operations-workspace.html"
+  ],
+  "notes": "Brazilian shared-services evidence confirms large service catalogs, KPI-driven operations and continuing automation interest. The simulated ranking opportunity was rejected because configurable rules, skills/capacity routing and current enterprise platforms already prioritize, assign and recommend resolutions. A learned ranker would require substantial historical data work and did not expose a distinct actor, process, authority boundary or measurable outcome beyond existing products. Advanced segment to human-resources and technical focus to causal-and-uplift-learning."
+}
