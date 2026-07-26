@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-07-26T22:11:09Z",
+  "event": "technical-focus-discovery-round",
+  "segment": "nonprofit",
+  "technical_focus": "time-series-and-sequence-models",
+  "result": "no-new-fit",
+  "focus_result": "rejected",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "operational_simulations": [
+    {
+      "process": "volunteer shift coverage and no-show recovery",
+      "actors": ["volunteer coordinator", "program manager", "site lead"],
+      "scenarios": ["normal recurring schedule", "late cancellations and incomplete availability", "peak campaign or emergency demand with reduced coverage"],
+      "deterministic_baseline": "self-service signup, eligibility and skill rules, reminders, waitlists, minimum coverage and coordinator override"
+    },
+    {
+      "process": "beneficiary-service demand and capacity planning",
+      "actors": ["service coordinator", "casework supervisor", "operations manager"],
+      "scenarios": ["normal weekly demand", "missing or duplicated intake events", "seasonal or emergency demand spike"],
+      "deterministic_baseline": "appointment slots, queue thresholds, moving averages, calendar seasonality and manual capacity buffers"
+    },
+    {
+      "process": "restricted-fund cash-flow and delivery pacing",
+      "actors": ["program manager", "finance lead", "partnership manager"],
+      "scenarios": ["normal planned disbursement", "delayed transfer or expense classification", "compressed delivery deadline after funding interruption"],
+      "deterministic_baseline": "approved budget, milestone schedule, committed-versus-paid ledger, cash-flow scenarios and human reforecasting"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": ["time-series-and-sequence-models"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "candidate_model_families": ["statistical-forecasting", "gradient-boosting-with-temporal-features", "state-space-models", "temporal-convolution", "temporal-transformer"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["time-series", "event", "tabular"],
+    "interaction_pattern": ["batch", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "volunteer shift, service queue interval or program-finance period at the planning timestamp",
+    "input_data": "signups, attendance, cancellations, calendar, role and site context, service intake and completion events, capacity, commitments and payments available before planning",
+    "target_or_reward": "later shift coverage or no-show, service demand and backlog, or period cash requirement; no reliable cross-organization label is assumed",
+    "label_source": "attendance and service completion records, reviewed queue outcomes, and reconciled finance records",
+    "prediction_time": "before reminders, replacement assignment, capacity adjustment, spending decision or final period reconciliation",
+    "expected_volume": "unknown and likely limited for small organizations; must be measured by program and time granularity",
+    "class_balance": "unknown; severe shortages, spikes and interruptions are likely uncommon",
+    "historical_coverage": "unknown; depends on consistent check-in, intake, capacity and finance event recording across program changes",
+    "train_validation_split": "time-based split with program, site or campaign holdouts where volume permits",
+    "leakage_risks": "final attendance, replacement assignment, completed service, revised capacity, corrected expense category and reconciled payment recorded after the planning point",
+    "representativeness_risks": "campaigns, emergencies, grant changes, holidays, site openings, volunteer turnover and policy changes alter the sequence-generating process",
+    "feedback_loop": "coordinator overrides, actual attendance, unmet demand, backlog recovery and finance reconciliation support later evaluation",
+    "privacy_and_usage_constraints": "beneficiary records and volunteer profiles require minimization, purpose limitation, access control and avoidance of sensitive-trait inference",
+    "fallback_if_data_is_insufficient": "self-service scheduling, reminders, waitlists, moving averages, seasonal rules, queue thresholds, scenario planning and human review"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["NONPROFIT-001", "NONPROFIT-002", "HOSP-001", "HEALTH-001"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "volunteer coordination is already served by mature scheduling, reminder, attendance and analytics products; demand and cash-flow candidates reduce to ordinary forecasting, scenario planning or existing capacity patterns without a distinct nonprofit decision-and-outcome spine"
+  },
+  "queries": [
+    "Brasil 2025 organizações sociais voluntariado retenção voluntários pesquisa OSC",
+    "site:ibge.gov.br organizações sem fins lucrativos Brasil 2025 FASFIL",
+    "volunteer management software scheduling retention analytics nonprofit 2025",
+    "software gestão voluntários agendamento previsão demanda organizações sem fins lucrativos 2025"
+  ],
+  "sources": [
+    "https://www.ibge.gov.br/estatisticas/economicas/outras-estatisticas-economicas/9023-as-fundacoes-privadas-e-associacoes-sem-fins-lucrativos-no-brasil.html",
+    "https://www.gov.br/gestao/pt-br/assuntos/noticias/2025/se/governo-lanca-manual-que-fortalece-parcerias-do-poder-publico-com-organizacoes-da-sociedade-civil",
+    "https://fundamentl.app/products/volunteers",
+    "https://www.getalignmint.org/features/volunteer-scheduling",
+    "https://www.giveffect.com/volunteer-management-software",
+    "https://www.zoho.com/pt-br/creator/industries/nonprofits-organization-management-software.html"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 25,
+    "investigated_custom_training_or_fine_tuning": 21,
+    "published_rounds": 0
+  },
+  "cursor_transition": {
+    "segment": "nonprofit -> cross-industry",
+    "technical_focus": "time-series-and-sequence-models -> specialized-neural-networks"
+  }
+}
