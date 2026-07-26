@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-07-26T07:01:30Z",
+  "event": "technical-focus-research-round",
+  "segment": "financial-services",
+  "technical_focus": "bandits-and-reinforcement-learning",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "technical_class": ["bandits-and-reinforcement-learning"],
+  "model_strategy": ["custom-trained", "offline-policy-evaluation"],
+  "candidate_model_families": ["contextual-bandit", "constrained-policy-learning", "offline-reinforcement-learning"],
+  "learning_paradigm": ["reinforcement-learning", "counterfactual-policy-evaluation"],
+  "data_modalities": ["tabular", "event", "sequence"],
+  "interaction_pattern": ["online-decision-support", "human-in-the-loop"],
+  "training_requirement": "required",
+  "data_readiness": "not-currently-trainable",
+  "training_data": {
+    "observation_unit": "One customer or case decision point with the state known before an eligible intervention.",
+    "input_data": "Consented account, transaction, affordability, channel, prior-contact, case-state, policy and operational-capacity features available at decision time.",
+    "target_or_reward": "A bounded outcome such as confirmed fraud prevention, sustainable customer-selected repayment, resolved investigation, or successful low-friction service recovery, penalized for complaints, reversals, harm and regulatory breaches.",
+    "label_source": "Audited case outcomes, customer choices, reversals, complaints, confirmed fraud investigations and human review; availability and consistency remain unknown.",
+    "prediction_time": "Immediately before selecting among legally and operationally eligible interventions.",
+    "expected_volume": "Unknown; must be established per institution and decision type.",
+    "class_balance": "Likely sparse positive outcomes and highly uneven action exposure; not confirmed.",
+    "historical_coverage": "Existing logs are likely policy-biased and may not record rejected alternatives, propensities or full delayed outcomes.",
+    "train_validation_split": "Time-based and policy-version-aware split, with customer/entity isolation and a final prospective shadow evaluation.",
+    "leakage_risks": "Post-decision contact results, investigation closure, renegotiation acceptance, later delinquency and manual escalation may leak into features.",
+    "representativeness_risks": "Historical policies, channel access, product mix and vulnerable-customer treatment may underrepresent future states and protected groups.",
+    "feedback_loop": "Human-approved actions and delayed audited outcomes, with explicit action propensities and complaint/harm monitoring.",
+    "privacy_and_usage_constraints": "LGPD purpose limitation, financial secrecy, explainability, automated-decision review rights, credit and consumer-protection controls, and strict prohibition on unconstrained exploration.",
+    "fallback_if_data_is_insufficient": "Use deterministic eligibility, policy rules, calibrated supervised risk models, constrained optimization and human review; run only offline or shadow policy evaluation until prospective governance is approved."
+  },
+  "simulations": [
+    "Fraud intervention sequencing after a suspicious Pix or account event.",
+    "Selection and timing of customer-approved debt-renegotiation assistance.",
+    "Financial-crime investigation action sequencing under analyst capacity constraints."
+  ],
+  "deterministic_baseline": "Regulatory eligibility, risk thresholds, fixed escalation matrices, affordability rules, channel consent, constrained optimization and human authorization.",
+  "closest_repository_patterns": ["FIN-001", "FIN-003"],
+  "disposition": "adopt",
+  "rejection_reason": "The strongest sequential-decision processes overlap existing financial-services opportunities, while safe online exploration is incompatible with current customer, credit, fraud and automated-decision governance. Historical logs also lack proven action propensities and counterfactual coverage for reliable offline policy learning.",
+  "coverage_effect": {
+    "custom_training_investigated": true,
+    "rl_bandit_causal_or_uplift_investigated": true,
+    "publication_forced": false
+  },
+  "sources": [
+    "https://www.gov.br/anpd/pt-br/assuntos/noticias/anpd-apresenta-resultados-da-tomada-de-subsidios-sobre-tratamento-automatizado-de-dados-pessoais",
+    "https://www.gov.br/anpd/pt-br/assuntos/noticias/decisao-automatizada-e-tema-de-workshop-em-forum-da-internet-no-brasil",
+    "https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares",
+    "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?numero=567&tipo=Resolu%C3%A7%C3%A3o+BCB",
+    "https://learn.microsoft.com/en-us/dynamics365/customer-insights/journeys/add-action"
+  ],
+  "cursor_advance": {
+    "segment": "financial-services -> healthcare",
+    "technical_focus": "bandits-and-reinforcement-learning -> forecasting-and-optimization"
+  }
+}
