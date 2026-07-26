@@ -1,0 +1,87 @@
+{
+  "timestamp": "2026-07-26T15:59:43Z",
+  "event": "technical-focus-research-round",
+  "segment": "education",
+  "technical_focus": "recommendation-and-ranking",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Brazilian public education network; pedagogical coordinator, teacher, and learner-support team",
+    "processes": [
+      "rank remedial learning activities after formative assessment",
+      "prioritize tutoring or learner-support interventions under limited capacity",
+      "rank vocational or enrichment pathways against student goals and prerequisites"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_and_statistical_baseline": "BNCC skill matrices, mastery thresholds, prerequisite rules, teacher-defined pathways, queue priority, capacity constraints, and simple score-based ordering",
+    "remaining_opportunity": "No distinct opportunity remained beyond existing adaptive-learning products, configured mastery paths, and the repository's existing persistence and accessibility cases."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["recommendation-and-ranking"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "candidate_model_families": ["learning-to-rank", "matrix-factorization", "two-tower-retrieval", "candidate-generation-and-reranking", "calibrated-recommender"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["tabular", "event"],
+    "interaction_pattern": ["online", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "agent": "not used",
+    "llm": "not used"
+  },
+  "training_data": {
+    "observation_unit": "One learner-candidate intervention pair at a defined instructional decision point",
+    "input_data": "Assessment results available before recommendation, skill and prerequisite mappings, learner goals, prior completed activities, accessibility constraints, intervention metadata, and current capacity",
+    "target_or_reward": "Subsequent mastery improvement, completion, or teacher-confirmed usefulness attributable enough to compare candidate ordering",
+    "label_source": "Later assessments, activity completion, and teacher review; causal attribution is not guaranteed",
+    "prediction_time": "After a formative assessment or support trigger and before the activity or intervention is assigned",
+    "expected_volume": "Unknown; must be measured per network, subject, grade, and intervention catalog",
+    "class_balance": "Unknown; positive learning gains and teacher approvals may be uneven across subjects and learner groups",
+    "historical_coverage": "Assumed to vary materially across schools, platforms, grade levels, and periods",
+    "train_validation_split": "Time-based and school-aware split, with protected holdouts by cohort and intervention catalog version",
+    "leakage_risks": "Using post-assignment engagement, later assessment results, teacher overrides, final pathway placement, or intervention completion fields as prediction-time inputs",
+    "representativeness_risks": "Differences in connectivity, disability support, school resources, teacher practice, curriculum sequencing, region, and learner socioeconomic context",
+    "feedback_loop": "Teacher accept, reject, or reorder actions plus later learning outcomes; monitor whether recommendations narrow exposure to diverse materials",
+    "privacy_and_usage_constraints": "Educational records require purpose limitation, minimization, access control, auditing, and prohibition of autonomous high-impact educational decisions",
+    "fallback_if_data_is_insufficient": "Use teacher-configured mastery paths, prerequisite rules, transparent score bands, and randomized or prospectively designed pilots before learned ranking"
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["EDU-001", "EDU-002", "HR-001"],
+    "material_differentiation": "Not established. Personalized activity ranking overlaps existing adaptive-learning and mastery-path products, while support prioritization overlaps EDU-001.",
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt"
+  },
+  "evidence": {
+    "queries": [
+      "Brasil 2025 educação superior atendimento estudantil filas evasão apoio acadêmico recomendação priorização estudantes",
+      "Brasil 2025 plataforma aprendizagem adaptativa recomendação conteúdo estudantes educação",
+      "site:gov.br mec 2025 avaliação formativa recomposição aprendizagem dados estudantes",
+      "education recommendation ranking intervention students existing platform adaptive learning 2025",
+      "site:jovensgenios.com aprendizagem adaptativa recomendação trilhas plataforma",
+      "site:instructure.com mastery paths personalized learning recommendations official"
+    ],
+    "sources": [
+      "https://presidencia.gov.br/ccivil_03/_ato2023-2026/2025/decreto/d12391.htm",
+      "https://www.gov.br/mec/pt-br/acesso-a-informacao/perguntas-frequentes/pacto-nacional-pela-recomposicao-das-aprendizagens/familiares-e-estudantes/o-pacto-preve-a-recomposicao",
+      "https://atendimento.educacao.sp.gov.br/knowledgebase/article/SED-08297/pt-br",
+      "https://www.jovensgenios.com/partners",
+      "https://www.instructure.com/mastery-k-12",
+      "https://community.instructure.com/t5/Canvas-Basics-Guide/What-is-Mastery-Paths/ta-p/404483"
+    ]
+  },
+  "coverage_effect": {
+    "evaluated_rounds": 19,
+    "investigated_custom_training_or_fine_tuning": 15,
+    "investigated_pretrained_llm_or_rag_primary": 4,
+    "investigated_rl_bandit_causal_or_uplift": 2,
+    "note": "Custom recommendation training was seriously investigated and rejected without forcing publication."
+  },
+  "cursor_transition": {
+    "segment": "education -> public-sector",
+    "technical_focus": "recommendation-and-ranking -> causal-and-uplift-learning"
+  },
+  "integrity_repairs": [
+    "Rebuilt opportunity-index.md from the YAML index because the dashboard declared 34 active opportunities but contained only 18 rows."
+  ]
+}
