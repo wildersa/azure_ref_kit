@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-07-26T17:59:14Z",
+  "event": "technical-focus-round",
+  "segment": "professional-services",
+  "technical_focus": "bandits-and-reinforcement-learning",
+  "result": "no-new-fit",
+  "technical_focus_result": "insufficient-data-path",
+  "opportunity_id": null,
+  "organization_archetype": "Brazilian accounting, legal, or consulting firm with recurring client document and fee collection workflows",
+  "actors": [
+    "operations coordinator",
+    "billing or client-success analyst",
+    "responsible professional"
+  ],
+  "processes_simulated": [
+    "sequence reminders for missing client documents before recurring filing deadlines",
+    "choose timing and channel for professional-fee collection follow-up",
+    "select recovery action for stalled client-service requests"
+  ],
+  "scenario_variants": [
+    "normal recurring collection flow",
+    "contradictory payment, document, or client-contact state",
+    "peak period with many deadlines and reduced staff capacity"
+  ],
+  "deterministic_baseline": "fixed reminder ladders, due-date rules, client segmentation, templates, WhatsApp or email automation, escalation thresholds, and professional approval",
+  "technical_class": ["bandits-and-reinforcement-learning"],
+  "candidate_model_families": [
+    "contextual-bandit",
+    "offline-rl",
+    "constrained-policy-learning"
+  ],
+  "model_strategy": ["custom-trained", "rules-plus-model"],
+  "learning_paradigm": ["contextual-bandit"],
+  "data_modalities": ["tabular", "event", "communication-metadata"],
+  "interaction_pattern": ["asynchronous", "human-in-the-loop"],
+  "training_requirement": "required",
+  "data_readiness": "not-currently-trainable",
+  "training_data": {
+    "observation_unit": "one eligible client account or missing-document case at a defined decision time",
+    "input_data": "only pre-action due date, prior contacts, channel availability, client relationship, document or invoice state, and permitted operational context",
+    "target_or_reward": "document receipt or payment within a bounded window, adjusted for contact cost, complaints, opt-outs, and professional override",
+    "label_source": "subsequent receipt or payment events plus verified communication outcomes",
+    "prediction_time": "immediately before choosing an eligible reminder or escalation action",
+    "expected_volume": "unknown and firm-specific",
+    "class_balance": "unknown; successful outcomes and complaints may vary materially by client mix and workflow",
+    "historical_coverage": "typically incomplete because fixed rules do not log alternative eligible actions or action propensities",
+    "train_validation_split": "time-based and client-group separated, with policy-era separation",
+    "leakage_risks": "using later payment, document receipt, manual escalation, revised due dates, or post-contact status fields",
+    "representativeness_risks": "different firm sizes, client portfolios, service types, deadlines, channels, and relationship norms",
+    "feedback_loop": "record action eligibility, selected action, propensity, delivery, response, outcome, complaint, opt-out, and human override",
+    "privacy_and_usage_constraints": "LGPD purpose limitation, communication consent and channel rules, professional confidentiality, minimal use of client content, and no inference of sensitive vulnerability",
+    "fallback_if_data_is_insufficient": "retain configurable deterministic reminder ladders and evaluate prospective randomized or phased tests only with governance approval"
+  },
+  "primary_training_data_risk": "historical systems rarely preserve eligible alternatives and action propensities, so offline policy evaluation would be biased",
+  "closest_repository_patterns": ["PROF-001", "FIN-003", "NONPROFIT-001"],
+  "existing_landscape": [
+    "Brazilian legal and accounting platforms already automate fee and document reminders",
+    "general collection tools already provide configurable WhatsApp and email reminder ladders",
+    "the remaining contextual-policy layer would be an implementation experiment rather than a differentiated business opportunity"
+  ],
+  "disposition": "adopt",
+  "ai_dependency": "supporting",
+  "agent": "not used",
+  "llm": "not used",
+  "human_control": "professionals define eligible actions, communication boundaries, escalation, exceptions, and relationship-sensitive decisions",
+  "coverage_effect": {
+    "evaluated_rounds_increment": 1,
+    "investigated_custom_training_or_fine_tuning_increment": 1,
+    "investigated_rl_bandit_causal_or_uplift_increment": 1
+  },
+  "queries": [
+    "Brasil 2025 escritórios advocacia inadimplência clientes cobrança automação gestão pesquisa",
+    "Brasil 2025 escritórios contabilidade documentos clientes atraso automação cobrança",
+    "software jurídico cobrança clientes automação lembretes Brasil 2026",
+    "contextual bandit debt collection communication channel optimization research"
+  ],
+  "sources": [
+    "https://pastacontabil.com.br/blog/automacao-cobranca-documentos-clientes-contabilidade",
+    "https://www.juribrasil.com.br/",
+    "https://cobadv.com.br/",
+    "https://www.mercadopago.com.br/blog/automacao-cobrancas-lembretes-pagamento",
+    "https://arxiv.org/abs/1606.03966"
+  ],
+  "notes": "No opportunity published. The selected focus exposed a repeated decision with observable outcomes, but deterministic reminder ladders and current products already cover the operational core. A contextual policy would require prospective logging of eligible actions and propensities before credible offline evaluation."
+}
