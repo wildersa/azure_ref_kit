@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-26T19:59:17Z"
+last_run: "2026-07-26T20:59:26Z"
 
-current_segment_index: 16
+current_segment_index: 17
 completed_segment_cycles: 3
 
-current_technical_focus_index: 1
+current_technical_focus_index: 2
 completed_technical_focus_cycles: 2
-next_technical_focus: anomaly-and-unsupervised-learning
+next_technical_focus: time-series-and-sequence-models
 
 technical_focus_state:
   classical-supervised-ml:
@@ -14,7 +14,7 @@ technical_focus_state:
     last_reviewed: "2026-07-26"
     last_result: rejected
   anomaly-and-unsupervised-learning:
-    runs: 2
+    runs: 3
     last_reviewed: "2026-07-26"
     last_result: rejected
   time-series-and-sequence-models:
@@ -56,9 +56,9 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 23
+  evaluated_rounds: 24
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 19
+  investigated_custom_training_or_fine_tuning: 20
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 4
   published_pretrained_llm_or_rag_primary: 0
@@ -153,10 +153,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: creator-contract, credit, rights-window and distribution-metadata exceptions where a distinct decision remains beyond structured registries, mandatory metadata, deterministic rights checks, current MAM and rights-management products, audiovisual piracy detection, live-caption continuity, generic archive tagging, semantic search, or metadata enrichment
   technology-software:
-    runs: 3
+    runs: 4
     last_reviewed: "2026-07-26"
     last_result: no-new-fit
-    next_focus: cloud-cost remediation actions, release and dependency decision support, developer-environment recovery, and support escalation workflows without repeating vulnerability prioritization, tenant-specific incident reproduction, generic codebase chat, documentation Q&A, or support knowledge-base RAG
+    next_focus: cloud-cost remediation, release-health decisions, developer-environment recovery, and support escalation where a distinct decision remains beyond native cost anomaly alerts, budgets and quotas, observability and canary rules, AIOps, vulnerability prioritization, tenant-specific incident reproduction, and generic anomaly dashboards
   nonprofit:
     runs: 3
     last_reviewed: "2026-07-26"
