@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-26T01:01:46Z"
+last_run: "2026-07-26T02:02:32Z"
 
-current_segment_index: 15
+current_segment_index: 16
 completed_segment_cycles: 2
 
-current_technical_focus_index: 4
+current_technical_focus_index: 5
 completed_technical_focus_cycles: 0
-next_technical_focus: small-language-models-and-nlp
+next_technical_focus: conversational-llm-and-rag
 
 technical_focus_state:
   classical-supervised-ml:
@@ -26,9 +26,9 @@ technical_focus_state:
     last_reviewed: "2026-07-26"
     last_result: rejected
   small-language-models-and-nlp:
-    runs: 0
-    last_reviewed: null
-    last_result: null
+    runs: 1
+    last_reviewed: "2026-07-26"
+    last_result: rejected
   conversational-llm-and-rag:
     runs: 0
     last_reviewed: null
@@ -56,9 +56,9 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 4
+  evaluated_rounds: 5
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 4
+  investigated_custom_training_or_fine_tuning: 5
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 0
   published_pretrained_llm_or_rag_primary: 0
@@ -148,10 +148,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: accessible guest operations, destination-disruption recovery, small-property back-office exceptions, and worker-safety workflows without repeating occupancy forecasting, generic guest messaging, room-inspection vision, food-waste tracking, hotel asset management, or pool-surveillance products
   media-entertainment:
-    runs: 2
-    last_reviewed: "2026-07-20"
-    last_result: MEDIA-002
-    next_focus: archive discoverability, production asset reconciliation, content provenance, audience operations, and creator-rights workflows without repeating audiovisual piracy or live-caption semantic continuity assurance
+    runs: 3
+    last_reviewed: "2026-07-26"
+    last_result: no-new-fit
+    next_focus: creator-contract and credit operations, regional-language content routing, provenance exceptions, and audience-service recovery without repeating audiovisual piracy, live-caption continuity, generic archive tagging, semantic MAM search, or automated metadata enrichment
   technology-software:
     runs: 2
     last_reviewed: "2026-07-20"
