@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-07-26T10:04:39Z",
+  "event": "research-round-v3",
+  "segment": "manufacturing",
+  "technical_focus": "anomaly-and-unsupervised-learning",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "simulation": {
+    "organization_and_actor": "medium or large Brazilian discrete or process manufacturer; process engineer, quality engineer, and production supervisor",
+    "processes": [
+      "detect process drift before scrap or rework rises",
+      "identify supplier or material shifts that change the operating envelope",
+      "triage abnormal production batches during peak or degraded operation"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "SPC control charts, engineering limits, recipe and product-version controls, 4M change records, alarm rules, sampling, and human root-cause review",
+    "remaining_gap": "Unsupervised drift detection may surface multivariate changes not covered by fixed limits, but the gap is not sufficiently distinct from existing equipment-condition monitoring and quality analytics once product, machine, material, and method context is modeled."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["anomaly-and-unsupervised-learning"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "candidate_model_families": ["isolation-methods", "one-class-models", "density-estimation", "autoencoders"],
+    "learning_paradigm": ["unsupervised", "semi-supervised"],
+    "data_modalities": ["time-series", "tabular", "event"],
+    "interaction_pattern": ["streaming", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "versioned production window or batch under one defined operating context",
+    "input_data": "sensor and process variables available during production plus product, recipe, equipment, material-lot, shift, and 4M change context",
+    "target_or_reward": "no mandatory target for unsupervised training; later quality result and engineer disposition used for evaluation and semi-supervised refinement",
+    "label_source": "quality release, scrap or rework result, maintenance findings, and engineer-confirmed false or true alert",
+    "prediction_time": "during or immediately after the production window, before final quality disposition where possible",
+    "expected_volume": "unknown until a plant and line are selected",
+    "class_balance": "abnormal events expected to be rare and heterogeneous; exact balance unknown",
+    "historical_coverage": "requires versioned history spanning normal operation, product mix, planned changes, maintenance states, and seasonal or shift variation",
+    "train_validation_split": "time-ordered and grouped by product, line, and change period; avoid random row splits",
+    "leakage_risks": "final quality fields, rework codes, maintenance actions, or operator annotations created after alert time",
+    "representativeness_risks": "new product variants, equipment changes, supplier lots, recipes, shifts, and maintenance states can change the normal envelope",
+    "feedback_loop": "quality and process engineers confirm alert relevance and record legitimate 4M changes",
+    "privacy_and_usage_constraints": "worker or shift identifiers should be minimized and not used for individual performance profiling",
+    "fallback_if_data_is_insufficient": "use SPC, engineering thresholds, versioned rules, targeted sampling, and a data-quality pilot before model training"
+  },
+  "portfolio_coherence": {
+    "closest_patterns": ["MANUF-001 equipment-condition monitoring", "generic industrial anomaly detection", "statistical process control"],
+    "material_differentiation": "not sufficient for a new opportunity; process-drift monitoring is best treated as an extension or experiment within existing manufacturing monitoring and quality workflows",
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt"
+  },
+  "evidence": [
+    {
+      "url": "https://www.mapadaindustria.cni.com.br/web/portal-da-industria",
+      "date": "2026-07-26",
+      "role": "current Brazilian industrial context"
+    },
+    {
+      "url": "https://www.omron.com/global/en/technology/omrontechnics/vol57/003.html",
+      "date": "2025-02-21",
+      "role": "concept drift and false-detection risk after 4M changes"
+    },
+    {
+      "url": "https://link.springer.com/article/10.1007/s10845-025-02590-9",
+      "date": "2025-04-21",
+      "role": "technical plausibility and benchmarking limits for high-dimensional process drift"
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/azure/ai-services/anomaly-detector/",
+      "date": "2026-07-26",
+      "role": "current Azure service lifecycle; Anomaly Detector retires on 2026-10-01"
+    }
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 13,
+    "investigated_custom_training_or_fine_tuning": 11,
+    "published_rounds": 0
+  },
+  "cursor_advance": {
+    "segment": "manufacturing -> logistics-transport",
+    "technical_focus": "anomaly-and-unsupervised-learning -> time-series-and-sequence-models"
+  },
+  "notes": "No opportunity published. The selected lens exposed a plausible process-drift experiment, but deterministic SPC and versioned 4M context are strong baselines, false alerts under legitimate change are material, and the candidate overlaps the repository's existing manufacturing condition-monitoring pattern."
+}
