@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-26T16:58:24Z"
+last_run: "2026-07-26T17:59:14Z"
 
-current_segment_index: 13
+current_segment_index: 14
 completed_segment_cycles: 3
 
-current_technical_focus_index: 9
+current_technical_focus_index: 10
 completed_technical_focus_cycles: 1
-next_technical_focus: bandits-and-reinforcement-learning
+next_technical_focus: forecasting-and-optimization
 
 technical_focus_state:
   classical-supervised-ml:
@@ -46,9 +46,9 @@ technical_focus_state:
     last_reviewed: "2026-07-26"
     last_result: insufficient-data-path
   bandits-and-reinforcement-learning:
-    runs: 1
+    runs: 2
     last_reviewed: "2026-07-26"
-    last_result: rejected
+    last_result: insufficient-data-path
   forecasting-and-optimization:
     runs: 1
     last_reviewed: "2026-07-26"
@@ -56,13 +56,13 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 20
+  evaluated_rounds: 21
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 16
+  investigated_custom_training_or_fine_tuning: 17
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 4
   published_pretrained_llm_or_rag_primary: 0
-  investigated_rl_bandit_causal_or_uplift: 3
+  investigated_rl_bandit_causal_or_uplift: 4
   published_rl_bandit_causal_or_uplift: 0
   note: Coverage targets apply prospectively and guide investigation, not publication quotas. Existing opportunities are tagged only when materially revalidated.
 
@@ -138,10 +138,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: service-access and benefit-take-up interventions that can be prospectively randomized or phased, with explicit treatment assignment and group-level outcomes, while avoiding automated eligibility, individual vulnerability profiling, procurement-document assurance, and generic fraud or outreach targeting
   professional-services:
-    runs: 3
+    runs: 4
     last_reviewed: "2026-07-26"
     last_result: no-new-fit
-    next_focus: tax-controversy evidence, engagement collections, client-service recovery, and cross-border controls without repeating litigation communication, generic case-duration prediction, conflict checking, or PSA delivery forecasting
+    next_focus: tax-controversy evidence, engagement collections, client-service recovery, and cross-border controls where a distinct operational decision remains beyond fixed reminder ladders, document-collection automation, fee-collection products, generic case-duration prediction, conflict checking, litigation communication, and PSA delivery forecasting
   hospitality-tourism:
     runs: 3
     last_reviewed: "2026-07-26"
