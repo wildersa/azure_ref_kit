@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-07-26T20:59:26Z",
+  "event": "technical-focus-discovery-round",
+  "segment": "technology-software",
+  "technical_focus": "anomaly-and-unsupervised-learning",
+  "result": "no-new-fit",
+  "focus_result": "rejected",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "operational_simulations": [
+    {
+      "process": "cloud-cost anomaly investigation and remediation",
+      "actors": ["FinOps analyst", "platform engineer", "service owner"],
+      "scenarios": ["normal daily review", "legitimate launch-driven spend spike", "runaway resource or degraded tagging during peak change volume"],
+      "deterministic_baseline": "budgets, allocation tags, thresholds, ownership routing, quotas, policy and native provider alerts"
+    },
+    {
+      "process": "release and delivery-pipeline degradation review",
+      "actors": ["release engineer", "platform team", "service owner"],
+      "scenarios": ["normal release", "rare test or latency deviation", "multiple concurrent releases with incomplete telemetry"],
+      "deterministic_baseline": "required checks, SLO thresholds, canary rules, rollback criteria and observability queries"
+    },
+    {
+      "process": "support-escalation anomaly review",
+      "actors": ["support operations lead", "incident manager", "engineering owner"],
+      "scenarios": ["normal queue", "new tenant-specific symptom", "volume spike with routing and telemetry gaps"],
+      "deterministic_baseline": "severity rules, duplicate detection, ownership maps, queue thresholds and human triage"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": ["anomaly-and-unsupervised-learning"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "candidate_model_families": ["isolation-methods", "one-class-models", "density-estimation", "autoencoders", "graph-anomaly-detection"],
+    "learning_paradigm": ["unsupervised", "semi-supervised"],
+    "data_modalities": ["time-series", "event", "tabular", "graph"],
+    "interaction_pattern": ["batch", "streaming", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "resource, service, deployment, pipeline execution or support queue interval at the decision timestamp",
+    "input_data": "cost and usage, tags, deployment and configuration changes, service metrics, pipeline events, ownership, incidents and support events available before review",
+    "target_or_reward": "review-confirmed actionable anomaly versus legitimate change; no reliable universal label is assumed",
+    "label_source": "FinOps, platform, release or support reviewer disposition and linked remediation outcome",
+    "prediction_time": "before investigation, remediation, rollback or final incident classification",
+    "expected_volume": "unknown; must be measured per organization and granularity",
+    "class_balance": "unknown and likely sparse for material actionable anomalies",
+    "historical_coverage": "unknown; depends on stable tagging, ownership, telemetry and change history",
+    "train_validation_split": "time-based split with service or team holdouts where volume permits",
+    "leakage_risks": "final incident severity, remediation action, corrected tags, rollback result, post-investigation owner and later cost adjustments",
+    "representativeness_risks": "launches, migrations, seasonal traffic, pricing changes, new services and reorganizations redefine normal behavior",
+    "feedback_loop": "review disposition, false-alert reason, remediation outcome and time-to-resolution feed later evaluation",
+    "privacy_and_usage_constraints": "tenant identifiers, support content, security events and employee ownership data require minimization and access controls",
+    "fallback_if_data_is_insufficient": "native provider anomaly alerts, statistical thresholds, policy, quotas, SLO rules and human review"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["TECH-001", "TECH-002", "TELCO-001", "CROSS-001"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "cloud-cost anomaly detection is already native and commercially mature; release and support anomaly candidates reduce to observability, rules, AIOps or existing incident patterns without a distinct actor-decision-outcome spine"
+  },
+  "queries": [
+    "Brasil 2025 empresas software incidentes cloud custos FinOps pesquisa",
+    "site:learn.microsoft.com Azure Cost Management anomaly detection 2026",
+    "Brasil FinOps 2025 pesquisa custos nuvem empresas",
+    "site:finops.org anomaly detection cloud cost official 2026"
+  ],
+  "sources": [
+    "https://radardanuvem.com.br/",
+    "https://learn.microsoft.com/en-us/azure/cost-management-billing/understand/analyze-unexpected-charges",
+    "https://learn.microsoft.com/en-us/azure/cost-management-billing/costs/overview-cost-management",
+    "https://www.finops.org/wg/managing-cloud-cost-anomalies/",
+    "https://data.finops.org/2025-report/"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 24,
+    "investigated_custom_training_or_fine_tuning": 20,
+    "published_rounds": 0
+  },
+  "cursor_transition": {
+    "segment": "technology-software -> nonprofit",
+    "technical_focus": "anomaly-and-unsupervised-learning -> time-series-and-sequence-models"
+  }
+}
