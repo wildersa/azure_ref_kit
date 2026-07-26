@@ -1,0 +1,84 @@
+{
+  "timestamp": "2026-07-26T23:06:56Z",
+  "event": "technical-focus-discovery-round",
+  "segment": "cross-industry",
+  "technical_focus": "specialized-neural-networks",
+  "result": "no-new-fit",
+  "focus_result": "rejected",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "operational_simulations": [
+    {
+      "process": "PPE compliance observation at shared industrial and logistics access points",
+      "actors": ["occupational-safety technician", "site supervisor", "access-control operator"],
+      "scenarios": ["normal shift entry with expected PPE", "occluded or task-specific equipment and ambiguous scene", "peak shift change with crowding, glare and camera degradation"],
+      "deterministic_baseline": "access rules, task-specific PPE matrix, physical inspection, signage, supervisor checks and incident reporting"
+    },
+    {
+      "process": "unsafe-zone intrusion and proximity review in shared facilities",
+      "actors": ["EHS coordinator", "operations supervisor", "security operator"],
+      "scenarios": ["normal authorized movement", "temporary maintenance changing the safe zone", "peak operation with vehicles, workers and partial visibility"],
+      "deterministic_baseline": "barriers, geofenced access, permits, spotters, alarms, speed limits and human observation"
+    },
+    {
+      "process": "ergonomic posture and repetitive-motion screening for prevention programs",
+      "actors": ["ergonomist", "occupational-health team", "worker representative"],
+      "scenarios": ["planned observation", "nonstandard task or assistive device", "high-throughput period with changed pace and workstation configuration"],
+      "deterministic_baseline": "participatory ergonomic assessment, task sampling, checklists, workstation measurements and specialist review"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": ["specialized-neural-networks"],
+    "model_strategy": ["custom-trained", "pretrained", "rules-plus-model"],
+    "candidate_model_families": ["cnn", "vision-transformer", "pose-estimation", "video-action-recognition", "multimodal-encoder"],
+    "learning_paradigm": ["supervised", "self-supervised"],
+    "data_modalities": ["image", "video", "spatial", "event"],
+    "interaction_pattern": ["streaming", "edge", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "pilot-data-needed",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "task-scoped image or video interval captured before a safety review or alert",
+    "input_data": "camera frames, site and zone configuration, task type, PPE requirement matrix, access state and environmental conditions available at inference time",
+    "target_or_reward": "reviewed presence and correct use of required PPE, unsafe-zone event or posture/action category; incident prevention is not assumed as a directly learnable label",
+    "label_source": "specialist-reviewed samples, supervisor corrections and confirmed safety observations collected prospectively",
+    "prediction_time": "during access, task execution or planned ergonomic observation before supervisor intervention",
+    "expected_volume": "unknown; must be measured per site, camera, task and positive-event type",
+    "class_balance": "unknown; true violations and dangerous events are expected to be rare relative to compliant activity",
+    "historical_coverage": "unknown; existing CCTV generally lacks task-scoped labels, consent boundaries and representative reviewed exceptions",
+    "train_validation_split": "time-based and site-held-out validation with camera, lighting, task, PPE and worker-context holdouts",
+    "leakage_risks": "using post-alert supervisor actions, incident records, access denial outcomes or manually zoomed footage unavailable at live inference",
+    "representativeness_risks": "occlusion, lighting, camera angle, body diversity, uniforms, PPE variants, task changes, temporary zones and site-specific operating practices",
+    "feedback_loop": "specialist confirmation, false-alert dismissal, missed-event review and periodic site-specific recalibration",
+    "privacy_and_usage_constraints": "worker monitoring requires purpose limitation, minimization, access controls, retention limits, labor consultation and prohibition of biometric identity inference unless separately lawful and necessary",
+    "fallback_if_data_is_insufficient": "physical barriers, access rules, task-specific PPE checklists, spotters, supervisor inspection, participatory ergonomics and manual incident review"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HR-002", "MANUF-002", "CONST-001", "ENERGY-003"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "PPE and unsafe-action computer vision are established solution categories, while the residual cross-industry value depends on task-specific configuration, representative site data and safety governance rather than a materially new actor-process-decision architecture"
+  },
+  "queries": [
+    "Brasil 2025 acidentes de trabalho dados oficiais observatório segurança e saúde no trabalho",
+    "Brasil visão computacional EPI segurança do trabalho solução 2025",
+    "Microsoft Azure AI Vision workplace safety PPE detection official",
+    "computer vision PPE detection false positives occlusion industrial safety review"
+  ],
+  "sources": [
+    "https://agenciagov.ebc.com.br/noticias/202604/menor-incidencia-mas-crescimento-acidentes-trabalho-2025",
+    "https://www.gov.br/previdencia/pt-br/assuntos/previdencia-social/saude-e-seguranca-do-trabalhador/acidente_trabalho_incapacidade",
+    "https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/concept-people-detection",
+    "https://link.springer.com/article/10.1007/s10462-024-10978-x",
+    "https://www.mdpi.com/2073-431X/15/6/388"
+  ],
+  "coverage_effect": {
+    "evaluated_rounds": 26,
+    "investigated_custom_training_or_fine_tuning": 22,
+    "published_rounds": 0
+  },
+  "cursor_transition": {
+    "segment": "cross-industry -> human-resources",
+    "technical_focus": "specialized-neural-networks -> small-language-models-and-nlp"
+  }
+}
