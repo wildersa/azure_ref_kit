@@ -11,7 +11,7 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 | Solution families | 8 |
 | Segments configured | 18 |
 | Completed research cycles | 2 |
-| Current segment | `telecommunications` |
+| Current segment | `nonprofit` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
@@ -57,23 +57,4 @@ Every active published opportunity must appear here as one concise row. Rejected
 
 The short description must use one concrete sentence, limited to roughly 40 words, explaining the problem, proposed solution, and material intelligent capability. It must not become a second copy of the full opportunity document.
 
-Every opportunity must declare `AI dependency` as `supporting` or `core`. Opportunities with no material intelligent capability are invalid for this radar.
-
-The default target market is Brazil. New opportunities require current Brazilian problem evidence and current Brazilian regulatory context when regulated. Foreign sources may support comparison or architecture but cannot be the main proof of applicability.
-
-## Operating links
-
-- [Operating model](README.md)
-- [Watcher contract](watcher-contract.md)
-- [Radar configuration](radar-config.yaml)
-- [Radar state](radar-state.yaml)
-- [Opportunity template](opportunity-template.md)
-- [Execution history](history.jsonl)
-- [Consolidation state](consolidation-state.yaml)
-- [Opportunity-to-family map](opportunity-family-map.yaml)
-- [Solution family index](solution-family-index.yaml)
-- [Solution consolidation method](solution-consolidation-method.md)
-
-## Publication rule
-
-A watcher run may end without creating an opportunity. Publish only when a specific problem, current Brazilian evidence, a necessary intelligent capability, measurable business and model outcomes, macro architecture, risks, differentiation from existing solutions, and fit breakdown are available.
+Every opportunity must declare `AI dependency` as `supporting` or `core`. A high fit score is not approval, implementation priority, or proof of production readiness.
