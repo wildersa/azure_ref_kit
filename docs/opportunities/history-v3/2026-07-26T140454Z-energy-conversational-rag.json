@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-07-26T14:04:54Z",
+  "event": "technical-focus-round",
+  "segment": "energy-utilities",
+  "technical_focus": "conversational-llm-and-rag",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "simulation": {
+    "organization_and_actor": "Brazilian electricity distributor or renewable-generation operator; field maintenance supervisor, control-room engineer, and field technician",
+    "processes": [
+      "retrieve approved procedures and asset-specific troubleshooting guidance before and during emergency field work",
+      "clarify current operating manuals, switching boundaries, and maintenance history for an ambiguous equipment condition",
+      "support a peak or degraded period with multiple incidents, incomplete connectivity, and scarce senior specialists"
+    ],
+    "deterministic_baseline": "version-controlled procedures, work-order context, asset registry, approved runbooks, offline document packages, search, checklists, escalation, and control-room authorization",
+    "remaining_gap": "faster source-grounded retrieval and synthesis is useful, but it is a known field-service assistant pattern rather than a differentiated energy-sector opportunity"
+  },
+  "technical_hypothesis": {
+    "technical_class": ["conversational-llm-and-rag"],
+    "candidate_model_families": ["pretrained-llm", "embedding-model", "reranker", "grounded-response-model"],
+    "model_strategy": ["pretrained", "rag-grounded"],
+    "learning_paradigm": ["no-custom-training"],
+    "data_modalities": ["text", "document", "event", "tabular"],
+    "interaction_pattern": ["conversational", "online", "human-in-the-loop"],
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-base-required",
+    "primary_risk": "obsolete, conflicting, or incorrectly scoped procedures could produce unsafe guidance; retrieval must respect document version, asset, role, work order, and authorization boundaries"
+  },
+  "research": {
+    "brazilian_context": [
+      {
+        "title": "ANEEL distribution manuals, models and instructions",
+        "url": "https://www.gov.br/aneel/pt-br/centrais-de-conteudos/manuais-modelos-e-instrucoes/distribuicao",
+        "date_or_update": "2026-07-01",
+        "relevance": "confirms the regulated and document-intensive operating context"
+      },
+      {
+        "title": "ANEEL emergency occurrence service indicators",
+        "url": "https://dadosabertos.aneel.gov.br/dataset/atendimento-ocorrencias-emergenciais",
+        "date_or_update": "2026-07-05",
+        "relevance": "confirms nationally tracked emergency preparation, travel, execution, and total service times"
+      }
+    ],
+    "existing_solutions": [
+      {
+        "title": "ServiceMax AI field service assistant",
+        "url": "https://www.ptc.com/en/news/2025/ptc-launches-servicemax-ai",
+        "date": "2025-02-12",
+        "overlap": "searches manuals, troubleshooting guides, asset history, and known resolutions for technicians"
+      },
+      {
+        "title": "Avangrid First Time Right Autopilot",
+        "url": "https://www.avangrid.com/w/avangrid-s-first-time-right-autopilot-transforms-field-operations-with-generative-ai",
+        "date": "2025-03-24",
+        "overlap": "energy-sector generative assistant for wind-turbine field technicians using internal manuals and troubleshooting knowledge"
+      }
+    ]
+  },
+  "portfolio_coherence": {
+    "closest_opportunities": ["ENERGY-001", "ENERGY-002", "ENERGY-003", "TECH-002"],
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt",
+    "reason": "the proposed capability is a generic and already commercialized field-service RAG assistant; energy-specific document scoping, offline access, and safety approvals are adapters and controls, not a new opportunity"
+  },
+  "coverage_effect": {
+    "evaluated_rounds": 17,
+    "investigated_pretrained_llm_or_rag_primary": 3,
+    "publication_forced": false
+  },
+  "cursor_advance": {
+    "segment": "energy-utilities -> telecommunications",
+    "technical_focus": "conversational-llm-and-rag -> llm-agents-and-tool-use"
+  }
+}
