@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-07-26T11:03:31Z",
+  "event": "technical-focus-round",
+  "segment": "logistics-transport",
+  "technical_focus": "time-series-and-sequence-models",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Brazilian parcel or freight operator; control-tower supervisor and route operations analyst",
+    "processes": [
+      "predict remaining delivery time and exception escalation",
+      "predict warehouse dwell and missed connection risk",
+      "detect sequence patterns preceding failed delivery or route recovery"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "event milestones, promised windows, route rules, cut-off tables, carrier SLAs, geofences, queue thresholds, and human escalation",
+    "remaining_gap": "Sequence-aware prediction is plausible, but the bounded outcomes overlap existing ETA, visibility, cold-chain, and exception-management products and repository cases."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["time-series-and-sequence-models"],
+    "candidate_model_families": ["survival-analysis", "gradient-boosting-with-temporal-features", "temporal-convolution", "recurrent-neural-network", "temporal-transformer"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["event-sequence", "time-series", "tabular", "geospatial"],
+    "interaction_pattern": ["streaming", "asynchronous"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "training_data": {
+      "observation_unit": "shipment, route leg, warehouse dwell interval, or delivery attempt at a defined prediction timestamp",
+      "input_data": "event history available before prediction, planned route and cut-offs, location, carrier, service level, capacity, weather and disruption context where lawfully available",
+      "target_or_reward": "remaining time, missed connection, failed delivery, or recovery outcome",
+      "label_source": "confirmed milestone timestamps, delivery result, exception closure and supervisor correction",
+      "prediction_time": "before the next operational intervention or customer promise update",
+      "expected_volume": "unknown; must be measured per operator, lane, service and event quality",
+      "class_balance": "failed deliveries and severe exceptions are likely minority outcomes; exact balance unknown",
+      "historical_coverage": "requires multiple seasonal periods and stable event definitions across carriers and facilities",
+      "train_validation_split": "time-based split with holdout by later period and, where relevant, unseen lane, hub or carrier",
+      "leakage_risks": "using final exception codes, later scans, customer-contact outcomes or revised ETA fields created after the prediction point",
+      "representativeness_risks": "carrier, region, urban density, peak season, international clearance and service-level differences",
+      "feedback_loop": "confirmed milestones, failed-delivery reasons, supervisor overrides and recovery outcomes",
+      "privacy_and_usage_constraints": "minimize recipient and driver data, restrict location history, define retention and access controls",
+      "fallback_if_data_is_insufficient": "retain deterministic milestone rules, SLA thresholds, statistical baselines and human control-tower review"
+    }
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["LOG-001", "LOG-002", "TELCO-002", "HOSP-001"],
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt",
+    "reason": "The remaining sequence-model hypothesis does not establish a materially distinct actor, decision, integration boundary and outcome beyond current visibility/ETA products and existing repository forecasting or logistics cases."
+  },
+  "sources": [
+    "https://www.gov.br/portos-e-aeroportos/pt-br/assuntos/noticias/2026/05/ministerio-de-portos-e-aeroportos-avanca-em-estudo-sobre-carga-aerea-com-visitas-tecnicas-a-centros-logisticos-em-sao-paulo",
+    "https://www.procon.sc.gov.br/procon-sc-orienta-lojas-apos-reclamacoes-sobre-a-demora-na-entrega-do-produto/",
+    "https://www.gov.br/receitafederal/pt-br/assuntos/aduana-e-comercio-exterior/manuais/remessas-postal-e-expressa/minha-encomenda-esta-atrasada-o-que-pode-ter-acontecido-como-resolvo/minha-encomenda-nao-chegou-o-que-pode-ter-acontecido-como-resolvo/",
+    "https://arxiv.org/abs/2303.07139"
+  ],
+  "cursor_advance": {
+    "segment": "logistics-transport -> agriculture",
+    "technical_focus": "time-series-and-sequence-models -> specialized-neural-networks"
+  }
+}
