@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-07-26T03:00:28Z",
+  "event": "research-round",
+  "segment": "technology-software",
+  "technical_focus": "conversational-llm-and-rag",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "operational_archetypes": [
+    "Brazilian B2B SaaS support team handling product incidents, configuration questions, and release regressions",
+    "platform engineering team answering developer-environment and runbook questions during degraded service"
+  ],
+  "simulated_processes": [
+    "support engineer investigates a customer question across product documentation, release notes, tickets, runbooks, and source history",
+    "developer diagnoses an environment or deployment issue using repository, issue, pull-request, and operational documentation context",
+    "incident commander retrieves current recovery guidance while sources are changing during a service degradation"
+  ],
+  "deterministic_and_existing_baselines": [
+    "curated documentation ownership, search, issue templates, release-note discipline, runbook validation, and escalation routing",
+    "GitHub Copilot Spaces grounded in repositories, issues, pull requests, files, and shared context",
+    "Microsoft Copilot Studio knowledge sources and generative answers with authenticated enterprise sources and citations"
+  ],
+  "technical_class": ["conversational-llm-and-rag"],
+  "model_strategy": ["pretrained", "rag-grounded", "rules-plus-model"],
+  "candidate_model_families": ["pretrained-llm", "embedding-model", "reranker", "grounded-response-model"],
+  "learning_paradigm": ["no-custom-training"],
+  "data_modalities": ["text", "document"],
+  "interaction_pattern": ["conversational", "human-in-the-loop"],
+  "training_requirement": "not-required",
+  "data_readiness": "knowledge-base-required",
+  "disposition": "adopt",
+  "closest_repository_patterns": ["TECH-001", "TECH-002"],
+  "rejection_reason": "Existing developer and enterprise knowledge products already cover grounded conversational retrieval across repositories, issues, pull requests, documentation, websites, SharePoint, Dataverse, and other authenticated enterprise sources. The simulated gaps were primarily knowledge hygiene, authority, freshness, access control, and escalation design rather than a differentiated new conversational RAG architecture or measurable operational outcome.",
+  "coverage_effect": {
+    "investigated_pretrained_llm_or_rag_primary_increment": 1,
+    "publication_forced": false
+  },
+  "queries": [
+    "Brasil 2025 suporte de software base de conhecimento RAG atendimento técnico SaaS",
+    "2025 software support knowledge management retrieval augmented generation existing products official",
+    "Microsoft Copilot Studio generative answers knowledge sources official 2026",
+    "GitHub Copilot Spaces knowledge bases documentation official"
+  ],
+  "sources": [
+    "https://docs.github.com/en/copilot/concepts/context/spaces",
+    "https://docs.github.com/en/copilot/how-tos/provide-context/use-copilot-spaces/use-copilot-spaces",
+    "https://learn.microsoft.com/en-in/microsoft-copilot-studio/knowledge-copilot-studio",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/nlu-boost-node",
+    "https://github.blog/changelog/2025-08-20-sunset-notice-copilot-knowledge-bases/"
+  ],
+  "cursor_advance": {
+    "segment": "technology-software -> nonprofit",
+    "technical_focus": "conversational-llm-and-rag -> llm-agents-and-tool-use"
+  },
+  "notes": "No opportunity published. The technical lens was investigated without forcing a familiar RAG case. Dashboard current segment drift was repaired."
+}
