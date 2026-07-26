@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-07-26T09:00:49Z",
+  "event": "technical-focus-round",
+  "segment": "retail-ecommerce",
+  "technical_focus": "classical-supervised-ml",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Brazilian omnichannel retailer or marketplace; customer-service operations manager, fulfillment-exception supervisor, and catalog-governance analyst",
+    "processes": [
+      "classify and route post-purchase complaints",
+      "predict fulfillment exceptions before the promised date",
+      "classify product listings and catalog-quality defects"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baselines": [
+      "order-state and SLA rules",
+      "carrier milestone alerts",
+      "mandatory catalog schemas and validation",
+      "queue routing by category, seller, order state, and consumer-rights rules"
+    ]
+  },
+  "technical_hypothesis": {
+    "technical_class": ["classical-supervised-ml"],
+    "candidate_model_families": ["logistic-regression", "decision-tree", "random-forest", "gradient-boosting", "calibrated-classifier"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["tabular", "event", "text"],
+    "interaction_pattern": ["online", "asynchronous", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "training_data": {
+      "observation_unit": "one complaint, order checkpoint, or product-listing review at a defined decision time",
+      "input_data": "order and carrier events, promised date, seller and SKU attributes, contact reason, catalog fields, and only information available before prediction",
+      "target_or_reward": "confirmed complaint category, later delivery failure, or specialist-confirmed catalog defect",
+      "label_source": "closed service cases, final delivery outcomes, refunds and cancellations, and catalog-review corrections",
+      "prediction_time": "case intake, pre-breach fulfillment checkpoint, or listing submission",
+      "expected_volume": "unknown; must be measured per retailer and target task",
+      "class_balance": "unknown; severe delivery failures and some catalog defects are likely minority classes",
+      "historical_coverage": "unknown; depends on stable category definitions and retained event history",
+      "train_validation_split": "time-based split with seller, SKU, campaign, and peak-season leakage controls",
+      "leakage_risks": "using final carrier status, refund, cancellation, resolution category, post-review edits, or fields created after escalation",
+      "representativeness_risks": "Black Friday peaks, new sellers, new SKUs, regional carriers, changing catalog taxonomies, and historical routing policy",
+      "feedback_loop": "agent corrections, final order outcome, consumer resolution, and catalog-governance approval",
+      "privacy_and_usage_constraints": "minimize consumer and seller identifiers; restrict customer-service text and decision-impacting features",
+      "fallback_if_data_is_insufficient": "retain deterministic SLA, schema validation, carrier alerts, and human triage; collect prospective labels before training"
+    }
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["RETAIL-001", "RETAIL-002", "RETAIL-003", "LOG-001"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "The remaining candidates either overlap existing repository cases or mature case-categorization, catalog-enrichment, and fulfillment-management capabilities. No distinct actor-process-capability-outcome gap remained."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "sources": [
+      "https://www.agenciasp.sp.gov.br/black-friday-2025-procon-sp-registra-3-mil-reclamacoes-online-e-irregularidades-em-340-estabelecimentos-no-estado/",
+      "https://www.servicenow.com/docs/r/customer-service-management/case-categorization-overview.html",
+      "https://help.sap.com/docs/CX_NG_SVC/56436b4e8fa84dc8b4408c7795a012c4/475d071b11354864bfc3f742c1051e06.html",
+      "https://www.ecommercebrasil.com.br/noticias/casas-bahia-moderniza-marketplace-com-ia-generativa-e-reduz-tarefas-manuais-em-50"
+    ]
+  },
+  "cursor_transition": {
+    "segment": "retail-ecommerce -> manufacturing",
+    "technical_focus": "classical-supervised-ml -> anomaly-and-unsupervised-learning"
+  },
+  "notes": "Custom training was seriously investigated and rejected without forcing publication."
+}
