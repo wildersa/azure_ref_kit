@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-07-26T12:01:03Z",
+  "event": "technical-focus-round",
+  "segment": "agriculture",
+  "technical_focus": "specialized-neural-networks",
+  "result": "no-new-fit",
+  "technical_focus_result": "rejected",
+  "opportunity_id": null,
+  "operational_simulation": {
+    "organization_and_actor": "Brazilian soybean, cotton, coffee, or cattle operation; agronomist, field technician, veterinarian, or production supervisor",
+    "processes": [
+      "photograph symptomatic plants and classify likely disease or pest for expert confirmation",
+      "capture fluorescence or multispectral imagery to screen for early crop stress",
+      "monitor cattle body condition, growth, gait, and behavior from drone or fixed-camera imagery"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "deterministic_baseline": "guided image capture, agronomic or veterinary inspection protocols, symptom keys, sampling, laboratory confirmation, scheduled weighing, threshold rules, and specialist review",
+    "remaining_gap": "Specialized vision and multimodal models are technically plausible, but the clearest bounded processes already have Brazilian research prototypes, free testing tools, commercial applications, or established precision-agriculture product categories."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["specialized-neural-networks"],
+    "candidate_model_families": ["convolutional-neural-network", "vision-transformer", "multimodal-encoder", "object-detection-and-tracking", "fluorescence-image-classifier"],
+    "model_strategy": ["custom-trained", "pretrained", "rules-plus-model"],
+    "learning_paradigm": ["supervised", "transfer-learning"],
+    "data_modalities": ["image", "video", "spatial", "multimodal"],
+    "interaction_pattern": ["edge", "online", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "pilot-data-needed",
+    "training_data": {
+      "observation_unit": "plant image, plot image sequence, fluorescence capture, animal image, or short video clip linked to a defined inspection point",
+      "input_data": "guided RGB, multispectral, fluorescence, depth, or video captures plus crop, variety, growth stage, location, weather, management, animal identity, and operating context available at inference time",
+      "target_or_reward": "expert-confirmed disease, pest, stress, body-condition, gait, growth, or behavior class and severity",
+      "label_source": "agronomist or veterinarian adjudication, laboratory or field confirmation, validated weighing, and corrected false-positive or abstention outcomes",
+      "prediction_time": "during field inspection or before treatment, targeted sampling, weighing, sale, or veterinary escalation",
+      "expected_volume": "unknown; must be measured by crop, disease, region, season, camera setup, farm, and animal population",
+      "class_balance": "rare diseases, early symptoms, lameness, and severe welfare events are likely minority classes; exact balance is unknown",
+      "historical_coverage": "requires multiple farms, seasons, cultivars, disease stages, lighting conditions, devices, animal breeds, ages, and management systems",
+      "train_validation_split": "hold out later seasons and unseen farms, plots, devices, or herds; prevent near-duplicate frames and the same plant or animal from crossing splits",
+      "leakage_risks": "using treatment records, laboratory results, expert annotations, later images, animal weights, or management actions created after the inference point",
+      "representativeness_risks": "regional climate, cultivar, symptom similarity, abiotic stress, image quality, lighting, soil, breed, housing, camera angle, occlusion, and farm-management differences",
+      "feedback_loop": "specialist confirmation, laboratory results, treatment response, repeated inspection, weighing, and explicit false-positive correction",
+      "privacy_and_usage_constraints": "protect farm location, production, disease, supplier, employee, and commercially sensitive herd or crop data; define image retention and sharing rights",
+      "fallback_if_data_is_insufficient": "retain guided capture, symptom keys, deterministic thresholds, specialist inspection, sampling, laboratory confirmation, and existing validated products"
+    }
+  },
+  "portfolio_coherence": {
+    "closest_repository_patterns": ["AGRI-001", "AGRI-002", "RETAIL-001", "CONST-001"],
+    "repeated_pattern_gate": "rejected",
+    "disposition": "adopt",
+    "reason": "Crop visual diagnosis, precision spraying, early stress imaging, and animal visual monitoring are established research and product categories. This round did not expose a materially distinct actor, decision, integration boundary, or measurable outcome beyond existing Brazilian tools and repository multimodal inspection patterns."
+  },
+  "sources": [
+    "https://www.embrapa.br/busca-de-noticias/-/noticia/99117140/produtor-ja-pode-testar-aplicativo-que-usa-registro-de-ondas-cerebrais-de-especialistas-para-detectar-doencas-da-soja",
+    "https://www.embrapa.br/busca-de-noticias/-/noticia/103640815/robo-usa-luz-para-diagnostico-precoce-de-doenca-em-algodao-e-soja",
+    "https://www.semear-digital.cnptia.embrapa.br/noticia/05/2026/drones-e-inteligencia-artificial-indicam-melhor-momento-de-abate-do-gado/",
+    "https://weedvision.com.br/",
+    "https://www.nature.com/articles/s41598-025-06452-5"
+  ],
+  "cursor_advance": {
+    "segment": "agriculture -> construction-real-estate",
+    "technical_focus": "specialized-neural-networks -> small-language-models-and-nlp"
+  }
+}
