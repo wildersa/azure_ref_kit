@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-07-27T00:11:34Z",
+  "event": "research-round-v3",
+  "segment": "human-resources",
+  "technical_focus": "small-language-models-and-nlp",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "simulation": {
+    "organization_and_actors": "Medium or large Brazilian employer; employee-service desk, payroll/benefits operations, occupational-health administration, and HR case specialists.",
+    "processes": [
+      "classify and route employee-service requests from short free-text descriptions",
+      "extract bounded administrative fields from absence and return-to-work requests before deterministic eSocial and policy validation",
+      "triage workplace-conduct or service-recovery narratives without deciding merit, discipline, health status, or employment outcome"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "baseline": "Structured forms, mandatory fields, HR-service taxonomy, keyword and rules routing, eSocial validation rules, queues, RBAC, confidentiality controls, and specialist review.",
+    "remaining_gap": "A compact classifier could reduce residual manual triage, but the capability is already available in HR service-delivery platforms and does not define a differentiated business outcome. Sensitive narratives also require abstention and human ownership."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["small-language-models-and-nlp"],
+    "candidate_model_families": ["compact-encoder", "sentence-transformer", "fine-tuned-classifier", "token-classifier"],
+    "model_strategy": ["custom-trained", "fine-tuned", "rules-plus-model"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["text", "document", "tabular"],
+    "interaction_pattern": ["online", "asynchronous", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "One employee-service or administrative HR case at its initial triage point.",
+    "input_data": "Initial short description, employee-selected service, channel, locale, organization context, and only fields available before routing.",
+    "target_or_reward": "Human-confirmed HR service, routing destination, or bounded extracted administrative fields.",
+    "label_source": "Final specialist correction and resolved service category; assumed available but quality and consistency are unknown.",
+    "prediction_time": "Immediately after intake and before specialist reassignment, investigation, medical interpretation, or case resolution.",
+    "expected_volume": "Unknown; must be measured per employer and service taxonomy.",
+    "class_balance": "Unknown and likely long-tailed across common payroll/benefit requests and rare sensitive cases.",
+    "historical_coverage": "Unknown; taxonomy changes, mergers, policy revisions, and channel differences may fragment history.",
+    "train_validation_split": "Time-based split with organization/service-version isolation; no random split across duplicated or reopened cases.",
+    "leakage_risks": "Final assignment, resolution notes, specialist identity, medical conclusions, disciplinary outcomes, and fields added after reassignment.",
+    "representativeness_risks": "Language, literacy, disability, region, role, channel, union context, and organization-specific taxonomy differences.",
+    "feedback_loop": "Specialist corrections can improve labels, but model-suggested categories may reinforce prior routing conventions.",
+    "privacy_and_usage_constraints": "Employment, health, grievance, conduct, and accommodation narratives require purpose limitation, access control, minimization, retention controls, and prohibition on autonomous employment decisions.",
+    "fallback_if_data_is_insufficient": "Use structured intake, rules, search, taxonomy maintenance, confidence abstention, and manual triage."
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HR-001", "HR-002", "PROF-001"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "The candidate repeats bounded text classification, extraction, and routing already represented in the portfolio and commercially delivered by HR service-management platforms."
+  },
+  "existing_landscape": {
+    "overlap": "ServiceNow HR Service Delivery Predictive Intelligence already auto-determines HR service from the case short description and supports HR case routing and specialist workspaces.",
+    "disposition": "adopt"
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "Compact text classification or bounded entity extraction for initial HR-case triage.",
+    "optional_secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "HR specialists retain routing correction, confidentiality handling, investigation, medical interpretation, grievance, discipline, accommodation, and employment decisions."
+  },
+  "queries": [
+    "site:gov.br trabalho 2025 atendimento trabalhador denúncias assédio canais empresas recursos humanos Brasil",
+    "site:gov.br eSocial 2025 afastamento trabalhador eventos saúde segurança trabalho",
+    "2025 Brazil employee service HR case management AI classification routing",
+    "ServiceNow HR service delivery AI case classification routing official 2026"
+  ],
+  "sources": [
+    "https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/julho/saiba-como-acessar-os-canais-de-atendimento-do-ministerio-do-trabalho-e-emprego/",
+    "https://www.gov.br/esocial/pt-br/noticias/importancia-do-registro-dos-afastamentos-no-esocial-para-a-concessao-de-beneficios-por-incapacidade",
+    "https://www.gov.br/esocial/pt-br/documentacao-tecnica/leiautes-esocial-versao-1-3-nt-04-2025/index.html",
+    "https://www.servicenow.com/docs/r/employee-service-management/hr-service-delivery/predict-hr-service.html",
+    "https://www.servicenow.com/docs/r/employee-service-management/hr-service-delivery/hr-service-delivery.html"
+  ],
+  "notes": "No opportunity published. Advanced segment to financial-services and technical focus to conversational-llm-and-rag."
+}
