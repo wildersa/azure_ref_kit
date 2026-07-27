@@ -1,0 +1,63 @@
+{
+  "timestamp": "2026-07-27T02:10:36Z",
+  "event": "research-round-v3",
+  "segment": "healthcare",
+  "technical_focus": "llm-agents-and-tool-use",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "simulation": {
+    "organization_and_actors": "Brazilian public or philanthropic hospital; bed-management coordinator, discharge nurse, pharmacist, attending physician, and internal-regulation team.",
+    "processes": [
+      "coordinate discharge prerequisites across clinical review, medication reconciliation, transport, documents, follow-up, and bed release",
+      "recover blocked inpatient transfers and diagnostic or specialist handoffs",
+      "assemble and verify administrative prerequisites for regulated access without making clinical or eligibility decisions"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "baseline": "Structured discharge and transfer checklists, protocol-based task queues, EHR workflow, deterministic prerequisites, role-based approvals, bed-management dashboards, alerts, escalation, and human clinical ownership.",
+    "remaining_gap": "A bounded agent could gather status, call approved read tools, propose missing tasks, draft communications, and execute reversible administrative actions. However, the core pattern is mature workflow orchestration with tool calling; hospital-specific integrations, permissions, and safety gates are implementation adaptations rather than a differentiated opportunity."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["llm-agents-and-tool-use"],
+    "candidate_model_families": ["tool-using-llm", "constrained-planner-executor", "deterministic-workflow-with-model-routing", "policy-governed-agent"],
+    "model_strategy": ["pretrained", "rules-plus-model"],
+    "learning_paradigm": ["no-custom-training"],
+    "data_modalities": ["text", "document", "tabular", "event-stream"],
+    "interaction_pattern": ["tool-use", "human-in-the-loop", "workflow-orchestration"],
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-base-required",
+    "ai_dependency": "supporting"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HEALTH-001", "HEALTH-002", "HOSP-001", "TECH-002", "TELCO-001"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "The candidate repeats governed multi-step orchestration, retrieval, tool invocation, exception routing, checkpoints, and human approval already represented across the portfolio; changing the tools to EHR, bed, pharmacy, and transport systems does not create a new architectural spine."
+  },
+  "existing_landscape": {
+    "overlap": "Current healthcare-agent platforms and enterprise agent builders already support healthcare-adapted orchestration, plugin selection, bounded workflow automation, and administrative discharge or bed-management assistance. Brazilian hospital regulation and patient-safety guidance require protocols, multiprofessional ownership, structured risk controls, and human clinical decisions.",
+    "disposition": "adopt"
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "A policy-governed agent retrieves current patient-flow context and invokes approved administrative tools to identify missing prerequisites, propose the next safe task, draft communication, and verify completion.",
+    "optional_secondary_mechanism": "none",
+    "agent": "Used only for bounded administrative coordination with allow-listed tools, explicit permissions, checkpoints, audit, and reversible actions.",
+    "llm": "Interprets unstructured operational context and selects approved tools; it does not diagnose, prescribe, prioritize clinical urgency, authorize discharge, or allocate access autonomously.",
+    "human_control": "Physicians, nurses, pharmacists, regulation teams, and bed managers retain clinical decisions, medication validation, discharge authorization, transfer acceptance, access prioritization, and exception resolution."
+  },
+  "queries": [
+    "Brasil 2025 hospital segurança do paciente conciliação medicamentosa alta hospitalar Ministério da Saúde",
+    "Brasil 2025 hospitais autorização internação regulação filas SUS alta hospitalar",
+    "official healthcare AI agent tool use care coordination hospital agent 2026 Microsoft",
+    "healthcare agentic AI hospital discharge coordination product official 2025"
+  ],
+  "sources": [
+    "https://www.gov.br/saude/pt-br/composicao/saes/seguranca-do-paciente",
+    "https://www.gov.br/saude/pt-br/composicao/saes/seguranca-do-paciente/publicacoes/protocolos-de-seguranca-do-paciente",
+    "https://bvsms.saude.gov.br/bvs/saudelegis/gm/2025/prt9262_31_12_2025.html",
+    "https://www.gov.br/saude/pt-br/composicao/saes/dahu/atencao-hospitalar/politica-nacional-de-atencao-hospitalar/politica-nacional-de-atencao-hospitalar/",
+    "https://learn.microsoft.com/en-us/azure/health-bot/copilot/orchestrator",
+    "https://news.microsoft.com/source/2026/06/08/nhs-england-accelerates-ai-adoption-with-microsoft-365-copilot-to-improve-service-delivery-reduce-costs-and-create-more-time-for-care/"
+  ],
+  "notes": "No opportunity published. Advanced segment to retail-ecommerce and technical focus to recommendation-and-ranking."
+}
