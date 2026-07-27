@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-07-27T05:00:25Z",
+  "event": "research-round",
+  "segment": "manufacturing",
+  "technical_focus": "causal-and-uplift-learning",
+  "focus_result": "insufficient-data-path",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "process_signals_sought": [
+    "intervention-alternatives",
+    "treatment-assignment",
+    "confounding",
+    "outcome",
+    "policy-question"
+  ],
+  "simulations": [
+    {
+      "organization": "Brazilian discrete-manufacturing plant",
+      "actor": "quality engineering manager",
+      "process": "decide whether a borderline lot should be reworked, released for further inspection, or scrapped",
+      "scenarios": ["normal lot review", "conflicting inspection and process evidence", "peak production with constrained rework capacity"],
+      "baseline": "control plans, SPC, engineering limits, cost rules, mandatory inspection, and human disposition"
+    },
+    {
+      "organization": "Brazilian process-manufacturing plant",
+      "actor": "process engineer",
+      "process": "select bounded parameter or recipe adjustments after yield or quality deterioration",
+      "scenarios": ["stable production", "recent 4M or recipe change", "degraded flow with multiple simultaneous deviations"],
+      "baseline": "designed experiments, centerline rules, versioned recipes, change control, and engineering approval"
+    },
+    {
+      "organization": "multi-line supplier operation",
+      "actor": "supplier-quality coordinator",
+      "process": "choose inspection, containment, supplier-development, or sourcing interventions after recurring defects",
+      "scenarios": ["routine defect review", "mixed supplier and internal-cause evidence", "shortage with limited alternative supply"],
+      "baseline": "8D, control plans, supplier scorecards, deterministic containment, audits, and procurement approval"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": ["causal-and-uplift-learning"],
+    "candidate_model_families": ["uplift-tree", "causal-forest", "doubly-robust-estimation", "propensity-method", "heterogeneous-treatment-effect-model"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": ["causal-inference"],
+    "data_modalities": ["tabular", "time-series", "event"],
+    "interaction_pattern": ["batch-decision-support", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable",
+    "ai_dependency": "core",
+    "primary_mechanism": "estimate the conditional effect of a bounded rework or process intervention on later yield, quality, or cost",
+    "secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used"
+  },
+  "training_data": {
+    "observation_unit": "lot, batch, process window, or supplier-quality case at the intervention decision point",
+    "input_data": "only pre-intervention product, line, recipe, material, supplier, process, inspection, environment, and capacity context",
+    "target_or_reward": "later verified yield, defect escape, rework success, scrap, throughput, or quality-cost outcome",
+    "label_source": "MES, QMS, inspection, rework, scrap, and engineering records; causal completeness and consistency unknown",
+    "prediction_time": "before rework, parameter adjustment, containment, inspection escalation, or supplier intervention",
+    "expected_volume": "unknown and plant-specific",
+    "class_balance": "unknown; intervention alternatives and severe outcomes are likely unevenly distributed",
+    "historical_coverage": "unknown; product, line, recipe, equipment, supplier, and 4M changes may make periods non-comparable",
+    "train_validation_split": "time-based and grouped by product, line, recipe, supplier, and intervention policy",
+    "leakage_risks": "post-intervention inspection, final disposition, rework completion, root-cause conclusion, revised process settings, and later quality outcomes",
+    "representativeness_risks": "product mix, line, operator, tooling, supplier, material, shift, recipe, maintenance state, and engineering-policy changes",
+    "feedback_loop": "the recommended action changes which lots receive rework or containment, altering future labels and treatment selection",
+    "privacy_and_usage_constraints": "access control for supplier and operator data, labor-purpose limitation, trade-secret protection, and auditable engineering override",
+    "fallback_if_data_is_insufficient": "retain designed experiments, SPC, deterministic quality rules, control plans, 8D, and engineer-approved disposition"
+  },
+  "closest_repository_patterns": ["MANUF-001", "MANUF-002", "NONPROFIT-001", "HEALTH-001"],
+  "repeated_pattern_gate": "rejected",
+  "no_new_fit_reasons": [
+    "insufficient-causal-data-path",
+    "existing-product-or-process-adoption-is-sufficient",
+    "no-material-uncovered-gap"
+  ],
+  "queries": [
+    "Brasil indústria 2025 desperdício refugo retrabalho qualidade manufatura causas dados",
+    "site:gov.br indústria brasileira 2025 produtividade qualidade desperdício manufatura",
+    "manufacturing causal AI root cause quality intervention platform 2025",
+    "causal machine learning manufacturing quality intervention uplift production"
+  ],
+  "sources": [
+    "https://www.gov.br/mdic/pt-br/assuntos/noticias/2025/novembro/brasil-mais-produtivo-celebra-aumento-de-produtividade-e-atendimento-de-67-5-mil-empresas-em-2-anos/",
+    "https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/46008-producao-industrial-avanca-1-8-em-janeiro",
+    "https://acerta.ai/",
+    "https://www.siemens.com/en-us/products/ethonai-industrial-ai-platform/",
+    "https://arxiv.org/abs/2406.11308"
+  ],
+  "notes": "No opportunity published. Causal estimation for rework, parameter adjustment, and supplier-quality interventions is technically credible, but ordinary manufacturing histories usually reflect engineer selection, product and 4M changes, mandatory controls, and unequal intervention assignment. Reliable use would require prospective instrumentation or designed experimentation. Current industrial analytics products and established SPC, DOE, 8D, and quality workflows already cover the central operational outcome, while MANUF-001 and MANUF-002 cover adjacent maintenance and quality-assurance decisions. Advanced segment to logistics-transport and technical focus to bandits-and-reinforcement-learning."
+}
