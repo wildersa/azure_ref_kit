@@ -1,0 +1,65 @@
+{
+  "timestamp": "2026-07-27T01:16:51Z",
+  "event": "research-round-v3",
+  "segment": "financial-services",
+  "technical_focus": "conversational-llm-and-rag",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "simulation": {
+    "organization_and_actors": "Brazilian bank, payment institution, insurer, or cooperative; compliance analyst, product-risk owner, operations specialist, and internal-control reviewer.",
+    "processes": [
+      "answer operational questions about current Banco Central, CMN, Open Finance, Pix, fraud-control, and internal-policy obligations",
+      "assemble source-grounded evidence for regulatory inquiries and control reviews",
+      "compare a proposed product or procedure change with approved internal policies and current authoritative norms"
+    ],
+    "scenarios": ["normal-flow", "exception-flow", "peak-or-degraded-flow"],
+    "baseline": "Authoritative norm repository, versioned internal policies, legal and compliance search, deterministic obligation registers, approval workflow, source links, and specialist review.",
+    "remaining_gap": "Conversational retrieval can reduce search and synthesis time, but the mechanism is a mature enterprise RAG pattern. The material difficulty is source governance, effective-date handling, obligation ownership, and deterministic control mapping rather than a differentiated financial-services opportunity."
+  },
+  "technical_hypothesis": {
+    "technical_class": ["conversational-llm-and-rag"],
+    "candidate_model_families": ["pretrained-llm", "embedding-model", "reranker", "retrieval-pipeline", "grounded-response-model"],
+    "model_strategy": ["pretrained", "rag-grounded", "rules-plus-model"],
+    "learning_paradigm": ["no-custom-training"],
+    "data_modalities": ["text", "document", "tabular"],
+    "interaction_pattern": ["conversational", "human-in-the-loop", "read-only"],
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-base-required",
+    "ai_dependency": "supporting"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["FIN-001", "FIN-002", "FIN-003", "PUBLIC-001", "TECH-002"],
+    "repeated_pattern_gate": "rejected",
+    "reason": "The candidate repeats grounded retrieval, document synthesis, contradiction review, and human-approved evidence assembly already represented in the portfolio; changing the regulatory corpus or financial actor does not create a new architectural spine."
+  },
+  "existing_landscape": {
+    "overlap": "Enterprise RAG platforms already retrieve and synthesize authorized organizational content with source grounding and governance controls, while financial-services cloud guidance and current implementations explicitly cover regulatory inquiry and compliance workflows.",
+    "disposition": "adopt"
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "Source-grounded retrieval and conversational synthesis of current regulations, internal policies, and prior approved interpretations.",
+    "optional_secondary_mechanism": "Reranking of effective, authoritative, and role-permitted sources.",
+    "agent": "not used",
+    "llm": "Used only for grounded synthesis and clarification; it does not determine compliance, approve product changes, or execute controls.",
+    "human_control": "Compliance, legal, risk, and control owners validate applicability, effective dates, interpretations, evidence, exceptions, and any operational or customer-impacting decision."
+  },
+  "queries": [
+    "site:bcb.gov.br inteligência artificial atendimento regulatório instituições financeiras documentos normas 2025 Brasil",
+    "site:susep.gov.br inteligência artificial seguros regulação 2025 documentos consultas",
+    "Brasil banco assistente IA generativa documentos políticas internas RAG 2025",
+    "financial services RAG compliance assistant product official 2026",
+    "site:microsoft.com financial services copilot compliance RAG official",
+    "site:aws.amazon.com financial services generative AI compliance RAG official"
+  ],
+  "sources": [
+    "https://www.bcb.gov.br/estabilidadefinanceira/buscanormas?dataFimBusca=31%2F12%2F2025&dataInicioBusca=01%2F01%2F2025&tipoDocumento=Instru%C3%A7%C3%A3o+Normativa+BCB",
+    "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?numero=18&tipo=Resolu%C3%A7%C3%A3o+Conjunta",
+    "https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/inteligencia-artificial-1/publicacoes/guia-de-rag",
+    "https://learn.microsoft.com/en-us/microsoft-copilot-studio/guidance/retrieval-augmented-generation",
+    "https://aws.amazon.com/blogs/machine-learning/how-amazon-finance-streamlines-regulatory-inquiries-by-using-generative-ai-on-aws/",
+    "https://aws.amazon.com/financial-services/generative-ai/"
+  ],
+  "notes": "No opportunity published. Advanced segment to healthcare and technical focus to llm-agents-and-tool-use."
+}
