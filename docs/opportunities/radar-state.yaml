@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-27T03:03:52Z"
+last_run: "2026-07-27T05:00:25Z"
 
-current_segment_index: 5
+current_segment_index: 6
 completed_segment_cycles: 4
 
-current_technical_focus_index: 8
+current_technical_focus_index: 9
 completed_technical_focus_cycles: 2
-next_technical_focus: causal-and-uplift-learning
+next_technical_focus: bandits-and-reinforcement-learning
 
 technical_focus_state:
   classical-supervised-ml:
@@ -42,8 +42,8 @@ technical_focus_state:
     last_reviewed: "2026-07-27"
     last_result: rejected
   causal-and-uplift-learning:
-    runs: 2
-    last_reviewed: "2026-07-26"
+    runs: 3
+    last_reviewed: "2026-07-27"
     last_result: insufficient-data-path
   bandits-and-reinforcement-learning:
     runs: 2
@@ -56,13 +56,13 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 30
+  evaluated_rounds: 31
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 24
+  investigated_custom_training_or_fine_tuning: 25
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 5
   published_pretrained_llm_or_rag_primary: 0
-  investigated_rl_bandit_causal_or_uplift: 4
+  investigated_rl_bandit_causal_or_uplift: 5
   published_rl_bandit_causal_or_uplift: 0
   note: Coverage targets apply prospectively and guide investigation, not publication quotas. Existing opportunities are tagged only when materially revalidated.
 
@@ -98,10 +98,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: post-purchase recovery, seller-quality interventions, fulfillment exceptions, catalog-governance, and consumer-service decisions where a distinct causal intervention remains beyond configured SLA rules, marketplace seller scores, catalog-quality tooling, generic next-best-action ranking, shelf-loss orchestration, and return disposition
   manufacturing:
-    runs: 3
-    last_reviewed: "2026-07-26"
+    runs: 4
+    last_reviewed: "2026-07-27"
     last_result: no-new-fit
-    next_focus: scrap and rework causation, supplier-quality shifts, industrial scheduling, and operator-assisted inspection where versioned product and 4M context can distinguish legitimate change from abnormal process behavior without repeating equipment-condition monitoring or allergen changeover release assurance
+    next_focus: scrap and rework interventions, supplier-quality recovery, industrial scheduling, and operator-assisted inspection where treatment assignment and outcomes can be measured prospectively without confusing product mix, 4M changes, maintenance condition, or mandatory quality controls
   logistics-transport:
     runs: 3
     last_reviewed: "2026-07-26"
