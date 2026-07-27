@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-26T23:06:56Z"
+last_run: "2026-07-27T00:11:34Z"
 
-current_segment_index: 1
+current_segment_index: 2
 completed_segment_cycles: 4
 
-current_technical_focus_index: 4
+current_technical_focus_index: 5
 completed_technical_focus_cycles: 2
-next_technical_focus: small-language-models-and-nlp
+next_technical_focus: conversational-llm-and-rag
 
 technical_focus_state:
   classical-supervised-ml:
@@ -26,8 +26,8 @@ technical_focus_state:
     last_reviewed: "2026-07-26"
     last_result: rejected
   small-language-models-and-nlp:
-    runs: 2
-    last_reviewed: "2026-07-26"
+    runs: 3
+    last_reviewed: "2026-07-27"
     last_result: rejected
   conversational-llm-and-rag:
     runs: 2
@@ -56,9 +56,9 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 26
+  evaluated_rounds: 27
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 22
+  investigated_custom_training_or_fine_tuning: 23
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 4
   published_pretrained_llm_or_rag_primary: 0
@@ -78,10 +78,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: enterprise service recovery, cross-functional exception ownership, approval bottlenecks, and shared occupational-safety decisions where a distinct mechanism remains beyond configured routing, queue rules, physical safety controls, mature PPE or unsafe-action computer vision, offboarding, supplier payment-change, and IBS/CBS configuration assurance
   human-resources:
-    runs: 4
-    last_reviewed: "2026-07-26"
+    runs: 5
+    last_reviewed: "2026-07-27"
     last_result: no-new-fit
-    next_focus: ergonomic-risk intervention, employee-service recovery, absence prevention, and workforce-safety learning where prospective treatment assignment and group-level outcomes can be evaluated without individual health profiling, while avoiding duplication of skills mobility, psychosocial-risk prevention, return-to-work accommodation, and generic wellbeing personalization
+    next_focus: employee-service recovery, absence and return-to-work administration, and sensitive workplace case coordination where a distinct decision remains beyond structured intake, eSocial rules, HR service taxonomies, existing HRSD case classification and routing, skills mobility, psychosocial-risk prevention, and return-to-work accommodation assurance
   financial-services:
     runs: 4
     last_reviewed: "2026-07-26"
