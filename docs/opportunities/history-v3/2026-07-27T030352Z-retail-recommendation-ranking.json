@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-07-27T03:03:52Z",
+  "event": "research-round",
+  "segment": "retail-ecommerce",
+  "technical_focus": "recommendation-and-ranking",
+  "focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "process_signals_sought": [
+    "candidate-set",
+    "eligibility",
+    "ordering-decision",
+    "observed-choice",
+    "observable-outcome"
+  ],
+  "simulations": [
+    {
+      "organization": "large Brazilian marketplace",
+      "actor": "seller-quality operations supervisor",
+      "process": "rank sellers and listings for coaching, restriction, evidence review, or escalation",
+      "scenarios": ["normal monitoring", "contradictory seller and logistics evidence", "campaign peak with high complaint volume"],
+      "baseline": "policy thresholds, defect-rate scorecards, deterministic eligibility, queues, and human escalation"
+    },
+    {
+      "organization": "omnichannel retailer",
+      "actor": "post-purchase recovery coordinator",
+      "process": "order delayed or failed cases and eligible recovery actions",
+      "scenarios": ["routine delay", "ambiguous responsibility", "carrier disruption peak"],
+      "baseline": "SLA, order value, customer promise, legal entitlements, fixed recovery matrices, and supervisor override"
+    },
+    {
+      "organization": "retail catalog operation",
+      "actor": "catalog-governance analyst",
+      "process": "prioritize products and attributes for correction before search and recommendation distribution",
+      "scenarios": ["daily catalog maintenance", "conflicting supplier data", "large assortment import"],
+      "baseline": "schema validation, mandatory fields, deterministic quality scores, category rules, and review queues"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": ["recommendation-and-ranking"],
+    "candidate_model_families": ["learning-to-rank", "two-tower-retrieval", "candidate-generation-and-reranking", "calibrated-recommender"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": ["supervised"],
+    "data_modalities": ["tabular", "event", "text"],
+    "interaction_pattern": ["batch-ranking", "human-in-the-loop"],
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_mechanism": "rank eligible seller, recovery, or catalog-review candidates",
+    "secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used"
+  },
+  "training_data": {
+    "observation_unit": "seller-period, post-purchase case, or catalog-item review decision",
+    "input_data": "only fields available before ranking, including order, seller, fulfillment, complaint, product, and catalog-quality signals",
+    "target_or_reward": "later verified resolution, recurrence reduction, correction acceptance, or service outcome",
+    "label_source": "human-reviewed case outcome and subsequent operational events; availability and consistency unknown",
+    "prediction_time": "before intervention, assignment, restriction, recovery offer, or catalog correction",
+    "expected_volume": "unknown and customer-specific",
+    "class_balance": "unknown; high-impact failures are likely less frequent than routine cases",
+    "historical_coverage": "unknown; policy and platform changes may make older periods non-comparable",
+    "train_validation_split": "time-based split with seller, customer, campaign, and product leakage controls",
+    "leakage_risks": "final complaint status, refund, restriction, corrected attributes, later delivery events, and agent disposition entered after ranking",
+    "representativeness_risks": "campaigns, categories, sellers, regions, carriers, customer cohorts, and changing marketplace policies",
+    "feedback_loop": "ranking changes which cases receive attention, causing labels to reflect the deployed policy",
+    "privacy_and_usage_constraints": "LGPD minimization, purpose limitation, access control, explainable eligibility, and no inference of sensitive traits",
+    "fallback_if_data_is_insufficient": "retain deterministic scorecards, SLA queues, catalog validation, and human review"
+  },
+  "closest_repository_patterns": ["RETAIL-001", "RETAIL-002", "HR-001", "HEALTH-001", "TECH-001"],
+  "repeated_pattern_gate": "rejected",
+  "no_new_fit_reasons": [
+    "existing-platform-adoption-or-configuration-is-sufficient",
+    "duplicate-of-existing-repository-opportunity",
+    "no-material-uncovered-gap"
+  ],
+  "queries": [
+    "Brasil 2025 ecommerce reclamações atraso entrega devolução consumidor oficial",
+    "marketplace seller performance ranking product official seller quality score",
+    "customer service next best action ranking retail CRM official product",
+    "catalog data quality prioritization ecommerce product AI official"
+  ],
+  "sources": [
+    "https://www.gov.br/pt-br/servicos/reclamar-contra-servico-ou-produto-de-empresas-privadas",
+    "https://economia.uol.com.br/noticias/redacao/2025/12/13/lojas-online-demora-entrega-encomenda-reclamacoes-crescem-sp-procon.htm",
+    "https://docs.cloud.google.com/retail/docs/catalog",
+    "https://shopify.engineering/catalog-clustering",
+    "https://www.getcatalog.ai/"
+  ],
+  "notes": "No opportunity published. Seller-quality intervention ranking, post-purchase recovery ranking, and catalog-correction prioritization were operationally plausible, but deterministic policies and current marketplace, CRM, commerce-search, and catalog-quality capabilities already cover the central actor, process, and outcome. RETAIL-001 and RETAIL-002 also already represent retail intervention and disposition ranking. Advanced segment to manufacturing and technical focus to causal-and-uplift-learning."
+}
