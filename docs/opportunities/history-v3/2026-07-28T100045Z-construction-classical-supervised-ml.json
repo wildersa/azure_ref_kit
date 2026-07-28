@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-07-28T10:00:45Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "construction-real-estate",
+  "technical_focus": "classical-supervised-ml",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "medium residential developer with an internal post-handover service team",
+      "actor": "warranty engineering coordinator",
+      "bounded_process": "classify a resident defect report, validate warranty eligibility, schedule inspection, and decide the responsible trade after technical confirmation",
+      "scenarios": ["normal complete claim", "ambiguous or contradictory evidence", "handover peak with accumulated requests"],
+      "candidate": "predict claim eligibility, defect class, recurrence risk, or inspection priority from intake-time attributes"
+    },
+    {
+      "organization": "commercial condominium manager",
+      "actor": "facility manager and contracted engineer",
+      "bounded_process": "triage building-condition reports and prioritize inspections without replacing mandatory engineering judgment",
+      "scenarios": ["routine maintenance report", "potential safety defect", "degraded flow with incomplete maintenance history"],
+      "candidate": "supervised classification of likely defect severity or responsible system"
+    },
+    {
+      "organization": "large developer with multiple delivered projects",
+      "actor": "quality and supplier-performance manager",
+      "bounded_process": "identify recurrent post-handover defects and direct corrective action to projects or suppliers",
+      "scenarios": ["stable portfolio", "new material or supplier", "high-volume seasonal recurrence"],
+      "candidate": "predict recurrence and supplier or construction-stage association"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "classical-supervised-ml",
+    "candidate_model_families": ["linear-models", "decision-trees", "random-forests", "gradient-boosting", "calibrated-classifiers"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["structured-case-data", "categorical-project-and-system-data", "inspection-outcomes"],
+    "interaction_pattern": "batch-or-case-time-risk-scoring-with-human-review",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "labels such as warranty eligibility, root cause, responsible trade, severity, and recurrence are created after inspection and often reflect inconsistent local coding; using final diagnosis, repair, supplier liability, or claim outcome at intake time would cause leakage"
+  },
+  "training_data": {
+    "observation_unit": "one post-handover request or one building-condition inspection candidate at the decision point",
+    "input_data": "only attributes available before inspection, such as project, building system, unit age, request channel, resident description category, previous related requests, warranty matrix, maintenance evidence availability, and current queue context",
+    "target_or_reward": "confirmed technical category, procedence, recurrence within a defined future window, or inspection escalation confirmed by an engineer",
+    "label_source": "closed service orders, signed inspection reports, and quality-engineering records; consistency is unknown until sampled",
+    "prediction_time": "after structured intake and before technical inspection or prioritization",
+    "expected_volume": "unknown; must be measured per developer and pooled only after taxonomy compatibility is proven",
+    "class_balance": "unknown; safety-relevant and materially recurrent defects are expected to be minority classes but must not be assumed",
+    "historical_coverage": "unknown; likely fragmented across CRM, post-handover platforms, spreadsheets, and contractor records",
+    "train_validation_split": "time-based and project-based holdouts to test transfer across buildings, suppliers, materials, and delivery cohorts",
+    "leakage_risks": "final inspection result, warranty approval, repair type, supplier chargeback, closure status, customer satisfaction, and fields corrected after escalation",
+    "representativeness_risks": "different building standards, regional climate, materials, contractors, resident reporting behavior, maintenance compliance, and coding practices",
+    "feedback_loop": "engineer-confirmed corrections may improve labels, but model-prioritized inspections can distort which cases receive detailed diagnosis",
+    "privacy_and_usage_constraints": "minimize resident identifiers and free text; preserve engineer authority for safety, warranty, liability, and repair decisions",
+    "fallback_if_data_is_insufficient": "structured intake, deterministic warranty and severity rules, duplicate detection, dashboards, and engineer-defined queues"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["CONST-001", "CONST-002", "PROF-001", "RETAIL-003-pattern"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The candidate is a generic intake classification or review-priority variant. Existing post-handover products already centralize structured claims, warranty rules, inspection scheduling, evidence, SLA, recurrence indicators, and assisted triage; the remaining learned score does not create a distinct bounded outcome or architecture."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or configure established post-handover and maintenance platforms, standardize defect and outcome taxonomies, and use deterministic warranty and safety rules before considering a local supervised model.",
+    "sources": [
+      "https://www.confea.org.br/ccjc-aprova-projeto-que-cria-inspecao-predial-obrigatoria",
+      "https://www.fastbuilt.com.br/",
+      "https://fastbuilt.app/",
+      "https://www.mobussconstrucao.com.br/modulo/assistencia-tecnica/",
+      "https://predialize.com.br/"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 construção civil pós-obra assistência técnica vícios construtivos dados reclamações",
+      "Brasil 2025 manutenção predial inspeção segurança edificações legislação",
+      "construction warranty defect prediction machine learning product",
+      "software assistência técnica pós obra construtora IA triagem Brasil"
+    ],
+    "findings": "Brazilian engineering bodies continue to emphasize periodic building inspection and preventive maintenance. Current Brazilian platforms already cover structured post-handover intake, warranty eligibility, inspection scheduling, evidence, SLA, recurrence indicators, and assisted triage, leaving no materially differentiated supervised-learning opportunity in this round."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "calibrated supervised score for defect category, inspection priority, or recurrence using intake-time data",
+    "optional_secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "engineers retain all authority over safety, diagnosis, warranty eligibility, liability, inspection, and repair"
+  },
+  "cursor_advance": {
+    "segment": {"from": "construction-real-estate", "to": "energy-utilities"},
+    "technical_focus": {"from": "classical-supervised-ml", "to": "anomaly-and-unsupervised-learning"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 34,
+    "investigated_custom_training_or_fine_tuning": 28,
+    "investigated_pretrained_llm_or_rag_primary": 5,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
