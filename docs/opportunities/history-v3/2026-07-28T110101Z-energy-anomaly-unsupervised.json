@@ -1,0 +1,107 @@
+{
+  "timestamp": "2026-07-28T11:01:01Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "energy-utilities",
+  "technical_focus": "anomaly-and-unsupervised-learning",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "large Brazilian electricity distributor with urban and peri-urban networks",
+      "actor": "vegetation-management planner and distribution maintenance supervisor",
+      "bounded_process": "inspect vegetation near circuits, identify abnormal encroachment, prioritize field verification, coordinate municipal authorization, and confirm pruning completion",
+      "scenarios": ["routine preventive cycle", "ambiguous imagery or legitimate seasonal growth", "storm-season peak with inspection backlog"],
+      "candidate": "detect vegetation-clearance anomalies from geospatial imagery or LiDAR and prioritize spans for inspection"
+    },
+    {
+      "organization": "regional electricity distributor",
+      "actor": "asset inspection engineer",
+      "bounded_process": "review drone imagery for vegetation, conductor, insulator, and structural exceptions before issuing field work",
+      "scenarios": ["normal inspection", "occlusion or sensor-quality degradation", "large-area emergency survey"],
+      "candidate": "unsupervised or weakly supervised anomaly detection over imagery and point clouds"
+    },
+    {
+      "organization": "distribution operations center",
+      "actor": "reliability analyst",
+      "bounded_process": "compare vegetation observations, outage history, weather exposure, and completed pruning to identify abnormal risk concentrations",
+      "scenarios": ["stable seasonal pattern", "new species or urban intervention", "severe-weather preparation"],
+      "candidate": "peer-group anomaly scoring for circuits or spans"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "anomaly-and-unsupervised-learning",
+    "candidate_model_families": ["clustering", "isolation-methods", "one-class-models", "density-estimation", "autoencoders", "graph-anomaly-detection"],
+    "model_strategy": ["custom-trained", "pretrained", "rules-plus-model"],
+    "learning_paradigm": "unsupervised",
+    "data_modalities": ["geospatial-imagery", "lidar-point-clouds", "asset-and-span-data", "inspection-corrections"],
+    "interaction_pattern": "batch-risk-map-with-human-field-verification",
+    "training_requirement": "required",
+    "data_readiness": "pilot-data-needed",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "normal vegetation varies by species, season, weather, terrain, capture geometry, municipal work, and network configuration, so an unsupervised model can treat legitimate change as hazardous and miss locally abnormal clearance conditions"
+  },
+  "training_data": {
+    "observation_unit": "one georeferenced network span or inspection capture at the review decision point",
+    "input_data": "imagery or LiDAR available before field dispatch, asset geometry, conductor clearance rules, vegetation class when known, weather and season, prior inspections, and recent pruning records",
+    "target_or_reward": "human-confirmed encroachment, required intervention class, or verified no-action result",
+    "label_source": "field inspection, georeferenced pruning completion, and engineer review corrections; consistency is unknown",
+    "prediction_time": "after remote inspection capture and before field verification or pruning prioritization",
+    "expected_volume": "unknown and utility-specific; sufficient longitudinal and geographic coverage must be measured before training",
+    "class_balance": "unknown; materially dangerous encroachment is expected to be less common than normal vegetation but must not be assumed",
+    "historical_coverage": "unknown; likely fragmented across GIS, inspection vendors, imagery stores, work orders, and municipal coordination records",
+    "train_validation_split": "geographic, seasonal, and time-based holdouts across municipalities, vegetation types, sensors, and network classes",
+    "leakage_risks": "completed pruning, outage cause confirmed after the decision, revised risk category, field inspection result, and post-event imagery",
+    "representativeness_risks": "species, growth rates, urban density, terrain, climate, sensor altitude, image resolution, LiDAR density, and local pruning practices",
+    "feedback_loop": "prioritized spans receive more inspection and better labels, which can bias future training toward already-visible risk areas",
+    "privacy_and_usage_constraints": "minimize incidental capture of people and private property; preserve environmental, municipal, safety, and engineering authorization requirements",
+    "fallback_if_data_is_insufficient": "regulatory vegetation-management plan, periodic inspections, deterministic clearance measurements, GIS risk layers, seasonal rules, and engineer-defined prioritization"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["ENERGY-002", "MANUF-001", "AGRI-001", "CONST-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "Vegetation anomaly detection is a mature condition-monitoring and inspection-prioritization pattern. ENERGY-002 already consumes vegetation as an outage-restoration signal, while current commercial inspection platforms provide georeferenced vegetation encroachment, clearance analysis, change detection, and GIS/EAM integration. The sector-specific configuration does not establish a distinct repository opportunity."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or integrate established geospatial and power-line inspection capabilities, combining deterministic clearance rules, regulatory vegetation plans, GIS, LiDAR or photogrammetry, and human field verification rather than creating a separate generic anomaly solution.",
+    "sources": [
+      "https://www.gov.br/aneel/pt-br/acesso-a-informacao/perguntas-frequentes/faq-resolucao-normativa-no-1-137-2025/",
+      "https://www.enel.com.br/pt/midia/press/d202603-enel-rio-realiza-12-milhao-de-podas-em-dois-anos.html",
+      "https://www.ufsm.br/2025/06/26/projeto-testa-uso-de-sensores-acoplados-a-drones-para-inspecao-de-linhas-de-alta-tensao",
+      "https://www.siemens.com/en-us/products/aerosophia-power-grid-inspections-solution/"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 distribuidoras energia manejo vegetação rede elétrica podas interrupções ANEEL",
+      "vegetation management power lines AI anomaly detection utility product satellite LiDAR 2026",
+      "Brasil inspeção vegetação rede elétrica drones inteligência artificial distribuidora 2025"
+    ],
+    "findings": "Brazilian regulation now requires operational vegetation-management plans with prioritized areas, monitoring, preventive and corrective actions. Recent Brazilian evidence confirms vegetation remains a major interruption driver and shows active drone and multimodal inspection research. Current commercial platforms already provide AI-assisted defect and vegetation encroachment detection, 3D clearance analysis, change tracking, and GIS/EAM integration, leaving no materially differentiated opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "geospatial or point-cloud anomaly detection for vegetation encroachment and abnormal clearance conditions",
+    "optional_secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "engineers and vegetation-management teams retain inspection confirmation, environmental and municipal coordination, pruning authorization, safety decisions, and work acceptance"
+  },
+  "cursor_advance": {
+    "segment": {"from": "energy-utilities", "to": "telecommunications"},
+    "technical_focus": {"from": "anomaly-and-unsupervised-learning", "to": "time-series-and-sequence-models"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 35,
+    "investigated_custom_training_or_fine_tuning": 29,
+    "investigated_pretrained_llm_or_rag_primary": 5,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
