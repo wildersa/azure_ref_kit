@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-07-28T18:59:33Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "nonprofit",
+  "technical_focus": "bandits-and-reinforcement-learning",
+  "technical_focus_result": "insufficient-data-path",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "Brazilian OSC coordinating recurring volunteer shifts across multiple service locations",
+      "actor": "volunteer operations coordinator",
+      "bounded_process": "choose among eligible reminders, replacement requests, shift offers and escalation actions to fill an uncovered volunteer role without overloading the same people",
+      "scenarios": ["routine weekly scheduling", "late cancellation with conflicting availability", "emergency-demand peak with reduced volunteer capacity"],
+      "candidate": "learn a constrained policy for selecting the next eligible engagement action while preserving fairness, consent and workload limits"
+    },
+    {
+      "organization": "Brazilian social-assistance OSC operating appointment-based beneficiary services",
+      "actor": "service-access coordinator",
+      "bounded_process": "choose a bounded recovery action for missed or unconfirmed appointments, such as reminder, assisted rescheduling, alternate channel or human outreach",
+      "scenarios": ["routine confirmation flow", "incomplete or sensitive contact data", "peak demand with limited staff and appointment capacity"],
+      "candidate": "adapt outreach actions to improve completed service access without changing eligibility or priority"
+    },
+    {
+      "organization": "Brazilian humanitarian or environmental organization mobilizing volunteers for time-bounded field actions",
+      "actor": "mobilization lead",
+      "bounded_process": "allocate a limited communication budget across eligible volunteer groups and channels while maintaining geographic and safeguarding constraints",
+      "scenarios": ["planned mobilization", "low-response or contradictory availability", "urgent event with degraded communications"],
+      "candidate": "use a budget-constrained contextual policy to choose communication actions while protecting underrepresented regions and groups"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "bandits-and-reinforcement-learning",
+    "candidate_model_families": ["multi-armed-bandit", "contextual-bandit", "offline-rl", "constrained-rl", "simulation-trained-policy"],
+    "model_strategy": ["custom-trained", "simulation-trained", "rules-plus-model"],
+    "learning_paradigm": "contextual-bandit",
+    "data_modalities": ["tabular", "event", "time-series"],
+    "interaction_pattern": "human-approved repeated decision with bounded actions",
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical systems usually record only the chosen reminder, assignment or outreach action and final participation, without the eligible alternatives, assignment probability, consent state, fairness constraints or changing volunteer availability needed for reliable offline evaluation"
+  },
+  "training_data": {
+    "observation_unit": "one volunteer-engagement, appointment-recovery or mobilization decision at a defined decision point",
+    "input_data": "confirmed candidate inputs include pre-decision availability, skills, location, consented channels, prior participation, workload limits, service urgency and eligible actions; completeness across OSCs is unknown",
+    "target_or_reward": "confirmed participation, completed service access or filled role, penalized for excessive contacts, inequitable exposure, cancellations, safeguarding violations or coordinator rework",
+    "label_source": "attendance, confirmation, cancellation, completed appointment, replacement and coordinator correction events; causal validity is unknown",
+    "prediction_time": "after deterministic eligibility, consent, safeguarding, availability and workload checks and before an engagement action is selected",
+    "expected_volume": "unknown and likely small or fragmented for many OSCs",
+    "class_balance": "unknown; positive responses and urgent exceptions are expected to vary strongly by organization, cause, channel and season",
+    "historical_coverage": "unknown; current volunteer platforms commonly preserve schedules, reminders, confirmations and hours, but not complete action propensities or counterfactual alternatives",
+    "train_validation_split": "time-based and organization or campaign-grouped evaluation would be required, followed by prospective randomized or uniformly explored pilot arms where ethically acceptable",
+    "leakage_risks": "using final attendance, later availability edits, coordinator substitutions, post-contact channel outcomes, beneficiary completion or emergency severity unavailable at decision time",
+    "representativeness_risks": "cause, region, connectivity, volunteer profile, accessibility needs, emergency context, staffing and organizational maturity vary materially",
+    "feedback_loop": "adaptive selection can repeatedly contact responsive volunteers, suppress exploration for less represented groups and reinforce historical geographic or digital-access disparities",
+    "privacy_and_usage_constraints": "contact, location, participation and beneficiary-service data require minimization, purpose limitation, consent and LGPD controls; sensitive traits must not be inferred for targeting",
+    "fallback_if_data_is_insufficient": "use structured availability and consent, deterministic eligibility and safeguarding rules, fair rotation, workload caps, ordinary reminders, waitlists, manual escalation and explicit prospective instrumentation before any adaptive policy"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["NONPROFIT-001", "NONPROFIT-002", "HEALTH-001", "HR-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The simulated adaptive decisions are plausible, but volunteer scheduling, reminders, confirmations, hours and basic matching are already covered by current platforms and deterministic controls. The remaining bandit hypothesis lacks trustworthy propensity and counterfactual data and would be an internal experiment after prospective instrumentation, not a differentiated repository opportunity. Donor outreach is already represented by NONPROFIT-001."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt volunteer-management, scheduling, reminder and reporting platforms; add explicit consent, eligibility, fair rotation and workload controls. Instrument eligible actions and assignment probabilities prospectively only when a bounded adaptive experiment is justified.",
+    "sources": [
+      "https://www.cbve.org.br/acervo/lancamento-do-censo-brasileiro-de-voluntariado-empresarial-2025",
+      "https://www.gov.br/icmbio/pt-br/acesso-a-informacao/auditorias/transparencia-e-prestacao-de-contas/relatorios-de-gestao/2025-1/informacoes-tecnicas-complementares-ao-relatorio-de-gestao/gestao-socioambiental",
+      "https://vol.org.br/",
+      "https://www.salesforce.com/br/nonprofit/volunteer-management/",
+      "https://transforma.fbb.org.br/tecnologia-social/6cs-gestao-de-voluntariado",
+      "https://arxiv.org/abs/2509.10777",
+      "https://arxiv.org/abs/2211.12004"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 organizações sociais voluntários gestão capacidade dados pesquisa voluntariado",
+      "Brasil plataforma gestão voluntários ONG escalas lembretes 2025",
+      "contextual bandit volunteer scheduling nonprofit outreach research"
+    ],
+    "findings": "Current Brazilian evidence confirms substantial volunteer activity and increasing formal management. Current platforms already provide opportunity publication, availability, scheduling, notifications, attendance, hours and reporting. Recent research shows contextual bandits can support charitable outreach and food-rescue volunteer engagement, but also highlights exploration, fairness, budget and policy-learning trade-offs. The repository-valid conclusion is insufficient-data-path and adoption rather than a new opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "select one action from a pre-approved eligible set for a repeated volunteer-engagement or service-recovery decision, only after prospective instrumentation",
+    "optional_secondary_mechanism": "none",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "coordinators retain eligibility, safeguarding, consent, workload, geographic equity, escalation, beneficiary priority and final assignment authority"
+  },
+  "cursor_advance": {
+    "segment": {"from": "nonprofit", "to": "cross-industry"},
+    "technical_focus": {"from": "bandits-and-reinforcement-learning", "to": "forecasting-and-optimization"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 43,
+    "investigated_custom_training_or_fine_tuning": 35,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 8
+  }
+}
