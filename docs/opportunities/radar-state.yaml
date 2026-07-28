@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-28T18:00:04Z"
+last_run: "2026-07-28T18:59:33Z"
 
-current_segment_index: 17
-completed_segment_cycles: 4
+current_segment_index: 0
+completed_segment_cycles: 5
 
-current_technical_focus_index: 9
+current_technical_focus_index: 10
 completed_technical_focus_cycles: 3
-next_technical_focus: bandits-and-reinforcement-learning
+next_technical_focus: forecasting-and-optimization
 
 technical_focus_state:
   classical-supervised-ml:
@@ -46,7 +46,7 @@ technical_focus_state:
     last_reviewed: "2026-07-28"
     last_result: insufficient-data-path
   bandits-and-reinforcement-learning:
-    runs: 3
+    runs: 4
     last_reviewed: "2026-07-28"
     last_result: insufficient-data-path
   forecasting-and-optimization:
@@ -56,13 +56,13 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 42
+  evaluated_rounds: 43
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 34
+  investigated_custom_training_or_fine_tuning: 35
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 6
   published_pretrained_llm_or_rag_primary: 0
-  investigated_rl_bandit_causal_or_uplift: 7
+  investigated_rl_bandit_causal_or_uplift: 8
   published_rl_bandit_causal_or_uplift: 0
   note: Coverage targets apply prospectively and guide investigation, not publication quotas. Existing opportunities are tagged only when materially revalidated.
 
@@ -158,7 +158,7 @@ segment_state:
     last_result: no-new-fit
     next_focus: cloud-cost, release, developer-environment and support-recovery decisions where alternative interventions can be prospectively assigned and measured beyond feature-flag experimentation, deterministic rollout controls, FinOps policy-as-code, native optimization recommendations, vulnerability prioritization, tenant-specific incident reproduction, and generic causal dashboards
   nonprofit:
-    runs: 4
-    last_reviewed: "2026-07-26"
+    runs: 5
+    last_reviewed: "2026-07-28"
     last_result: no-new-fit
-    next_focus: restricted-fund allocation, safeguarding coordination, beneficiary-service recovery, and volunteer-capacity decisions where a distinct mechanism remains beyond donor-retention uplift, program evidence-chain assurance, deterministic scheduling and reminders, demand moving averages, generic volunteer-management platforms, and ordinary workforce forecasting
+    next_focus: restricted-fund allocation, safeguarding coordination, beneficiary-service recovery, and volunteer-capacity planning where a distinct forecasting or constrained-optimization decision remains beyond donor-retention uplift, program evidence-chain assurance, deterministic eligibility and safeguarding rules, ordinary scheduling, reminders, volunteer-management platforms, and uninstrumented adaptive outreach
