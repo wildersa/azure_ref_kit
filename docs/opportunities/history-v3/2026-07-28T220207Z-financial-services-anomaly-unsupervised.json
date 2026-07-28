@@ -1,0 +1,103 @@
+{
+  "timestamp": "2026-07-28T22:02:07Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "financial-services",
+  "technical_focus": "anomaly-and-unsupervised-learning",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {"active_index_count": 34, "drift_found": false, "repairs": []},
+  "operational_simulations": [
+    {
+      "organization": "Brazilian payment institution operating Pix continuously",
+      "actor": "fraud-monitoring analyst",
+      "bounded_process": "review behavioral and transaction anomalies before or immediately after payment authorization",
+      "scenarios": ["routine transaction stream", "legitimate behavior change or sparse customer history", "attack burst with delayed telemetry and review backlog"],
+      "candidate": "peer-aware unsupervised anomaly score for previously unseen transaction behavior"
+    },
+    {
+      "organization": "medium Brazilian bank treasury and liquidity operation",
+      "actor": "liquidity-risk supervisor",
+      "bounded_process": "reconcile intraday positions, payment flows and operational limits",
+      "scenarios": ["ordinary settlement day", "calendar or market event producing legitimate deviation", "degraded feed or concentrated payment peak"],
+      "candidate": "multivariate anomaly detection over positions and settlement flows"
+    },
+    {
+      "organization": "Brazilian insurer with digital claims intake",
+      "actor": "claims-operations quality lead",
+      "bounded_process": "identify unusual claim clusters or process deviations before specialist review",
+      "scenarios": ["normal claim mix", "new product or catastrophe changing the operating envelope", "surge with incomplete evidence and vendor backlog"],
+      "candidate": "cluster and graph anomaly detection for unusual operational patterns"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "anomaly-and-unsupervised-learning",
+    "candidate_model_families": ["clustering", "isolation-methods", "one-class-models", "density-estimation", "autoencoders", "graph-anomaly-detection"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": "unsupervised",
+    "data_modalities": ["tabular", "event", "graph", "time-series"],
+    "interaction_pattern": "real-time or near-real-time human-reviewed alert prioritization",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "the operating envelope changes with new products, customer life events, campaigns, fraud adaptation, regulation and incident response, producing unstable baselines and high false-positive risk"
+  },
+  "training_data": {
+    "observation_unit": "one transaction, entity-time window, settlement interval or claim relationship at the review cutoff",
+    "input_data": "pre-cutoff values, frequencies, device or channel context, counterparties, account history, peer group, graph relationships and system-health signals; availability varies by institution",
+    "target_or_reward": "human-confirmed unusual or actionable case and downstream investigation outcome; unsupervised training does not require labels, but thresholding and evaluation do",
+    "label_source": "fraud, AML, treasury, claims, incident and case-management review outcomes; consistency and linkage are unknown",
+    "prediction_time": "before authorization when permitted, or before analyst prioritization and operational escalation",
+    "expected_volume": "unknown and institution-dependent",
+    "class_balance": "unknown; actionable anomalies are expected to be rare",
+    "historical_coverage": "unknown; regime, product, channel and fraud-pattern changes reduce comparability",
+    "train_validation_split": "time-based backtesting across regime changes, products and channels, with entity-group holdouts where transfer is claimed",
+    "leakage_risks": "using investigation outcomes, blocks, chargebacks, MED results, corrected positions, claim decisions or post-review graph edges created after the cutoff",
+    "representativeness_risks": "customer segments, regions, channels, products, institution size, fraud campaigns, catastrophes and market calendars differ materially",
+    "feedback_loop": "alerts change blocks, analyst attention and customer behavior, altering the future baseline and observed outcomes",
+    "privacy_and_usage_constraints": "financial and behavioral data require purpose limitation, minimization, strict access, auditability and controls against discriminatory peer grouping",
+    "fallback_if_data_is_insufficient": "use deterministic limits, velocity and scenario rules, reconciliations, sanctions and fraud controls, supervised models where labels exist, and specialist review"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["FIN-001", "FIN-002", "CROSS-002", "MANUF-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "Pix behavioral and graph anomaly detection is already central to FIN-001, claim relationship anomalies are represented in FIN-002, and generic transaction or liquidity anomaly monitoring does not expose a distinct bounded outcome beyond current regulatory controls and mature monitoring platforms."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or extend existing fraud, AML, treasury, claims and observability platforms with institution-specific rules and governed anomaly models; do not create a separate generic anomaly opportunity.",
+    "sources": [
+      "https://www.bcb.gov.br/estabilidadefinanceira/monitoramento",
+      "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?numero=498&tipo=Resolu%C3%A7%C3%A3o+BCB",
+      "https://learn.microsoft.com/en-us/azure/ai-services/anomaly-detector/how-to/create-resource",
+      "https://arxiv.org/abs/2503.15896"
+    ]
+  },
+  "research": {
+    "queries": [
+      "site:bcb.gov.br 2026 anomalias transações prevenção fraude instituições financeiras Brasil monitoramento",
+      "site:learn.microsoft.com Azure anomaly detection financial transactions 2026",
+      "plataforma detecção anomalias transações financeiras Brasil 2025"
+    ],
+    "findings": "Current Banco Central rules require continuous real-time monitoring of atypical or fraudulent transactions using historical and behavioral patterns, and the regulator already performs broad anomaly-oriented monitoring of the financial system. The mechanism is important but already represented in FIN-001 and mature fraud, AML and risk-monitoring capabilities. Microsoft also retires the standalone Azure Anomaly Detector service on 1 October 2026, reinforcing use of broader Fabric or custom/open-source implementations rather than a new standalone reference opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "detect multivariate, peer-group or graph deviations not covered by deterministic scenarios and prioritize specialist review",
+    "optional_secondary_mechanism": "none",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "fraud, AML, treasury, claims and risk specialists retain blocking, reporting, investigation, customer-impact and regulatory decisions"
+  },
+  "cursor_advance": {
+    "segment": {"from": "financial-services", "to": "healthcare"},
+    "technical_focus": {"from": "anomaly-and-unsupervised-learning", "to": "time-series-and-sequence-models"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 46,
+    "investigated_custom_training_or_fine_tuning": 38,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 8
+  }
+}
