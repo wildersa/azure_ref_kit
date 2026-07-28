@@ -11,7 +11,7 @@ This dashboard summarizes active opportunities recorded in `opportunity-index.ya
 | Solution families | 8 |
 | Segments configured | 18 |
 | Completed research cycles | 4 |
-| Current segment | `agriculture` |
+| Current segment | `construction-real-estate` |
 | Default primary market | `Brazil` |
 
 ## Opportunity index
