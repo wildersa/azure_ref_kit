@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-07-28T16:01:03Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "hospitality-tourism",
+  "technical_focus": "llm-agents-and-tool-use",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "mid-sized Brazilian urban hotel",
+      "actor": "front-office supervisor",
+      "bounded_process": "recover a guest request or service failure by checking reservation and room context, creating tasks, coordinating housekeeping or maintenance, communicating progress and escalating unresolved incidents",
+      "scenarios": ["routine amenity request", "contradictory room status and unavailable requested service", "peak arrival period with reduced staff and multiple unresolved requests"],
+      "candidate": "policy-governed agent that reads PMS and task state, creates bounded work orders, drafts guest updates and escalates by SLA"
+    },
+    {
+      "organization": "Brazilian resort or event hotel",
+      "actor": "guest-experience manager",
+      "bounded_process": "coordinate an accessible stay by reconciling declared needs, room features, transport, food-service and event operations without making assumptions about the guest",
+      "scenarios": ["planned accessible arrival", "requested accommodation conflicts with current room inventory", "degraded flow during a large event or destination disruption"],
+      "candidate": "permission-aware agent that checks verified property capabilities, proposes feasible coordination steps and requires staff and guest confirmation"
+    },
+    {
+      "organization": "small multi-property hotel group",
+      "actor": "operations manager",
+      "bounded_process": "triage maintenance and housekeeping incidents across properties, assign eligible staff, verify completion evidence and prepare management escalation",
+      "scenarios": ["ordinary room defect", "safety-sensitive or ambiguous incident", "system or connectivity degradation with backlog across properties"],
+      "candidate": "constrained operations agent over PMS, maintenance and messaging tools with reversible task actions and human approval for guest-impacting changes"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "llm-agents-and-tool-use",
+    "candidate_model_families": ["tool-using-llm", "constrained-planner-executor", "deterministic-workflow-with-model-routing", "policy-governed-agent"],
+    "model_strategy": ["pretrained", "rules-plus-model"],
+    "learning_paradigm": "no-custom-training",
+    "data_modalities": ["guest-messages", "reservation-and-room-state", "property-rules", "task-and-incident-events", "accessibility-capability-records", "staff-availability"],
+    "interaction_pattern": "event-driven bounded tool use with checkpoints, audit trail and human escalation",
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-base-required",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "not applicable"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HOSP-001", "TECH-002", "TELCO-001", "HEALTH-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The candidate is a generic hotel operations and guest-recovery agent over PMS, messaging, housekeeping and maintenance tools. Current hotel operating platforms already cover the same actors, bounded actions, escalation pattern and operational outcomes; accessibility requires verified structured capability data and human confirmation rather than a separate agent architecture."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or configure a current PMS-connected hotel operations platform for request capture, task creation, incident escalation, housekeeping and maintenance coordination. Keep accessibility commitments, safety-sensitive changes, compensation, room moves and exceptional guest-impact decisions under explicit staff authority.",
+    "sources": [
+      "https://www.gov.br/pt-br/servicos/cadastrar-se-no-site-turismo-acessivel",
+      "https://www.gov.br/turismo/pt-br/assuntos/noticias/ministerio-do-turismo-lanca-guia-para-atendimento-a-turistas-neurodivergentes/",
+      "https://www.gov.br/turismo/pt-br/publicacoes/atos-normativos-2/2025/portaria-mtur-no-41-de-14-de-novembro-de-2025",
+      "https://www.trytelos.co/features",
+      "https://getmoyu.com/",
+      "https://hotelnative.ai/platform/pms"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil hotelaria 2025 escassez mão de obra operação hotel reclamações hóspedes interrupções manutenção",
+      "site:gov.br turismo hotelaria acessibilidade 2025 Brasil hospedagem",
+      "hotel operations agent AI task automation maintenance guest requests product 2026",
+      "hotel AI agent property management system guest recovery automation product"
+    ],
+    "findings": "Brazilian official sources updated in 2025-2026 reinforce accessible hospitality, verified accessibility information, digital guest registration, data protection and fallback during connectivity failures. Current hotel platforms already connect guest calls and messages, PMS and room state to task creation, housekeeping, maintenance, incident escalation, reporting and bounded automated actions. The remaining controls are primarily structured property data, permissions, deterministic policy and human authority, not a differentiated new opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "interpret guest or staff intent and select bounded, policy-allowed tool actions such as creating a task, retrieving current room context, drafting an update or escalating an incident",
+    "optional_secondary_mechanism": "none",
+    "agent": "a constrained planner-executor may use approved PMS, messaging and task-management tools with checkpoints, idempotency, audit logs and escalation",
+    "llm": "interprets unstructured requests and selects among pre-authorized actions; it does not determine accessibility adequacy, safety, compensation or exceptional room changes",
+    "human_control": "hotel staff confirm accessibility arrangements, room moves, compensation, safety-sensitive maintenance, privacy exceptions, service recovery and incident closure"
+  },
+  "cursor_advance": {
+    "segment": {"from": "hospitality-tourism", "to": "media-entertainment"},
+    "technical_focus": {"from": "llm-agents-and-tool-use", "to": "recommendation-and-ranking"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 40,
+    "investigated_custom_training_or_fine_tuning": 32,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
