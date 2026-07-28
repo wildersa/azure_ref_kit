@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-07-28T14:59:12Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "professional-services",
+  "technical_focus": "conversational-llm-and-rag",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "medium-sized Brazilian tax law firm",
+      "actor": "tax-cont controversy lawyer",
+      "bounded_process": "review an e-Process case, identify disputed facts and legal grounds, retrieve authoritative sources, and assemble a cited evidence map for a defense or appeal",
+      "scenarios": ["routine administrative notice with complete documents", "conflicting attachments and uncertain legal basis", "deadline peak with several large case files"],
+      "candidate": "grounded conversational assistant over case documents, legislation, CARF decisions and approved firm knowledge"
+    },
+    {
+      "organization": "accounting advisory shared-services team",
+      "actor": "senior tax consultant",
+      "bounded_process": "answer client questions about procedural requirements and required evidence for Receita Federal digital services",
+      "scenarios": ["known service with current official instructions", "ambiguous request spanning multiple services", "regulatory update with stale internal guidance"],
+      "candidate": "RAG assistant restricted to current official Receita Federal sources and approved internal procedures"
+    },
+    {
+      "organization": "corporate legal department",
+      "actor": "legal operations analyst",
+      "bounded_process": "triage outside-counsel memoranda and internal precedents for a tax dispute while preserving source authority, confidentiality and review ownership",
+      "scenarios": ["standard precedent search", "contradictory opinions or revoked authority", "degraded access to one repository during a filing deadline"],
+      "candidate": "permission-aware retrieval and cited synthesis across internal and authoritative legal collections"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "conversational-llm-and-rag",
+    "candidate_model_families": ["pretrained-llm", "embedding-model", "reranker", "retrieval-pipeline", "grounded-response-model"],
+    "model_strategy": ["pretrained", "rag-grounded", "rules-plus-model"],
+    "learning_paradigm": "no-custom-training",
+    "data_modalities": ["case-documents", "legislation", "administrative-decisions", "official-procedural-guidance", "approved-internal-knowledge"],
+    "interaction_pattern": "conversational-research-with-citations-and-mandatory-professional-review",
+    "training_requirement": "not-required",
+    "data_readiness": "knowledge-base-required",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "not applicable"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["PROF-001", "CROSS-003", "PUBLIC-001", "TECH-002"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The remaining capability is a conventional permission-aware legal RAG assistant with citation verification. It improves research productivity but does not introduce a materially distinct actor, bounded decision, integration boundary or measurable outcome beyond existing evidence-grounded legal and regulatory patterns."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt a current legal-research or enterprise RAG platform with authoritative-source controls, private matter collections, citation audit and mandatory lawyer verification. Keep procedural deadlines and filing requirements in deterministic workflows represented by PROF-001.",
+    "sources": [
+      "https://www.gov.br/receitafederal/pt-br/assuntos/processos-digitais/processos",
+      "https://www.gov.br/pt-br/servicos/consultar-processo",
+      "https://www.gov.br/receitafederal/pt-br/assuntos/processos-digitais/documentos",
+      "https://www.gov.br/pt-br/servicos/juntar-documentos-a-processo",
+      "https://aclanthology.org/2026.propor-2.9/"
+    ]
+  },
+  "research": {
+    "queries": [
+      "site:gov.br Receita Federal e-CAC processo digital consulta documentos 2026",
+      "site:cnj.jus.br IA generativa advocacia processos judiciais 2025",
+      "plataforma jurídica IA generativa RAG jurisprudência Brasil 2026",
+      "legal research generative AI grounded citations product official 2026"
+    ],
+    "findings": "Receita Federal guidance confirms that e-Processo already centralizes case status, history, communications, notices and document submission under controlled representation. A 2026 Brazilian Portuguese legal RAG publication reports a production pipeline using hybrid retrieval, reranking and post-generation citation audit, showing that the core technical pattern is already available and that citation fidelity remains the central control rather than a new solution opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "retrieve and synthesize case-specific legal and procedural evidence with explicit citations and source-authority metadata",
+    "optional_secondary_mechanism": "citation existence and fidelity audit",
+    "agent": "not used",
+    "llm": "grounded conversational synthesis only; it does not determine legal strategy, deadline or filing authority",
+    "human_control": "lawyers and authorized tax professionals verify sources, applicability, privilege, procedural deadlines, legal argument and every submitted document"
+  },
+  "cursor_advance": {
+    "segment": {"from": "professional-services", "to": "hospitality-tourism"},
+    "technical_focus": {"from": "conversational-llm-and-rag", "to": "llm-agents-and-tool-use"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 39,
+    "investigated_custom_training_or_fine_tuning": 32,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
