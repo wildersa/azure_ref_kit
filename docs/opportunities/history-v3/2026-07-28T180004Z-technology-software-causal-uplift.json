@@ -1,0 +1,111 @@
+{
+  "timestamp": "2026-07-28T18:00:04Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "technology-software",
+  "technical_focus": "causal-and-uplift-learning",
+  "technical_focus_result": "insufficient-data-path",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "Brazilian SaaS company with a shared cloud platform and formal FinOps practice",
+      "actor": "FinOps lead with platform-engineering approval",
+      "bounded_process": "choose among rightsizing, schedule shutdown, storage-tier, commitment or architecture-review interventions for a workload while preserving SLO and delivery constraints",
+      "scenarios": ["routine monthly optimization", "conflicting ownership or incomplete unit-cost attribution", "cost spike during a product launch or AI workload surge"],
+      "candidate": "estimate which eligible optimization intervention causes incremental cost reduction without unacceptable reliability or delivery impact"
+    },
+    {
+      "organization": "Brazilian digital-product company operating continuous delivery",
+      "actor": "release engineering lead",
+      "bounded_process": "choose rollout exposure, canary duration, rollback threshold or additional validation for a release using service and product telemetry",
+      "scenarios": ["ordinary progressive rollout", "contradictory health and business metrics", "peak release window with limited engineering capacity"],
+      "candidate": "estimate heterogeneous treatment effects of rollout strategies on incidents, user outcomes and recovery time"
+    },
+    {
+      "organization": "Brazilian B2B SaaS provider with tiered support and incident management",
+      "actor": "support operations manager",
+      "bounded_process": "choose bounded recovery interventions such as guided diagnostics, specialist escalation, sandbox reproduction or customer communication for complex tenant incidents",
+      "scenarios": ["routine support queue", "tenant-specific evidence is incomplete or privacy-sensitive", "incident surge after a release"],
+      "candidate": "estimate which recovery intervention changes resolution or recurrence outcomes for which incident context"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "causal-and-uplift-learning",
+    "candidate_model_families": ["uplift-tree", "causal-forest", "doubly-robust-estimation", "propensity-method", "heterogeneous-treatment-effect-model"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": "causal-inference",
+    "data_modalities": ["tabular", "event", "time-series"],
+    "interaction_pattern": "batch or online human-in-the-loop policy evaluation",
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical actions were selected by engineers under severity, ownership, customer, release, workload and staffing conditions that are incompletely recorded, while alternative eligible interventions and assignment propensities are usually absent"
+  },
+  "training_data": {
+    "observation_unit": "a workload optimization decision, release rollout decision or incident-recovery decision at a defined decision point",
+    "input_data": "confirmed candidate inputs include pre-decision service telemetry, cost and usage, release metadata, incident context, ownership, customer impact and eligible-action constraints; customer-specific completeness is unknown",
+    "target_or_reward": "incremental change in cost, reliability, incident rate, recovery time, recurrence, user outcome or delivery delay attributable to one bounded intervention rather than another",
+    "label_source": "post-decision telemetry, cost records, incident outcomes, rollback events, support resolution and recurrence; causal validity of these outcomes is unknown",
+    "prediction_time": "after deterministic eligibility, safety, permission and SLO checks and before an intervention is selected",
+    "expected_volume": "unknown and likely fragmented across teams, products, clouds and intervention types",
+    "class_balance": "not directly applicable as a simple class ratio; treatment groups and rare adverse outcomes are expected to be uneven",
+    "historical_coverage": "unknown; most operational systems record the chosen action and result but not all eligible alternatives, assignment rationale or probability",
+    "train_validation_split": "time-based and service or product-grouped evaluation would be required, with prospective holdouts or randomized rollout where safe",
+    "leakage_risks": "using post-intervention telemetry, final incident severity, rollback decisions, resolved root cause, later ownership corrections or cost outcomes unavailable at decision time",
+    "representativeness_risks": "service architecture, customer mix, cloud pricing, release process, team maturity, traffic shape and intervention policy vary materially across products and periods",
+    "feedback_loop": "recommendations change which interventions are observed, potentially eliminating counterfactual coverage and reinforcing incumbent engineering choices",
+    "privacy_and_usage_constraints": "tenant support data, telemetry and developer or operator activity must be minimized and governed under LGPD and internal employment, security and confidentiality controls",
+    "fallback_if_data_is_insufficient": "use feature flags, controlled canaries, deterministic rollback and SLO gates, FinOps policy-as-code, native cost recommendations, explicit experiment design and human review; instrument treatment eligibility and assignment prospectively before causal modeling"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["TECH-001", "TECH-002", "NONPROFIT-001", "ENERGY-002"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The simulated questions are genuinely causal, but current workflows lack trustworthy treatment assignment and counterfactual coverage. Progressive delivery, feature flags, controlled experiments, deterministic SLO gates, FinOps policy-as-code and existing optimization recommendations already provide safer decision mechanisms. A causal model would be an internal analytical capability after prospective instrumentation, not a differentiated repository opportunity today."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt controlled experimentation, feature flags, progressive exposure, deterministic rollback and FinOps governance. Instrument eligible actions, assignment rationale, propensity and outcomes prospectively; reconsider causal estimation only after sufficient comparable interventions exist.",
+    "sources": [
+      "https://www.gov.br/aneel/pt-br/assuntos/noticias/2025/aneel-comunica-instabilidade-do-sistema-de-protocolo-digital-spd/",
+      "https://www.mckinsey.com.br/capabilities/mckinsey-digital/our-insights/everything-is-better-as-code-using-finops-to-manage-cloud-costs",
+      "https://data.finops.org/2025-report/",
+      "https://learn.microsoft.com/en-us/devops/operate/progressive-experimentation-feature-flags",
+      "https://docs.developers.optimizely.com/feature-experimentation/docs/introduction",
+      "https://arxiv.org/abs/2605.02454",
+      "https://arxiv.org/abs/2605.28482"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 software deploy falhas incidentes DevOps pesquisa",
+      "Brasil 2025 FinOps cloud custos desperdício pesquisa",
+      "causal inference software engineering release interventions experimentation platform official",
+      "feature flags experimentation causal impact software delivery official"
+    ],
+    "findings": "Brazilian public-service incidents and current FinOps material confirm that reliability and cloud-value decisions remain operationally relevant. Current feature-flag and experimentation platforms already support progressive exposure, rollback and controlled measurement. Recent causal-software-engineering research frames causal reasoning as promising but still emphasizes explicit assumptions, confounding control and an evaluation roadmap rather than a mature default operational capability."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "estimate heterogeneous treatment effects for one bounded operational intervention only after deterministic eligibility and safety controls",
+    "optional_secondary_mechanism": "none",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "FinOps, platform, release, SRE and support owners retain intervention eligibility, experiment approval, rollout, rollback, customer communication and production-change authority"
+  },
+  "cursor_advance": {
+    "segment": {"from": "technology-software", "to": "nonprofit"},
+    "technical_focus": {"from": "causal-and-uplift-learning", "to": "bandits-and-reinforcement-learning"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 42,
+    "investigated_custom_training_or_fine_tuning": 34,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 7
+  }
+}
