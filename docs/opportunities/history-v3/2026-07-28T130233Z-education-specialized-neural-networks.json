@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-07-28T13:02:33Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "education",
+  "technical_focus": "specialized-neural-networks",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "municipal elementary-school network",
+      "actor": "literacy assessment coordinator",
+      "bounded_process": "collect guided oral-reading recordings, identify decoding, pause, repetition and prosody signals, and route results for teacher review",
+      "scenarios": ["scheduled assessment", "noisy or incomplete recording", "network-wide assessment peak with limited reviewers"],
+      "candidate": "speech and audio models for automated reading-fluency evidence"
+    },
+    {
+      "organization": "large public-school network",
+      "actor": "formative-assessment specialist",
+      "bounded_process": "digitize handwritten short answers and mathematical work, compare legible evidence with rubrics, and queue ambiguous responses for teacher correction",
+      "scenarios": ["clear response", "low-quality image or atypical handwriting", "high-volume assessment window"],
+      "candidate": "handwriting and visual-structure recognition for correction support"
+    },
+    {
+      "organization": "technical and vocational school",
+      "actor": "practical-skills instructor",
+      "bounded_process": "observe a bounded practical demonstration, verify mandatory steps and safety evidence, and record instructor feedback",
+      "scenarios": ["standard demonstration", "occluded or ambiguous action", "degraded camera or simultaneous student assessments"],
+      "candidate": "video action recognition for practical-assessment evidence"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "specialized-neural-networks",
+    "candidate_model_families": ["cnn", "vision-transformer", "domain-specific-audio-model", "multimodal-encoder", "action-recognition-network"],
+    "model_strategy": ["custom-trained", "pretrained", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["student-audio", "handwritten-response-images", "assessment-video", "rubrics", "teacher-corrections"],
+    "interaction_pattern": "batch-or-guided-capture-with-specialist-review",
+    "training_requirement": "required",
+    "data_readiness": "pilot-data-needed",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "student speech, handwriting and practical demonstrations vary by age, region, disability, device, noise, task and teaching context; expert labels and consented representative samples are not established"
+  },
+  "training_data": {
+    "observation_unit": "one consented student assessment artifact captured for a defined task and rubric",
+    "input_data": "audio waveform or image/video capture, task prompt, grade or course context, capture-quality metadata, rubric and only the context available at assessment time",
+    "target_or_reward": "expert-annotated reading events, legibility and response structure, or observed practical steps; final pedagogical judgment remains human",
+    "label_source": "double-reviewed teacher, literacy-specialist or instructor annotations; availability and inter-rater agreement are unknown",
+    "prediction_time": "after guided capture and before specialist correction or pedagogical decision",
+    "expected_volume": "unknown and network-specific; sufficient coverage across grades, regions, devices and learner profiles must be measured before training",
+    "class_balance": "unknown; uncommon speech patterns, disabilities, rare handwriting forms and unsafe or omitted practical steps may be underrepresented",
+    "historical_coverage": "unknown; current assessment data may contain scores without reusable raw audio, images, video, consent or aligned annotations",
+    "train_validation_split": "student-disjoint and school-disjoint holdouts, plus region, device, grade, task and time-based holdouts",
+    "leakage_risks": "final score, teacher correction, remediation assignment, answer key markup or post-assessment transcript included in model inputs",
+    "representativeness_risks": "regional accents, bilingual students, disabilities, age, literacy stage, camera and microphone quality, handwriting tools, classroom noise and vocational equipment",
+    "feedback_loop": "automated flags can influence teacher attention and annotation density, changing future labels and apparent error rates",
+    "privacy_and_usage_constraints": "student voice, image, video and educational records require minimization, purpose limitation, access control, retention rules, consent or other valid legal basis, and prohibition of autonomous high-stakes grading",
+    "fallback_if_data_is_insufficient": "guided capture, deterministic audio and image quality checks, structured rubrics, sampling, double correction, teacher review and adoption of validated existing assessment platforms"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["EDU-001", "EDU-002", "MEDIA-002", "CONST-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "Reading-fluency automation is already commercially available in Brazil; handwriting correction remains a rubric and teacher-review extension; practical video assessment repeats multimodal recognition and evidence-review patterns already represented. None exposes a distinct actor-process-capability-outcome combination sufficient for publication."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt validated reading-fluency platforms where appropriate and preserve guided capture, deterministic quality controls, structured rubrics and specialist review. Treat handwriting or practical-action recognition only as bounded experiments inside existing assessment workflows, not separate opportunities.",
+    "sources": [
+      "https://dados.es.gov.br/dataset/avaliacao-fluencia-em-leitura-2025",
+      "https://www.lytera.com.br/",
+      "https://www.arvore.com.br/",
+      "https://www.plataformaauroria.com.br/",
+      "https://recima21.com.br/recima21/article/view/7694",
+      "https://www.sciencedirect.com/science/article/pii/S2666920X25000517"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil educação 2025 avaliação oral leitura fluência Ministério da Educação",
+      "Brasil 2025 tecnologia reconhecimento de fala educação leitura fluência alunos",
+      "plataforma avaliação fluência leitora inteligência artificial Brasil",
+      "computer vision education classroom Brazil 2025 assessment"
+    ],
+    "findings": "Brazilian 2025 reading-fluency microdata and current commercial platforms confirm a real assessment workflow and existing AI-assisted offerings. Recent Brazilian research shows technical feasibility for automated fluency measures but explicitly requires further empirical validation across real educational contexts. The remaining handwriting and practical-video candidates are optional recognition layers with strong representativeness, privacy and pedagogical-validity constraints rather than materially differentiated repository opportunities."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "specialized speech, handwriting or video recognition to generate bounded assessment evidence for specialist review",
+    "optional_secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "teachers and specialists retain scoring, diagnosis, intervention, accommodation and any consequential educational decision"
+  },
+  "cursor_advance": {
+    "segment": {"from": "education", "to": "public-sector"},
+    "technical_focus": {"from": "specialized-neural-networks", "to": "small-language-models-and-nlp"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 37,
+    "investigated_custom_training_or_fine_tuning": 31,
+    "investigated_pretrained_llm_or_rag_primary": 5,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
