@@ -15,7 +15,7 @@
   "operational_simulations": [
     {
       "organization": "medium-sized Brazilian tax law firm",
-      "actor": "tax-cont controversy lawyer",
+      "actor": "tax controversy lawyer",
       "bounded_process": "review an e-Process case, identify disputed facts and legal grounds, retrieve authoritative sources, and assemble a cited evidence map for a defense or appeal",
       "scenarios": ["routine administrative notice with complete documents", "conflicting attachments and uncertain legal basis", "deadline peak with several large case files"],
       "candidate": "grounded conversational assistant over case documents, legislation, CARF decisions and approved firm knowledge"
