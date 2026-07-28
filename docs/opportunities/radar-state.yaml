@@ -1,12 +1,12 @@
 schema_version: 2
-last_run: "2026-07-28T17:00:09Z"
+last_run: "2026-07-28T18:00:04Z"
 
-current_segment_index: 16
+current_segment_index: 17
 completed_segment_cycles: 4
 
-current_technical_focus_index: 8
+current_technical_focus_index: 9
 completed_technical_focus_cycles: 3
-next_technical_focus: causal-and-uplift-learning
+next_technical_focus: bandits-and-reinforcement-learning
 
 technical_focus_state:
   classical-supervised-ml:
@@ -42,8 +42,8 @@ technical_focus_state:
     last_reviewed: "2026-07-28"
     last_result: rejected
   causal-and-uplift-learning:
-    runs: 3
-    last_reviewed: "2026-07-27"
+    runs: 4
+    last_reviewed: "2026-07-28"
     last_result: insufficient-data-path
   bandits-and-reinforcement-learning:
     runs: 3
@@ -56,13 +56,13 @@ technical_focus_state:
 
 technical_coverage_state:
   tracking_started: "2026-07-25"
-  evaluated_rounds: 41
+  evaluated_rounds: 42
   published_rounds: 0
-  investigated_custom_training_or_fine_tuning: 33
+  investigated_custom_training_or_fine_tuning: 34
   published_custom_training_or_fine_tuning: 0
   investigated_pretrained_llm_or_rag_primary: 6
   published_pretrained_llm_or_rag_primary: 0
-  investigated_rl_bandit_causal_or_uplift: 6
+  investigated_rl_bandit_causal_or_uplift: 7
   published_rl_bandit_causal_or_uplift: 0
   note: Coverage targets apply prospectively and guide investigation, not publication quotas. Existing opportunities are tagged only when materially revalidated.
 
@@ -153,10 +153,10 @@ segment_state:
     last_result: no-new-fit
     next_focus: creator-contract, credit, rights-window, distribution-metadata and catalog-circulation interventions where a distinct causal effect can be measured beyond deterministic eligibility, editorial curation, established recommendation platforms, audiovisual rights monitoring, live-caption continuity, archive tagging, semantic search, automated highlights, and metadata enrichment
   technology-software:
-    runs: 4
-    last_reviewed: "2026-07-26"
+    runs: 5
+    last_reviewed: "2026-07-28"
     last_result: no-new-fit
-    next_focus: cloud-cost remediation, release-health decisions, developer-environment recovery, and support escalation where a distinct decision remains beyond native cost anomaly alerts, budgets and quotas, observability and canary rules, AIOps, vulnerability prioritization, tenant-specific incident reproduction, and generic anomaly dashboards
+    next_focus: cloud-cost, release, developer-environment and support-recovery decisions where alternative interventions can be prospectively assigned and measured beyond feature-flag experimentation, deterministic rollout controls, FinOps policy-as-code, native optimization recommendations, vulnerability prioritization, tenant-specific incident reproduction, and generic causal dashboards
   nonprofit:
     runs: 4
     last_reviewed: "2026-07-26"
