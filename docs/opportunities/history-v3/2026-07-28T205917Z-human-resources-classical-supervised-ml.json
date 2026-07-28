@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-07-28T20:59:17Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "human-resources",
+  "technical_focus": "classical-supervised-ml",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "large Brazilian employer with centralized people operations and integrated payroll",
+      "actor": "leave-of-absence administrator",
+      "bounded_process": "validate leave, extension and return events before payroll close and eSocial transmission",
+      "scenarios": ["routine return with complete dates", "contradictory certificates or overlapping absences", "payroll-close peak with late updates and integration backlog"],
+      "candidate": "supervised score for cases likely to require correction, reopening or specialist review"
+    },
+    {
+      "organization": "Brazilian multi-site employer using an HR shared-service center",
+      "actor": "employee-service queue supervisor",
+      "bounded_process": "triage absence and return-to-work cases across payroll, occupational health and local HR",
+      "scenarios": ["ordinary structured request", "missing or conflicting employee status", "volume spike with unavailable specialists"],
+      "candidate": "classification of escalation or rework risk before assignment"
+    },
+    {
+      "organization": "Brazilian employer with occupational-health and accommodation workflows",
+      "actor": "return-to-work coordinator",
+      "bounded_process": "reconcile administrative prerequisites and route cases without predicting medical fitness or employment outcomes",
+      "scenarios": ["planned return", "changed date or incomplete administrative evidence", "degraded integration between HCM, payroll and health systems"],
+      "candidate": "prediction of administrative exception risk using only pre-decision operational attributes"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "classical-supervised-ml",
+    "candidate_model_families": ["linear-models", "decision-trees", "random-forests", "gradient-boosting", "calibrated-classifiers"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["tabular", "event"],
+    "interaction_pattern": "human-in-the-loop case prioritization before payroll or HR processing",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical correction, escalation and reopening labels are often created after specialist handling and may leak final diagnosis, resolution, payroll impact or revised employee status into prediction-time features"
+  },
+  "training_data": {
+    "observation_unit": "one absence, return or employee-service case at the initial administrative review cutoff",
+    "input_data": "pre-cutoff event type, dates, employee status, work schedule, prior related events, source system, completeness flags, queue, known deadlines and integration status; availability and consistency are unknown",
+    "target_or_reward": "later administrative correction, reopening, reassignment, eSocial rejection or specialist escalation; definitions vary by organization",
+    "label_source": "HCM, payroll, eSocial messaging, case-management and workflow audit events; cross-system linkage quality is unknown",
+    "prediction_time": "before case assignment, payroll close or eSocial transmission",
+    "expected_volume": "unknown and organization-dependent; rare event types and smaller employers may not support reliable local training",
+    "class_balance": "unknown; material exceptions are expected to be less frequent than routine cases",
+    "historical_coverage": "unknown; policy, vendor, taxonomy and integration changes can make older cases non-comparable",
+    "train_validation_split": "time-based validation with holdouts across payroll cycles and policy or system changes; site or business-unit grouped tests where transfer is claimed",
+    "leakage_risks": "using final resolution, revised dates, specialist assignment, payroll reopening, medical conclusion, accepted eSocial response or fields populated after initial triage",
+    "representativeness_risks": "collective agreements, work schedules, benefit regimes, organization size, occupational-health process, payroll vendor and local HR maturity vary materially",
+    "feedback_loop": "prioritization changes who reviews a case and how quickly corrections occur, altering the observed label and potentially reinforcing queues with historically greater attention",
+    "privacy_and_usage_constraints": "absence and health-adjacent records require strict minimization, purpose limitation, role-based access and LGPD controls; the model must not infer health condition, fitness, discipline or employability",
+    "fallback_if_data_is_insufficient": "use eSocial validation rules, mandatory fields, overlap checks, deterministic deadlines, integration reconciliation, configured escalation rules and specialist review queues"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HR-001", "HR-002", "PROF-001", "TECH-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The remaining classifier only ranks administrative exception or escalation risk. It does not introduce a distinct HR outcome beyond existing structured HCM, eSocial validation, case-routing and escalation capabilities, and it risks duplicating generic supervised triage patterns already represented elsewhere."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or configure HCM absence management, eSocial validations, case routing and escalation rules. Consider a local classifier only after deterministic controls are exhausted and incremental value over built-in case prediction is demonstrated.",
+    "sources": [
+      "https://www.gov.br/esocial/pt-br/empregador-domestico/manual-do-empregador-domestico",
+      "https://www.gov.br/esocial/pt-br/empresas/manual-web-geral",
+      "https://help.sap.com/docs/successfactors-employee-central/employee-central-scope-items/manage-leave-of-absence",
+      "https://www.servicenow.com/docs/r/employee-service-management/hr-service-delivery/predictive-intelligence-for-hr-service-delivery.html",
+      "https://www.servicenow.com/docs/r/employee-service-management/hr-service-delivery/train-model-ettr.html"
+    ]
+  },
+  "research": {
+    "queries": [
+      "site:gov.br eSocial 2026 retorno afastamento obrigatório folha remuneração",
+      "Brasil 2025 gestão afastamentos retorno trabalho eSocial",
+      "HR case escalation prediction ServiceNow machine learning employee service management 2026",
+      "SAP SuccessFactors leave of absence return to work official 2026"
+    ],
+    "findings": "Current eSocial guidance shows that missing or conflicting return events can block later absences and payroll remuneration, confirming an operational need. However, the core controls are deterministic and current HCM and HR-service platforms already support leave and return workflows, traceability, routing, escalation, service prediction and estimated resolution time. No materially distinct opportunity remains."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "predict which administratively valid cases are more likely to require correction, reassignment or specialist review",
+    "optional_secondary_mechanism": "none",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "HR, payroll, occupational-health and legal specialists retain event correction, medical or fitness interpretation, accommodation, payroll reopening and employment decisions"
+  },
+  "cursor_advance": {
+    "segment": {"from": "human-resources", "to": "financial-services"},
+    "technical_focus": {"from": "classical-supervised-ml", "to": "anomaly-and-unsupervised-learning"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 45,
+    "investigated_custom_training_or_fine_tuning": 37,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 8
+  }
+}
