@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-07-28T20:01:40Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "cross-industry",
+  "technical_focus": "forecasting-and-optimization",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "large Brazilian enterprise operating a shared-services center for finance, procurement and employee administration",
+      "actor": "shared-services capacity manager",
+      "bounded_process": "forecast incoming cases by queue and skill and convert demand into weekly staffing, cross-training and backlog-recovery plans",
+      "scenarios": ["routine weekly planning", "contradictory demand after policy or system changes", "month-end peak with absences and degraded integrations"],
+      "candidate": "probabilistic demand forecasting combined with constrained staffing and cross-skill allocation"
+    },
+    {
+      "organization": "Brazilian multi-business group with centralized IT and enterprise-service desks",
+      "actor": "service operations manager",
+      "bounded_process": "plan capacity for incidents and requests across assignment groups while preserving SLAs, on-call coverage and specialist constraints",
+      "scenarios": ["normal service volume", "major incident distorting queue history", "release peak with simultaneous demand and reduced specialist capacity"],
+      "candidate": "forecast workload and optimize shift, on-call and temporary reassignment decisions"
+    },
+    {
+      "organization": "Brazilian company coordinating cross-functional approval queues for purchasing, payments and access requests",
+      "actor": "enterprise process owner",
+      "bounded_process": "anticipate approval bottlenecks and allocate reviewers before deadline-sensitive queues exceed capacity",
+      "scenarios": ["ordinary approvals", "missing evidence and repeated re-entry", "fiscal-close peak with unavailable approvers"],
+      "candidate": "forecast queue arrivals and service times and solve a constrained reviewer-allocation plan"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "forecasting-and-optimization",
+    "candidate_model_families": ["probabilistic-forecasting", "mathematical-optimization", "constraint-programming", "simulation-optimization", "learned-forecast-with-deterministic-solver"],
+    "model_strategy": ["custom-trained", "optimization-with-learned-components", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["tabular", "event", "time-series"],
+    "interaction_pattern": "manager-reviewed periodic capacity planning",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical demand and handling-time series are distorted by policy changes, migrations, backlog-clearing campaigns, outages, staffing decisions and post-hoc queue edits, creating leakage and unstable seasonality"
+  },
+  "training_data": {
+    "observation_unit": "one queue-skill-time interval at the planning cutoff",
+    "input_data": "pre-cutoff arrivals, backlog age, case type, channel, calendar, service time, skill coverage, planned absences, known campaigns and system availability; completeness across functions is unknown",
+    "target_or_reward": "future arrivals and workload, followed by a deterministic objective balancing SLA risk, backlog, overtime, skill coverage and schedule stability",
+    "label_source": "ticket, case, workflow, schedule and queue events; consistency between systems is unknown",
+    "prediction_time": "before weekly or intraday staffing and allocation decisions",
+    "expected_volume": "unknown and organization-dependent; low-volume specialist queues may be too sparse for local models",
+    "class_balance": "not directly applicable to forecasting; peaks and severe backlog events are expected to be rare and uneven",
+    "historical_coverage": "unknown; mature shared-service and ITSM platforms may retain several years, while migrations and taxonomy changes can break comparability",
+    "train_validation_split": "rolling time-based validation with holdouts spanning policy, system and organizational changes; queue or business-unit grouped tests where transfer is claimed",
+    "leakage_risks": "using final resolved category, revised priority, completed handling time, later staffing changes, backlog-clearing actions or incident severity unavailable at planning time",
+    "representativeness_risks": "business unit, channel, skill taxonomy, automation level, labor rules, hybrid work, policy changes and system maturity vary materially",
+    "feedback_loop": "staffing and routing decisions alter future backlog, handling time and observed demand, so forecasts trained on prior policies can reinforce under-service of difficult queues",
+    "privacy_and_usage_constraints": "employee schedules and case metadata require minimization, role-based access and LGPD controls; productivity prediction must not become opaque individual performance scoring",
+    "fallback_if_data_is_insufficient": "use seasonal baselines, Erlang or queueing formulas where applicable, configured calendars, capacity thresholds, deterministic skill constraints and manager-adjusted scenarios"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["HEALTH-001", "HOSP-001", "TELCO-002", "ENERGY-002"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "Demand forecasting plus constrained capacity allocation is already represented in sector-specific opportunities. Cross-industry shared-service planning does not introduce a distinct data modality, authority boundary, intelligent mechanism or measurable outcome, and mature workforce-optimization products already cover demand scenarios, schedules, skills and queues."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt or configure workforce-optimization and service-management capabilities, normalize queue and skill taxonomies, and begin with seasonal or queueing baselines plus deterministic constraints. Train local forecasts only when historical stability and incremental value over built-in forecasting are demonstrated.",
+    "sources": [
+      "https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2013-agencia-de-noticias/releases/45878-volume-de-servicos-recua-0-4-em-dezembro-e-fecha-2025-com-alta-de-2-8",
+      "https://www.servicenow.com/products/workforce-optimization.html",
+      "https://www.servicenow.com/docs/r/employee-service-management/workforce-optimization-for-hr/wfo-hr-overview.html",
+      "https://www.servicenow.com/docs/r/washingtondc/customer-service-management/workforce-optimization-for-customer-service/explore-demand-forecast-configurable-wfo-cs.html"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 centrais de serviços compartilhados previsão demanda capacidade atendimento pesquisa",
+      "site:ibge.gov.br 2025 setor de serviços Brasil volume recorde",
+      "workforce management forecasting optimization service desk official product documentation",
+      "ServiceNow workforce optimization demand forecasting official"
+    ],
+    "findings": "Current Brazilian official statistics confirm the scale and continued growth of services, but do not expose a uniquely cross-industry forecasting gap. Current workforce-optimization products already model demand scenarios, staffing impact, schedules, skills, queues and surge coverage. The remaining work is primarily adoption, data normalization and deterministic constraint configuration rather than a differentiated opportunity."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "forecast queue-level arrivals and workload before a manager-reviewed capacity plan",
+    "optional_secondary_mechanism": "deterministic solver for skill, schedule, SLA and workload constraints",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "service and process managers retain staffing, overtime, reassignment, labor-rule, service-priority and exception authority"
+  },
+  "cursor_advance": {
+    "segment": {"from": "cross-industry", "to": "human-resources"},
+    "technical_focus": {"from": "forecasting-and-optimization", "to": "classical-supervised-ml"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 44,
+    "investigated_custom_training_or_fine_tuning": 36,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 8
+  }
+}
