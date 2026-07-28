@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-07-28T14:02:54Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "public-sector",
+  "technical_focus": "small-language-models-and-nlp",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "federal or state ombudsman office",
+      "actor": "ombudsman intake analyst",
+      "bounded_process": "receive a citizen narrative, classify manifestation type and subject, identify the responsible body, and route it for treatment",
+      "scenarios": ["clear routine request", "ambiguous report mixing complaint and allegation", "volume peak with incomplete metadata"],
+      "candidate": "compact Portuguese text classifier for type, subject and routing suggestions"
+    },
+    {
+      "organization": "medium-sized municipality",
+      "actor": "citizen-service protocol attendant",
+      "bounded_process": "convert free-text or transcribed requests into a structured municipal service protocol and responsible department",
+      "scenarios": ["known service request", "informal or geographically ambiguous description", "channel degradation with duplicate submissions"],
+      "candidate": "small NLP classifier and entity extractor for service and location fields"
+    },
+    {
+      "organization": "public administrative shared-services center",
+      "actor": "document distribution clerk",
+      "bounded_process": "classify incoming administrative expedients, extract bounded identifiers and route them to the correct workflow",
+      "scenarios": ["standard document", "mixed or missing subject", "deadline peak with legacy scans and manual re-entry"],
+      "candidate": "compact document-text classifier and token extractor"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "small-language-models-and-nlp",
+    "candidate_model_families": ["compact-encoder", "sentence-transformer", "fine-tuned-classifier", "token-classifier", "domain-extractor"],
+    "model_strategy": ["custom-trained", "fine-tuned", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["citizen-free-text", "administrative-document-text", "controlled-taxonomies", "routing-corrections"],
+    "interaction_pattern": "online-intake-with-human-confirmation-and-batch-quality-review",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical classifications are sparse, heavily use generic categories such as 'other', and may encode post-routing corrections, sensitive allegations or inconsistent local taxonomies"
+  },
+  "training_data": {
+    "observation_unit": "one citizen manifestation, service request or administrative expedient at initial intake",
+    "input_data": "text available at submission time, channel metadata, citizen-selected fields when present, controlled taxonomy and only non-sensitive routing context permitted for the task",
+    "target_or_reward": "human-confirmed manifestation type, subject, responsible body or bounded extracted fields",
+    "label_source": "final classifications and corrections made by authorized intake or treatment staff; consistency and reuse rights must be audited",
+    "prediction_time": "after submission and before routing, triage or substantive treatment",
+    "expected_volume": "unknown and organization-specific; class and taxonomy coverage must be measured before training",
+    "class_balance": "unknown; generic categories and high-frequency services are likely dominant, while sensitive or unusual manifestations may be rare",
+    "historical_coverage": "partially plausible because Fala.BR and protocol systems retain classifications, but label quality, versioned taxonomies and local portability are unknown",
+    "train_validation_split": "time-based and organization-disjoint holdouts, with separate evaluation for rare classes, taxonomy revisions and ambiguous multi-label cases",
+    "leakage_risks": "using final responsible unit, treatment notes, investigation outcome, response text, reclassification or closure fields unavailable at intake",
+    "representativeness_risks": "regional language, literacy, accessibility, channel, service taxonomy, agency responsibilities and changes in public-service catalogs",
+    "feedback_loop": "model suggestions can anchor human classification and gradually reproduce its own prior errors or suppress rare categories",
+    "privacy_and_usage_constraints": "manifestations may contain personal, sensitive or whistleblower data; minimization, access control, retention, purpose limitation and human review are mandatory",
+    "fallback_if_data_is_insufficient": "structured intake, controlled vocabulary search, mandatory fields, deterministic routing rules, synonym dictionaries and manual classification"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["PUBLIC-001", "PROF-001", "HR-001", "TECH-002"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The remaining mechanism is generic bounded text classification and routing. It does not create a distinct actor-process-outcome pattern beyond current public platforms, configurable workflow products and repository classification or extraction patterns."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Adopt and configure Fala.BR or equivalent public-service workflow platforms, using structured taxonomies and human confirmation. A compact local classifier may be an implementation option for uncovered municipal integrations, not a separate solution opportunity.",
+    "sources": [
+      "https://www.gov.br/secom/pt-br/acompanhe-a-secom/noticias/2026/04/fala-br-ganha-novo-formato-e-passa-a-usar-inteligencia-artificial-para-simplificar-atendimento-ao-cidadao",
+      "https://www.gov.br/ouvidorias/pt-br/falabr/assuntos-subassuntos/mais-detalhes-da-mudanca",
+      "https://www.gov.br/ouvidorias/pt-br/assuntos/noticias/2025/cgu-apresenta-estudo-inedito-com-uso-de-inteligencia-artificial-para-qualificar-escuta-nas-ouvidorias/",
+      "https://limeira.sp.gov.br/imprensa/noticias/destaques/ia-de-limeira-passa-a-abrir-protocolos-de-servicos-publicos-pelo-whatsapp",
+      "https://www.gov.br/governodigital/pt-br/infraestrutura-nacional-de-dados/inteligencia-artificial-1/publicacoes/guia-unificado-de-inteligencia-artificial-para-o-setor-publico-1/guia-unificado-de-inteligencia-artificial-para-o-setor-publico"
+    ]
+  },
+  "research": {
+    "queries": [
+      "site:gov.br 2025 inteligência artificial classificação automática manifestações ouvidoria Fala.BR",
+      "site:gov.br 2025 triagem automática demandas serviços públicos inteligência artificial protocolo",
+      "Brasil software gestão ouvidoria classificação automática manifestações IA 2025",
+      "small language model text classification public service requests government"
+    ],
+    "findings": "The Fala.BR rollout published on 2 April 2026 already automates manifestation-type classification and announced suggestions for subject, destination body and public service. Current official material also documents a very large controlled taxonomy with frequent generic or missing classifications, confirming the label-quality risk. Municipal conversational protocol systems and commercial ombudsman platforms cover the same intake and routing outcome."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "compact Portuguese text classification and bounded entity extraction to suggest type, subject, service or responsible unit",
+    "optional_secondary_mechanism": null,
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "authorized public servants confirm classification, routing, confidentiality, allegation handling, eligibility and any substantive administrative decision"
+  },
+  "cursor_advance": {
+    "segment": {"from": "public-sector", "to": "professional-services"},
+    "technical_focus": {"from": "small-language-models-and-nlp", "to": "conversational-llm-and-rag"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 38,
+    "investigated_custom_training_or_fine_tuning": 32,
+    "investigated_pretrained_llm_or_rag_primary": 5,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
