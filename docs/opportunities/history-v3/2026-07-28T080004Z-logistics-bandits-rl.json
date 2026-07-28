@@ -1,0 +1,104 @@
+{
+  "timestamp": "2026-07-28T08:00:04Z",
+  "event": "solution-opportunity-discovery-v3",
+  "segment": "logistics-transport",
+  "technical_focus": "bandits-and-reinforcement-learning",
+  "focus_result": "insufficient-data-path",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "process_signals_sought": [
+    "repeated-decision",
+    "alternative-actions",
+    "state",
+    "reward",
+    "delayed-effect",
+    "exploration-constraint",
+    "offline-or-simulated-evaluation"
+  ],
+  "simulations": [
+    {
+      "workflow": "yard-and-dock recovery",
+      "actor": "yard supervisor at a medium or large distribution center",
+      "normal": "assign arriving trucks to eligible dock windows using appointment, cargo, equipment and labor constraints",
+      "exception": "late arrival, unavailable dock, mismatched cargo documents or priority shipment requires reassignment",
+      "degraded": "peak queue with reduced dock or labor capacity",
+      "candidate": "contextual policy for selecting one eligible recovery action",
+      "baseline": "appointment rules, priority queues, constraint programming and supervisor override"
+    },
+    {
+      "workflow": "failed-delivery recovery",
+      "actor": "last-mile control-tower supervisor",
+      "normal": "choose retry window, pickup point, customer contact or return flow from eligible actions",
+      "exception": "ambiguous address, absent recipient, restricted item or conflicting customer preference",
+      "degraded": "campaign peak with limited vehicles and support capacity",
+      "candidate": "contextual bandit for bounded recovery-action selection",
+      "baseline": "configured retry ladders, SLA rules, customer choice and route optimization"
+    },
+    {
+      "workflow": "dynamic dispatch exception",
+      "actor": "dispatcher coordinating urban pickups and deliveries",
+      "normal": "assign new jobs to eligible drivers while preserving route and service constraints",
+      "exception": "vehicle failure, cancellation, traffic disruption or missed connection",
+      "degraded": "rapid demand spike with constrained fleet",
+      "candidate": "offline or constrained reinforcement-learning policy",
+      "baseline": "rolling-horizon optimization, heuristics, deterministic eligibility and human dispatch"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "bandits-and-reinforcement-learning",
+    "model_strategy": ["custom-trained", "simulation-trained", "rules-plus-model"],
+    "candidate_model_families": ["contextual-bandit", "offline-rl", "constrained-rl", "simulation-trained-policy"],
+    "learning_paradigm": ["contextual-bandit", "reinforcement-learning"],
+    "data_modalities": ["operational-events", "geospatial", "time-series", "structured-constraints"],
+    "interaction_pattern": "human-supervised recommendation",
+    "training_requirement": "required",
+    "data_readiness": "not-currently-trainable",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "one decision point with the state, eligible actions, selected action and later operational outcome",
+    "input_data": "appointment, shipment, route, vehicle, driver, dock, labor, customer, traffic and event state available at decision time",
+    "target_or_reward": "bounded service, delay, cost and recovery outcome subject to safety, labor, customer and contractual constraints",
+    "label_source": "operational execution and final outcome logs; reliable action propensity is currently unknown",
+    "prediction_time": "immediately before a recovery, dispatch or reassignment decision",
+    "expected_volume": "unknown; must be measured per operation and decision type",
+    "class_balance": "not applicable as a fixed class balance; action and outcome frequencies are unknown",
+    "historical_coverage": "unknown and likely policy-biased because only chosen actions and their outcomes are recorded",
+    "train_validation_split": "time-based and site or route holdout if instrumentation becomes available",
+    "leakage_risks": "using final route, revised ETA, completed delivery, later exception codes or supervisor corrections unavailable at decision time",
+    "representativeness_risks": "season, region, fleet, customer mix, facility layout, labor rules and disruption regimes",
+    "feedback_loop": "recommended actions alter future state and observed outcomes; overrides and reasons must be logged",
+    "privacy_and_usage_constraints": "minimize customer and driver data, restrict worker-performance use and preserve human authority",
+    "fallback_if_data_is_insufficient": "use deterministic rules, customer choice, rolling-horizon optimization and shadow-mode instrumentation"
+  },
+  "closest_repository_patterns": ["LOG-001", "LOG-002", "RETAIL-002", "ENERGY-002", "HOSP-001"],
+  "repeated_pattern_gate": "rejected",
+  "material_differentiation": "No separate opportunity remained after comparison: yard and route decisions are substantially covered by deterministic scheduling, mathematical optimization and current logistics platforms, while bandit or RL evaluation lacks logged propensities, alternative-action outcomes and a safe exploration path.",
+  "where_ai_enters": {
+    "primary_mechanism": "bounded policy recommendation among already eligible recovery or dispatch actions",
+    "optional_secondary_mechanism": "offline counterfactual policy evaluation",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "dispatchers and supervisors retain eligibility, override, safety, labor, customer and operational authority"
+  },
+  "queries": [
+    "Brasil logística 2025 entregas não realizadas reentrega custo última milha dados",
+    "Brasil 2025 pátio docas agendamento caminhões filas logística",
+    "contextual bandit logistics delivery intervention route recovery production",
+    "commercial logistics platform dynamic dispatch optimization last mile official"
+  ],
+  "sources": [
+    "https://www.gov.br/pt-br/servicos/solicitar-pedido-de-acesso-aquaviario-para-os-portos-administrados-pela-cdrj?id=11414&origem=servico",
+    "https://www.oguiatransportes.com.br/GestaoPatio",
+    "https://nexello.com.br/nexello-organiza/",
+    "https://www.dispatchit.com/",
+    "https://www.dispatchscience.com/cloud-software/",
+    "https://arxiv.org/abs/2607.22356"
+  ],
+  "cursor_advance": {
+    "segment": "logistics-transport -> agriculture",
+    "technical_focus": "bandits-and-reinforcement-learning -> forecasting-and-optimization"
+  },
+  "notes": "No opportunity published. Three workflow simulations exposed valid repeated decisions, but mature scheduling, routing and dispatch products already cover the central operational outcome. Historical logs generally contain only the selected action and realized outcome, not eligible alternatives or selection propensities; safe online exploration is also constrained. Record no-new-fit with insufficient-data-path and adopt/configure existing deterministic optimization and logistics platforms."
+}
