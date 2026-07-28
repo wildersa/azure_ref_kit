@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-07-28T23:02:59Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "healthcare",
+  "technical_focus": "time-series-and-sequence-models",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {"active_index_count": 34, "drift_found": false, "repairs": []},
+  "operational_simulations": [
+    {"organization":"Brazilian general hospital with adult inpatient wards","actor":"rapid-response nurse and ward physician","bounded_process":"recognize clinical deterioration from repeated vital signs, laboratory results and care-state transitions","scenarios":["routine ward monitoring","missing or contradictory measurements and transient post-procedure changes","peak census with delayed observations and alert backlog"],"candidate":"temporal deterioration-risk trend for human escalation"},
+    {"organization":"Brazilian emergency department","actor":"clinical-flow coordinator","bounded_process":"reassess waiting patients as symptoms, vitals and queue state evolve","scenarios":["normal reassessment","incomplete history or changing triage findings","crowding with delayed reassessment"],"candidate":"sequence-aware reassessment priority"},
+    {"organization":"Brazilian hospital pharmacy and clinical team","actor":"clinical pharmacist","bounded_process":"reconcile medication changes across admission, transfer and discharge","scenarios":["ordinary transition","conflicting lists or delayed reconciliation","high discharge volume and system degradation"],"candidate":"temporal medication-state contradiction alert"}
+  ],
+  "technical_hypothesis": {
+    "technical_class":"time-series-and-sequence-models",
+    "candidate_model_families":["statistical-forecasting","gradient-boosting-with-temporal-features","lstm","gru","temporal-convolution","state-space-models","temporal-transformer"],
+    "model_strategy":["custom-trained","rules-plus-model"],
+    "learning_paradigm":"supervised",
+    "data_modalities":["time-series","tabular","event"],
+    "interaction_pattern":"near-real-time clinician-reviewed alert prioritization",
+    "training_requirement":"required",
+    "data_readiness":"viable-with-data-work",
+    "ai_dependency":"supporting",
+    "primary_training_data_risk":"care actions, measurement frequency, transfers and documentation change after clinicians perceive deterioration, creating leakage, treatment-confounding and site-specific sequence patterns"
+  },
+  "training_data": {
+    "observation_unit":"one patient-time window at an escalation cutoff",
+    "input_data":"vital-sign sequences, laboratory timestamps, oxygen and medication changes, ward location, procedures and measurement-quality indicators available before cutoff",
+    "target_or_reward":"clinical deterioration within a defined horizon, such as rapid-response activation, unplanned ICU transfer or death; exact operational target requires local governance",
+    "label_source":"EHR events, rapid-response records and audited transfers; linkage and consistency are unknown",
+    "prediction_time":"before protocol escalation or clinician prioritization",
+    "expected_volume":"unknown and hospital-dependent",
+    "class_balance":"unknown; deterioration events are expected to be uncommon",
+    "historical_coverage":"unknown across wards, devices, staffing regimes and patient groups",
+    "train_validation_split":"time-based and hospital- or ward-held-out validation with subgroup checks and prospective shadow evaluation",
+    "leakage_risks":"post-cutoff measurements, ICU orders, rapid-response documentation, treatment changes and increased observation frequency triggered by clinician concern",
+    "representativeness_risks":"hospital size, specialty, age, disability, comorbidity, device, staffing and documentation practices differ materially",
+    "feedback_loop":"alerts change measurement frequency, interventions and transfers, altering future labels and sequences",
+    "privacy_and_usage_constraints":"sensitive health data require purpose limitation, minimization, access controls, auditability and clinical-safety governance",
+    "fallback_if_data_is_insufficient":"use validated NEWS2 or local early-warning scores, protocol thresholds, mandatory reassessment, rapid-response criteria and clinician judgment"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns":["HEALTH-001","HEALTH-002","MANUF-001","LOG-001"],
+    "material_differentiation":false,
+    "repeated_pattern_gate":"rejected",
+    "reason":"clinical deterioration sequence prediction is important but is already a mature early-warning category with validated deterministic scores and commercial or research ML implementations; medication and queue sequences overlap existing protocol, stewardship and access-orchestration cases without a distinct uncovered outcome."
+  },
+  "existing_landscape": {
+    "disposition":"adopt",
+    "summary":"Adopt validated early-warning protocols and evaluate existing EWS or governed predictive modules locally; do not create a separate generic healthcare sequence opportunity.",
+    "sources":["https://pubmed.ncbi.nlm.nih.gov/40767651/","https://goias.gov.br/saude/crer-capacita-equipes-assistenciais-e-reforca-seguranca-do-paciente-com-protocolo-de-deterioracao-clinica/","https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2824885","https://pubmed.ncbi.nlm.nih.gov/40138535/"]
+  },
+  "research": {
+    "queries":["site:gov.br saúde 2025 deterioração clínica protocolo sinais vitais hospital Brasil","Brazil hospital early warning score deterioration AI 2025","time series clinical deterioration platform hospital early warning official product 2026"],
+    "findings":"Brazilian evidence supports NEWS2-based deterioration protocols and a 2025 prospective Brazilian evaluation. Comparative and prospective studies show that learned scores can outperform some conventional scores, but performance varies materially and simple NEWS remains competitive. The category is established rather than a differentiated repository opportunity."
+  },
+  "where_ai_enters": {"primary_mechanism":"model temporal changes in vital signs, laboratory results and care-state events to prioritize clinician review","optional_secondary_mechanism":"none","agent":"not used","llm":"not used","human_control":"nurses and physicians retain assessment, rapid-response activation, treatment, transfer and discharge decisions"},
+  "cursor_advance":{"segment":{"from":"healthcare","to":"retail-ecommerce"},"technical_focus":{"from":"time-series-and-sequence-models","to":"specialized-neural-networks"}},
+  "coverage_after_round":{"evaluated_rounds":47,"investigated_custom_training_or_fine_tuning":39,"investigated_pretrained_llm_or_rag_primary":6,"investigated_rl_bandit_causal_or_uplift":8}
+}
