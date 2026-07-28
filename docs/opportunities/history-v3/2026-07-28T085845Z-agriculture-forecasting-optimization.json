@@ -1,0 +1,100 @@
+{
+  "timestamp": "2026-07-28T08:58:45Z",
+  "event": "solution-opportunity-discovery-v3",
+  "segment": "agriculture",
+  "technical_focus": "forecasting-and-optimization",
+  "focus_result": "rejected",
+  "result": "no-new-fit",
+  "opportunity_id": null,
+  "disposition": "adopt",
+  "process_signals_sought": [
+    "future-demand-or-capacity",
+    "constraints",
+    "objective-function",
+    "feasible-actions",
+    "planning-decision"
+  ],
+  "simulations": [
+    {
+      "workflow": "harvest-window and machinery planning",
+      "actor": "farm operations manager at a medium or large grain producer",
+      "normal": "plan harvest sequence and machinery capacity from crop maturity, weather, field access and storage availability",
+      "exception": "weather forecast changes, uneven maturity, equipment failure or inaccessible field require replanning",
+      "degraded": "compressed harvest window with limited machines, operators, trucks and receiving capacity",
+      "candidate": "probabilistic harvest-readiness forecast feeding a constrained scheduling solver",
+      "baseline": "agronomic inspection, weather forecasts, maturity rules, priority heuristics and constraint-based scheduling"
+    },
+    {
+      "workflow": "post-harvest receiving and storage-capacity planning",
+      "actor": "grain receiving and storage coordinator",
+      "normal": "align expected arrivals with drying, aeration, silo and loading capacity",
+      "exception": "quality variation, excess moisture, delayed trucks or unavailable silo changes feasible routing",
+      "degraded": "regional harvest peak creates queues and drying bottlenecks",
+      "candidate": "arrival and moisture forecast combined with deterministic capacity optimization",
+      "baseline": "booking windows, queue rules, storage constraints, moisture thresholds and operations planning"
+    },
+    {
+      "workflow": "input-demand and field-operation planning",
+      "actor": "agronomic planning lead at a cooperative or multi-farm operation",
+      "normal": "estimate seed, fertilizer, crop-protection and labor demand by field and operation window",
+      "exception": "planting delay, replanting, pest pressure or supplier disruption changes demand",
+      "degraded": "short planting window and constrained inventory require allocation across farms",
+      "candidate": "probabilistic demand forecast feeding constrained allocation",
+      "baseline": "crop plans, bills of materials, safety stocks, agronomic rules and mathematical optimization"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "forecasting-and-optimization",
+    "model_strategy": ["custom-trained", "optimization-with-learned-components", "rules-plus-model"],
+    "candidate_model_families": ["probabilistic-forecasting", "mathematical-optimization", "constraint-programming", "learned-forecast-with-deterministic-solver"],
+    "learning_paradigm": ["supervised", "hybrid"],
+    "data_modalities": ["time-series", "weather", "geospatial", "operational-events", "structured-constraints"],
+    "interaction_pattern": "human-supervised planning recommendation",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting"
+  },
+  "training_data": {
+    "observation_unit": "one field-operation, harvest, receiving or input-planning interval with information available at planning time and later realized demand or capacity outcome",
+    "input_data": "crop stage, field, weather forecast, historical operations, equipment, labor, inventory, transport, storage and agronomic constraints available before planning",
+    "target_or_reward": "realized harvest readiness, arrivals, workload or input demand; solver objective combines delay, loss, cost and constraint violations",
+    "label_source": "operational records, agronomic observations, receiving logs and inventory movements; completeness is unknown",
+    "prediction_time": "before daily or weekly harvest, receiving, procurement or allocation planning",
+    "expected_volume": "unknown; must be measured by farm, field, crop and planning horizon",
+    "class_balance": "not applicable as a fixed classification balance; demand regimes and disruption frequency are unknown",
+    "historical_coverage": "unknown and likely fragmented across farm-management, weather, machinery, storage and cooperative systems",
+    "train_validation_split": "time-based split with season, farm or region holdout where sufficient coverage exists",
+    "leakage_risks": "using realized weather, final yield, actual arrivals, completed operations, revised plans or inventory corrections unavailable at planning time",
+    "representativeness_risks": "crop, cultivar, soil, region, season, weather regime, management practice, machinery and farm scale",
+    "feedback_loop": "recommended schedules and allocations change later observations; overrides, reasons and realized outcomes must be logged",
+    "privacy_and_usage_constraints": "protect farm commercial data, land and production information and avoid worker-performance inference",
+    "fallback_if_data_is_insufficient": "use official forecasts, agronomic rules, scenario ranges, safety stocks and deterministic constraint optimization"
+  },
+  "closest_repository_patterns": ["AGRI-001", "HOSP-001", "HEALTH-001", "LOG-001", "TELCO-002"],
+  "repeated_pattern_gate": "rejected",
+  "material_differentiation": "No separate opportunity remained after comparison. Harvest, receiving and input planning are valid forecasting and optimization problems, but their intelligent mechanisms and outcomes substantially repeat existing demand, capacity, storage and operational-planning patterns. The agriculture-specific constraints are configuration and data-integration adaptations rather than a materially distinct opportunity.",
+  "where_ai_enters": {
+    "primary_mechanism": "probabilistic forecast of harvest readiness, arrivals, workload or input demand",
+    "optional_secondary_mechanism": "deterministic constrained scheduling or allocation solver",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "agronomists and operations managers retain crop, safety, quality, procurement, allocation and execution authority"
+  },
+  "queries": [
+    "site:embrapa.br 2025 previsão safra otimização planejamento colheita pecuária Brasil agricultura",
+    "site:conab.gov.br 2025 previsão safra custos armazenagem planejamento agrícola",
+    "Brasil software previsão demanda insumos agrícolas otimização colheita 2025",
+    "agricultural forecasting optimization software crop planning official"
+  ],
+  "sources": [
+    "https://www.gov.br/pt-br/servicos/obter-informacoes-sobre-quadro-de-oferta-e-demanda?id=23318&origem=servico",
+    "https://www.gov.br/conab/pt-br/atuacao/informacoes-agropecuarias/safras/progresso-de-safra",
+    "https://www.embrapa.br/busca-de-publicacoes/-/publicacao/1185644/informativo-agropecuario-de-rondonia-n-19-marco2026",
+    "https://arxiv.org/abs/2512.10396"
+  ],
+  "cursor_advance": {
+    "segment": "agriculture -> construction-real-estate",
+    "technical_focus": "forecasting-and-optimization -> classical-supervised-ml"
+  },
+  "notes": "No opportunity published. Three workflow simulations exposed credible planning problems, but official Brazilian forecasts, agronomic rules, deterministic optimization and existing repository forecasting patterns cover the central outcomes. Record no-new-fit with rejected focus and adopt or configure existing forecasting and optimization capabilities."
+}
