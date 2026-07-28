@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-07-28T17:00:09Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "media-entertainment",
+  "technical_focus": "recommendation-and-ranking",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {
+    "active_index_count": 34,
+    "drift_found": false,
+    "repairs": []
+  },
+  "operational_simulations": [
+    {
+      "organization": "Brazilian independent VoD platform or audiovisual distributor",
+      "actor": "catalog and acquisition manager",
+      "bounded_process": "select eligible Brazilian titles for catalog campaigns and placement using rights windows, territory, format, audience history and editorial commitments",
+      "scenarios": ["routine weekly curation", "sparse audience history for a new or long-tail title", "peak release calendar with limited promotional slots"],
+      "candidate": "constrained ranking of eligible titles by expected audience fit and circulation value"
+    },
+    {
+      "organization": "regional broadcaster or FAST channel operator",
+      "actor": "programming supervisor",
+      "bounded_process": "assemble a schedule from rights-valid programs while balancing audience profile, content obligations, recurrence limits and commercial inventory",
+      "scenarios": ["ordinary schedule planning", "late rights or asset conflict", "degraded flow after a live-event overrun or unavailable program"],
+      "candidate": "ranking of schedule candidates after deterministic eligibility and compliance filtering"
+    },
+    {
+      "organization": "sports, news or entertainment media archive",
+      "actor": "digital distribution editor",
+      "bounded_process": "prioritize archive moments and newly produced clips for platform-specific publication using rights, recency, editorial relevance, format and observed engagement",
+      "scenarios": ["routine daily publishing", "ambiguous rights or incomplete metadata", "breaking-event peak with many candidate clips"],
+      "candidate": "candidate generation and reranking for clips or archive assets under editorial approval"
+    }
+  ],
+  "technical_hypothesis": {
+    "technical_class": "recommendation-and-ranking",
+    "candidate_model_families": ["learning-to-rank", "matrix-factorization", "two-tower-retrieval", "candidate-generation-and-reranking", "calibrated-recommender"],
+    "model_strategy": ["custom-trained", "rules-plus-model"],
+    "learning_paradigm": "supervised",
+    "data_modalities": ["catalog-metadata", "rights-and-window-data", "audience-events", "editorial-decisions", "distribution-outcomes"],
+    "interaction_pattern": "batch or online human-in-the-loop ranking after deterministic eligibility filtering",
+    "training_requirement": "required",
+    "data_readiness": "viable-with-data-work",
+    "ai_dependency": "supporting",
+    "primary_training_data_risk": "historical exposure and engagement are strongly biased by previous placement, marketing, catalog availability and editorial choices, while sparse long-tail titles lack reliable counterfactual outcomes"
+  },
+  "training_data": {
+    "observation_unit": "an eligible title, program or clip considered for a specific placement, schedule slot or distribution channel",
+    "input_data": "confirmed candidates include rights and territory eligibility, availability windows, format, genre, language, editorial metadata, prior exposure and audience events; customer-specific coverage is unknown",
+    "target_or_reward": "candidate outcomes could include completed views, qualified watch time, retention, circulation across services or editor-approved placement; the correct objective and trade-offs are unknown",
+    "label_source": "platform exposure and consumption logs plus explicit editorial decisions and corrections; label quality and completeness are unknown",
+    "prediction_time": "after deterministic rights, compliance, availability and format checks and before editorial placement or publication",
+    "expected_volume": "unknown and likely highly uneven between large platforms, regional broadcasters and independent catalogs",
+    "class_balance": "unknown; long-tail titles and rarely selected archive assets are expected to have sparse positive outcomes",
+    "historical_coverage": "unknown; prior placements, marketing support and catalog availability may be incompletely recorded",
+    "train_validation_split": "time-based and title or franchise-grouped splits would be required to avoid future and near-duplicate leakage",
+    "leakage_risks": "using final placement, post-campaign metadata, later rights corrections, completed audience outcomes or editor decisions unavailable at ranking time",
+    "representativeness_risks": "audience, platform, device, region, genre, release window and marketing differences can make historical rankings non-transferable",
+    "feedback_loop": "ranking changes exposure, which changes future labels and can reinforce already visible titles unless exploration and editorial diversity controls are explicit",
+    "privacy_and_usage_constraints": "audience-event data must be minimized and governed under LGPD; editorial, licensing and commercial data may be confidential",
+    "fallback_if_data_is_insufficient": "use deterministic eligibility, editorial collections, transparent business rules, search and manual curation; adopt existing recommendation or media-asset-management capabilities where appropriate"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns": ["MEDIA-001", "MEDIA-002", "RETAIL-001", "HR-001"],
+    "material_differentiation": false,
+    "repeated_pattern_gate": "rejected",
+    "reason": "The selected workflows expose real ranking decisions, but title and clip discovery, catalog personalization, metadata enrichment, automated highlight surfacing and editorial curation are established platform capabilities. The Brazilian circulation problem is material, yet a ranking engine does not itself solve licensing, catalog acquisition or regulatory visibility constraints, and no distinct integration boundary or measurable outcome remained beyond adopting or configuring current products."
+  },
+  "existing_landscape": {
+    "disposition": "adopt",
+    "summary": "Use deterministic rights and compliance filters, editorial curation and existing recommendation or media-asset-management capabilities. Treat circulation of Brazilian works as a catalog, licensing, policy and distribution problem first; evaluate local ranking only as an internal product feature when sufficient unbiased exposure data exists.",
+    "sources": [
+      "https://www.gov.br/ancine/pt-br/assuntos/noticias/ancine-divulga-panorama-do-mercado-de-video-por-demanda-no-brasil-2025",
+      "https://www.gov.br/ancine/pt-br/assuntos/noticias/balanco-2025-regulacao-com-dados-inovacao-e-transparencia",
+      "https://revistas.usp.br/novosolhares/pt_BR/article/view/243538",
+      "https://www.reuters.com/media-center/reuters-imagen-integrates-magnifi-ai-automate-highlights-live-archive-video-2026-03-10/"
+    ]
+  },
+  "research": {
+    "queries": [
+      "Brasil 2025 audiovisual plataformas recomendação conteúdo catálogo curadoria ANCINE VOD",
+      "2025 media asset management AI content recommendation metadata ranking platform official",
+      "Brasil 2025 mídia entretenimento recomendação programação conteúdo audiência pesquisa",
+      "official media platform AI content recommendation scheduling ranking 2025"
+    ],
+    "findings": "ANCINE data published in December 2025 confirms low availability and circulation of Brazilian works across leading VoD platforms, but the load-bearing constraint includes catalog presence and licensing rather than only recommendation quality. Current media platforms already provide recommendation, metadata enrichment, archive discovery, automated moment detection and distribution workflows. Research on a Brazilian alternative streaming service also shows editorial curation without intensive datafication as a viable operating model."
+  },
+  "where_ai_enters": {
+    "primary_mechanism": "rank titles, programs or clips only after deterministic eligibility, rights, format and compliance filtering",
+    "optional_secondary_mechanism": "none",
+    "agent": "not used",
+    "llm": "not used",
+    "human_control": "editors, programming teams and rights managers retain catalog acquisition, licensing, schedule, diversity, prominence, publication and removal decisions"
+  },
+  "cursor_advance": {
+    "segment": {"from": "media-entertainment", "to": "technology-software"},
+    "technical_focus": {"from": "recommendation-and-ranking", "to": "causal-and-uplift-learning"}
+  },
+  "coverage_after_round": {
+    "evaluated_rounds": 41,
+    "investigated_custom_training_or_fine_tuning": 33,
+    "investigated_pretrained_llm_or_rag_primary": 6,
+    "investigated_rl_bandit_causal_or_uplift": 6
+  }
+}
