@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-07-29T00:04:02Z",
+  "event": "solution-opportunity-radar-v3-round",
+  "segment": "retail-ecommerce",
+  "technical_focus": "specialized-neural-networks",
+  "technical_focus_result": "rejected",
+  "result": "no-new-fit",
+  "disposition": "adopt",
+  "opportunity_id": null,
+  "integrity": {"active_index_count": 34, "drift_found": false, "repairs": []},
+  "operational_simulations": [
+    {"organization":"Brazilian supermarket chain with staffed and self-checkout lanes","actor":"front-end supervisor and loss-prevention analyst","bounded_process":"resolve produce identification, item-scan mismatch and checkout exceptions","scenarios":["routine checkout with readable items","visually similar produce, occlusion or damaged packaging","peak-hour queues with camera or scale degradation"],"candidate":"fine-grained product recognition and scan-mismatch review"},
+    {"organization":"Brazilian grocery retailer with fresh-food departments","actor":"produce and quality supervisor","bounded_process":"inspect freshness, damage and presentation before replenishment or markdown","scenarios":["scheduled inspection","ambiguous visual defect or mixed maturity","high inbound volume with limited staff and inconsistent lighting"],"candidate":"visual freshness and condition triage"},
+    {"organization":"Brazilian large-format retailer","actor":"store operations and safety supervisor","bounded_process":"detect aisle obstruction, spill, unsafe stacking and unattended hazards","scenarios":["normal floor walk","partially hidden or uncertain hazard","crowded store with camera blind spots and delayed response"],"candidate":"video-based hazard detection for human dispatch"}
+  ],
+  "technical_hypothesis": {
+    "technical_class":"specialized-neural-networks",
+    "candidate_model_families":["cnn","vision-transformer","multimodal-encoder","domain-specific-neural-network"],
+    "model_strategy":["custom-trained","rules-plus-model"],
+    "learning_paradigm":"supervised",
+    "data_modalities":["image","video","tabular","event"],
+    "interaction_pattern":"edge or near-real-time human-reviewed visual alerting",
+    "training_requirement":"required",
+    "data_readiness":"viable-with-data-work",
+    "ai_dependency":"supporting",
+    "primary_training_data_risk":"store-specific lighting, camera angle, packaging changes, seasonal produce appearance and intervention-biased review labels can cause severe domain shift and false alerts"
+  },
+  "training_data": {
+    "observation_unit":"one checkout item event, fresh-item inspection or bounded video hazard window",
+    "input_data":"images or short video clips plus SKU, scale, POS, location, timestamp and operating-context fields available at decision time",
+    "target_or_reward":"verified item identity or mismatch, audited condition class, or confirmed operational hazard requiring action",
+    "label_source":"cashier corrections, quality inspections, incident records and sampled specialist annotation; consistency and coverage are unknown",
+    "prediction_time":"before checkout completion, replenishment or markdown decision, or staff hazard dispatch",
+    "expected_volume":"unknown and retailer-dependent",
+    "class_balance":"unknown; material mismatches, defects and hazards are expected to be minority classes",
+    "historical_coverage":"unknown across stores, formats, cameras, seasons, packaging and customer-density conditions",
+    "train_validation_split":"time-based and store-held-out validation with SKU, season, camera and subgroup slices plus prospective shadow evaluation",
+    "leakage_risks":"post-intervention cashier actions, final markdown or disposal codes, incident resolution notes and manually selected exception reason",
+    "representativeness_risks":"store format, region, lighting, device, product assortment, packaging, skin tone and mobility-device visibility differ materially",
+    "feedback_loop":"alerts change staff attention, customer interaction and recorded outcomes, concentrating future labels on already-detected patterns",
+    "privacy_and_usage_constraints":"avoid biometric identification and unnecessary customer profiling; minimize retention, restrict access and assess LGPD purpose, transparency and proportionality",
+    "fallback_if_data_is_insufficient":"use barcode and scale validation, controlled produce picklists, scheduled quality inspection, deterministic shelf-life rules, floor walks, incident buttons and human review"
+  },
+  "portfolio_comparison": {
+    "closest_repository_patterns":["RETAIL-001","RETAIL-002","FIN-002","CONST-001"],
+    "material_differentiation":false,
+    "repeated_pattern_gate":"rejected",
+    "reason":"shelf-state recognition and retail-loss operations are already represented by RETAIL-001, while item-condition inspection and disposition are represented by RETAIL-002; checkout vision, freshness inspection and store video analytics are also established commercial categories without a distinct uncovered actor, decision and outcome."
+  },
+  "existing_landscape": {
+    "disposition":"adopt",
+    "summary":"Adopt or configure established checkout-vision, shelf and store-operations products where justified; retain deterministic POS, scale, quality and safety controls rather than publishing another generic retail computer-vision opportunity.",
+    "sources":["https://kpmg.com/br/pt/insights/2026/01/pesquisa-abrappe.html","https://www.retellect.com/","https://www.ultralytics.com/solutions/computer-vision-in-retail","https://www.gov.br/anpd/pt-br/assuntos/noticias/anpd-fiscaliza-uso-de-sistema-de-reconhecimento-facial-na-venda-de-ingressos-e-na-entrada-de-estadios-por-23-clubes-de-futebol","https://arxiv.org/abs/2605.18029"]
+  },
+  "research": {
+    "queries":["Brasil varejo 2025 visão computacional prevenção perdas filas checkout reconhecimento produtos pesquisa","Brasil varejo 2025 inteligência artificial inspeção frescor alimentos visão computacional supermercado","retail computer vision shelf checkout loss prevention product freshness commercial platform 2026","site:gov.br ANPD reconhecimento facial varejo inteligência artificial 2025"],
+    "findings":"Brazilian loss evidence remains current, but the repository already covers shelf availability and return-condition vision. Current products and open model platforms cover checkout item recognition, scan mismatch, shelf monitoring and loss-prevention video. Fine-grained SKU retrieval still has precision and domain-shift limits, while biometric or person-focused surveillance raises material LGPD proportionality and transparency concerns."
+  },
+  "where_ai_enters": {"primary_mechanism":"recognize fine-grained product, condition or bounded physical hazard patterns from images or short video for human review","optional_secondary_mechanism":"none","agent":"not used","llm":"not used","human_control":"store staff retain checkout intervention, quality disposition, markdown, security response, customer interaction and safety decisions"},
+  "cursor_advance":{"segment":{"from":"retail-ecommerce","to":"manufacturing"},"technical_focus":{"from":"specialized-neural-networks","to":"small-language-models-and-nlp"}},
+  "coverage_after_round":{"evaluated_rounds":48,"investigated_custom_training_or_fine_tuning":40,"investigated_pretrained_llm_or_rag_primary":6,"investigated_rl_bandit_causal_or_uplift":8}
+}
